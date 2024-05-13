@@ -19,7 +19,7 @@ Object _init() {
   return [];
 }
 
-/// Adds provided [ForeignValue] to the end of provided [List]
+/// Adds the provided [ForeignValue] to the end of the provided [List],
 /// extending the length by one.
 void _add(List<dynamic> list, ForeignValue value) {
   list.add(value.toDart());

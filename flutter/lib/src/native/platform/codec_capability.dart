@@ -15,7 +15,7 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Returns available [RtpCodecCapability]s for [RtpSender].
+/// Returns available [RtpCodecCapability]s for an [RtpSender].
 Object _getSenderCodecCapabilities(int kind) {
   return () => RtpSender.getCapabilities(MediaKind.values[kind])
       .then((res) => res.codecs);

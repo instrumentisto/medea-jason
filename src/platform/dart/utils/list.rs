@@ -43,7 +43,7 @@ mod list {
         /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
         pub fn init() -> Dart_Handle;
 
-        /// Adds provided [`DartValue`] to the provided [`List`].
+        /// Adds the provided [`DartValue`] to the provided [`List`].
         ///
         /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
         pub fn add(map: Dart_Handle, value: DartValue);
@@ -64,8 +64,8 @@ impl DartList {
         Self(unsafe { DartHandle::new(map) })
     }
 
-    /// Adds [`DartValue`] to the end of this [`DartList`], extending the length
-    /// by one.
+    /// Adds the provided [`DartValue`] to the end of this [`DartList`],
+    /// extending the length by one.
     pub fn add(&mut self, value: DartValue) {
         unsafe {
             list::add(self.0.get(), value);

@@ -33,7 +33,7 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Adds an [RtpTransceiver] to the provided [PeerConnection].
+/// Adds an [RtpTransceiverInit] to the provided [PeerConnection].
 ///
 /// Returns [Future] which will be resolved into created [RtpTransceiver].
 Object _addTransceiver(PeerConnection peer, int kind, RtpTransceiverInit init) {

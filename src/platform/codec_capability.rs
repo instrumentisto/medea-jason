@@ -1,16 +1,16 @@
-//! Platform-agnostic functionality of [`platform::CodecCapability`].
+//! Platform-agnostic functionality of a [`platform::CodecCapability`].
 
 use derive_more::{Display, From};
 
 use crate::{platform, utils::Caused};
 
-/// Error occurred when getting [`platform::CodecCapability`].
+/// Error occurred when retrieving a [`platform::CodecCapability`].
 #[derive(Caused, Clone, Copy, Debug, Display, From)]
 #[cause(error = platform::Error)]
 pub enum CodecCapabilityError {
-    /// Failed to get [`RTCRtpCodecCapability`].
+    /// Failed to retrieve an [RTCRtpCodecCapability][1].
     ///
-    /// [`RTCRtpCodecCapability`]: https://tinyurl.com/4jcp8m4s
-    #[display(fmt = "Failed to get codec capabilities")]
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
+    #[display(fmt = "Failed to retrieve codec capabilities")]
     FailedToGetCapabilities,
 }

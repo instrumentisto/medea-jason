@@ -78,21 +78,21 @@ mod transceiver {
             encoding: Dart_Handle,
         );
 
-        /// Returns [`Parameters`] of the underlying [`RTCRtpSender`][1].
+        /// Returns [`Parameters`] of the underlying [RTCRtpSender].
         ///
-        /// [1]: https://www.w3.org/TR/webrtc/#rtcrtpsender-interface
+        /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
         pub fn get_send_parameters(transceiver: Dart_Handle) -> Dart_Handle;
 
-        /// Sets [`Parameters`] into the underlying [`RTCRtpSender`][1].
+        /// Sets [`Parameters`] into the underlying [RTCRtpSender].
         ///
-        /// [1]: https://www.w3.org/TR/webrtc/#rtcrtpsender-interface
+        /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
         pub fn set_send_parameters(
             transceiver: Dart_Handle,
             parameters: Dart_Handle,
         ) -> Dart_Handle;
 
-        /// Overrides the default receive codec preferences used by
-        /// the user agent for this [`Transceiver`].
+        /// Overrides the default receive codec preferences, used by the user
+        /// agent for the provided [`Transceiver`].
         pub fn set_codec_preferences(
             transceiver: Dart_Handle,
             codec_capabilities: Dart_Handle,
@@ -208,9 +208,9 @@ impl Transceiver {
         }
     }
 
-    /// Returns [`Parameters`] of the underlying [`RTCRtpSender`].
+    /// Returns [`Parameters`] of the underlying [RTCRtpSender].
     ///
-    /// [`RTCRtpSender`]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
     pub fn get_send_parameters(&self) -> impl Future<Output = Parameters> {
         let handle = self.0.get();
         async move {
@@ -221,15 +221,15 @@ impl Transceiver {
         }
     }
 
-    /// Sets [`Parameters`] into the underlying [`RTCRtpSender`].
+    /// Sets [`Parameters`] into the underlying [RTCRtpSender].
     ///
     /// # Errors
     ///
-    /// Errors with [`platform::Error`] if the underlying [`setParameters`][1]
-    /// call fails.
+    /// With [`platform::Error`] if the underlying [setParameters()][1] call
+    /// fails.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
-    /// [`RTCRtpSender`]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-setparameters
     pub fn set_send_parameters(
         &self,
         params: Parameters,
@@ -263,15 +263,15 @@ impl Transceiver {
         };
     }
 
-    /// Updates parameters of encoding for underlying [`RTCRtpSender`].
+    /// Updates [`EncodingParameters`] for the underlying [RTCRtpSender].
     ///
     /// # Errors
     ///
-    /// Errors with [`platform::Error`] if the underlying [`setParameters`][1]
-    /// call fails.
+    /// With [`platform::Error`] if the underlying [setParameters()][1] call
+    /// fails.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
-    /// [`RTCRtpSender`]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-setparameters
     pub async fn update_send_encodings(
         &self,
         encodings: Vec<EncodingParameters>,
@@ -319,9 +319,9 @@ impl Drop for Transceiver {
     }
 }
 
-/// Dart side representation of [RTCRtpTransceiverInit].
+/// Dart side representation of an [RTCRtpTransceiverInit].
 ///
-/// [RTCRtpTransceiverInit]: https://tinyurl.com/mtdkabcj
+/// [RTCRtpTransceiverInit]: https://w3.org/TR/webrtc#dom-rtcrtptransceiverinit
 #[derive(Debug)]
 pub struct TransceiverInit(DartHandle);
 
@@ -340,7 +340,8 @@ impl TransceiverInit {
         self.0.get()
     }
 
-    /// Adds provided [`SendEncodingParameters`] to this [`TransceiverInit`].
+    /// Adds the provided [`SendEncodingParameters`] to this
+    /// [`TransceiverInit`].
     pub fn sending_encodings(
         &mut self,
         encodings: Vec<SendEncodingParameters>,

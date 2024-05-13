@@ -11,9 +11,7 @@ use crate::{
     platform::{Error, TransceiverDirection},
 };
 
-/// Dart side representation of [RTCRtpTransceiverInit].
-///
-/// [RTCRtpTransceiverInit]: https://tinyurl.com/mtdkabcj
+/// Wrapper around an [`RtcRtpTransceiverInit`].
 #[derive(Debug)]
 pub struct TransceiverInit(RtcRtpTransceiverInit);
 
@@ -26,7 +24,7 @@ impl TransceiverInit {
         Self(init)
     }
 
-    /// Returns underlying [`RtcRtpTransceiverInit`].
+    /// Returns the underlying [`RtcRtpTransceiverInit`].
     #[must_use]
     pub const fn handle(&self) -> &RtcRtpTransceiverInit {
         &self.0
