@@ -1,5 +1,7 @@
-//! Wrapper around an [RTCRtpCodecCapability][1].
-/// [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
+//! Wrapper around an [RTCRtpCodecCapability].
+//!
+//! [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
+
 use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
