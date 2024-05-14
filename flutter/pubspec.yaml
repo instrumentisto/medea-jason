@@ -36,7 +36,9 @@ dev_dependencies:
 
 # TODO: Remove once `flutter_gherkin` updates.
 dependency_overrides:
+  # Pinned until `flutter_gherkin` updates
   analyzer: ^6.5.0
+  # Pinned until `flutter_gherkin` updates
   meta: ^1.14.0
   # Pinned until gql-dart updates to v4
   # https://github.com/gql-dart/gql/blob/master/links/gql_websocket_link/pubspec.yaml#L13
