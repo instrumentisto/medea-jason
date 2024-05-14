@@ -15,11 +15,10 @@ void registerFunctions(DynamicLibrary dl) {
 /// Function used by Rust to call closures with a single [ForeignValue]
 /// argument.
 void _callFn(Object fn, ForeignValue value) {
-  fn as FutureOr<void> Function(dynamic);
   try {
     var arg = value.toDart();
     if (arg != null) {
-      var res = fn(arg);
+      var res = (fn as dynamic Function(dynamic))(arg);
       if (res is Future<void>) {
         res.catchError((e, stack) => api.logDartException(
             message: e.toString(), stackTrace: stack.toString()));
