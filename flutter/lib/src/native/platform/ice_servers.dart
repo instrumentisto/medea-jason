@@ -22,8 +22,9 @@ Object _new() {
 }
 
 /// Adds an [IceServer] with the provided data to the provided [List].
-void _add(List servers, Pointer<Utf8> url, ForeignValue username,
+void _add(Object servers, Pointer<Utf8> url, ForeignValue username,
     ForeignValue credentials) {
+  servers as List;
   var iceServer = webrtc.IceServer([url.nativeStringToDartString()],
       username.toDart(), credentials.toDart());
   servers.add(iceServer);

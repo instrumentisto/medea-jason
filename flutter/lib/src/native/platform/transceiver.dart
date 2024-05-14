@@ -34,27 +34,33 @@ Object _createTransceiverInit(int direction) {
 /// Adds [SendEncodingParameters] to the provided
 /// [RtpTransceiverInit.sendEncodings].
 void _addSendingEncodings(
-    RtpTransceiverInit init, SendEncodingParameters encoding) {
+    Object init, Object encoding) {
+  init as RtpTransceiverInit;
+  encoding as SendEncodingParameters;
   init.sendEncodings.add(encoding);
 }
 
 /// Changes the receive direction of the provided [RtpTransceiver].
-Object _setRecv(RtpTransceiver transceiver, bool active) {
+Object _setRecv(Object transceiver, bool active) {
+  transceiver as RtpTransceiver;
   return () => transceiver.setRecv(active);
 }
 
 /// Changes the send direction of the provided [RtpTransceiver].
-Object _setSend(RtpTransceiver transceiver, bool active) {
+Object _setSend(Object transceiver, bool active) {
+  transceiver as RtpTransceiver;
   return () => transceiver.setSend(active);
 }
 
 /// Returns the current [TransceiverDirection] of the provided [RtpTransceiver].
-Object _getDirection(RtpTransceiver transceiver) {
+Object _getDirection(Object transceiver) {
+  transceiver as RtpTransceiver;
   return () => transceiver.getDirection().then((d) => d.index);
 }
 
 /// Returns the current mID of the provided [RtpTransceiver].
-Pointer _mid(RtpTransceiver transceiver) {
+Pointer _mid(Object transceiver) {
+  transceiver as RtpTransceiver;
   if (transceiver.mid != null) {
     return ForeignValue.fromString(transceiver.mid!).intoRustOwned();
   } else {
@@ -64,7 +70,8 @@ Pointer _mid(RtpTransceiver transceiver) {
 
 /// Returns the current [RtpTransceiver.sender]'s track of the provided
 /// [RtpTransceiver].
-Pointer _getSendTrack(RtpTransceiver transceiver) {
+Pointer _getSendTrack(Object transceiver) {
+  transceiver as RtpTransceiver;
   if (transceiver.sender.track != null) {
     return ForeignValue.fromHandle(transceiver.sender.track!).intoRustOwned();
   } else {
@@ -74,12 +81,15 @@ Pointer _getSendTrack(RtpTransceiver transceiver) {
 
 /// Replaces [RtpTransceiver.sender]'s [MediaStreamTrack] of the provided
 /// [RtpTransceiver] with a provided [MediaStreamTrack].
-Object _replaceSendTrack(RtpTransceiver transceiver, MediaStreamTrack track) {
+Object _replaceSendTrack(Object transceiver, Object track) {
+  transceiver as RtpTransceiver;
+  track as MediaStreamTrack;
   return () => transceiver.sender.replaceTrack(track);
 }
 
 /// Drops the [RtpTransceiver.sender] of the provided [RtpTransceiver].
-Object _dropSender(RtpTransceiver transceiver) {
+Object _dropSender(Object transceiver) {
+  transceiver as RtpTransceiver;
   if (transceiver.sender.track == null) {
     return () => transceiver.sender.replaceTrack(null);
   } else {
@@ -89,29 +99,36 @@ Object _dropSender(RtpTransceiver transceiver) {
 
 /// Indicates whether the [RtpTransceiver.sender]'s [MediaStreamTrack] is
 /// stopped.
-bool _isStopped(RtpTransceiver transceiver) {
+bool _isStopped(Object transceiver) {
+  transceiver as RtpTransceiver;
   return transceiver.isStopped();
 }
 
 /// Disposes of this [RtpTransceiver].
-Object _dispose(RtpTransceiver transceiver) {
+Object _dispose(Object transceiver) {
+  transceiver as RtpTransceiver;
   return () => transceiver.dispose();
 }
 
 /// Returns [RtpParameters] from the provided [RtpTransceiver.sender].
-Object _getSendParameters(RtpTransceiver transceiver) {
+Object _getSendParameters(Object transceiver) {
+  transceiver as RtpTransceiver;
   return () => transceiver.sender.getParameters();
 }
 
 /// Sets [RtpParameters] into the provided [RtpTransceiver.sender].
 Object _setSendParameters(
-    RtpTransceiver transceiver, RtpParameters parameters) {
+    Object transceiver, Object parameters) {
+  transceiver as RtpTransceiver;
+  parameters as RtpParameters;
   return () => transceiver.sender.setParameters(parameters);
 }
 
 /// Sets the provided [RtpCodecCapability] as the only preferred
 /// [RtpCodecCapability] for the provided [RtpTransceiver].
 void _setCodecPreferences(
-    RtpTransceiver transceiver, List<RtpCodecCapability> codecCapability) {
+    Object transceiver, Object codecCapability) {
+  transceiver as RtpTransceiver;
+  codecCapability as List<RtpCodecCapability>;
   transceiver.setCodecPreferences(codecCapability);
 }
