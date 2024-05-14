@@ -34,14 +34,12 @@ dev_dependencies:
   import_sorter: ^4.6.0
   json_serializable: ^6.7.1
 
-# TODO: Remove once `flutter_gherkin` updates.
 dependency_overrides:
   # Pinned until `flutter_gherkin` updates
   analyzer: ^6.5.0
   # Pinned until `flutter_gherkin` updates
   meta: ^1.14.0
-  # Pinned until gql-dart updates to v4
-  # https://github.com/gql-dart/gql/blob/master/links/gql_websocket_link/pubspec.yaml#L13
+  # Pinned until `flutter_gherkin` updates
   uuid: ^3.0.7
 
 
