@@ -33,8 +33,7 @@ Object _createTransceiverInit(int direction) {
 
 /// Adds [SendEncodingParameters] to the provided
 /// [RtpTransceiverInit.sendEncodings].
-void _addSendingEncodings(
-    Object init, Object encoding) {
+void _addSendingEncodings(Object init, Object encoding) {
   init as RtpTransceiverInit;
   encoding as SendEncodingParameters;
   init.sendEncodings.add(encoding);
@@ -117,8 +116,7 @@ Object _getSendParameters(Object transceiver) {
 }
 
 /// Sets [RtpParameters] into the provided [RtpTransceiver.sender].
-Object _setSendParameters(
-    Object transceiver, Object parameters) {
+Object _setSendParameters(Object transceiver, Object parameters) {
   transceiver as RtpTransceiver;
   parameters as RtpParameters;
   return () => transceiver.sender.setParameters(parameters);
@@ -126,8 +124,7 @@ Object _setSendParameters(
 
 /// Sets the provided [RtpCodecCapability] as the only preferred
 /// [RtpCodecCapability] for the provided [RtpTransceiver].
-void _setCodecPreferences(
-    Object transceiver, Object codecCapability) {
+void _setCodecPreferences(Object transceiver, Object codecCapability) {
   transceiver as RtpTransceiver;
   codecCapability as List<RtpCodecCapability>;
   transceiver.setCodecPreferences(codecCapability);

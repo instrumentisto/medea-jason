@@ -97,8 +97,7 @@ void _setVideoConstraintValue(Object cons, int kind, ForeignValue value) {
 /// Specifies the provided setting of a [MediaStreamConstraints.audio][0].
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
-void _setAudioConstraintValue(
-     Object cons, int kind, ForeignValue value) {
+void _setAudioConstraintValue(Object cons, int kind, ForeignValue value) {
   cons as webrtc.AudioConstraints;
 
   switch (AudioConstraintKind.values[kind]) {
@@ -126,8 +125,7 @@ void _setVideoConstraint(Object cons, int type, Object video) {
 
 /// Specifies the provided nature and settings of a audio track to the given
 /// [DeviceConstraints].
-void _setAudioConstraint(
-    Object cons, int type, Object audio) {
+void _setAudioConstraint(Object cons, int type, Object audio) {
   cons as webrtc.DeviceConstraints;
   audio as webrtc.AudioConstraints;
 

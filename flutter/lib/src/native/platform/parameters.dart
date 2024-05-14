@@ -19,8 +19,7 @@ Object _encodings(Object parameters) {
 
 /// Sets the provided [SendEncodingParameters] into the provided
 /// [RtpParameters].
-Object _setEncodings(
-    Object parameters, Object encoding) {
+Object _setEncodings(Object parameters, Object encoding) {
   parameters as RtpParameters;
   encoding as SendEncodingParameters;
   return () => parameters.encodings.add(encoding);

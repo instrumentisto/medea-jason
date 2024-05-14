@@ -47,16 +47,14 @@ void _setMaxBitrate(Object encoding, int maxBitrate) {
 
 /// Sets [SendEncodingParameters.scaleResolutionDownBy] of the provided
 /// [SendEncodingParameters].
-void _setScaleResolutionDownBy(
-    Object encoding, int scaleResolutionDownBy) {
+void _setScaleResolutionDownBy(Object encoding, int scaleResolutionDownBy) {
   encoding as SendEncodingParameters;
   encoding.scaleResolutionDownBy = scaleResolutionDownBy.toDouble();
 }
 
 /// Sets [SendEncodingParameters.scalabilityMode] of the provided
 /// [SendEncodingParameters].
-void _setScalabilityMode(
-    Object encoding, Pointer<Utf8> scalabilityMode) {
+void _setScalabilityMode(Object encoding, Pointer<Utf8> scalabilityMode) {
   encoding as SendEncodingParameters;
   encoding.scalabilityMode = scalabilityMode.nativeStringToDartString();
 }
