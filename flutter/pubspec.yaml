@@ -38,9 +38,6 @@ dev_dependencies:
 dependency_overrides:
   analyzer: ^6.5.0
   meta: ^1.14.0
-  # Pinned until analyzer is upgraded to v6
-  #  https://github.com/dart-lang/dart_style/issues/1328
-  dart_style: 2.3.3
   # Pinned until gql-dart updates to v4
   # https://github.com/gql-dart/gql/blob/master/links/gql_websocket_link/pubspec.yaml#L13
   uuid: ^3.0.7
