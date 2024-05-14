@@ -28,7 +28,7 @@ pub use self::{
     media_track::MediaStreamTrack,
     peer_connection::RtcPeerConnection,
     rtc_stats::RtcStats,
-    transceiver::Transceiver,
+    transceiver::{Transceiver, TransceiverInit},
     transport::WebSocketRpcTransport,
     utils::Function,
 };

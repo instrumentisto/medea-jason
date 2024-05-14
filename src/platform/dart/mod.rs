@@ -12,6 +12,7 @@
     unused_variables
 )]
 
+pub mod codec_capability;
 pub mod constraints;
 pub mod error;
 pub mod executor;
@@ -21,8 +22,10 @@ pub mod media_device_info;
 pub mod media_devices;
 pub mod media_display_info;
 pub mod media_track;
+pub mod parameters;
 pub mod peer_connection;
 pub mod rtc_stats;
+pub mod send_encoding_parameters;
 pub mod transceiver;
 pub mod transport;
 pub mod utils;
@@ -34,6 +37,7 @@ use libc::c_void;
 use crate::platform::utils::dart_api;
 
 pub use self::{
+    codec_capability::CodecCapability,
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
     executor::spawn,
@@ -43,7 +47,7 @@ pub use self::{
     media_track::MediaStreamTrack,
     peer_connection::RtcPeerConnection,
     rtc_stats::RtcStats,
-    transceiver::Transceiver,
+    transceiver::{Transceiver, TransceiverInit},
     transport::WebSocketRpcTransport,
     utils::{completer::delay_for, Function},
 };
