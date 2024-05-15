@@ -50,7 +50,7 @@ impl CodecCapability {
             .ok_or(Error::FailedToGetMimeType)
     }
 
-    /// Returns the underlying [`JsValue`] of this [`TransceiverInit`].
+    /// Returns the underlying [`JsValue`] of this [`CodecCapability`].
     #[must_use]
     pub const fn handle(&self) -> &JsValue {
         &self.0

@@ -24,7 +24,7 @@ impl SendEncodingParameters {
         Self(params)
     }
 
-    /// Returns underlying [`_Dart_Handle`].
+    /// Returns the underlying [`JsValue`] of this [`RtcRtpEncodingParameters`].
     #[must_use]
     pub const fn handle(&self) -> &RtcRtpEncodingParameters {
         &self.0

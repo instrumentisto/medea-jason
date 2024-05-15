@@ -14,7 +14,7 @@ pub enum CodecCapabilityError {
     #[display(fmt = "Failed to retrieve codec capabilities")]
     FailedToGetCapabilities,
 
-    /// Failed to get codec's mimeType
+    /// Failed to get codec's `mimeType`
     #[display(fmt = "Failed to get codec's mimeType")]
     FailedToGetMimeType,
 }
