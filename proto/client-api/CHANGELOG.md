@@ -11,18 +11,14 @@ All user visible changes to this project will be documented in this file. This p
 
 ## BC Breaks
 
-- Added `PeerMetrics::PeerConnectionError` variant ([#151]).
-- Added `TrackPatchEvent::encoding_parameters` field ([#164]).
-- Added `VideoSettings::svc_settings` and `VideoSettings::encoding_parameters` fields ([#164]).
+- `PeerMetrics::PeerConnectionError` variant ([#151]).
 
 ## Added
 
 - `PeerConnectionError` type ([#151]).
 - `IceCandidateError` type ([#151]).
-- `Codec`, `ScalabilityMode`, `SvcSettings` and `EncodingParameters` types ([#164]).
 
 [#151]: /../../pull/151
-[#164]: /../../pull/164
 
 
 

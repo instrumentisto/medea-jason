@@ -49,7 +49,6 @@ fn toggle_disable_track_update(id: TrackId, enabled: bool) -> TrackPatchEvent {
         receivers: None,
         media_direction: Some(media_direction),
         muted: None,
-        encoding_parameters: None,
     }
 }
 
@@ -812,8 +811,6 @@ impl InterconnectedPeers {
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
-                    encoding_parameters: Vec::new(),
-                    svc_settings: Vec::new(),
                 }),
             },
         ]
@@ -843,8 +840,6 @@ impl InterconnectedPeers {
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
-                    encoding_parameters: Vec::new(),
-                    svc_settings: Vec::new(),
                 }),
             },
         ]
@@ -1319,8 +1314,6 @@ async fn new_remote_track() {
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
-                    encoding_parameters: Vec::new(),
-                    svc_settings: Vec::new(),
                 }),
             },
             LocalTracksConstraints::default(),
@@ -1593,7 +1586,6 @@ async fn disable_and_enable_all_tracks() {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
-            encoding_parameters: None,
         })
         .await;
     pc.state().when_updated().await;
@@ -1609,7 +1601,6 @@ async fn disable_and_enable_all_tracks() {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
-            encoding_parameters: None,
         })
         .await;
     pc.state().when_updated().await;
@@ -1625,7 +1616,6 @@ async fn disable_and_enable_all_tracks() {
             receivers: None,
             media_direction: Some(MediaDirection::SendRecv),
             muted: None,
-            encoding_parameters: None,
         })
         .await;
     pc.state().when_updated().await;
@@ -1641,7 +1631,6 @@ async fn disable_and_enable_all_tracks() {
             receivers: None,
             media_direction: Some(MediaDirection::SendRecv),
             muted: None,
-            encoding_parameters: None,
         })
         .await;
     pc.state().when_updated().await;

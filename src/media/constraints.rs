@@ -214,14 +214,14 @@ impl LocalTracksConstraints {
     /// Indicates whether provided [`MediaType`] is enabled in the underlying
     /// [`MediaStreamSettings`].
     #[must_use]
-    pub fn enabled(&self, kind: &MediaType) -> bool {
+    pub fn enabled(&self, kind: MediaType) -> bool {
         self.0.borrow().enabled(kind)
     }
 
     /// Indicates whether provided [`MediaType`] is muted in the underlying
     /// [`MediaStreamSettings`].
     #[must_use]
-    pub fn muted(&self, kind: &MediaType) -> bool {
+    pub fn muted(&self, kind: MediaType) -> bool {
         self.0.borrow().muted(kind)
     }
 
@@ -659,7 +659,7 @@ impl MediaStreamSettings {
     /// Indicates whether the given [`MediaType`] is enabled and constrained in
     /// this [`MediaStreamSettings`].
     #[must_use]
-    pub const fn enabled(&self, kind: &MediaType) -> bool {
+    pub const fn enabled(&self, kind: MediaType) -> bool {
         match kind {
             MediaType::Video(video) => self.is_track_enabled_and_constrained(
                 MediaKind::Video,
@@ -675,7 +675,7 @@ impl MediaStreamSettings {
     /// Indicates whether the given [`MediaType`] is muted in this
     /// [`MediaStreamSettings`].
     #[must_use]
-    pub const fn muted(&self, kind: &MediaType) -> bool {
+    pub const fn muted(&self, kind: MediaType) -> bool {
         match kind {
             MediaType::Video(video) => match video.source_kind {
                 MediaSourceKind::Device => self.device_video.muted,

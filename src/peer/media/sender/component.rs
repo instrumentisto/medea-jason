@@ -148,7 +148,7 @@ impl AsProtoState for State {
             id: self.id,
             connection_mode: self.connection_mode,
             mid: self.mid.clone(),
-            media_type: self.media_type.clone(),
+            media_type: self.media_type,
             receivers: self.receivers.borrow().clone(),
             media_direction: self.media_direction.get(),
             muted: self.mute_state.muted(),
@@ -264,7 +264,7 @@ impl From<&State> for proto::state::Sender {
             id: state.id,
             connection_mode: state.connection_mode,
             mid: state.mid.clone(),
-            media_type: state.media_type.clone(),
+            media_type: state.media_type,
             receivers: state.receivers.borrow().clone(),
             media_direction: state.media_direction.get(),
             muted: state.mute_state.muted(),
@@ -333,8 +333,8 @@ impl State {
 
     /// Returns current [`MediaType`] of this [`State`].
     #[must_use]
-    pub const fn media_type(&self) -> &MediaType {
-        &self.media_type
+    pub const fn media_type(&self) -> MediaType {
+        self.media_type
     }
 
     /// Returns current [`MemberId`]s of the `Member`s that this [`State`]
@@ -635,7 +635,7 @@ impl TransceiverSide for State {
     }
 
     fn is_transitable(&self) -> bool {
-        let caps = TrackConstraints::from(self.media_type.clone());
+        let caps = TrackConstraints::from(self.media_type);
         match &caps {
             TrackConstraints::Video(VideoSource::Device(_)) => {
                 self.send_constraints.inner().get_device_video().is_some()
