@@ -90,4 +90,3 @@ Object _dispose(Object transceiver) {
   transceiver as RtpTransceiver;
   return () => transceiver.dispose();
 }
-
