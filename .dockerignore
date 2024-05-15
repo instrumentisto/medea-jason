@@ -5,6 +5,7 @@
 !Cargo.lock
 !src/
 !README.md
+!.cargo
 
 # Project sub-crates.
 !crates/
