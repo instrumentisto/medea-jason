@@ -29,7 +29,6 @@ use medea_jason::{
     media::MediaKind,
     peer::PeerConnection,
     platform,
-    platform::TransceiverInit,
     room::Room,
     rpc::MockRpcSession,
     utils::Updatable,
@@ -3185,16 +3184,10 @@ async fn sender_answerer() {
         .unwrap();
 
     let a_tr = peer
-        .add_transceiver(
-            MediaKind::Audio,
-            TransceiverInit::new(platform::TransceiverDirection::RECV),
-        )
+        .add_transceiver(MediaKind::Audio, platform::TransceiverDirection::RECV)
         .await;
     let v_tr = peer
-        .add_transceiver(
-            MediaKind::Video,
-            TransceiverInit::new(platform::TransceiverDirection::RECV),
-        )
+        .add_transceiver(MediaKind::Video, platform::TransceiverDirection::RECV)
         .await;
     let offer = peer.create_offer().await.unwrap();
     peer.set_offer(&offer).await.unwrap();

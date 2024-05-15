@@ -38,8 +38,6 @@ doc-valid-idents = [
     "RTCIceCandidate", "RTCIceCandidateInit", "RTCIceCandidateType",
     "RTCIceServer", "RTCIceTransport",
     "RTCPeerConnection", "RTCPeerConnectionIceEvent",
-    "RTCRtpCodecCapability",
-    "RTCRtpParameters",
     "RTCRtpSender", "RTCSenderVideoTrackAttachmentStats",
     "RTCRtpTransceiver", "RTCRtpTransceiverDirection",
     "RTCSctpTransport",

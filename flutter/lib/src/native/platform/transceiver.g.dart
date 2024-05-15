@@ -16,47 +16,12 @@ void registerFunction(
   required Pointer<NativeFunction<Handle Function(Handle, Bool)>> setRecv,
   required Pointer<NativeFunction<Handle Function(Handle, Bool)>> setSend,
   required Pointer<NativeFunction<Handle Function(Handle)>> dispose,
-  required Pointer<NativeFunction<Handle Function(Int64)>>
-      createTransceiverInit,
-  required Pointer<NativeFunction<Void Function(Handle, Handle)>>
-      addSendingEncodings,
-  required Pointer<NativeFunction<Handle Function(Handle)>> getSendParameters,
-  required Pointer<NativeFunction<Handle Function(Handle, Handle)>>
-      setSendParameters,
-  required Pointer<NativeFunction<Void Function(Handle, Handle)>>
-      setCodecPreferences,
 }) {
   dl.lookupFunction<
-      Void Function(
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer),
-      void Function(
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer)>('register_transceiver')(
+      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
+          Pointer, Pointer, Pointer),
+      void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
+          Pointer, Pointer, Pointer)>('register_transceiver')(
     getDirection,
     getSendTrack,
     replaceTrack,
@@ -66,10 +31,5 @@ void registerFunction(
     setRecv,
     setSend,
     dispose,
-    createTransceiverInit,
-    addSendingEncodings,
-    getSendParameters,
-    setSendParameters,
-    setCodecPreferences,
   );
 }

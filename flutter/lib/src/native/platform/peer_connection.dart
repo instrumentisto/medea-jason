@@ -33,13 +33,12 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Adds an [RtpTransceiverInit] to the provided [PeerConnection].
+/// Adds an [RtpTransceiver] to the provided [PeerConnection].
 ///
 /// Returns [Future] which will be resolved into created [RtpTransceiver].
-Object _addTransceiver(Object peer, int kind, Object init) {
-  peer as PeerConnection;
-  init as RtpTransceiverInit;
-  return () => peer.addTransceiver(MediaKind.values[kind], init);
+Object _addTransceiver(PeerConnection peer, int kind, int direction) {
+  return () => peer.addTransceiver(MediaKind.values[kind],
+      RtpTransceiverInit(TransceiverDirection.values[direction]));
 }
 
 /// Returns a newly created [PeerConnection] with the provided `iceServers`

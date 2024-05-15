@@ -2,13 +2,11 @@
 //!
 //! [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
 
-use dart_sys::Dart_Handle;
 use derive_more::From;
 use medea_macro::dart_bridge;
 
-use crate::{
-    api::DartValue,
-    platform::dart::utils::{handle::DartHandle, NonNullDartValueArgExt},
+use crate::platform::dart::utils::{
+    handle::DartHandle, NonNullDartValueArgExt,
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/list.g.dart")]
@@ -17,10 +15,7 @@ mod list {
 
     use dart_sys::Dart_Handle;
 
-    use crate::{
-        api::{DartValue, DartValueArg},
-        platform::dart::utils::handle::DartHandle,
-    };
+    use crate::{api::DartValueArg, platform::dart::utils::handle::DartHandle};
 
     extern "C" {
         /// Returns an element by the provided `index` from the provided
@@ -37,16 +32,6 @@ mod list {
         /// [`length`]: https://api.dart.dev/stable/dart-core/List/length.html
         /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
         pub fn length(list: Dart_Handle) -> u32;
-
-        /// Initializes a new empty [`List`].
-        ///
-        /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
-        pub fn init() -> Dart_Handle;
-
-        /// Adds the provided [`DartValue`] to the provided [`List`].
-        ///
-        /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
-        pub fn add(map: Dart_Handle, value: DartValue);
     }
 }
 
@@ -57,21 +42,6 @@ mod list {
 pub struct DartList(DartHandle);
 
 impl DartList {
-    /// Creates a new empty [`DartList`].
-    #[must_use]
-    pub fn new() -> Self {
-        let map = unsafe { list::init() };
-        Self(unsafe { DartHandle::new(map) })
-    }
-
-    /// Adds the provided [`DartValue`] to the end of this [`DartList`],
-    /// extending the length by one.
-    pub fn add(&mut self, value: DartValue) {
-        unsafe {
-            list::add(self.0.get(), value);
-        }
-    }
-
     /// Returns an element by the provided `index` from this [`DartList`].
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
@@ -88,12 +58,6 @@ impl DartList {
     pub fn length(&self) -> usize {
         unsafe { list::length(self.0.get()) as usize }
     }
-
-    /// Returns the underlying [`Dart_Handle`] of this [`DartList`].
-    #[must_use]
-    pub fn handle(&self) -> Dart_Handle {
-        self.0.get()
-    }
 }
 
 impl<T: From<DartHandle>> From<DartList> for Vec<T> {
@@ -106,11 +70,5 @@ impl<T: From<DartHandle>> From<DartList> for Vec<T> {
             }
         }
         out
-    }
-}
-
-impl Default for DartList {
-    fn default() -> Self {
-        Self::new()
     }
 }

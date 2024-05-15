@@ -4,32 +4,12 @@ use std::{future::Future, rc::Rc};
 
 use derive_more::From;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{RtcRtpTransceiver, RtcRtpTransceiverInit};
+use web_sys::RtcRtpTransceiver;
 
 use crate::{
     media::track::local,
     platform::{Error, TransceiverDirection},
 };
-
-/// Wrapper around an [`RtcRtpTransceiverInit`].
-#[derive(Debug)]
-pub struct TransceiverInit(RtcRtpTransceiverInit);
-
-impl TransceiverInit {
-    /// Creates a new [`TransceiverInit`].
-    #[must_use]
-    pub fn new(direction: TransceiverDirection) -> Self {
-        let mut init = RtcRtpTransceiverInit::new();
-        _ = init.direction(direction.into());
-        Self(init)
-    }
-
-    /// Returns the underlying [`RtcRtpTransceiverInit`].
-    #[must_use]
-    pub const fn handle(&self) -> &RtcRtpTransceiverInit {
-        &self.0
-    }
-}
 
 /// Wrapper around [`RtcRtpTransceiver`] which provides handy methods for
 /// direction changes.

@@ -25,7 +25,6 @@ use crate::{
     media::{track::local, MediaKind},
     peer::{LocalStreamUpdateCriteria, PeerEvent},
     platform,
-    platform::TransceiverInit,
     utils::{Caused, Component},
 };
 
@@ -321,11 +320,7 @@ impl InnerMediaConnections {
         kind: MediaKind,
         direction: platform::TransceiverDirection,
     ) -> impl Future<Output = platform::Transceiver> + 'static {
-        let peer = Rc::clone(&self.peer);
-        async move {
-            peer.add_transceiver(kind, TransceiverInit::new(direction))
-                .await
-        }
+        self.peer.add_transceiver(kind, direction)
     }
 
     /// Lookups a [`platform::Transceiver`] by the provided [`mid`].

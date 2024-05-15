@@ -18,25 +18,7 @@ void registerFunctions(DynamicLibrary dl) {
     setRecv: Pointer.fromFunction(_setRecv),
     setSend: Pointer.fromFunction(_setSend),
     dispose: Pointer.fromFunction(_dispose),
-    createTransceiverInit: Pointer.fromFunction(_createTransceiverInit),
-    addSendingEncodings: Pointer.fromFunction(_addSendingEncodings),
-    getSendParameters: Pointer.fromFunction(_getSendParameters),
-    setSendParameters: Pointer.fromFunction(_setSendParameters),
-    setCodecPreferences: Pointer.fromFunction(_setCodecPreferences),
   );
-}
-
-/// Creates a new [RtpTransceiverInit].
-Object _createTransceiverInit(int direction) {
-  return RtpTransceiverInit(TransceiverDirection.values[direction]);
-}
-
-/// Adds [SendEncodingParameters] to the provided
-/// [RtpTransceiverInit.sendEncodings].
-void _addSendingEncodings(Object init, Object encoding) {
-  init as RtpTransceiverInit;
-  encoding as SendEncodingParameters;
-  init.sendEncodings.add(encoding);
 }
 
 /// Changes the receive direction of the provided [RtpTransceiver].
@@ -109,23 +91,3 @@ Object _dispose(Object transceiver) {
   return () => transceiver.dispose();
 }
 
-/// Returns [RtpParameters] from the provided [RtpTransceiver.sender].
-Object _getSendParameters(Object transceiver) {
-  transceiver as RtpTransceiver;
-  return () => transceiver.sender.getParameters();
-}
-
-/// Sets [RtpParameters] into the provided [RtpTransceiver.sender].
-Object _setSendParameters(Object transceiver, Object parameters) {
-  transceiver as RtpTransceiver;
-  parameters as RtpParameters;
-  return () => transceiver.sender.setParameters(parameters);
-}
-
-/// Sets the provided [RtpCodecCapability] as the only preferred
-/// [RtpCodecCapability] for the provided [RtpTransceiver].
-void _setCodecPreferences(Object transceiver, Object codecCapability) {
-  transceiver as RtpTransceiver;
-  codecCapability as List<RtpCodecCapability>;
-  transceiver.setCodecPreferences(codecCapability);
-}
