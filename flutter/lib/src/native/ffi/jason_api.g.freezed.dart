@@ -12,7 +12,7 @@ part of 'jason_api.g.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$ApiConstrainFacingMode {
@@ -146,7 +146,7 @@ class _$ApiConstrainFacingMode_ExactImpl
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ApiConstrainFacingMode_ExactImpl &&
@@ -291,7 +291,7 @@ class _$ApiConstrainFacingMode_IdealImpl
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ApiConstrainFacingMode_IdealImpl &&
@@ -518,7 +518,7 @@ class _$ConstrainU32_ExactImpl implements ConstrainU32_Exact {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ConstrainU32_ExactImpl &&
@@ -662,7 +662,7 @@ class _$ConstrainU32_IdealImpl implements ConstrainU32_Ideal {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ConstrainU32_IdealImpl &&
@@ -813,7 +813,7 @@ class _$ConstrainU32_RangeImpl implements ConstrainU32_Range {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ConstrainU32_RangeImpl &&

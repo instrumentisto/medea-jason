@@ -61,7 +61,8 @@ class MockMediaDevices {
 
   /// Requests media input access and returns the created
   /// [webrtc.MediaStreamTrack]s.
-  static Object getUserMedia(webrtc.DeviceConstraints constraints) {
+  static Object getUserMedia(Object constraints) {
+    constraints as webrtc.DeviceConstraints;
     return () => _getUserMedia(constraints);
   }
 
@@ -72,7 +73,8 @@ class MockMediaDevices {
 }
 
 /// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
-Object _getUserMedia(webrtc.DeviceConstraints constraints) {
+Object _getUserMedia(Object constraints) {
+  constraints as webrtc.DeviceConstraints;
   return () => webrtc.getUserMedia(constraints);
 }
 
@@ -88,7 +90,8 @@ Object _enumerateDisplays() {
 
 /// Starts capturing the contents of a display and returns the created
 /// [webrtc.MediaStreamTrack]s.
-Object _getDisplayMedia(webrtc.DisplayConstraints constraints) {
+Object _getDisplayMedia(Object constraints) {
+  constraints as webrtc.DisplayConstraints;
   return () => webrtc.getDisplayMedia(constraints);
 }
 
@@ -115,11 +118,13 @@ Object _microphoneVolume() {
 }
 
 /// Subscribes onto the `MediaDevices`'s `devicechange` event.
-void _onDeviceChange(Function cb) {
+void _onDeviceChange(Object cb) {
+  cb as Function;
   webrtc.onDeviceChange(() => cb(null));
 }
 
 /// Returns the kind of the `GetMediaException`.
-int _getMediaExceptionKind(webrtc.GetMediaException exception) {
+int _getMediaExceptionKind(Object exception) {
+  exception as webrtc.GetMediaException;
   return exception.kind().index;
 }
