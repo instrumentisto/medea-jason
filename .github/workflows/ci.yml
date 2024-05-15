@@ -13,7 +13,7 @@ concurrency:
 
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-  MEDEA_TAG: edge
+  MEDEA_TAG: v0.7.6
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 
