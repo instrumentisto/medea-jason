@@ -21,12 +21,16 @@ Object _init() {
 
 /// Adds the provided [ForeignValue] to the end of the provided [List],
 /// extending the length by one.
-void _add(List<dynamic> list, ForeignValue value) {
+void _add(Object list, ForeignValue value) {
+  list as List<dynamic>;
+
   list.add(value.toDart());
 }
 
 /// Returns a [Pointer] to a [List] element with the provided [index].
-Pointer _get(List arr, int index) {
+Pointer _get(Object arr, int index) {
+  arr as List;
+
   final el = arr[index];
   if (el == null) {
     return ForeignValue.none().intoRustOwned();
@@ -36,6 +40,8 @@ Pointer _get(List arr, int index) {
 }
 
 /// Returns length of the provided [List].
-int _len(List arr) {
+int _len(Object arr) {
+  arr as List;
+
   return arr.length;
 }

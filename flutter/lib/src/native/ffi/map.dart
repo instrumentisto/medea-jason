@@ -18,6 +18,7 @@ Object _init() {
 }
 
 /// Sets the given [value] under the given [key] in the provided [Map].
-void _set(Map<String, dynamic> map, Pointer<Utf8> key, ForeignValue value) {
+void _set(Object map, Pointer<Utf8> key, ForeignValue value) {
+  map as Map<String, dynamic>;
   map[key.nativeStringToDartString()] = value.toDart();
 }

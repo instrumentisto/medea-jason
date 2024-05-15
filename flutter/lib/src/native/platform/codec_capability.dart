@@ -22,6 +22,8 @@ Object _getSenderCodecCapabilities(int kind) {
 }
 
 /// Returns [RtpCodecCapability.mimeType].
-Pointer<Utf8> _mimeType(RtpCodecCapability codecCapability) {
+Pointer<Utf8> _mimeType(Object codecCapability) {
+  codecCapability as RtpCodecCapability;
+
   return codecCapability.mimeType.toNativeUtf8();
 }

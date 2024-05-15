@@ -26,32 +26,35 @@ Object _newSendEncodingParameters(Pointer<Utf8> rid, bool active) {
 
 /// Returns [SendEncodingParameters.rid] from the provided
 /// [SendEncodingParameters].
-Pointer<Utf8> _getRid(SendEncodingParameters encoding) {
+Pointer<Utf8> _getRid(Object encoding) {
+  encoding as SendEncodingParameters;
   return encoding.rid.toNativeUtf8();
 }
 
 /// Sets [SendEncodingParameters.active] of the provided
 /// [SendEncodingParameters].
-void _setActive(SendEncodingParameters encoding, bool active) {
+void _setActive(Object encoding, bool active) {
+  encoding as SendEncodingParameters;
   encoding.active = active;
 }
 
 /// Sets [SendEncodingParameters.maxBitrate] of the provided
 /// [SendEncodingParameters].
-void _setMaxBitrate(SendEncodingParameters encoding, int maxBitrate) {
+void _setMaxBitrate(Object encoding, int maxBitrate) {
+  encoding as SendEncodingParameters;
   encoding.maxBitrate = maxBitrate;
 }
 
 /// Sets [SendEncodingParameters.scaleResolutionDownBy] of the provided
 /// [SendEncodingParameters].
-void _setScaleResolutionDownBy(
-    SendEncodingParameters encoding, int scaleResolutionDownBy) {
+void _setScaleResolutionDownBy(Object encoding, int scaleResolutionDownBy) {
+  encoding as SendEncodingParameters;
   encoding.scaleResolutionDownBy = scaleResolutionDownBy.toDouble();
 }
 
 /// Sets [SendEncodingParameters.scalabilityMode] of the provided
 /// [SendEncodingParameters].
-void _setScalabilityMode(
-    SendEncodingParameters encoding, Pointer<Utf8> scalabilityMode) {
+void _setScalabilityMode(Object encoding, Pointer<Utf8> scalabilityMode) {
+  encoding as SendEncodingParameters;
   encoding.scalabilityMode = scalabilityMode.nativeStringToDartString();
 }
