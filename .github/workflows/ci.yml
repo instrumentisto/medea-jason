@@ -291,7 +291,7 @@ jobs:
         run: docker pull hub.instrumentisto.com/streaming/medea:edge
         if: ${{ env.MEDEA_TAG == 'edge' }}
       - name: Pull review Medea Docker image
-        run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_TAG }}
+        run: docker pull hub.instrumentisto.com/streaming/medea:${{ env.MEDEA_TAG }}
         if: ${{ env.MEDEA_TAG != 'edge' }}
 
       - name: Chrome (P2P mesh)

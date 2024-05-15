@@ -1134,7 +1134,7 @@ docker.up.demo: docker.down.demo
 docker-up-e2e-env = RUST_BACKTRACE=1 \
 	$(if $(call eq,$(log),yes),,RUST_LOG=warn) \
 	COMPOSE_MEDEA_IMAGE_NAME=hub.instrumentisto.com/streaming/medea$(if \
-		$(call eq,$(medea-tag),edge),,/review) \
+		$(call eq,$(medea-tag),edge),,) \
 	COMPOSE_MEDEA_IMAGE_VER=$(or $(medea-tag),dev) \
 	COMPOSE_CONTROL_MOCK_IMAGE_VER=$(or $(control-tag),dev) \
 	COMPOSE_WEBDRIVER_IMAGE_NAME=$(strip \
