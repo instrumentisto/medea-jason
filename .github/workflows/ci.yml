@@ -767,7 +767,7 @@ jobs:
   dart-pub-publish:
     name: dart pub publish (pub.dev)
     if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
-         || github.ref_name == 'master'
+         || github.ref_name == 'stable-client-api'
          || (github.event_name == 'pull_request'
              && github.event.pull_request.head.repo.owner.login == 'instrumentisto') }}
     needs:
