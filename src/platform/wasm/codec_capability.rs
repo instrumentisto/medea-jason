@@ -23,7 +23,7 @@ impl CodecCapability {
     ///
     /// Errors with [`Error::FailedToGetCapabilities`] if fails to get
     /// capabilities.
-    // Async needed for constency with Dart implementation.
+    // Async needed for consistency with Dart implementation.
     #[allow(clippy::unused_async)]
     pub async fn get_sender_codec_capabilities(
         kind: MediaKind,
@@ -50,7 +50,7 @@ impl CodecCapability {
             .ok_or(Error::FailedToGetMimeType)
     }
 
-    /// Returns underlying [`JsValue`].
+    /// Returns the underlying [`JsValue`] of this [`TransceiverInit`].
     #[must_use]
     pub const fn handle(&self) -> &JsValue {
         &self.0
