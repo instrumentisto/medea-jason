@@ -15,13 +15,15 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Gets available [RtpCodecCapability]s for [RtpSender].
+/// Returns available [RtpCodecCapability]s for an [RtpSender].
 Object _getSenderCodecCapabilities(int kind) {
   return () => RtpSender.getCapabilities(MediaKind.values[kind])
       .then((res) => res.codecs);
 }
 
-/// Gets [RtpCodecCapability.mimeType].
-Pointer<Utf8> _mimeType(RtpCodecCapability codecCapability) {
+/// Returns [RtpCodecCapability.mimeType].
+Pointer<Utf8> _mimeType(Object codecCapability) {
+  codecCapability as RtpCodecCapability;
+
   return codecCapability.mimeType.toNativeUtf8();
 }

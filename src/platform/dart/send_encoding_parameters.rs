@@ -1,8 +1,8 @@
-//! [SendEncodingParameters] wrapper.
+//! Wrapper around [RTCRtpEncodingParameters][0].
 //!
-//! [SendEncodingParameters]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
+//! [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
 
-use dart_sys::_Dart_Handle;
+use dart_sys::Dart_Handle;
 use medea_client_api_proto::{EncodingParameters, ScalabilityMode};
 use medea_macro::dart_bridge;
 
@@ -19,29 +19,47 @@ mod send_encoding_parameters {
     use dart_sys::Dart_Handle;
 
     extern "C" {
-        /// Creates a new [`SendEncodingParameters`].
+        /// Creates new [RTCRtpEncodingParameters][0].
+        ///
+        /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
         pub fn new_send_encoding_parameters(
             rid: ptr::NonNull<c_char>,
             active: bool,
         ) -> Dart_Handle;
 
-        /// Gets `rid` of this [`SendEncodingParameters`].
+        /// Returns [RID] from the provided [RTCRtpEncodingParameters][0].
+        ///
+        /// [RID]: https://w3.org/TR/webrtc#dom-rtcrtpcodingparameters-rid
+        /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
         pub fn get_rid(encoding: Dart_Handle) -> ptr::NonNull<c_char>;
 
-        /// Sets `active` for the provided [`SendEncodingParameters`].
+        /// Sets [activeness][1] of the provided [RTCRtpEncodingParameters][0].
+        ///
+        /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-active
         pub fn set_active(encoding: Dart_Handle, active: bool);
 
-        /// Sets `max_bitrate` for the provided [`SendEncodingParameters`].
+        /// Sets [maxBitrate][1] of the provided [RTCRtpEncodingParameters][0].
+        ///
+        /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
+        /// [1]:https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
         pub fn set_max_bitrate(encoding: Dart_Handle, max_bitrate: i64);
 
-        /// Sets `scale_resolution_down_by` for the provided
-        /// [`SendEncodingParameters`].
+        /// Sets [scaleResolutionDownBy][1] of the provided
+        /// [RTCRtpEncodingParameters][0].
+        ///
+        /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
+        /// [1]: https://tinyurl.com/ypzzc75t
         pub fn set_scale_resolution_down_by(
             encoding: Dart_Handle,
             scale_resolution_down_by: i64,
         );
 
-        /// Sets `scalability_mode` for the provided [`SendEncodingParameters`].
+        /// Sets [scalabilityMode][1] of the provided
+        /// [RTCRtpEncodingParameters][0].
+        ///
+        /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
+        /// [1]: https://tinyurl.com/3zuaee45
         pub fn set_scalability_mode(
             encoding: Dart_Handle,
             scalability_mode: ptr::NonNull<c_char>,
@@ -49,10 +67,10 @@ mod send_encoding_parameters {
     }
 }
 
-/// Wrapper around [RTCRtpEncodingParameters] which provides handy methods for
+/// Wrapper around [RTCRtpEncodingParameters][0] providing handy methods for its
 /// direction changes.
 ///
-/// [RTCRtpEncodingParameters]: https://tinyurl.com/mr3dt9ch
+/// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
 #[derive(Clone, Debug)]
 pub struct SendEncodingParameters(DartHandle);
 
@@ -63,7 +81,7 @@ impl From<DartHandle> for SendEncodingParameters {
 }
 
 impl SendEncodingParameters {
-    /// Creates a new [`SendEncodingParameters`].
+    /// Creates new [`SendEncodingParameters`].
     #[must_use]
     pub fn new(rid: String, active: bool) -> Self {
         let handle = unsafe {
@@ -75,13 +93,16 @@ impl SendEncodingParameters {
         Self(unsafe { DartHandle::new(handle) })
     }
 
-    /// Returns underlying [`_Dart_Handle`].
+    /// Returns the underlying [`Dart_Handle`] of these
+    /// [`SendEncodingParameters`].
     #[must_use]
-    pub fn handle(&self) -> *mut _Dart_Handle {
+    pub fn handle(&self) -> Dart_Handle {
         self.0.get()
     }
 
-    /// Returns `rid`.
+    /// Returns [RID] of these [`SendEncodingParameters`].
+    ///
+    /// [RID]: https://w3.org/TR/webrtc#dom-rtcrtpcodingparameters-rid
     #[must_use]
     pub fn rid(&self) -> String {
         let handle = self.0.get();
@@ -89,7 +110,9 @@ impl SendEncodingParameters {
         unsafe { c_str_into_string(rid) }
     }
 
-    /// Sets `active`.
+    /// Sets [activeness][1] of these [`SendEncodingParameters`].
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-active
     pub fn set_active(&mut self, active: bool) {
         let handle = self.0.get();
         unsafe {
@@ -97,7 +120,9 @@ impl SendEncodingParameters {
         };
     }
 
-    /// Sets `max_bitrate`.
+    /// Sets [maxBitrate][1] of these [`SendEncodingParameters`].
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
     pub fn set_max_bitrate(&mut self, max_bitrate: i64) {
         let handle = self.0.get();
         unsafe {
@@ -105,7 +130,9 @@ impl SendEncodingParameters {
         };
     }
 
-    /// Sets `scale_resolution_down_by`.
+    /// Sets [scaleResolutionDownBy][1] of these [`SendEncodingParameters`].
+    ///
+    /// [1]: https://tinyurl.com/ypzzc75t
     pub fn set_scale_resolution_down_by(
         &mut self,
         scale_resolution_down_by: i64,
@@ -119,7 +146,9 @@ impl SendEncodingParameters {
         };
     }
 
-    /// Sets `set_scalability_mode`.
+    /// Sets [scalabilityMode][1] of these [`SendEncodingParameters`].
+    ///
+    /// [1]: https://tinyurl.com/3zuaee45
     pub fn set_scalability_mode(&mut self, scalability_mode: ScalabilityMode) {
         let handle = self.0.get();
         unsafe {

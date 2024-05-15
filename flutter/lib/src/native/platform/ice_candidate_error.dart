@@ -22,7 +22,8 @@ void registerFunctions(DynamicLibrary dl) {
 ///
 /// [STUN]: https://webrtcglossary.com/stun
 /// [TURN]: https://webrtcglossary.com/turn
-Pointer<Utf8> _address(webrtc.IceCandidateErrorEvent error) {
+Pointer<Utf8> _address(Object error) {
+  error as webrtc.IceCandidateErrorEvent;
   return error.address.toNativeUtf8();
 }
 
@@ -30,7 +31,8 @@ Pointer<Utf8> _address(webrtc.IceCandidateErrorEvent error) {
 ///
 /// [STUN]: https://webrtcglossary.com/stun
 /// [TURN]: https://webrtcglossary.com/turn
-int _port(webrtc.IceCandidateErrorEvent error) {
+int _port(Object error) {
+  error as webrtc.IceCandidateErrorEvent;
   return error.port;
 }
 
@@ -39,7 +41,8 @@ int _port(webrtc.IceCandidateErrorEvent error) {
 ///
 /// [STUN]: https://webrtcglossary.com/stun
 /// [TURN]: https://webrtcglossary.com/turn
-Pointer<Utf8> _url(webrtc.IceCandidateErrorEvent error) {
+Pointer<Utf8> _url(Object error) {
+  error as webrtc.IceCandidateErrorEvent;
   return error.url.toNativeUtf8();
 }
 
@@ -52,7 +55,8 @@ Pointer<Utf8> _url(webrtc.IceCandidateErrorEvent error) {
 ///
 /// [STUN]: https://webrtcglossary.com/stun
 /// [TURN]: https://webrtcglossary.com/turn
-int _errorCode(webrtc.IceCandidateErrorEvent error) {
+int _errorCode(Object error) {
+  error as webrtc.IceCandidateErrorEvent;
   return error.errorCode;
 }
 
@@ -63,6 +67,7 @@ int _errorCode(webrtc.IceCandidateErrorEvent error) {
 ///
 /// [STUN]: https://webrtcglossary.com/stun
 /// [TURN]: https://webrtcglossary.com/turn
-Pointer<Utf8> _errorText(webrtc.IceCandidateErrorEvent error) {
+Pointer<Utf8> _errorText(Object error) {
+  error as webrtc.IceCandidateErrorEvent;
   return error.errorText.toNativeUtf8();
 }

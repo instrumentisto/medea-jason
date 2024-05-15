@@ -1,8 +1,8 @@
-//! Wrapper around [RTCRtpParameters][1].
+//! Wrapper around [RTCRtpParameters].
 //!
-//! [1]: https://w3.org/TR/webrtc/#dom-rtcrtpparameters
+//! [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
 
-use dart_sys::_Dart_Handle;
+use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
@@ -18,11 +18,18 @@ mod parameters {
     use dart_sys::Dart_Handle;
 
     extern "C" {
-        /// Gets [`SendEncodingParameters`] of this [`Parameters`].
+        /// Returns [RTCRtpEncodingParameters][1] from the provided
+        /// [RTCRtpParameters].
+        ///
+        /// [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
         pub fn encodings(parameters: Dart_Handle) -> Dart_Handle;
 
-        /// Sets the provided [`SendEncodingParameters`] into this
-        /// [`Parameters`].
+        /// Sets the provided [RTCRtpEncodingParameters][1] into the provided
+        /// [RTCRtpParameters].
+        ///
+        /// [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
         pub fn set_encoding(
             parameters: Dart_Handle,
             encoding: Dart_Handle,
@@ -30,9 +37,9 @@ mod parameters {
     }
 }
 
-/// Representation of [RTCRtpParameters][1].
+/// Representation of [RTCRtpParameters].
 ///
-/// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpparameters
+/// [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
 #[derive(Clone, Debug)]
 pub struct Parameters(DartHandle);
 
@@ -43,7 +50,7 @@ impl From<DartHandle> for Parameters {
 }
 
 impl Parameters {
-    /// Gets [`SendEncodingParameters`] of this [`Parameters`].
+    /// Returns [`SendEncodingParameters`] of these [`Parameters`].
     #[must_use]
     pub fn encodings(
         &self,
@@ -67,7 +74,7 @@ impl Parameters {
         })
     }
 
-    /// Sets the provided [`SendEncodingParameters`] into this [`Parameters`].
+    /// Sets the provided [`SendEncodingParameters`] into these [`Parameters`].
     #[must_use]
     pub fn set_encoding(
         &self,
@@ -81,9 +88,9 @@ impl Parameters {
         })
     }
 
-    /// Returns underlying [`_Dart_Handle`].
+    /// Returns the underlying [`Dart_Handle`] of these [`Parameters`].
     #[must_use]
-    pub fn handle(&self) -> *mut _Dart_Handle {
+    pub fn handle(&self) -> Dart_Handle {
         self.0.get()
     }
 }
