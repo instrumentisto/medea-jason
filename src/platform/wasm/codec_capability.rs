@@ -41,8 +41,8 @@ impl CodecCapability {
     ///
     /// # Errors
     ///
-    /// Never errors, but [`Result`] is needed for consistency with WASM
-    /// implementation.
+    /// Errors with [`Error::FailedToGetMimeType`] if fails to get codec's
+    /// `mimeType`.
     pub fn mime_type(&self) -> Result<String, Error> {
         Reflect::get(&self.0, &JsString::from("mimeType"))
             .ok()

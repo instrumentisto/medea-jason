@@ -2,9 +2,8 @@
 //!
 //! [SendEncodingParameters]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
 
-use web_sys::RtcRtpEncodingParameters;
-
 use medea_client_api_proto::{EncodingParameters, ScalabilityMode};
+use web_sys::RtcRtpEncodingParameters;
 
 /// Wrapper around [RTCRtpEncodingParameters] which provides handy methods for
 /// direction changes.
@@ -24,7 +23,8 @@ impl SendEncodingParameters {
         Self(params)
     }
 
-    /// Returns the underlying [`JsValue`] of this [`RtcRtpEncodingParameters`].
+    /// Returns the underlying [`RtcRtpEncodingParameters`] of this
+    /// [`RtcRtpEncodingParameters`].
     #[must_use]
     pub const fn handle(&self) -> &RtcRtpEncodingParameters {
         &self.0

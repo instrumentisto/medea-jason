@@ -20,9 +20,7 @@ use crate::{
 
 use super::get_property_by_name;
 
-/// Dart side representation of [RTCRtpTransceiverInit].
-///
-/// [RTCRtpTransceiverInit]: https://tinyurl.com/mtdkabcj
+/// Wrapper around an [`RtcRtpTransceiverInit`].
 #[derive(Debug)]
 pub struct TransceiverInit(RtcRtpTransceiverInit);
 
