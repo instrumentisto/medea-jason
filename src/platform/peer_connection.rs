@@ -25,7 +25,7 @@ pub enum SdpType {
 
 /// [RTCIceCandidate][1] representation.
 ///
-/// [1]: https://w3.org/TR/webrtc/#rtcicecandidate-interface
+/// [1]: https://w3.org/TR/webrtc#rtcicecandidate-interface
 #[derive(Debug)]
 pub struct IceCandidate {
     /// [`candidate` field][2] of the discovered [RTCIceCandidate][1].

@@ -39,7 +39,8 @@ impl TransceiverInit {
         &self.0
     }
 
-    /// Adds provided [`SendEncodingParameters`] to this [`TransceiverInit`].
+    /// Adds the provided [`SendEncodingParameters`] to this
+    /// [`TransceiverInit`].
     pub fn sending_encodings(
         &mut self,
         encodings: Vec<SendEncodingParameters>,
@@ -135,14 +136,16 @@ impl Transceiver {
         self.0.stopped()
     }
 
-    /// Updates parameters of encoding for underlying `sender`.
+    /// Updates parameters of `encodings` for the underlying [RTCRtpSender] of
+    /// this [`Transceiver`].
     ///
     /// # Errors
     ///
-    /// Errors with [`platform::Error`] if the underlying [`setParameters`][1]
-    /// call fails.
+    /// With [`platform::Error`] if the underlying [setParameters()][1] call
+    /// fails.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
+    /// [RTCRtpSender]: https://w3.org/TR/webrtc#dom-rtcrtpsender
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-setparameters
     #[allow(clippy::missing_panics_doc)]
     pub async fn update_send_encodings(
         &self,
@@ -186,7 +189,7 @@ impl Transceiver {
         Ok(())
     }
 
-    /// Sets preferred [`CodecCapability`] for this [`Transceiver`].
+    /// Sets the preferred [`CodecCapability`]s for this [`Transceiver`].
     pub fn set_codec_preferences(&self, codecs: Vec<CodecCapability>) {
         let is_api_available =
             get_property_by_name(&self.0, "set_codec_preferences", |val| {

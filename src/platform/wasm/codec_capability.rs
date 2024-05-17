@@ -1,7 +1,6 @@
-//! [SendEncodingParameters] wrapper.
-//!
-//! [SendEncodingParameters]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-
+/// WASM side representation of an [RTCRtpCodecCapability].
+///
+/// [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
 use js_sys::{Array, JsString, Reflect};
 use wasm_bindgen::JsValue;
 use web_sys::RtcRtpSender;
@@ -10,20 +9,22 @@ use crate::{
     media::MediaKind, platform::codec_capability::CodecCapabilityError as Error,
 };
 
-/// WASM side representation of [RTCRtpCodecCapability].
+/// WASM side representation of an [RTCRtpCodecCapability].
 ///
-/// [RTCRtpCodecCapability]: https://tinyurl.com/4jcp8m4s
+/// [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
 #[derive(Clone, Debug)]
 pub struct CodecCapability(JsValue);
 
 impl CodecCapability {
-    /// Gets available `sender`'s [`CodecCapability`]s.
+    /// Returns available [RTCRtpSender]'s [`CodecCapability`]s.
     ///
     /// # Errors
     ///
-    /// Errors with [`Error::FailedToGetCapabilities`] if fails to get
+    /// With [`Error::FailedToGetCapabilities`] if fails to retrieve
     /// capabilities.
-    // Async needed for consistency with Dart implementation.
+    ///
+    /// [RTCRtpSender]: https://w3.org/TR/webrtc#dom-rtcrtpsender
+    // Async is needed for consistency with Dart implementation.
     #[allow(clippy::unused_async)]
     pub async fn get_sender_codec_capabilities(
         kind: MediaKind,
@@ -37,12 +38,14 @@ impl CodecCapability {
         Ok(Array::from(&codecs).iter().map(Self).collect())
     }
 
-    /// Gets `mime_type` of this [`CodecCapability`]s.
+    /// Returns [MIME media type][2] of this [`CodecCapability`].
     ///
     /// # Errors
     ///
-    /// Errors with [`Error::FailedToGetMimeType`] if fails to get codec's
-    /// `mimeType`.
+    /// With [`Error::FailedToGetMimeType`] if fails to retrieve codec's
+    /// [MIME media type][2].
+    ///
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
     pub fn mime_type(&self) -> Result<String, Error> {
         Reflect::get(&self.0, &JsString::from("mimeType"))
             .ok()

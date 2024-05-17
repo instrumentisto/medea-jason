@@ -1,11 +1,11 @@
 *
 
 # Jason sources and manifest.
+!.cargo/
 !Cargo.toml
 !Cargo.lock
 !src/
 !README.md
-!.cargo
 
 # Project sub-crates.
 !crates/
