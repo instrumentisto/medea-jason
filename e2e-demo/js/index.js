@@ -5,21 +5,24 @@ const baseUrl = 'ws://127.0.0.1:8080/ws/';
 const tracks = {};
 
 const isVideoStat = (stat) => {
-  return (stat.mediaType === 'video' || stat.id.toLowerCase().includes('video')) &&
-         stat.type === 'inbound-rtp' && !stat.id.includes('rtcp');
+  return(stat.mediaType === 'video' || stat
+    .id
+    .toLowerCase()
+    .includes('video')) && stat.type === 'inbound-rtp' && !stat.id.includes('rtcp');
 };
 
 const updateTrackBitrate = (track, stat) => {
   track.bsnow = stat.bytesReceived;
   track.tsnow = stat.timestamp;
-
   if (track.bsbefore === null || track.tsbefore === null) {
     track.bsbefore = track.bsnow;
     track.tsbefore = track.tsnow;
   } else {
     const timePassed = track.tsnow - track.tsbefore;
     const bitrate = Math.round((track.bsnow - track.bsbefore) * 8 / timePassed);
-    track.bitrate = Number.isFinite(bitrate) ? bitrate : 0;
+    track.bitrate = Number.isFinite(bitrate)
+      ? bitrate
+      : 0;
     track.bsbefore = track.bsnow;
     track.tsbefore = track.tsnow;
   }
@@ -49,23 +52,39 @@ const updateMediaElementData = (track, mediaElement) => {
   mediaElement.dataset.bitrate = track.bitrate;
   mediaElement.dataset.width = settings.width || track.width || 'N/A';
   mediaElement.dataset.height = settings.height || track.height || 'N/A';
-  mediaElement.dataset.framerate = settings.frameRate ? settings.frameRate.toFixed(2) : (track.frameRate ? track.frameRate.toFixed(2) : 'N/A');
+  mediaElement.dataset.framerate = settings.frameRate
+    ? settings.frameRate.toFixed(2)
+    : (
+      track.frameRate
+        ? track.frameRate.toFixed(2)
+        : 'N/A'
+    );
 };
 
 const updateTrackStats = (track, id) => {
-  track.receiver.getStats().then((res) => {
-    res.forEach((stat) => {
-      if (!stat) return;
-      if (isVideoStat(stat)) {
-        updateTrackBitrate(track, stat);
-        updateTrackDimensions(track, stat);
-      }
-    });
+  track
+    .receiver
+    .getStats()
+    .then((res) => {
+      res.forEach((stat) => {
+        if (!stat)
+          return;
 
-    if (typeof track.bitrate !== 'number') return;
-    if (!track.element) attachTrackElement(track, id);
-    if (track.element) updateMediaElementData(track, track.element);
-  });
+        if (isVideoStat(stat)) {
+          updateTrackBitrate(track, stat);
+          updateTrackDimensions(track, stat);
+        }
+      });
+      if (typeof track.bitrate !== 'number')
+        return;
+
+      if (!track.element)
+        attachTrackElement(track, id);
+
+      if (track.element)
+        updateMediaElementData(track, track.element);
+
+    });
 };
 
 const startTimer = () => setInterval(() => {
@@ -76,15 +95,21 @@ const startTimer = () => setInterval(() => {
 }, 1000);
 
 let timer = null;
-
 const listenerWrapper = (evt, listener) => {
   listener(evt);
+  if (evt.track.kind === 'audio')
+    return;
 
-  if (evt.track.kind === 'audio') return;
-
-  tracks[evt.track.id] = { inner: evt.track, receiver: evt.receiver, bsbefore: null, tsbefore: null, width: null, height: null, frameRate: null };
-
-  if (!timer) {
+  tracks[evt.track.id] = {
+    inner: evt.track,
+    receiver: evt.receiver,
+    bsbefore: null,
+    tsbefore: null,
+    width: null,
+    height: null,
+    frameRate: null
+  };
+  if (! timer) {
     timer = startTimer();
   }
 };
