@@ -246,8 +246,8 @@ pub enum GetMidsError {
     ReceiversWithoutMid,
 }
 
-/// Returns required [`CodecCapability`]s and [`ScalabilityMode`] based on the
-/// provided [`SvcSettings`] and [`MediaKind`].
+/// Returns required [`CodecCapability`]s and [`ScalabilityMode`] for
+/// [`platform::Transceiver`] based on the provided [`SvcSettings`].
 async fn probe_video_codecs(
     svc: &Vec<SvcSettings>,
 ) -> (Vec<CodecCapability>, Option<ScalabilityMode>) {
@@ -294,8 +294,8 @@ async fn probe_video_codecs(
         )
 }
 
-/// Returns [`SendEncodingParameters`] based on the provided
-/// [`EncodingParameters`] and target [`ScalabilityMode`]
+/// Returns [`SendEncodingParameters`] for [`platform::Transceiver`] based on
+/// the provided [`EncodingParameters`] and target [`ScalabilityMode`]
 fn get_encodings_params(
     mut encodings: Vec<EncodingParameters>,
     target_sm: Option<ScalabilityMode>,
@@ -390,6 +390,9 @@ impl InnerMediaConnections {
 
     /// Creates a [`platform::Transceiver`] and adds it to the
     /// [`platform::RtcPeerConnection`].
+    ///
+    /// It handles both audio and video media types, including setting up
+    /// encoding parameters and codec preferences for video.
     fn add_transceiver(
         &self,
         media_type: MediaType,
