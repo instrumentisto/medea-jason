@@ -1,6 +1,7 @@
-/// WASM side representation of an [RTCRtpCodecCapability].
-///
-/// [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
+//! WASM side representation of an [RTCRtpCodecCapability].
+//!
+//! [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
+
 use js_sys::{Array, JsString, Reflect};
 use wasm_bindgen::JsValue;
 use web_sys::RtcRtpSender;
