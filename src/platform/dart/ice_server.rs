@@ -1,6 +1,6 @@
 //! Collection of [RTCIceServer][1]s.
 //!
-//! [1]: https://w3.org/TR/webrtc/#rtciceserver-dictionary
+//! [1]: https://w3.org/TR/webrtc#rtciceserver-dictionary
 
 use dart_sys::Dart_Handle;
 use medea_client_api_proto::IceServer;
@@ -33,7 +33,7 @@ mod ice_servers {
 
 /// Collection of [RTCIceServer][1]s.
 ///
-/// [1]: https://w3.org/TR/webrtc/#rtciceserver-dictionary
+/// [1]: https://w3.org/TR/webrtc#rtciceserver-dictionary
 #[derive(Debug)]
 pub struct RtcIceServers(DartHandle);
 

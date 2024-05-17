@@ -727,7 +727,7 @@ impl PeerConnection {
     /// local description if offerer, and remote if answerer.
     ///
     /// [1]: https://tools.ietf.org/html/rfc4566#section-5.14
-    /// [2]: https://w3.org/TR/webrtc/#rtcrtptransceiver-interface
+    /// [2]: https://w3.org/TR/webrtc#rtcrtptransceiver-interface
     fn get_mids(
         &self,
     ) -> Result<HashMap<TrackId, String>, Traced<GetMidsError>> {
@@ -783,7 +783,7 @@ impl PeerConnection {
     ///
     /// [`Sender`]: sender::Sender
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastream
-    /// [2]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [2]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     pub async fn update_local_stream(
         &self,
         criteria: LocalStreamUpdateCriteria,
@@ -917,7 +917,7 @@ impl PeerConnection {
     /// With [`RtcPeerConnectionError::SetRemoteDescriptionFailed`][3] if
     /// [RTCPeerConnection.setRemoteDescription()][2] fails.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     /// [2]: https://w3.org/TR/webrtc#dom-peerconnection-setremotedescription
     /// [3]: platform::RtcPeerConnectionError::SetRemoteDescriptionFailed
     async fn set_remote_answer(
@@ -936,7 +936,7 @@ impl PeerConnection {
     /// With [`platform::RtcPeerConnectionError::SetRemoteDescriptionFailed`] if
     /// [RTCPeerConnection.setRemoteDescription()][2] fails.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     /// [2]: https://w3.org/TR/webrtc#dom-peerconnection-setremotedescription
     async fn set_remote_offer(
         &self,
@@ -959,7 +959,7 @@ impl PeerConnection {
     /// [RtcPeerConnection.addIceCandidate()][3] fails when adding buffered ICE
     /// candidates.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     /// [2]: https://w3.org/TR/webrtc#dom-peerconnection-setremotedescription
     /// [3]: https://w3.org/TR/webrtc#dom-peerconnection-addicecandidate
     async fn set_remote_description(

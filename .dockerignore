@@ -1,6 +1,7 @@
 *
 
 # Jason sources and manifest.
+!.cargo/
 !Cargo.toml
 !Cargo.lock
 !src/

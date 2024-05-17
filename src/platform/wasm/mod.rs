@@ -1,5 +1,6 @@
 //! `wasm32`-platform-specific functionality.
 
+pub mod codec_capability;
 pub mod constraints;
 pub mod error;
 pub mod ice_server;
@@ -8,6 +9,7 @@ pub mod media_devices;
 pub mod media_track;
 pub mod peer_connection;
 pub mod rtc_stats;
+pub mod send_encoding_parameters;
 pub mod transceiver;
 pub mod transport;
 pub mod utils;
@@ -21,6 +23,7 @@ use wasm_bindgen_futures::JsFuture;
 use web_sys::Window;
 
 pub use self::{
+    codec_capability::CodecCapability,
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
     media_device_info::MediaDeviceInfo,

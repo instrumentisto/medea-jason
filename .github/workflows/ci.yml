@@ -685,6 +685,10 @@ jobs:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
         if: ${{ env.CACHE == 'true' }}
+      - uses: arduino/setup-protoc@v3
+        with:
+          version: ${{ env.PROTOC_VER }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       # Run all task sequentially to not flood the jobs list.
       - run: make docs.rust crate=medea-macro open=no

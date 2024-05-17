@@ -56,7 +56,8 @@ impl CodecCapability {
     ///
     /// # Errors
     ///
-    /// With [`Error::FailedToGetCapabilities`] if fails to get capabilities.
+    /// With [`Error::FailedToGetCapabilities`] if fails to retrieve
+    /// capabilities.
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#dom-rtcrtpsender
     pub async fn get_sender_codec_capabilities(

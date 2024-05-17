@@ -1,3 +1,6 @@
+[build]
+rustflags = ["--cfg=web_sys_unstable_apis"]
+
 [env]
 CARGO_WORKSPACE_DIR = { value = "", relative = true }
 

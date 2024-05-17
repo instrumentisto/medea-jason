@@ -765,7 +765,7 @@ pub struct IceCandidate {
     /// If this [`IceCandidate`] represents an end-of-candidates indication,
     /// then it's an empty string.
     ///
-    /// [0]: https://w3.org/TR/webrtc/#dfn-candidate-attribute
+    /// [0]: https://w3.org/TR/webrtc#dfn-candidate-attribute
     pub candidate: String,
 
     /// Index (starting at zero) of the media description in the SDP this
@@ -775,7 +775,7 @@ pub struct IceCandidate {
     /// [Media stream "identification-tag"] for the media component this
     /// [`IceCandidate`] is associated with.
     ///
-    /// [0]: https://w3.org/TR/webrtc/#dfn-media-stream-identification-tag
+    /// [0]: https://w3.org/TR/webrtc#dfn-media-stream-identification-tag
     pub sdp_mid: Option<String>,
 }
 
@@ -988,7 +988,7 @@ pub enum Direction {
 
         /// [Media stream "identification-tag"] of this outgoing [`Track`].
         ///
-        /// [0]: https://w3.org/TR/webrtc/#dfn-media-stream-identification-tag
+        /// [0]: https://w3.org/TR/webrtc#dfn-media-stream-identification-tag
         mid: Option<String>,
     },
 
@@ -999,7 +999,7 @@ pub enum Direction {
 
         /// [Media stream "identification-tag"] of this incoming [`Track`].
         ///
-        /// [0]: https://w3.org/TR/webrtc/#dfn-media-stream-identification-tag
+        /// [0]: https://w3.org/TR/webrtc#dfn-media-stream-identification-tag
         mid: Option<String>,
     },
 }
