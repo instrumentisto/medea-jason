@@ -73,20 +73,25 @@
       width: 100%;
     }
 
-    .camera-video {
+    .camera-video,
+    .display-video {
       position: relative;
       margin: 5px;
     }
 
-    .camera-video video {
+    .camera-video video,
+    .display-video video {
       display: block;
       margin: 0px;
       padding: 0px;
     }
 
     .camera-video::before,
-    .camera-video::after {
-      display: none;
+    .display-video::before,
+    .camera-video::after,
+    .display-video::after {
+      <!-- display: none; -->
+      display: block;
       position: absolute;
       right: 3px;
       padding: 3px 5px;
@@ -97,20 +102,24 @@
       color: #ffffff;
     }
 
-    .camera-video::before {
+    .camera-video::before,
+    .display-video::before {
       content: attr(data-bitrate) " kbits/sec";
       top: 3px;
       background-color: #033c73;
     }
 
-    .camera-video::after {
+    .camera-video::after,
+    .display-video::after {
       content: attr(data-width) "x" attr(data-height) "x" attr(data-framerate);
       top: 24px;
       background-color: #2fa4e7;
     }
 
     .camera-video:hover:before,
-    .camera-video:hover:after {
+    .display-video:hover:before,
+    .camera-video:hover:after,
+    .display-video:hover:after {
       display: block;
     }
   </style>

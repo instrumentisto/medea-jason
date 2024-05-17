@@ -2,79 +2,100 @@ const controlDomain = 'http://127.0.0.1:8000';
 const controlUrl = controlDomain + '/control-api/';
 const baseUrl = 'ws://127.0.0.1:8080/ws/';
 
-let [listenerWrapper, deleteTrack] = (() => {
-  const tracks = {};
-  const startTimer = () => setInterval(() => {
-    Object.keys(tracks).forEach(id => {
-      const track = tracks[id];
+const tracks = {};
 
-      track.receiver.getStats()
-        .then(res => {
-          res.forEach(stat => {
-            if (!stat) return;
-            let inStats = false;
-            if ((stat.mediaType === 'video' || stat.id.toLowerCase().indexOf('video') > -1) &&
-              stat.type === 'inbound-rtp' && stat.id.indexOf('rtcp') < 0) {
-              inStats = true;
-            }
-            if (inStats) {
-              track.bsnow = stat.bytesReceived;
-              track.tsnow = stat.timestamp;
-              if (track.bsbefore === null || track.tsbefore === null) {
-                track.bsbefore = track.bsnow;
-                track.tsbefore = track.tsnow;
-              } else {
-                let timePassed = track.tsnow - track.tsbefore;
-                let bitrate = Math.round((track.bsnow - track.bsbefore) * 8 / timePassed);
-                track.bitrate = typeof bitrate == 'number' ? bitrate : 0;
-                track.bsbefore = track.bsnow;
-                track.tsbefore = track.tsnow;
-              }
-            }
-          });
+const isVideoStat = (stat) => {
+  return (stat.mediaType === 'video' || stat.id.toLowerCase().includes('video')) &&
+         stat.type === 'inbound-rtp' && !stat.id.includes('rtcp');
+};
 
-          if (typeof track.bitrate != 'number') {
-            return;
-          }
+const updateTrackBitrate = (track, stat) => {
+  track.bsnow = stat.bytesReceived;
+  track.tsnow = stat.timestamp;
 
-          if (!track.element) {
-            const mediaElements = document.querySelectorAll('.camera-video');
-            for (const i in Object.keys(mediaElements)) {
-              if (mediaElements[i].dataset.trackId == id) {
-                track.element = mediaElements[i];
-                break;
-              }
-            }
+  if (track.bsbefore === null || track.tsbefore === null) {
+    track.bsbefore = track.bsnow;
+    track.tsbefore = track.tsnow;
+  } else {
+    const timePassed = track.tsnow - track.tsbefore;
+    const bitrate = Math.round((track.bsnow - track.bsbefore) * 8 / timePassed);
+    track.bitrate = Number.isFinite(bitrate) ? bitrate : 0;
+    track.bsbefore = track.bsnow;
+    track.tsbefore = track.tsnow;
+  }
+};
 
-            if (!track.element) return;
-          }
+const updateTrackDimensions = (track, stat) => {
+  if (stat.frameWidth && stat.frameHeight) {
+    track.width = stat.frameWidth;
+    track.height = stat.frameHeight;
+  }
+  if (stat.framesPerSecond) {
+    track.frameRate = stat.framesPerSecond;
+  }
+};
 
-          const mediaElement = track.element;
-          mediaElement.dataset.bitrate = track.bitrate;
-          const settings = track.inner.getSettings();
-          mediaElement.dataset.width = settings.width;
-          mediaElement.dataset.height = settings.height;
-          mediaElement.dataset.framerate = settings.frameRate.toFixed(2);;
-        });
-    });
-  }, 1000);
-  let timer;
+const attachTrackElement = (track, id) => {
+  const mediaElements = document.querySelectorAll('.camera-video, .display-video');
+  mediaElements.forEach((mediaElement) => {
+    if (mediaElement.dataset.trackId === id) {
+      track.element = mediaElement;
+    }
+  });
+};
 
-  return [
-    (evt, listener) => {
-      listener(evt);
+const updateMediaElementData = (track, mediaElement) => {
+  const settings = track.inner.getSettings();
+  mediaElement.dataset.bitrate = track.bitrate;
+  mediaElement.dataset.width = settings.width || track.width || 'N/A';
+  mediaElement.dataset.height = settings.height || track.height || 'N/A';
+  mediaElement.dataset.framerate = settings.frameRate ? settings.frameRate.toFixed(2) : (track.frameRate ? track.frameRate.toFixed(2) : 'N/A');
+};
 
-      if (evt.track.kind == 'audio') return;
-
-      Object.assign(tracks, { [evt.track.id]: { 'inner': evt.track, 'receiver': evt.receiver } });
-      if (!timer) {
-        timer = startTimer();
-        delete startTimer;
+const updateTrackStats = (track, id) => {
+  track.receiver.getStats().then((res) => {
+    res.forEach((stat) => {
+      if (!stat) return;
+      if (isVideoStat(stat)) {
+        updateTrackBitrate(track, stat);
+        updateTrackDimensions(track, stat);
       }
-    },
-    id => delete tracks[id]
-  ];
-})();
+    });
+
+    if (typeof track.bitrate !== 'number') return;
+    if (!track.element) attachTrackElement(track, id);
+    if (track.element) updateMediaElementData(track, track.element);
+  });
+};
+
+const startTimer = () => setInterval(() => {
+  Object.keys(tracks).forEach((id) => {
+    const track = tracks[id];
+    updateTrackStats(track, id);
+  });
+}, 1000);
+
+let timer = null;
+
+const listenerWrapper = (evt, listener) => {
+  listener(evt);
+
+  if (evt.track.kind === 'audio') return;
+
+  tracks[evt.track.id] = { inner: evt.track, receiver: evt.receiver, bsbefore: null, tsbefore: null, width: null, height: null, frameRate: null };
+
+  if (!timer) {
+    timer = startTimer();
+  }
+};
+
+const deleteTrack = (id) => {
+  delete tracks[id];
+  if (Object.keys(tracks).length === 0) {
+    clearInterval(timer);
+    timer = null;
+  }
+};
 
 RTCPeerConnection.prototype.addEventListener = function (type, listener, others) {
   EventTarget.prototype.addEventListener.call(
@@ -791,22 +812,30 @@ window.onload = async function() {
 
         if (track.kind() === rust.MediaKind.Video) {
           if (track.media_source_kind() === rust.MediaSourceKind.Display) {
-            playElement = memberVideoDiv.getElementsByClassName('display-video')[0];
+            memberVideoDiv.querySelectorAll('.display-video').forEach(videoElement => {
+              if (videoElement.dataset.trackId == track.get_track().id) playElement = videoElement;
+            });
             if (playElement === undefined) {
-              playElement = document.createElement('video');
+              playElement = document.createElement('div');
+              playElement.appendChild(document.createElement('video'))
               playElement.classList.add('display-video', 'order-2');
-              playElement.playsinline = 'true';
-              playElement.controls = 'true';
-              playElement.autoplay = 'true';
+              playElement.firstChild.playsinline = 'true';
+              playElement.firstChild.controls = 'true';
+              playElement.firstChild.autoplay = 'true';
+              playElement.dataset.trackId = track.get_track().id;
+              playElement.dataset.bitrate = 0;
+              playElement.dataset.width = 0;
+              playElement.dataset.height = 0;
+              playElement.dataset.framerate = 0;
               if (track.media_direction() != 0) {
-                playElement.pause();
+                playElement.firstChild.pause();
                 playElement.style.display = 'none';
               }
               memberVideoDiv.appendChild(playElement);
             }
             let mediaStream = new MediaStream();
             mediaStream.addTrack(track.get_track());
-            playElement.srcObject = mediaStream;
+            playElement.firstChild.srcObject = mediaStream;
           } else {
             memberVideoDiv.querySelectorAll('.camera-video').forEach(videoElement => {
               if (videoElement.dataset.trackId == track.get_track().id) playElement = videoElement;
