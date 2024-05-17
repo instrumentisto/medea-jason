@@ -7,6 +7,7 @@ mod manager;
 pub mod track;
 
 use derive_more::Display;
+use medea_client_api_proto::MediaType;
 
 #[doc(inline)]
 pub use self::{
@@ -57,6 +58,15 @@ impl From<&TrackConstraints> for MediaKind {
         match media_type {
             TrackConstraints::Audio(_) => Self::Audio,
             TrackConstraints::Video(_) => Self::Video,
+        }
+    }
+}
+
+impl From<&MediaType> for MediaKind {
+    fn from(media_type: &MediaType) -> Self {
+        match media_type {
+            MediaType::Audio(_) => Self::Audio,
+            MediaType::Video(_) => Self::Video,
         }
     }
 }

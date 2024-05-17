@@ -9,10 +9,7 @@ use medea_client_api_proto as proto;
 use proto::{ConnectionMode, TrackId};
 
 use crate::{
-    media::{
-        track::remote, MediaDirection, MediaKind, RecvConstraints,
-        TrackConstraints,
-    },
+    media::{track::remote, MediaDirection, RecvConstraints, TrackConstraints},
     peer::{
         media::media_exchange_state, MediaConnections, MediaStateControllable,
         PeerEvent, TrackEvent,
@@ -107,7 +104,6 @@ impl Receiver {
         connection_mode: ConnectionMode,
     ) -> Self {
         let caps = TrackConstraints::from(state.media_type().clone());
-        let kind = MediaKind::from(&caps);
 
         #[allow(clippy::if_then_some_else_none)]
         let transceiver = if state.mid().is_none() {
@@ -129,7 +125,7 @@ impl Receiver {
             } else {
                 let new_transceiver =
                     media_connections.0.borrow().add_transceiver(
-                        kind,
+                        state.media_type().clone(),
                         platform::TransceiverDirection::INACTIVE,
                     );
                 new_transceiver.await

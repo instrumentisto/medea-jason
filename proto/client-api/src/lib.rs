@@ -1088,6 +1088,18 @@ pub enum Codec {
     AV1,
 }
 
+impl Codec {
+    /// Returns MIME-type of this [`Codec`].
+    #[must_use]
+    pub const fn mime_type(&self) -> &'static str {
+        match self {
+            Self::VP8 => "video/VP8",
+            Self::VP9 => "video/VP9",
+            Self::AV1 => "video/AV1",
+        }
+    }
+}
+
 /// [Scalability mode] preference for [SVC (Scalable Video Coding)][SVC].
 ///
 /// In [SVC], the scalability is typically defined in terms of layers (L) and
@@ -1248,6 +1260,17 @@ pub struct EncodingParameters {
     ///
     /// Must be greater than or equal to `1`.
     pub scale_resolution_down_by: Option<u8>,
+}
+
+impl Default for EncodingParameters {
+    fn default() -> Self {
+        Self {
+            rid: "0".to_owned(),
+            active: true,
+            max_bitrate: None,
+            scale_resolution_down_by: None,
+        }
+    }
 }
 
 /// Estimated connection quality.
