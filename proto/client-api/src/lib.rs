@@ -1262,6 +1262,7 @@ pub struct EncodingParameters {
     pub scale_resolution_down_by: Option<u8>,
 }
 
+// TODO: remove default cause default rid is not really correct
 impl Default for EncodingParameters {
     fn default() -> Self {
         Self {

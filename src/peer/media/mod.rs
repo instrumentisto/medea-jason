@@ -246,6 +246,7 @@ pub enum GetMidsError {
     ReceiversWithoutMid,
 }
 
+// TODO: add unit tests
 /// Returns required [`CodecCapability`]s and [`ScalabilityMode`] for
 /// [`platform::Transceiver`] based on the provided [`SvcSettings`].
 async fn probe_video_codecs(
