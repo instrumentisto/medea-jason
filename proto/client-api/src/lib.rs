@@ -1262,18 +1262,6 @@ pub struct EncodingParameters {
     pub scale_resolution_down_by: Option<u8>,
 }
 
-// TODO: remove default cause default rid is not really correct
-impl Default for EncodingParameters {
-    fn default() -> Self {
-        Self {
-            rid: "0".to_owned(),
-            active: true,
-            max_bitrate: None,
-            scale_resolution_down_by: None,
-        }
-    }
-}
-
 /// Estimated connection quality.
 #[cfg_attr(feature = "client", derive(Deserialize))]
 #[cfg_attr(feature = "server", derive(Serialize))]

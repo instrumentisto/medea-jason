@@ -302,7 +302,12 @@ fn get_encodings_params(
     target_sm: Option<ScalabilityMode>,
 ) -> Vec<SendEncodingParameters> {
     if encodings.is_empty() && target_sm.is_some() {
-        encodings.push(EncodingParameters::default());
+        encodings.push(EncodingParameters {
+            rid: "0".to_owned(),
+            active: true,
+            max_bitrate: None,
+            scale_resolution_down_by: None,
+        });
     }
 
     encodings
