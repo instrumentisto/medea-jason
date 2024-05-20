@@ -514,14 +514,22 @@ mod codec_probing {
     // support new video codecs.
     #[wasm_bindgen_test]
     async fn codec_capability_not_changed() {
+        // List of codecs which are not fully supported by all browsers.
+        const NOT_FULLY_SUPPORTED_CODECS: &[&str] = &["video/AV1"];
+
         let caps =
             CodecCapability::get_sender_codec_capabilities(MediaKind::Video)
                 .await
                 .unwrap();
+
+        // Filter codecs which are not fully supported by all browsers.
+        let codecs_caps: Vec<_> = target_codecs_mime_types(&caps)
+            .into_iter()
+            .filter(|c| !NOT_FULLY_SUPPORTED_CODECS.contains(&c.as_str()))
+            .collect();
         assert_eq!(
-            target_codecs_mime_types(&caps),
+            codecs_caps,
             vec![
-                "video/AV1",
                 "video/H264",
                 "video/VP8",
                 "video/VP9",
