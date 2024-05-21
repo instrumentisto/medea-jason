@@ -1089,7 +1089,9 @@ pub enum Codec {
 }
 
 impl Codec {
-    /// Returns MIME-type of this [`Codec`].
+    /// Returns [MIME "type/subtype"] string of this [`Codec`].
+    ///
+    /// [MIME "type/subtype"]: https://en.wikipedia.org/wiki/Media_type
     #[must_use]
     pub const fn mime_type(&self) -> &'static str {
         match self {

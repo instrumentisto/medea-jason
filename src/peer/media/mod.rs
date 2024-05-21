@@ -246,12 +246,12 @@ pub enum GetMidsError {
     ReceiversWithoutMid,
 }
 
-/// Returns required [`CodecCapability`]s and [`ScalabilityMode`] for
+/// Returns the required [`CodecCapability`]s and [`ScalabilityMode`] for a
 /// [`platform::Transceiver`] based on the provided [`SvcSettings`].
 pub async fn probe_video_codecs(
     svc: &Vec<SvcSettings>,
 ) -> (Vec<CodecCapability>, Option<ScalabilityMode>) {
-    /// List of required codecs for every [`MediaKind::Video`]
+    /// List of required codecs for every [`MediaKind::Video`] of a
     /// [`platform::Transceiver`].
     const REQUIRED_CODECS: [&str; 3] =
         ["video/rtx", "video/red", "video/ulpfec"];
@@ -294,8 +294,8 @@ pub async fn probe_video_codecs(
         )
 }
 
-/// Returns [`SendEncodingParameters`] for [`platform::Transceiver`] based on
-/// the provided [`EncodingParameters`] and target [`ScalabilityMode`]
+/// Returns [`SendEncodingParameters`] for a [`platform::Transceiver`] based on
+/// the provided [`EncodingParameters`] and target [`ScalabilityMode`].
 fn get_encodings_params(
     mut encodings: Vec<EncodingParameters>,
     target_sm: Option<ScalabilityMode>,
@@ -396,8 +396,8 @@ impl InnerMediaConnections {
     /// Creates a [`platform::Transceiver`] and adds it to the
     /// [`platform::RtcPeerConnection`].
     ///
-    /// It handles both audio and video media types, including setting up
-    /// encoding parameters and codec preferences for video.
+    /// Handles both audio and video media types, including setting up
+    /// [`EncodingParameters`] and codec preferences for video.
     fn add_transceiver(
         &self,
         media_type: MediaType,
