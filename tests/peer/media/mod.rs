@@ -448,3 +448,97 @@ mod receiver_patch {
         );
     }
 }
+
+mod codec_probing {
+    use medea_client_api_proto::{Codec, ScalabilityMode, SvcSettings};
+    use medea_jason::{
+        media::MediaKind, peer::media::probe_video_codecs,
+        platform::CodecCapability,
+    };
+
+    use super::*;
+
+    fn target_codecs_mime_types(codecs: &[CodecCapability]) -> Vec<String> {
+        let mut mime_types: Vec<_> =
+            codecs.iter().map(|c| c.mime_type().unwrap()).collect();
+        mime_types.sort();
+        mime_types.dedup();
+        mime_types
+    }
+
+    #[wasm_bindgen_test]
+    async fn probes_only_one_codec() {
+        let (target_codecs, svc) = probe_video_codecs(&vec![SvcSettings {
+            codec: Codec::VP8,
+            scalability_mode: ScalabilityMode::L1T1,
+        }])
+        .await;
+
+        assert_eq!(svc, Some(ScalabilityMode::L1T1));
+        assert_eq!(
+            target_codecs_mime_types(&target_codecs),
+            vec!["video/VP8", "video/red", "video/rtx", "video/ulpfec"]
+        );
+    }
+
+    #[wasm_bindgen_test]
+    async fn probes_first_codec_when_many() {
+        let (target_codecs, svc) = probe_video_codecs(&vec![
+            SvcSettings {
+                codec: Codec::VP9,
+                scalability_mode: ScalabilityMode::L1T2,
+            },
+            SvcSettings {
+                codec: Codec::VP8,
+                scalability_mode: ScalabilityMode::L1T1,
+            },
+        ])
+        .await;
+
+        assert_eq!(svc, Some(ScalabilityMode::L1T2));
+        assert_eq!(
+            target_codecs_mime_types(&target_codecs),
+            vec!["video/VP9", "video/red", "video/rtx", "video/ulpfec"]
+        );
+    }
+
+    #[wasm_bindgen_test]
+    async fn empty_codec_probe_when_target_codec_not_found() {
+        let (target_codecs, svc) = probe_video_codecs(&vec![]).await;
+        assert!(target_codecs.is_empty());
+        assert_eq!(svc, None);
+    }
+
+    // This test is necessary to identify changes in the list of available
+    // browser codecs, allowing us to add new required service codecs or
+    // support new video codecs.
+    #[wasm_bindgen_test]
+    async fn codec_capability_not_changed() {
+        // List of codecs which are not fully supported by all browsers.
+        const NOT_FULLY_SUPPORTED_CODECS: &[&str] = &["video/AV1"];
+
+        let caps =
+            CodecCapability::get_sender_codec_capabilities(MediaKind::Video)
+                .await
+                .unwrap();
+
+        // Filter codecs which are not fully supported by all browsers.
+        let codecs_caps: Vec<_> = target_codecs_mime_types(&caps)
+            .into_iter()
+            .filter(|c| !NOT_FULLY_SUPPORTED_CODECS.contains(&c.as_str()))
+            .collect();
+        assert_eq!(
+            codecs_caps,
+            vec![
+                "video/H264",
+                "video/VP8",
+                "video/VP9",
+                "video/red",
+                "video/rtx",
+                "video/ulpfec"
+            ],
+            "Browser available codecs are changed, check new codecs \
+            and update this test"
+        );
+    }
+}

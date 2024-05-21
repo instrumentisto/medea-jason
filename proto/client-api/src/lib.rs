@@ -1088,6 +1088,20 @@ pub enum Codec {
     AV1,
 }
 
+impl Codec {
+    /// Returns [MIME "type/subtype"] string of this [`Codec`].
+    ///
+    /// [MIME "type/subtype"]: https://en.wikipedia.org/wiki/Media_type
+    #[must_use]
+    pub const fn mime_type(&self) -> &'static str {
+        match self {
+            Self::VP8 => "video/VP8",
+            Self::VP9 => "video/VP9",
+            Self::AV1 => "video/AV1",
+        }
+    }
+}
+
 /// [Scalability mode] preference for [SVC (Scalable Video Coding)][SVC].
 ///
 /// In [SVC], the scalability is typically defined in terms of layers (L) and

@@ -15,8 +15,9 @@ use futures::{
 };
 use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
-use medea_client_api_proto::{ConnectionMode, MediaType, MemberId};
-use proto::{MediaSourceKind, TrackId};
+use medea_client_api_proto::{ConnectionMode, MemberId};
+use medea_client_api_proto::{EncodingParameters, SvcSettings};
+use proto::{MediaSourceKind, MediaType, ScalabilityMode, TrackId};
 use tracerr::Traced;
 
 #[cfg(feature = "mockable")]
@@ -25,7 +26,10 @@ use crate::{
     media::{track::local, MediaKind},
     peer::{LocalStreamUpdateCriteria, PeerEvent},
     platform,
-    platform::TransceiverInit,
+    platform::{
+        send_encoding_parameters::SendEncodingParameters, CodecCapability,
+        TransceiverInit,
+    },
     utils::{Caused, Component},
 };
 
@@ -242,6 +246,81 @@ pub enum GetMidsError {
     ReceiversWithoutMid,
 }
 
+/// Returns the required [`CodecCapability`]s and [`ScalabilityMode`] for a
+/// [`platform::Transceiver`] based on the provided [`SvcSettings`].
+pub async fn probe_video_codecs(
+    svc: &Vec<SvcSettings>,
+) -> (Vec<CodecCapability>, Option<ScalabilityMode>) {
+    /// List of required codecs for every [`MediaKind::Video`] of a
+    /// [`platform::Transceiver`].
+    const REQUIRED_CODECS: [&str; 3] =
+        ["video/rtx", "video/red", "video/ulpfec"];
+
+    CodecCapability::get_sender_codec_capabilities(MediaKind::Video)
+        .await
+        .map_or_else(
+            |_| (vec![], None),
+            |codecs| {
+                let mut target_scalability_mode = None;
+                let mut target_codecs = Vec::new();
+                let mut codecs: HashMap<String, CodecCapability> = codecs
+                    .into_iter()
+                    .filter_map(|codec| Some((codec.mime_type().ok()?, codec)))
+                    .collect();
+
+                for svc_setting in svc {
+                    if let Some(codec_cap) =
+                        codecs.remove(svc_setting.codec.mime_type())
+                    {
+                        target_codecs.push(codec_cap);
+                        target_scalability_mode =
+                            Some(svc_setting.scalability_mode);
+                        break;
+                    }
+                }
+                if !target_codecs.is_empty() {
+                    codecs
+                        .into_iter()
+                        .filter_map(|(mime, codec)| {
+                            REQUIRED_CODECS
+                                .contains(&mime.as_str())
+                                .then_some(codec)
+                        })
+                        .for_each(|cap| target_codecs.push(cap));
+                }
+
+                (target_codecs, target_scalability_mode)
+            },
+        )
+}
+
+/// Returns [`SendEncodingParameters`] for a [`platform::Transceiver`] based on
+/// the provided [`EncodingParameters`] and target [`ScalabilityMode`].
+fn get_encodings_params(
+    mut encodings: Vec<EncodingParameters>,
+    target_sm: Option<ScalabilityMode>,
+) -> Vec<SendEncodingParameters> {
+    if encodings.is_empty() && target_sm.is_some() {
+        encodings.push(EncodingParameters {
+            rid: "0".to_owned(),
+            active: true,
+            max_bitrate: None,
+            scale_resolution_down_by: None,
+        });
+    }
+
+    encodings
+        .into_iter()
+        .map(|enc| {
+            let mut enc = SendEncodingParameters::from(enc);
+            if let Some(target_sm) = target_sm {
+                enc.set_scalability_mode(target_sm);
+            }
+            enc
+        })
+        .collect()
+}
+
 /// Actual data of [`MediaConnections`] storage.
 #[derive(Debug)]
 struct InnerMediaConnections {
@@ -316,15 +395,45 @@ impl InnerMediaConnections {
 
     /// Creates a [`platform::Transceiver`] and adds it to the
     /// [`platform::RtcPeerConnection`].
+    ///
+    /// Handles both audio and video media types, including setting up
+    /// [`EncodingParameters`] and codec preferences for video.
     fn add_transceiver(
         &self,
-        kind: MediaKind,
+        media_type: MediaType,
         direction: platform::TransceiverDirection,
     ) -> impl Future<Output = platform::Transceiver> + 'static {
         let peer = Rc::clone(&self.peer);
+
         async move {
-            peer.add_transceiver(kind, TransceiverInit::new(direction))
-                .await
+            let kind = MediaKind::from(&media_type);
+
+            match media_type {
+                MediaType::Audio(_) => {
+                    peer.add_transceiver(kind, TransceiverInit::new(direction))
+                        .await
+                }
+                MediaType::Video(settings) => {
+                    let mut init = TransceiverInit::new(direction);
+
+                    let (target_codecs, target_scalability_mode) =
+                        probe_video_codecs(&settings.svc_settings).await;
+
+                    let encoding_params = get_encodings_params(
+                        settings.encoding_parameters,
+                        target_scalability_mode,
+                    );
+                    if !encoding_params.is_empty() {
+                        init.sending_encodings(encoding_params);
+                    }
+
+                    let transceiver = peer.add_transceiver(kind, init).await;
+                    if !target_codecs.is_empty() {
+                        transceiver.set_codec_preferences(target_codecs);
+                    }
+                    transceiver
+                }
+            }
         }
     }
 
