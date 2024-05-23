@@ -825,6 +825,21 @@ pub enum ReceiverStatsKind {
 #[derive(Clone, Debug, Deserialize, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RtcIceCandidatePairStats {
+    /// Unique identifier associated to the object that was inspected to
+    /// produce the [`RtcTransportStats`] associated with this candidates
+    /// pair.
+    pub transport_id: Option<String>,
+
+    /// Unique identifier associated to the object that was inspected to
+    /// produce the [`RtcIceCandidateStats`] for the local candidate
+    /// associated with this candidates pair.
+    pub local_candidate_id: Option<String>,
+
+    /// Unique identifier associated to the object that was inspected to
+    /// produce the [`RtcIceCandidateStats`] for the remote candidate
+    /// associated with this candidates pair.
+    pub remote_candidate_id: Option<String>,
+
     /// State of the checklist for the local and remote candidates in a pair.
     pub state: IceCandidatePairState,
 
