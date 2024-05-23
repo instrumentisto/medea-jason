@@ -21,7 +21,7 @@ All user visible changes to this project will be documented in this file. This p
     - Exceptions thrown from Dart callbacks called by Rust ([#138]).
 - Monitoring:
     - `IceCandidateError` metric sending to server ([#151]);
-    - `transport_id`, `local_candidate_id` and `remote_candidate_id` to the `RtcIceCandidatePairStats` ([#172]).
+    - `transport_id`, `local_candidate_id` and `remote_candidate_id` to `RtcIceCandidatePairStats` ([#172]).
 
 ### Fixed
 
