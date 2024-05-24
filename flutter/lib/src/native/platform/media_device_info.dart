@@ -19,27 +19,32 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Returns [MediaDeviceInfo.deviceId] value.
-Pointer<Utf8> _deviceId(webrtc.MediaDeviceInfo deviceInfo) {
+Pointer<Utf8> _deviceId(Object deviceInfo) {
+  deviceInfo as webrtc.MediaDeviceInfo;
   return deviceInfo.deviceId.toNativeUtf8();
 }
 
 /// Returns [MediaDeviceInfo.label] value.
-Pointer<Utf8> _label(webrtc.MediaDeviceInfo deviceInfo) {
+Pointer<Utf8> _label(Object deviceInfo) {
+  deviceInfo as webrtc.MediaDeviceInfo;
   return deviceInfo.label.toNativeUtf8();
 }
 
 /// Returns [MediaDeviceInfo.groupId] value.
-Pointer _groupId(webrtc.MediaDeviceInfo deviceInfo) {
+Pointer _groupId(Object deviceInfo) {
+  deviceInfo as webrtc.MediaDeviceInfo;
   return ForeignValue.none().intoRustOwned();
 }
 
 /// Indicates whether the last attempt to use the provided device failed.
-bool _isFailed(webrtc.MediaDeviceInfo deviceInfo) {
+bool _isFailed(Object deviceInfo) {
+  deviceInfo as webrtc.MediaDeviceInfo;
   return deviceInfo.isFailed;
 }
 
 /// Returns [MediaDeviceInfo.kind] value.
-int _kind(webrtc.MediaDeviceInfo deviceInfo) {
+int _kind(Object deviceInfo) {
+  deviceInfo as webrtc.MediaDeviceInfo;
   switch (deviceInfo.kind) {
     case webrtc.MediaDeviceKind.audioinput:
       return 0;

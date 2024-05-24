@@ -16,7 +16,7 @@ dependencies:
   http: ^0.13.5
   js: ^0.6.5
   json_annotation: ^4.7.0
-  medea_flutter_webrtc: 0.10.0-dev+rev.ac47bda72db66e216e2504f7f34fe704f19dad6e
+  medea_flutter_webrtc: 0.10.0-dev+rev.eac7fec21bfcb886416427e00efa111d005a50c1
   meta: ^1.8.0
   retry: ^3.1.0
   tuple: ^2.0.1
@@ -29,23 +29,18 @@ dev_dependencies:
   flutter_lints: ^3.0.1
   flutter_test:
     sdk: flutter
-  freezed: ^2.2.0
+  freezed: 2.5.3
   gherkin: ^3.1.0
   import_sorter: ^4.6.0
   json_serializable: ^6.7.1
 
-# TODO: Remove once `flutter_gherkin` updates.
 dependency_overrides:
-  analyzer: ^5.13.0
-  # Pinned until analyzer is upgraded to v6
-  #  https://github.com/dart-lang/dart_style/issues/1328
-  dart_style: 2.3.3
-  # Pinned until gql-dart updates to v4
-  # https://github.com/gql-dart/gql/blob/master/links/gql_websocket_link/pubspec.yaml#L13
+  # Pinned until `flutter_gherkin` updates
+  analyzer: ^6.5.0
+  # Pinned until `flutter_gherkin` updates
+  meta: ^1.14.0
+  # Pinned until `flutter_gherkin` updates
   uuid: ^3.0.7
-  # Pinned until flutter_rust_bridge update to v11
-  # https://github.com/fzyzcjy/flutter_rust_bridge/pull/1757
-  ffigen: 9.0.0
 
 
 flutter:

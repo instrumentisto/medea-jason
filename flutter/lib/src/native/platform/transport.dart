@@ -61,8 +61,9 @@ class MockWebSocket {
   ///
   /// Subscribes to the created [WebSocket] messages with the specified
   /// [onMessage] and [onClose] callbacks.
-  static Object connect(
-      Pointer<Utf8> addr, Function onMessage, Function onClose) {
+  static Object connect(Pointer<Utf8> addr, Object onMessage, Object onClose) {
+    onMessage as Function;
+    onClose as Function;
     return () async {
       var ws = await WebSocket.connect(addr.nativeStringToDartString());
       _lastWebSocket = ws;
@@ -97,7 +98,9 @@ class MockWebSocket {
 ///
 /// Subscribes to the created [WebSocket] messages with the given [onMessage]
 /// and [onClose] callbacks.
-Object _connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
+Object _connect(Pointer<Utf8> addr, Object onMessage, Object onClose) {
+  onMessage as Function;
+  onClose as Function;
   return () async {
     var ws = await WebSocket.connect(addr.nativeStringToDartString());
     ws.listen(
@@ -116,22 +119,26 @@ Object _connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
 }
 
 /// Sends the provided [message] to the provided [WebSocket].
-void _send(WebSocket ws, Pointer<Utf8> message) {
+void _send(Object ws, Pointer<Utf8> message) {
+  ws as WebSocket;
   ws.add(message.nativeStringToDartString());
 }
 
 /// Closes the provided [WebSocket] connection with the provided
 /// [closeCode] and [closeMsg].
-void _close(WebSocket ws, int closeCode, Pointer<Utf8> closeMsg) {
+void _close(Object ws, int closeCode, Pointer<Utf8> closeMsg) {
+  ws as WebSocket;
   ws.close(closeCode, closeMsg.nativeStringToDartString());
 }
 
 /// Returns [CloseFrame.code] of the provided [CloseFrame].
-int _closeCode(CloseFrame closeFrame) {
+int _closeCode(Object closeFrame) {
+  closeFrame as CloseFrame;
   return closeFrame.code ?? 1005;
 }
 
 /// Returns [CloseFrame.reason] of the provided [CloseFrame].
-Pointer<Utf8> _closeReason(CloseFrame closeFrame) {
+Pointer<Utf8> _closeReason(Object closeFrame) {
+  closeFrame as CloseFrame;
   return (closeFrame.reason ?? '').toNativeUtf8();
 }

@@ -3,8 +3,6 @@
 //! [1]: https://w3.org/TR/mediacapture-streams#mediadevices
 
 #![allow(clippy::unwrap_used)]
-// TODO: False positive in function signatures, try remove on 1.78 Rust upgrade.
-#![allow(clippy::let_underscore_untyped)]
 
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen_futures::JsFuture;

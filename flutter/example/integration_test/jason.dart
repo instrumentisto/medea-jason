@@ -34,6 +34,9 @@ void main() {
     } else if (Platform.isMacOS) {
       deviceLength = 3;
     }
+    if (Platform.isMacOS) {
+      deviceLength = 3;
+    }
 
     expect(devices.length, equals(deviceLength));
     expect(tracks.length, equals(2));

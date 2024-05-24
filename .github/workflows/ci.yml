@@ -13,7 +13,7 @@ concurrency:
 
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-  MEDEA_TAG: rtp-mode-svc
+  MEDEA_TAG: edge
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 
@@ -685,6 +685,10 @@ jobs:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
         if: ${{ env.CACHE == 'true' }}
+      - uses: arduino/setup-protoc@v3
+        with:
+          version: ${{ env.PROTOC_VER }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       # Run all task sequentially to not flood the jobs list.
       - run: make docs.rust crate=medea-macro open=no

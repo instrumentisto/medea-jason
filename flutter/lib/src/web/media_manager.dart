@@ -64,13 +64,13 @@ class WebMediaManagerHandle implements MediaManagerHandle {
 
   @override
   Future<int> microphoneVolume() {
-    // TODO(logist322): implement microphoneVolume
+    // TODO: implement microphoneVolume
     throw UnimplementedError();
   }
 
   @override
   Future<void> setMicrophoneVolume(int level) {
-    // TODO(logist322): implement setMicrophoneVolume
+    // TODO: implement setMicrophoneVolume
     throw UnimplementedError();
   }
 }

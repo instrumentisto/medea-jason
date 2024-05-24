@@ -51,6 +51,7 @@
     clippy::large_stack_frames,
     clippy::let_underscore_untyped,
     clippy::lossy_float_literal,
+    clippy::manual_c_str_literals,
     clippy::manual_clamp,
     clippy::map_err_ignore,
     clippy::mem_forget,
@@ -74,6 +75,7 @@
     clippy::print_stderr,
     clippy::print_stdout,
     clippy::pub_without_shorthand,
+    clippy::ref_as_ptr,
     clippy::rc_buffer,
     clippy::rc_mutex,
     clippy::read_zero_byte_vec,
@@ -763,7 +765,7 @@ pub struct IceCandidate {
     /// If this [`IceCandidate`] represents an end-of-candidates indication,
     /// then it's an empty string.
     ///
-    /// [0]: https://w3.org/TR/webrtc/#dfn-candidate-attribute
+    /// [0]: https://w3.org/TR/webrtc#dfn-candidate-attribute
     pub candidate: String,
 
     /// Index (starting at zero) of the media description in the SDP this
@@ -773,7 +775,7 @@ pub struct IceCandidate {
     /// [Media stream "identification-tag"] for the media component this
     /// [`IceCandidate`] is associated with.
     ///
-    /// [0]: https://w3.org/TR/webrtc/#dfn-media-stream-identification-tag
+    /// [0]: https://w3.org/TR/webrtc#dfn-media-stream-identification-tag
     pub sdp_mid: Option<String>,
 }
 
@@ -986,7 +988,7 @@ pub enum Direction {
 
         /// [Media stream "identification-tag"] of this outgoing [`Track`].
         ///
-        /// [0]: https://w3.org/TR/webrtc/#dfn-media-stream-identification-tag
+        /// [0]: https://w3.org/TR/webrtc#dfn-media-stream-identification-tag
         mid: Option<String>,
     },
 
@@ -997,7 +999,7 @@ pub enum Direction {
 
         /// [Media stream "identification-tag"] of this incoming [`Track`].
         ///
-        /// [0]: https://w3.org/TR/webrtc/#dfn-media-stream-identification-tag
+        /// [0]: https://w3.org/TR/webrtc#dfn-media-stream-identification-tag
         mid: Option<String>,
     },
 }
@@ -1084,6 +1086,20 @@ pub enum Codec {
     /// [AV1]: https://en.wikipedia.org/wiki/AV1
     #[display(fmt = "AV1")]
     AV1,
+}
+
+impl Codec {
+    /// Returns [MIME "type/subtype"] string of this [`Codec`].
+    ///
+    /// [MIME "type/subtype"]: https://en.wikipedia.org/wiki/Media_type
+    #[must_use]
+    pub const fn mime_type(&self) -> &'static str {
+        match self {
+            Self::VP8 => "video/VP8",
+            Self::VP9 => "video/VP9",
+            Self::AV1 => "video/AV1",
+        }
+    }
 }
 
 /// [Scalability mode] preference for [SVC (Scalable Video Coding)][SVC].
