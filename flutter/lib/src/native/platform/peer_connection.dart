@@ -96,15 +96,32 @@ Map<String, dynamic> convertRtcIceCandidateStatsToMap(
     'transportId': stats.transportId,
     'address': stats.address,
     'port': stats.port,
-    // TODO(fix): convert this enum to string
-    'protocol': stats.protocol,
-    // TODO(fix): convert this enum to string
-    'candidateType': stats.candidateType,
+    'protocol': convertProtocolToString(stats.protocol),
+    'candidateType': convertCandidateTypeToString(stats.candidateType),
     'priority': stats.priority,
     'url': stats.url,
-    // TODO(fix): convert this enum to string
-    'relayProtocol': stats.relayProtocol,
+    'relayProtocol': convertProtocolToString(stats.relayProtocol),
   };
+}
+
+String convertCandidateTypeToString(CandidateType candidateType) {
+  return switch (candidateType) {
+    CandidateType.host => 'host',
+    CandidateType.srflx => 'srflx',
+    CandidateType.prflx => 'prflx',
+    CandidateType.relay => 'relay',
+  };
+}
+
+String? convertProtocolToString(Protocol? protocol) {
+  if (protocol == null) {
+    return null;
+  } else {
+    return switch (protocol) {
+      Protocol.tcp => 'tcp',
+      Protocol.udp => 'udp',
+    };
+  }
 }
 
 Map<String, dynamic> convertRtcOutboundRtpStreamStatsToMap(
@@ -126,6 +143,8 @@ Map<String, dynamic> convertRtcOutboundRtpStreamStatsToMap(
       'frameHeight': mediaType.frameHeight,
       'framesPerSecond': mediaType.framesPerSecond,
     };
+  } else {
+    throw 'Unreachable';
   }
   return {
     'trackId': stats.trackId,
@@ -169,6 +188,8 @@ Map<String, dynamic> convertRtcInboundRtpStreamStatsToMap(
       'framesReceived': mediaType.framesReceived,
       'sliCount': mediaType.sliCount,
     };
+  } else {
+    throw 'Unreachable';
   }
   return {
     'mediaType': mediaTypeString,
@@ -184,8 +205,7 @@ Map<String, dynamic> convertRtcInboundRtpStreamStatsToMap(
 Map<String, dynamic> convertRtcIceCandidatePairStatsToMap(
     RtcIceCandidatePairStats stats) {
   return {
-    // TODO(fix): convert this enum to string
-    'state': stats.state,
+    'state': convertRtcStatsIceCandidatePairStateToString(stats.state),
     'nominated': stats.nominated,
     'bytesSent': stats.bytesSent,
     'bytesReceived': stats.bytesReceived,
@@ -195,15 +215,37 @@ Map<String, dynamic> convertRtcIceCandidatePairStatsToMap(
   };
 }
 
+String convertRtcStatsIceCandidatePairStateToString(
+    RtcStatsIceCandidatePairState state) {
+  return switch (state) {
+    RtcStatsIceCandidatePairState.frozen => 'frozen',
+    RtcStatsIceCandidatePairState.waiting => 'waiting',
+    RtcStatsIceCandidatePairState.inProgress => 'inProgress',
+    RtcStatsIceCandidatePairState.failed => 'failed',
+    RtcStatsIceCandidatePairState.succeeded => 'succeeded',
+  };
+}
+
 Map<String, dynamic> convertRtcTransportStatsToMap(RtcTransportStats stats) {
   return {
     'packetsSent': stats.packetsSent,
     'packetsReceived': stats.packetsReceived,
     'bytesSent': stats.bytesSent,
     'bytesReceived': stats.bytesReceived,
-    // TODO(fix): convert this enum to string
-    'iceRole': stats.iceRole,
+    'iceRole': convertIceRoleToString(stats.iceRole),
   };
+}
+
+String? convertIceRoleToString(IceRole role) {
+  if (rol == null) {
+    return null;
+  } else {
+    return switch (role) {
+      IceRole.unknown => 'unknown',
+      IceRole.controlling => 'controlling',
+      IceRole.controlled => 'controlled',
+    };
+  }
 }
 
 Map<String, dynamic> convertRtcRemoteInboundRtpStreamStatsToMap(
