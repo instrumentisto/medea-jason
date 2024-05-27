@@ -98,31 +98,32 @@ extension RtcIceCandidateStatsMapConverter on RtcIceCandidateStats {
       'transportId': this.transportId,
       'address': this.address,
       'port': this.port,
-      'protocol': convertProtocolToString(this.protocol),
-      'candidateType': convertCandidateTypeToString(this.candidateType),
+      'protocol': this.protocol.toJsonString(),
+      'candidateType': this.candidateType.toJsonString(),
       'priority': this.priority,
       'url': this.url,
-      'relayProtocol': convertProtocolToString(this.relayProtocol),
+      'relayProtocol': this.relayProtocol.toJsonString(),
     };
   }
 }
 
-String convertCandidateTypeToString(CandidateType candidateType) {
-  return switch (candidateType) {
-    CandidateType.host => 'host',
-    CandidateType.srflx => 'srflx',
-    CandidateType.prflx => 'prflx',
-    CandidateType.relay => 'relay',
-  };
+extension CandidateTypeJsonStringConverter on CandidateType {
+  String toJsonString() {
+    return switch (this) {
+      CandidateType.host => 'host',
+      CandidateType.srflx => 'srflx',
+      CandidateType.prflx => 'prflx',
+      CandidateType.relay => 'relay',
+    };
+  }
 }
 
-String? convertProtocolToString(Protocol? protocol) {
-  if (protocol == null) {
-    return null;
-  } else {
-    return switch (protocol) {
+extension ProtocolJsonStringConverter on Protocol? {
+  String? toJsonString() {
+    return switch (this) {
       Protocol.tcp => 'tcp',
       Protocol.udp => 'udp',
+      null => null
     };
   }
 }
@@ -214,7 +215,7 @@ extension RtcInboundRtpStreamStatsMapConverter on RtcInboundRtpStreamStats {
 extension RtcIceCandidatePairStatsMapConverter on RtcIceCandidatePairStats {
   Map<String, dynamic> toMap() {
     return {
-      'state': convertRtcStatsIceCandidatePairStateToString(this.state),
+      'state': this.state.toJsonString(),
       'nominated': this.nominated,
       'bytesSent': this.bytesSent,
       'bytesReceived': this.bytesReceived,
@@ -225,15 +226,17 @@ extension RtcIceCandidatePairStatsMapConverter on RtcIceCandidatePairStats {
   }
 }
 
-String convertRtcStatsIceCandidatePairStateToString(
-    RtcStatsIceCandidatePairState state) {
-  return switch (state) {
-    RtcStatsIceCandidatePairState.frozen => 'frozen',
-    RtcStatsIceCandidatePairState.waiting => 'waiting',
-    RtcStatsIceCandidatePairState.inProgress => 'inProgress',
-    RtcStatsIceCandidatePairState.failed => 'failed',
-    RtcStatsIceCandidatePairState.succeeded => 'succeeded',
-  };
+extension RtcStatsIceCandidatePairStateJsonStringConverter
+    on RtcStatsIceCandidatePairState {
+  String toJsonString() {
+    return switch (this) {
+      RtcStatsIceCandidatePairState.frozen => 'frozen',
+      RtcStatsIceCandidatePairState.waiting => 'waiting',
+      RtcStatsIceCandidatePairState.inProgress => 'inProgress',
+      RtcStatsIceCandidatePairState.failed => 'failed',
+      RtcStatsIceCandidatePairState.succeeded => 'succeeded',
+    };
+  }
 }
 
 extension RtcTransportStatsMapConverter on RtcTransportStats {
@@ -243,19 +246,18 @@ extension RtcTransportStatsMapConverter on RtcTransportStats {
       'packetsReceived': this.packetsReceived,
       'bytesSent': this.bytesSent,
       'bytesReceived': this.bytesReceived,
-      'iceRole': convertIceRoleToString(this.iceRole),
+      'iceRole': this.iceRole.toJsonString(),
     };
   }
 }
 
-String? convertIceRoleToString(IceRole? role) {
-  if (role == null) {
-    return null;
-  } else {
-    return switch (role) {
+extension IceRoleJsonStringConverter on IceRole? {
+  String? toJsonString() {
+    return switch (this) {
       IceRole.unknown => 'unknown',
       IceRole.controlling => 'controlling',
       IceRole.controlled => 'controlled',
+      null => null
     };
   }
 }
