@@ -23,8 +23,7 @@ All user visible changes to this project will be documented in this file. This p
     - `IceCandidateError` metric sending to server ([#151]);
     - `transport_id`, `local_candidate_id` and `remote_candidate_id` to `RtcIceCandidatePairStats` ([#172]).
 - Library API:
-    - `AudioTrackConstraints.ideal_auto_gain_control` and `AudioTrackConstraints.exact_auto_gain_control` functions ([#166]).
-    
+    - `ideal_auto_gain_control()` and `exact_auto_gain_control()` methods to `AudioTrackConstraints` ([#166]).
 
 ### Fixed
 

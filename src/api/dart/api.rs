@@ -100,8 +100,8 @@ pub struct ApiAudioConstraints {
     #[frb(non_final)]
     pub device_id: Option<String>,
 
-    /// Automatically manages changes in the volume of its source
-    /// media to maintain a steady overall volume level.
+    /// Automatically manages changes in the volume of its source media to
+    /// maintain a steady overall volume level.
     #[frb(non_final)]
     pub auto_gain_control: Option<ConstrainBoolean>,
 }

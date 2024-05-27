@@ -77,7 +77,9 @@ wee_alloc = { version = "0.4", optional = true }
     version = "0.3.68"
     features = [
         "console",
-        "ConstrainDomStringParameters", "ConstrainBooleanParameters", "ConstrainDoubleRange",
+        "ConstrainBooleanParameters",
+        "ConstrainDomStringParameters",
+        "ConstrainDoubleRange",
         "CloseEvent",
         "DisplayMediaStreamConstraints",
         "Event", "EventTarget",

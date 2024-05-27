@@ -968,8 +968,8 @@ pub struct AudioTrackConstraints {
     /// Identifier of the device generating the content for the media track.
     pub device_id: Option<ConstrainString<String>>,
 
-    /// Automatically manages changes in the volume of its source
-    /// media to maintain a steady overall volume level.
+    /// Automatically manages changes in the volume of its source media to
+    /// maintain a steady overall volume level.
     pub auto_gain_control: Option<ConstrainBoolean>,
 
     /// Importance of this [`AudioTrackConstraints`].
@@ -1114,12 +1114,12 @@ pub enum ConstrainString<T> {
     Ideal(T),
 }
 
-/// Representation of the [ConstrainBoolean][1].
+/// Representation of a [ConstrainBoolean][1].
 ///
 /// Can set exact (must be the parameter's value) and ideal (should be used if
 /// possible) constrain.
 ///
-/// [1]: https://w3.org/TR/mediacapture-streams/#dom-constrainboolean
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ConstrainBoolean {
     /// Exact value required for this property.
