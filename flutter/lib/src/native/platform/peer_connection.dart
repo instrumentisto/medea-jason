@@ -88,7 +88,7 @@ extension RtcMediaSourceStatsMapConverter on RtcMediaSourceStats {
 
 extension RtcIceCandidateStatsMapConverter on RtcIceCandidateStats {
   Map<String, dynamic> toMap() {
-    var type = "";
+    var type;
     if (this is RtcLocalIceCandidateStats) {
       type = "local-candidate";
     } else if (this is RtcRemoteIceCandidateStats) {
@@ -169,7 +169,7 @@ extension RtcOutboundRtpStreamStatsMapConverter on RtcOutboundRtpStreamStats {
 extension RtcInboundRtpStreamStatsMapConverter on RtcInboundRtpStreamStats {
   Map<String, dynamic> toMap() {
     var additionalData = {};
-    var mediaTypeString = "";
+    var mediaTypeString;
     if (this.mediaType is RtcInboundRtpStreamAudio) {
       var mediaType = this.mediaType as RtcInboundRtpStreamAudio;
       mediaTypeString = 'audio';
