@@ -276,28 +276,28 @@ Map<String, dynamic> convertRtcRemoteOutboundRtpStreamStatsToMap(
 Map<String, dynamic> convertStatsTypeToMap(RtcStatsType stats_type) {
   if (stats_type is RtcMediaSourceStats) {
     stats_type as RtcMediaSourceStats;
-    print(convertRtcMediaSourceStatsToMap(stats_type));
+    print(jsonEncode(convertRtcMediaSourceStatsToMap(stats_type)));
   } else if (stats_type is RtcIceCandidateStats) {
     stats_type as RtcIceCandidateStats;
-    print(convertRtcIceCandidateStatsToMap(stats_type));
+    print(jsonEncode(convertRtcIceCandidateStatsToMap(stats_type)));
   } else if (stats_type is RtcOutboundRtpStreamStats) {
     stats_type as RtcOutboundRtpStreamStats;
-    print(convertRtcOutboundRtpStreamStatsToMap(stats_type));
+    print(jsonEncode(convertRtcOutboundRtpStreamStatsToMap(stats_type)));
   } else if (stats_type is RtcInboundRtpStreamStats) {
     stats_type as RtcInboundRtpStreamStats;
-    print(convertRtcInboundRtpStreamStatsToMap(stats_type));
+    print(jsonEncode(convertRtcInboundRtpStreamStatsToMap(stats_type)));
   } else if (stats_type is RtcIceCandidatePairStats) {
     stats_type as RtcIceCandidatePairStats;
-    print(convertRtcIceCandidatePairStatsToMap(stats_type));
+    print(jsonEncode(convertRtcIceCandidatePairStatsToMap(stats_type)));
   } else if (stats_type is RtcTransportStats) {
     stats_type as RtcTransportStats;
     print(jsonEncode(convertRtcTransportStatsToMap(stats_type)));
   } else if (stats_type is RtcRemoteInboundRtpStreamStats) {
     stats_type as RtcRemoteInboundRtpStreamStats;
-    print(convertRtcRemoteInboundRtpStreamStatsToMap(stats_type));
+    print(jsonEncode(convertRtcRemoteInboundRtpStreamStatsToMap(stats_type)));
   } else if (stats_type is RtcRemoteOutboundRtpStreamStats) {
     stats_type as RtcRemoteOutboundRtpStreamStats;
-    print(convertRtcRemoteOutboundRtpStreamStatsToMap(stats_type));
+    print(jsonEncode(convertRtcRemoteOutboundRtpStreamStatsToMap(stats_type)));
   }
   return {};
 }
