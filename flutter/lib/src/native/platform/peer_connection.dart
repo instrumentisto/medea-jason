@@ -12,6 +12,7 @@ import 'peer_connection.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
+    getStats: Pointer.fromFunction(_getStats),
     setRemoteDescription: Pointer.fromFunction(_setRemoteDescription),
     setLocalDescription: Pointer.fromFunction(_setLocalDescription),
     addIceCandidate: Pointer.fromFunction(_addIceCandidate),
@@ -352,15 +353,15 @@ extension RtcStatsMapConverter on RtcStats {
 void _onTrack(Object conn, Object f) {
   conn as PeerConnection;
   f as Function;
-  () async {
-    while (true) {
-      var stats = await conn.getStats();
-      for (var stat in stats) {
-        print(jsonEncode(stat.toMap()));
-      }
-      await Future.delayed(Duration(seconds: 2));
-    }
-  }();
+  // () async {
+  //   while (true) {
+  //     var stats = await conn.getStats();
+  //     for (var stat in stats) {
+  //       print(jsonEncode(stat.toMap()));
+  //     }
+  //     await Future.delayed(Duration(seconds: 2));
+  //   }
+  // }();
   conn.onTrack((track, transceiver) {
     f(track, transceiver);
   });
@@ -402,6 +403,17 @@ void _onConnectionStateChange(Object conn, Object f) {
   conn.onConnectionStateChange((e) {
     f(e.index);
   });
+}
+
+Object _getStats(Object conn) {
+  conn as PeerConnection;
+  return () => conn.getStats().then((stats) {
+        var statsToEncode = [];
+        for (var stat in stats) {
+          statsToEncode.add(stat.toMap());
+        }
+        return jsonEncode(statsToEncode);
+      });
 }
 
 /// Lookups an [RtpTransceiver] in the provided [PeerConnection] by the provided

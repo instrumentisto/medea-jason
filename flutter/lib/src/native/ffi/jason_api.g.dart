@@ -5781,6 +5781,18 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>('rollback');
   late final _rollback = _rollbackPtr.asFunction<Object Function(Object)>();
 
+  Object get_stats(
+    Object peer,
+  ) {
+    return _get_stats(
+      peer,
+    );
+  }
+
+  late final _get_statsPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>('get_stats');
+  late final _get_stats = _get_statsPtr.asFunction<Object Function(Object)>();
+
   void on_track(
     Object peer,
     Object cb,
