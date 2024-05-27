@@ -152,7 +152,7 @@ let closeApp = document.getElementById('control__close_app');
 let audioSelect = document.getElementById('connect__select-device_audio');
 let videoSelect = document.getElementById('connect__select-device_video');
 let screenshareSwitchEl = document.getElementById('connection-settings__screenshare');
-let diasbleAudioGainControlSwitchEl = document.getElementById('connection-settings__audio_gain_control');
+let disableAudioGainControlSwitchEl = document.getElementById('connection-settings__audio_gain_control');
 let localVideo = document.getElementById('local-video');
 
 function getMemberId() {
@@ -717,7 +717,7 @@ window.onload = async function() {
       if (audioSource) {
         audio.device_id(audioSource.value);
       }
-      audio.exact_auto_gain_control(!diasbleAudioGainControlSwitchEl.checked);
+      audio.exact_auto_gain_control(!disableAudioGainControlSwitchEl.checked);
       constraints.audio(audio);
     }
 
@@ -1016,7 +1016,7 @@ window.onload = async function() {
           }
     };
     audioSelect.addEventListener('change', audioSwitch);
-    diasbleAudioGainControlSwitchEl.addEventListener('change', audioSwitch);
+    disableAudioGainControlSwitchEl.addEventListener('change', audioSwitch);
 
     let videoSwitch = async () => {
       try {
