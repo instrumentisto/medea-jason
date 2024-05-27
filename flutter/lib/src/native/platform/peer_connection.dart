@@ -52,56 +52,59 @@ Object _newPeer(Object iceServers, bool isForceRelayed) {
       iceType, servers.map((e) => e as IceServer).toList());
 }
 
-Map<String, dynamic> convertRtcMediaSourceStatsToMap(
-    RtcMediaSourceStats stats) {
-  var type;
-  var additionalData = {};
-  if (stats is RtcAudioSourceStats) {
-    stats as RtcAudioSourceStats;
-    type = 'rtc-audio-source-stats';
-    additionalData = {
-      'audioLevel': stats.audioLevel,
-      'totalAudioEnergy': stats.totalAudioEnergy,
-      'totalSamplesDuration': stats.totalSamplesDuration,
-      'echoReturnLoss': stats.echoReturnLoss,
-      'echoReturnLossEnhancement': stats.echoReturnLossEnhancement,
-    };
-  } else if (stats is RtcVideoSourceStats) {
-    type = 'rtc-video-source-stats';
-    additionalData = {
-      'width': stats.width,
-      'height': stats.height,
-      'frames': stats.frames,
-      'framesPerSecond': stats.framesPerSecond,
-    };
-  } else {
-    throw 'Unreachable';
+extension RtcMediaSourceStatsMapConverter on RtcMediaSourceStats {
+  Map<String, dynamic> toMap() {
+    var type;
+    var additionalData = {};
+    if (this is RtcAudioSourceStats) {
+      var stat = this as RtcAudioSourceStats;
+      type = 'rtc-audio-source-stats';
+      additionalData = {
+        'audioLevel': stat.audioLevel,
+        'totalAudioEnergy': stat.totalAudioEnergy,
+        'totalSamplesDuration': stat.totalSamplesDuration,
+        'echoReturnLoss': stat.echoReturnLoss,
+        'echoReturnLossEnhancement': stat.echoReturnLossEnhancement,
+      };
+    } else if (this is RtcVideoSourceStats) {
+      var stat = this as RtcVideoSourceStats;
+      type = 'rtc-video-source-stats';
+      additionalData = {
+        'width': stat.width,
+        'height': stat.height,
+        'frames': stat.frames,
+        'framesPerSecond': stat.framesPerSecond,
+      };
+    } else {
+      throw 'Unreachable';
+    }
+    return {'trackIdentifier': this.trackIdentifier, ...additionalData};
   }
-  return {'trackIdentifier': stats.trackIdentifier, ...additionalData};
 }
 
-Map<String, dynamic> convertRtcIceCandidateStatsToMap(
-    RtcIceCandidateStats stats) {
-  var kind = "";
-  if (stats is RtcLocalIceCandidateStats) {
-    kind = "local";
-  } else if (stats is RtcRemoteIceCandidateStats) {
-    kind = "remote";
-  } else {
-    throw 'Unreachable';
+extension RtcIceCandidateStatsMapConverter on RtcIceCandidateStats {
+  Map<String, dynamic> toMap() {
+    var kind = "";
+    if (this is RtcLocalIceCandidateStats) {
+      kind = "local";
+    } else if (this is RtcRemoteIceCandidateStats) {
+      kind = "remote";
+    } else {
+      throw 'Unreachable';
+    }
+    return {
+      // TODO(fix): how this field really called?
+      'kind': kind,
+      'transportId': this.transportId,
+      'address': this.address,
+      'port': this.port,
+      'protocol': convertProtocolToString(this.protocol),
+      'candidateType': convertCandidateTypeToString(this.candidateType),
+      'priority': this.priority,
+      'url': this.url,
+      'relayProtocol': convertProtocolToString(this.relayProtocol),
+    };
   }
-  return {
-    // TODO(fix): how this field really called?
-    'kind': kind,
-    'transportId': stats.transportId,
-    'address': stats.address,
-    'port': stats.port,
-    'protocol': convertProtocolToString(stats.protocol),
-    'candidateType': convertCandidateTypeToString(stats.candidateType),
-    'priority': stats.priority,
-    'url': stats.url,
-    'relayProtocol': convertProtocolToString(stats.relayProtocol),
-  };
 }
 
 String convertCandidateTypeToString(CandidateType candidateType) {
@@ -124,99 +127,102 @@ String? convertProtocolToString(Protocol? protocol) {
   }
 }
 
-Map<String, dynamic> convertRtcOutboundRtpStreamStatsToMap(
-    RtcOutboundRtpStreamStats stats) {
-  var additionalData = {};
-  var mediaTypeString;
-  if (stats.mediaType is RtcOutboundRtpStreamStatsAudio) {
-    var mediaType = stats.mediaType as RtcOutboundRtpStreamStatsAudio;
-    mediaTypeString = 'audio';
-    additionalData = {
-      'totalSamplesSent': mediaType.totalSamplesSent,
-      'voiceActivityFlag': mediaType.voiceActivityFlag,
+extension RtcOutboundRtpStreamStatsMapConverter on RtcOutboundRtpStreamStats {
+  Map<String, dynamic> toMap() {
+    var additionalData = {};
+    var mediaTypeString;
+    if (this.mediaType is RtcOutboundRtpStreamStatsAudio) {
+      var mediaType = this.mediaType as RtcOutboundRtpStreamStatsAudio;
+      mediaTypeString = 'audio';
+      additionalData = {
+        'totalSamplesSent': mediaType.totalSamplesSent,
+        'voiceActivityFlag': mediaType.voiceActivityFlag,
+      };
+    } else if (this.mediaType is RtcOutboundRtpStreamStatsVideo) {
+      var mediaType = this.mediaType as RtcOutboundRtpStreamStatsVideo;
+      mediaTypeString = 'video';
+      additionalData = {
+        'frameWidth': mediaType.frameWidth,
+        'frameHeight': mediaType.frameHeight,
+        'framesPerSecond': mediaType.framesPerSecond,
+      };
+    } else if (this.mediaType == null) {
+      // It can be null, so do nothing.
+    } else {
+      throw 'Unreachable';
+    }
+    return {
+      'trackId': this.trackId,
+      'mediaType': mediaTypeString,
+      'bytesSent': this.bytesSent,
+      'packetsSent': this.packetsSent,
+      'mediaSourceId': this.mediaSourceId,
+      ...additionalData,
     };
-  } else if (stats.mediaType is RtcOutboundRtpStreamStatsVideo) {
-    var mediaType = stats.mediaType as RtcOutboundRtpStreamStatsVideo;
-    mediaTypeString = 'video';
-    additionalData = {
-      'frameWidth': mediaType.frameWidth,
-      'frameHeight': mediaType.frameHeight,
-      'framesPerSecond': mediaType.framesPerSecond,
-    };
-  } else if (stats.mediaType == null) {
-    // It can be null, so do nothing.
-  } else {
-    throw 'Unreachable';
   }
-  return {
-    'trackId': stats.trackId,
-    'mediaType': mediaTypeString,
-    'bytesSent': stats.bytesSent,
-    'packetsSent': stats.packetsSent,
-    'mediaSourceId': stats.mediaSourceId,
-    ...additionalData,
-  };
 }
 
-Map<String, dynamic> convertRtcInboundRtpStreamStatsToMap(
-    RtcInboundRtpStreamStats stats) {
-  var additionalData = {};
-  var mediaTypeString = "";
-  if (stats.mediaType is RtcInboundRtpStreamAudio) {
-    var mediaType = stats.mediaType as RtcInboundRtpStreamAudio;
-    mediaTypeString = 'audio';
-    additionalData = {
-      'totalSamplesReceived': mediaType.totalSamplesReceived,
-      'concealedSamples': mediaType.concealedSamples,
-      'silentConcealedSamples': mediaType.silentConcealedSamples,
-      'audioLevel': mediaType.audioLevel,
-      'totalAudioEnergy': mediaType.totalAudioEnergy,
-      'totalSamplesDuration': mediaType.totalSamplesDuration,
-      'voiceActivityFlag': mediaType.voiceActivityFlag,
+extension RtcInboundRtpStreamStatsMapConverter on RtcInboundRtpStreamStats {
+  Map<String, dynamic> toMap() {
+    var additionalData = {};
+    var mediaTypeString = "";
+    if (this.mediaType is RtcInboundRtpStreamAudio) {
+      var mediaType = this.mediaType as RtcInboundRtpStreamAudio;
+      mediaTypeString = 'audio';
+      additionalData = {
+        'totalSamplesReceived': mediaType.totalSamplesReceived,
+        'concealedSamples': mediaType.concealedSamples,
+        'silentConcealedSamples': mediaType.silentConcealedSamples,
+        'audioLevel': mediaType.audioLevel,
+        'totalAudioEnergy': mediaType.totalAudioEnergy,
+        'totalSamplesDuration': mediaType.totalSamplesDuration,
+        'voiceActivityFlag': mediaType.voiceActivityFlag,
+      };
+    } else if (this.mediaType is RtcInboundRtpStreamVideo) {
+      mediaTypeString = 'video';
+      var mediaType = this.mediaType as RtcInboundRtpStreamVideo;
+      additionalData = {
+        'framesDecoded': mediaType.framesDecoded,
+        'keyFramesDecoded': mediaType.keyFramesDecoded,
+        'frameWidth': mediaType.frameWidth,
+        'frameHeight': mediaType.frameHeight,
+        'totalInterFrameDelay': mediaType.totalInterFrameDelay,
+        'framesPerSecond': mediaType.framesPerSecond,
+        'firCount': mediaType.firCount,
+        'pliCount': mediaType.pliCount,
+        'concealmentEvents': mediaType.concealmentEvents,
+        'framesReceived': mediaType.framesReceived,
+        'sliCount': mediaType.sliCount,
+      };
+    } else if (this.mediaType == null) {
+      // Do nothing, because it can be null
+    } else {
+      throw 'Unreachable';
+    }
+    return {
+      'mediaType': mediaTypeString,
+      'remoteId': this.remoteId,
+      'bytesReceived': this.bytesReceived,
+      'packetsReceived': this.packetsReceived,
+      'totalDecodeTime': this.totalDecodeTime,
+      'jitterBufferEmittedCount': this.jitterBufferEmittedCount,
+      ...additionalData,
     };
-  } else if (stats.mediaType is RtcInboundRtpStreamVideo) {
-    mediaTypeString = 'video';
-    var mediaType = stats.mediaType as RtcInboundRtpStreamVideo;
-    additionalData = {
-      'framesDecoded': mediaType.framesDecoded,
-      'keyFramesDecoded': mediaType.keyFramesDecoded,
-      'frameWidth': mediaType.frameWidth,
-      'frameHeight': mediaType.frameHeight,
-      'totalInterFrameDelay': mediaType.totalInterFrameDelay,
-      'framesPerSecond': mediaType.framesPerSecond,
-      'firCount': mediaType.firCount,
-      'pliCount': mediaType.pliCount,
-      'concealmentEvents': mediaType.concealmentEvents,
-      'framesReceived': mediaType.framesReceived,
-      'sliCount': mediaType.sliCount,
-    };
-  } else if (stats.mediaType == null) {
-    // Do nothing, because it can be null
-  } else {
-    throw 'Unreachable';
   }
-  return {
-    'mediaType': mediaTypeString,
-    'remoteId': stats.remoteId,
-    'bytesReceived': stats.bytesReceived,
-    'packetsReceived': stats.packetsReceived,
-    'totalDecodeTime': stats.totalDecodeTime,
-    'jitterBufferEmittedCount': stats.jitterBufferEmittedCount,
-    ...additionalData,
-  };
 }
 
-Map<String, dynamic> convertRtcIceCandidatePairStatsToMap(
-    RtcIceCandidatePairStats stats) {
-  return {
-    'state': convertRtcStatsIceCandidatePairStateToString(stats.state),
-    'nominated': stats.nominated,
-    'bytesSent': stats.bytesSent,
-    'bytesReceived': stats.bytesReceived,
-    'totalRoundTripTime': stats.totalRoundTripTime,
-    'currentRoundTripTime': stats.currentRoundTripTime,
-    'availableOutgoingBitrate': stats.availableOutgoingBitrate,
-  };
+extension RtcIceCandidatePairStatsMapConverter on RtcIceCandidatePairStats {
+  Map<String, dynamic> toMap() {
+    return {
+      'state': convertRtcStatsIceCandidatePairStateToString(this.state),
+      'nominated': this.nominated,
+      'bytesSent': this.bytesSent,
+      'bytesReceived': this.bytesReceived,
+      'totalRoundTripTime': this.totalRoundTripTime,
+      'currentRoundTripTime': this.currentRoundTripTime,
+      'availableOutgoingBitrate': this.availableOutgoingBitrate,
+    };
+  }
 }
 
 String convertRtcStatsIceCandidatePairStateToString(
@@ -230,14 +236,16 @@ String convertRtcStatsIceCandidatePairStateToString(
   };
 }
 
-Map<String, dynamic> convertRtcTransportStatsToMap(RtcTransportStats stats) {
-  return {
-    'packetsSent': stats.packetsSent,
-    'packetsReceived': stats.packetsReceived,
-    'bytesSent': stats.bytesSent,
-    'bytesReceived': stats.bytesReceived,
-    'iceRole': convertIceRoleToString(stats.iceRole),
-  };
+extension RtcTransportStatsMapConverter on RtcTransportStats {
+  Map<String, dynamic> toMap() {
+    return {
+      'packetsSent': this.packetsSent,
+      'packetsReceived': this.packetsReceived,
+      'bytesSent': this.bytesSent,
+      'bytesReceived': this.bytesReceived,
+      'iceRole': convertIceRoleToString(this.iceRole),
+    };
+  }
 }
 
 String? convertIceRoleToString(IceRole? role) {
@@ -252,59 +260,67 @@ String? convertIceRoleToString(IceRole? role) {
   }
 }
 
-Map<String, dynamic> convertRtcRemoteInboundRtpStreamStatsToMap(
-    RtcRemoteInboundRtpStreamStats stats) {
-  return {
-    'localId': stats.localId,
-    'roundTripTime': stats.roundTripTime,
-    'fractionLost': stats.fractionLost,
-    'roundTripTimeMeasurements': stats.roundTripTimeMeasurements,
-    'jitter': stats.jitter,
-    'reportsReceived': stats.reportsReceived,
-  };
-}
-
-Map<String, dynamic> convertRtcRemoteOutboundRtpStreamStatsToMap(
-    RtcRemoteOutboundRtpStreamStats stats) {
-  return {
-    'localId': stats.localId,
-    'remoteTimestamp': stats.remoteTimestamp,
-    'reportsSent': stats.reportsSent,
-  };
-}
-
-Map<String, dynamic> convertStatsTypeToMap(RtcStatsType stats_type) {
-  if (stats_type is RtcMediaSourceStats) {
-    stats_type as RtcMediaSourceStats;
-    print(jsonEncode(convertRtcMediaSourceStatsToMap(stats_type)));
-  } else if (stats_type is RtcIceCandidateStats) {
-    stats_type as RtcIceCandidateStats;
-    print(jsonEncode(convertRtcIceCandidateStatsToMap(stats_type)));
-  } else if (stats_type is RtcOutboundRtpStreamStats) {
-    stats_type as RtcOutboundRtpStreamStats;
-    print(jsonEncode(convertRtcOutboundRtpStreamStatsToMap(stats_type)));
-  } else if (stats_type is RtcInboundRtpStreamStats) {
-    stats_type as RtcInboundRtpStreamStats;
-    print(jsonEncode(convertRtcInboundRtpStreamStatsToMap(stats_type)));
-  } else if (stats_type is RtcIceCandidatePairStats) {
-    stats_type as RtcIceCandidatePairStats;
-    print(jsonEncode(convertRtcIceCandidatePairStatsToMap(stats_type)));
-  } else if (stats_type is RtcTransportStats) {
-    stats_type as RtcTransportStats;
-    print(jsonEncode(convertRtcTransportStatsToMap(stats_type)));
-  } else if (stats_type is RtcRemoteInboundRtpStreamStats) {
-    stats_type as RtcRemoteInboundRtpStreamStats;
-    print(jsonEncode(convertRtcRemoteInboundRtpStreamStatsToMap(stats_type)));
-  } else if (stats_type is RtcRemoteOutboundRtpStreamStats) {
-    stats_type as RtcRemoteOutboundRtpStreamStats;
-    print(jsonEncode(convertRtcRemoteOutboundRtpStreamStatsToMap(stats_type)));
+extension RtcRemoteInboundRtpStreamStatsMapConverter
+    on RtcRemoteInboundRtpStreamStats {
+  Map<String, dynamic> toMap() {
+    return {
+      'localId': this.localId,
+      'roundTripTime': this.roundTripTime,
+      'fractionLost': this.fractionLost,
+      'roundTripTimeMeasurements': this.roundTripTimeMeasurements,
+      'jitter': this.jitter,
+      'reportsReceived': this.reportsReceived,
+    };
   }
-  return {};
 }
 
-Map<String, dynamic> convertStatsToMap(RtcStats stats) {
-  convertStatsTypeToMap(stats.type);
-  return {};
+extension RtcRemoteOutboundRtpStreamStatsMapConverter
+    on RtcRemoteOutboundRtpStreamStats {
+  Map<String, dynamic> toMap() {
+    return {
+      'localId': this.localId,
+      'remoteTimestamp': this.remoteTimestamp,
+      'reportsSent': this.reportsSent,
+    };
+  }
+}
+
+extension RtcStatsTypeMapConverter on RtcStatsType {
+  Map<String, dynamic> toMap() {
+    if (this is RtcMediaSourceStats) {
+      var stats_type = this as RtcMediaSourceStats;
+      print(jsonEncode(stats_type.toMap()));
+    } else if (this is RtcIceCandidateStats) {
+      var stats_type = this as RtcIceCandidateStats;
+      print(jsonEncode(stats_type.toMap()));
+    } else if (this is RtcOutboundRtpStreamStats) {
+      var stats_type = this as RtcOutboundRtpStreamStats;
+      print(jsonEncode(stats_type.toMap()));
+    } else if (this is RtcInboundRtpStreamStats) {
+      var stats_type = this as RtcInboundRtpStreamStats;
+      print(jsonEncode(stats_type.toMap()));
+    } else if (this is RtcIceCandidatePairStats) {
+      var stats_type = this as RtcIceCandidatePairStats;
+      print(jsonEncode(stats_type.toMap()));
+    } else if (this is RtcTransportStats) {
+      var stats_type = this as RtcTransportStats;
+      print(jsonEncode(stats_type.toMap()));
+    } else if (this is RtcRemoteInboundRtpStreamStats) {
+      var stats_type = this as RtcRemoteInboundRtpStreamStats;
+      print(jsonEncode(stats_type.toMap()));
+    } else if (this is RtcRemoteOutboundRtpStreamStats) {
+      var stats_type = this as RtcRemoteOutboundRtpStreamStats;
+      print(jsonEncode(stats_type.toMap()));
+    }
+    return {};
+  }
+}
+
+extension RtcStatsMapConverter on RtcStats {
+  Map<String, dynamic> toMap() {
+    this.type.toMap();
+    return {};
+  }
 }
 
 /// Sets the provided [f] to the [PeerConnection.onTrack] callback.
@@ -315,7 +331,7 @@ void _onTrack(Object conn, Object f) {
     while (true) {
       var stats = await conn.getStats();
       for (var stat in stats) {
-        convertStatsToMap(stat);
+        stat.toMap();
         // print(jsonEncode({
         //   'id': stat.id,
         //   'timestampUs': stat.timestampUs,
