@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
@@ -51,10 +52,232 @@ Object _newPeer(Object iceServers, bool isForceRelayed) {
       iceType, servers.map((e) => e as IceServer).toList());
 }
 
+Map<String, dynamic> convertRtcMediaSourceStatsToMap(
+    RtcMediaSourceStats stats) {
+  var type;
+  var additionalData = {};
+  if (stats is RtcAudioSourceStats) {
+    stats as RtcAudioSourceStats;
+    type = 'rtc-audio-source-stats';
+    additionalData = {
+      'audioLevel': stats.audioLevel,
+      'totalAudioEnergy': stats.totalAudioEnergy,
+      'totalSamplesDuration': stats.totalSamplesDuration,
+      'echoReturnLoss': stats.echoReturnLoss,
+      'echoReturnLossEnhancement': stats.echoReturnLossEnhancement,
+    };
+  } else if (stats is RtcVideoSourceStats) {
+    type = 'rtc-video-source-stats';
+    additionalData = {
+      'width': stats.width,
+      'height': stats.height,
+      'frames': stats.frames,
+      'framesPerSecond': stats.framesPerSecond,
+    };
+  } else {
+    throw 'Unreachable';
+  }
+  return {'trackIdentifier': stats.trackIdentifier, ...additionalData};
+}
+
+Map<String, dynamic> convertRtcIceCandidateStatsToMap(
+    RtcIceCandidateStats stats) {
+  var kind = "";
+  if (stats is RtcLocalIceCandidateStats) {
+    kind = "local";
+  } else if (stats is RtcRemoteIceCandidateStats) {
+    kind = "remote";
+  } else {
+    throw 'Unreachable';
+  }
+  return {
+    // TODO(fix): how this field really called?
+    'kind': kind,
+    'transportId': stats.transportId,
+    'address': stats.address,
+    'port': stats.port,
+    // TODO(fix): convert this enum to string
+    'protocol': stats.protocol,
+    // TODO(fix): convert this enum to string
+    'candidateType': stats.candidateType,
+    'priority': stats.priority,
+    'url': stats.url,
+    // TODO(fix): convert this enum to string
+    'relayProtocol': stats.relayProtocol,
+  };
+}
+
+Map<String, dynamic> convertRtcOutboundRtpStreamStatsToMap(
+    RtcOutboundRtpStreamStats stats) {
+  var additionalData = {};
+  var mediaTypeString;
+  if (stats.mediaType is RtcOutboundRtpStreamStatsAudio) {
+    var mediaType = stats.mediaType as RtcOutboundRtpStreamStatsAudio;
+    mediaTypeString = 'audio';
+    additionalData = {
+      'totalSamplesSent': mediaType.totalSamplesSent,
+      'voiceActivityFlag': mediaType.voiceActivityFlag,
+    };
+  } else if (stats.mediaType is RtcOutboundRtpStreamStatsVideo) {
+    var mediaType = stats.mediaType as RtcOutboundRtpStreamStatsVideo;
+    mediaTypeString = 'video';
+    additionalData = {
+      'frameWidth': mediaType.frameWidth,
+      'frameHeight': mediaType.frameHeight,
+      'framesPerSecond': mediaType.framesPerSecond,
+    };
+  }
+  return {
+    'trackId': stats.trackId,
+    'mediaType': mediaTypeString,
+    'bytesSent': stats.bytesSent,
+    'packetsSent': stats.packetsSent,
+    'mediaSourceId': stats.mediaSourceId,
+    ...additionalData,
+  };
+}
+
+Map<String, dynamic> convertRtcInboundRtpStreamStatsToMap(
+    RtcInboundRtpStreamStats stats) {
+  var additionalData = {};
+  var mediaTypeString = "";
+  if (stats.mediaType is RtcInboundRtpStreamAudio) {
+    var mediaType = stats.mediaType as RtcInboundRtpStreamAudio;
+    mediaTypeString = 'audio';
+    additionalData = {
+      'totalSamplesReceived': mediaType.totalSamplesReceived,
+      'concealedSamples': mediaType.concealedSamples,
+      'silentConcealedSamples': mediaType.silentConcealedSamples,
+      'audioLevel': mediaType.audioLevel,
+      'totalAudioEnergy': mediaType.totalAudioEnergy,
+      'totalSamplesDuration': mediaType.totalSamplesDuration,
+      'voiceActivityFlag': mediaType.voiceActivityFlag,
+    };
+  } else if (stats.mediaType is RtcInboundRtpStreamVideo) {
+    mediaTypeString = 'video';
+    var mediaType = stats.mediaType as RtcInboundRtpStreamVideo;
+    additionalData = {
+      'framesDecoded': mediaType.framesDecoded,
+      'keyFramesDecoded': mediaType.keyFramesDecoded,
+      'frameWidth': mediaType.frameWidth,
+      'frameHeight': mediaType.frameHeight,
+      'totalInterFrameDelay': mediaType.totalInterFrameDelay,
+      'framesPerSecond': mediaType.framesPerSecond,
+      'firCount': mediaType.firCount,
+      'pliCount': mediaType.pliCount,
+      'concealmentEvents': mediaType.concealmentEvents,
+      'framesReceived': mediaType.framesReceived,
+      'sliCount': mediaType.sliCount,
+    };
+  }
+  return {
+    'mediaType': mediaTypeString,
+    'remoteId': stats.remoteId,
+    'bytesReceived': stats.bytesReceived,
+    'packetsReceived': stats.packetsReceived,
+    'totalDecodeTime': stats.totalDecodeTime,
+    'jitterBufferEmittedCount': stats.jitterBufferEmittedCount,
+    ...additionalData,
+  };
+}
+
+Map<String, dynamic> convertRtcIceCandidatePairStatsToMap(
+    RtcIceCandidatePairStats stats) {
+  return {
+    // TODO(fix): convert this enum to string
+    'state': stats.state,
+    'nominated': stats.nominated,
+    'bytesSent': stats.bytesSent,
+    'bytesReceived': stats.bytesReceived,
+    'totalRoundTripTime': stats.totalRoundTripTime,
+    'currentRoundTripTime': stats.currentRoundTripTime,
+    'availableOutgoingBitrate': stats.availableOutgoingBitrate,
+  };
+}
+
+Map<String, dynamic> convertRtcTransportStatsToMap(RtcTransportStats stats) {
+  return {
+    'packetsSent': stats.packetsSent,
+    'packetsReceived': stats.packetsReceived,
+    'bytesSent': stats.bytesSent,
+    'bytesReceived': stats.bytesReceived,
+    // TODO(fix): convert this enum to string
+    'iceRole': stats.iceRole,
+  };
+}
+
+Map<String, dynamic> convertRtcRemoteInboundRtpStreamStatsToMap(
+    RtcRemoteInboundRtpStreamStats stats) {
+  return {
+    'localId': stats.localId,
+    'roundTripTime': stats.roundTripTime,
+    'fractionLost': stats.fractionLost,
+    'roundTripTimeMeasurements': stats.roundTripTimeMeasurements,
+    'jitter': stats.jitter,
+    'reportsReceived': stats.reportsReceived,
+  };
+}
+
+Map<String, dynamic> convertRtcRemoteOutboundRtpStreamStatsToMap(
+    RtcRemoteOutboundRtpStreamStats stats) {
+  return {
+    'localId': stats.localId,
+    'remoteTimestamp': stats.remoteTimestamp,
+    'reportsSent': stats.reportsSent,
+  };
+}
+
+Map<String, dynamic> convertStatsTypeToMap(RtcStatsType stats_type) {
+  if (stats_type is RtcMediaSourceStats) {
+    stats_type as RtcMediaSourceStats;
+    print(convertRtcMediaSourceStatsToMap(stats_type));
+  } else if (stats_type is RtcIceCandidateStats) {
+    stats_type as RtcIceCandidateStats;
+    print(convertRtcIceCandidateStatsToMap(stats_type));
+  } else if (stats_type is RtcOutboundRtpStreamStats) {
+    stats_type as RtcOutboundRtpStreamStats;
+    print(convertRtcOutboundRtpStreamStatsToMap(stats_type));
+  } else if (stats_type is RtcInboundRtpStreamStats) {
+    stats_type as RtcInboundRtpStreamStats;
+    print(convertRtcInboundRtpStreamStatsToMap(stats_type));
+  } else if (stats_type is RtcIceCandidatePairStats) {
+    stats_type as RtcIceCandidatePairStats;
+    print(convertRtcIceCandidatePairStatsToMap(stats_type));
+  } else if (stats_type is RtcTransportStats) {
+    stats_type as RtcTransportStats;
+    print(jsonEncode(convertRtcTransportStatsToMap(stats_type)));
+  } else if (stats_type is RtcRemoteInboundRtpStreamStats) {
+    stats_type as RtcRemoteInboundRtpStreamStats;
+    print(convertRtcRemoteInboundRtpStreamStatsToMap(stats_type));
+  } else if (stats_type is RtcRemoteOutboundRtpStreamStats) {
+    stats_type as RtcRemoteOutboundRtpStreamStats;
+    print(convertRtcRemoteOutboundRtpStreamStatsToMap(stats_type));
+  }
+  return {};
+}
+
+Map<String, dynamic> convertStatsToMap(RtcStats stats) {
+  convertStatsTypeToMap(stats.type);
+  return {};
+}
+
 /// Sets the provided [f] to the [PeerConnection.onTrack] callback.
 void _onTrack(Object conn, Object f) {
   conn as PeerConnection;
   f as Function;
+  () async {
+    while (true) {
+      var stats = await conn.getStats();
+      for (var stat in stats) {
+        convertStatsToMap(stat);
+        // print(jsonEncode({
+        //   'id': stat.id,
+        //   'timestampUs': stat.timestampUs,
+        // }));
+      }
+      await Future.delayed(Duration(seconds: 2));
+    }
+  }();
   conn.onTrack((track, transceiver) {
     f(track, transceiver);
   });
