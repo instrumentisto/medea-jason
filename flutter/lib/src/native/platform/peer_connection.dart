@@ -54,11 +54,11 @@ Object _newPeer(Object iceServers, bool isForceRelayed) {
 
 extension RtcMediaSourceStatsMapConverter on RtcMediaSourceStats {
   Map<String, dynamic> toMap() {
-    var type;
+    var kind;
     var additionalData = {};
     if (this is RtcAudioSourceStats) {
       var stat = this as RtcAudioSourceStats;
-      type = 'rtc-audio-source-stats';
+      kind = 'audio';
       additionalData = {
         'audioLevel': stat.audioLevel,
         'totalAudioEnergy': stat.totalAudioEnergy,
@@ -68,7 +68,7 @@ extension RtcMediaSourceStatsMapConverter on RtcMediaSourceStats {
       };
     } else if (this is RtcVideoSourceStats) {
       var stat = this as RtcVideoSourceStats;
-      type = 'rtc-video-source-stats';
+      kind = 'video';
       additionalData = {
         'width': stat.width,
         'height': stat.height,
@@ -78,23 +78,26 @@ extension RtcMediaSourceStatsMapConverter on RtcMediaSourceStats {
     } else {
       throw 'Unreachable';
     }
-    return {'trackIdentifier': this.trackIdentifier, ...additionalData};
+    return {
+      'trackIdentifier': this.trackIdentifier,
+      'kind': kind,
+      ...additionalData
+    };
   }
 }
 
 extension RtcIceCandidateStatsMapConverter on RtcIceCandidateStats {
   Map<String, dynamic> toMap() {
-    var kind = "";
+    var type = "";
     if (this is RtcLocalIceCandidateStats) {
-      kind = "local";
+      type = "local-candidate";
     } else if (this is RtcRemoteIceCandidateStats) {
-      kind = "remote";
+      type = "remote-candidate";
     } else {
       throw 'Unreachable';
     }
     return {
-      // TODO(fix): how this field really called?
-      'kind': kind,
+      'type': type,
       'transportId': this.transportId,
       'address': this.address,
       'port': this.port,
@@ -298,7 +301,6 @@ extension RtcStatsTypeMapConverter on RtcStatsType {
       additionalData = stats_type.toMap();
     } else if (this is RtcIceCandidateStats) {
       var stats_type = this as RtcIceCandidateStats;
-      statsName = 'ice-candidate';
       additionalData = stats_type.toMap();
     } else if (this is RtcOutboundRtpStreamStats) {
       var stats_type = this as RtcOutboundRtpStreamStats;
@@ -339,7 +341,8 @@ extension RtcStatsMapConverter on RtcStats {
   Map<String, dynamic> toMap() {
     return {
       'id': this.id,
-      'timestampUs': this.timestampUs,
+      'timestamp': this.timestampUs.toDouble() /
+          1000.0, // convert microsecs in millisecs
       ...this.type.toMap(),
     };
   }
