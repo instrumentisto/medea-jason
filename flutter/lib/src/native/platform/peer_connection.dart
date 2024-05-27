@@ -289,39 +289,59 @@ extension RtcRemoteOutboundRtpStreamStatsMapConverter
 
 extension RtcStatsTypeMapConverter on RtcStatsType {
   Map<String, dynamic> toMap() {
+    var statsName;
+    var additionalData = {};
+
     if (this is RtcMediaSourceStats) {
       var stats_type = this as RtcMediaSourceStats;
-      print(jsonEncode(stats_type.toMap()));
+      statsName = 'media-source';
+      additionalData = stats_type.toMap();
     } else if (this is RtcIceCandidateStats) {
       var stats_type = this as RtcIceCandidateStats;
-      print(jsonEncode(stats_type.toMap()));
+      statsName = 'ice-candidate';
+      additionalData = stats_type.toMap();
     } else if (this is RtcOutboundRtpStreamStats) {
       var stats_type = this as RtcOutboundRtpStreamStats;
-      print(jsonEncode(stats_type.toMap()));
+      statsName = 'outbound-rtp';
+      additionalData = stats_type.toMap();
     } else if (this is RtcInboundRtpStreamStats) {
       var stats_type = this as RtcInboundRtpStreamStats;
-      print(jsonEncode(stats_type.toMap()));
+      statsName = 'inbound-rtp';
+      additionalData = stats_type.toMap();
     } else if (this is RtcIceCandidatePairStats) {
       var stats_type = this as RtcIceCandidatePairStats;
-      print(jsonEncode(stats_type.toMap()));
+      statsName = 'ice-candidate-pair';
+      additionalData = stats_type.toMap();
     } else if (this is RtcTransportStats) {
       var stats_type = this as RtcTransportStats;
-      print(jsonEncode(stats_type.toMap()));
+      statsName = 'transport';
+      additionalData = stats_type.toMap();
     } else if (this is RtcRemoteInboundRtpStreamStats) {
       var stats_type = this as RtcRemoteInboundRtpStreamStats;
-      print(jsonEncode(stats_type.toMap()));
+      statsName = 'remote-inbound-rtp';
+      additionalData = stats_type.toMap();
     } else if (this is RtcRemoteOutboundRtpStreamStats) {
       var stats_type = this as RtcRemoteOutboundRtpStreamStats;
-      print(jsonEncode(stats_type.toMap()));
+      statsName = 'remote-outbound-rtp';
+      additionalData = stats_type.toMap();
+    } else {
+      throw 'Unreachable';
     }
-    return {};
+
+    return {
+      'type': statsName,
+      ...additionalData,
+    };
   }
 }
 
 extension RtcStatsMapConverter on RtcStats {
   Map<String, dynamic> toMap() {
-    this.type.toMap();
-    return {};
+    return {
+      'id': this.id,
+      'timestampUs': this.timestampUs,
+      ...this.type.toMap(),
+    };
   }
 }
 
@@ -333,11 +353,7 @@ void _onTrack(Object conn, Object f) {
     while (true) {
       var stats = await conn.getStats();
       for (var stat in stats) {
-        stat.toMap();
-        // print(jsonEncode({
-        //   'id': stat.id,
-        //   'timestampUs': stat.timestampUs,
-        // }));
+        print(jsonEncode(stat.toMap()));
       }
       await Future.delayed(Duration(seconds: 2));
     }
