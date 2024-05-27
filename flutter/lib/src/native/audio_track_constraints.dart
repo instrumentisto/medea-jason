@@ -12,5 +12,15 @@ class AudioTrackConstraints implements base.AudioTrackConstraints {
   }
 
   @override
+  void exactAutoGainControl(bool autoGainControl) {
+    constraints.autoGainControl = frb.ConstrainBoolean_Exact(autoGainControl);
+  }
+
+  @override
+  void idealAutoGainControl(bool autoGainControl) {
+    constraints.autoGainControl = frb.ConstrainBoolean_Ideal(autoGainControl);
+  }
+
+  @override
   void free() {}
 }

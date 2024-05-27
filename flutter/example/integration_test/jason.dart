@@ -31,8 +31,7 @@ void main() {
     var deviceLength = 2;
     if (Platform.isAndroid) {
       deviceLength = 4;
-    }
-    if (Platform.isMacOS) {
+    } else if (Platform.isMacOS) {
       deviceLength = 3;
     }
 

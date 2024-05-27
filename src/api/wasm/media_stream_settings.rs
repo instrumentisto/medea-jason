@@ -65,6 +65,20 @@ impl AudioTrackConstraints {
     pub fn device_id(&mut self, device_id: String) {
         self.0.device_id(device_id);
     }
+
+    /// Sets an exact [autoGainControl][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
+    pub fn exact_auto_gain_control(&mut self, auto_gain_control: bool) {
+        self.0.exact_auto_gain_control(auto_gain_control);
+    }
+
+    /// Sets an ideal [autoGainControl][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
+    pub fn ideal_auto_gain_control(&mut self, auto_gain_control: bool) {
+        self.0.ideal_auto_gain_control(auto_gain_control);
+    }
 }
 
 /// Constraints applicable to video tracks that are sourced from some media

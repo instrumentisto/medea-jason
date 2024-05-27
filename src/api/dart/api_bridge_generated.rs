@@ -20,7 +20,7 @@ use std::{ffi::c_void, sync::Arc};
 
 use crate::{
     media::{
-        constraints::{ConstrainU32, FacingMode},
+        constraints::{ConstrainBoolean, ConstrainU32, FacingMode},
         track::{remote::MediaDirection, MediaSourceKind},
         MediaDeviceKind, MediaKind,
     },
@@ -1988,6 +1988,12 @@ mod io {
     }
 
     #[no_mangle]
+    pub extern "C" fn new_box_autoadd_constrain_boolean_0(
+    ) -> *mut wire_ConstrainBoolean {
+        support::new_leak_box_ptr(wire_ConstrainBoolean::new_with_null_ptr())
+    }
+
+    #[no_mangle]
     pub extern "C" fn new_box_autoadd_constrain_u_32_0(
     ) -> *mut wire_ConstrainU32 {
         support::new_leak_box_ptr(wire_ConstrainU32::new_with_null_ptr())
@@ -2185,6 +2191,7 @@ mod io {
         fn wire2api(self) -> ApiAudioConstraints {
             ApiAudioConstraints {
                 device_id: self.device_id.wire2api(),
+                auto_gain_control: self.auto_gain_control.wire2api(),
             }
         }
     }
@@ -2273,6 +2280,12 @@ mod io {
             Wire2Api::<ApiMediaStreamSettings>::wire2api(*wrap).into()
         }
     }
+    impl Wire2Api<ConstrainBoolean> for *mut wire_ConstrainBoolean {
+        fn wire2api(self) -> ConstrainBoolean {
+            let wrap = unsafe { support::box_from_leak_ptr(self) };
+            Wire2Api::<ConstrainBoolean>::wire2api(*wrap).into()
+        }
+    }
     impl Wire2Api<ConstrainU32> for *mut wire_ConstrainU32 {
         fn wire2api(self) -> ConstrainU32 {
             let wrap = unsafe { support::box_from_leak_ptr(self) };
@@ -2288,6 +2301,23 @@ mod io {
     impl Wire2Api<u32> for *mut u32 {
         fn wire2api(self) -> u32 {
             unsafe { *support::box_from_leak_ptr(self) }
+        }
+    }
+    impl Wire2Api<ConstrainBoolean> for wire_ConstrainBoolean {
+        fn wire2api(self) -> ConstrainBoolean {
+            match self.tag {
+                0 => unsafe {
+                    let ans = support::box_from_leak_ptr(self.kind);
+                    let ans = support::box_from_leak_ptr(ans.Exact);
+                    ConstrainBoolean::Exact(ans.field0.wire2api())
+                },
+                1 => unsafe {
+                    let ans = support::box_from_leak_ptr(self.kind);
+                    let ans = support::box_from_leak_ptr(ans.Ideal);
+                    ConstrainBoolean::Ideal(ans.field0.wire2api())
+                },
+                _ => unreachable!(),
+            }
         }
     }
     impl Wire2Api<ConstrainU32> for wire_ConstrainU32 {
@@ -2380,6 +2410,7 @@ mod io {
     #[derive(Clone)]
     pub struct wire_ApiAudioConstraints {
         device_id: *mut wire_uint_8_list,
+        auto_gain_control: *mut wire_ConstrainBoolean,
     }
 
     #[repr(C)]
@@ -2440,6 +2471,30 @@ mod io {
         field0: i32,
     }
 
+    #[repr(C)]
+    #[derive(Clone)]
+    pub struct wire_ConstrainBoolean {
+        tag: i32,
+        kind: *mut ConstrainBooleanKind,
+    }
+
+    #[repr(C)]
+    pub union ConstrainBooleanKind {
+        Exact: *mut wire_ConstrainBoolean_Exact,
+        Ideal: *mut wire_ConstrainBoolean_Ideal,
+    }
+
+    #[repr(C)]
+    #[derive(Clone)]
+    pub struct wire_ConstrainBoolean_Exact {
+        field0: bool,
+    }
+
+    #[repr(C)]
+    #[derive(Clone)]
+    pub struct wire_ConstrainBoolean_Ideal {
+        field0: bool,
+    }
     #[repr(C)]
     #[derive(Clone)]
     pub struct wire_ConstrainU32 {
@@ -2544,6 +2599,7 @@ mod io {
         fn new_with_null_ptr() -> Self {
             Self {
                 device_id: core::ptr::null_mut(),
+                auto_gain_control: core::ptr::null_mut(),
             }
         }
     }
@@ -2641,6 +2697,41 @@ mod io {
         fn default() -> Self {
             Self::new_with_null_ptr()
         }
+    }
+
+    impl Default for wire_ConstrainBoolean {
+        fn default() -> Self {
+            Self::new_with_null_ptr()
+        }
+    }
+
+    impl NewWithNullPtr for wire_ConstrainBoolean {
+        fn new_with_null_ptr() -> Self {
+            Self {
+                tag: -1,
+                kind: core::ptr::null_mut(),
+            }
+        }
+    }
+
+    #[no_mangle]
+    pub extern "C" fn inflate_ConstrainBoolean_Exact(
+    ) -> *mut ConstrainBooleanKind {
+        support::new_leak_box_ptr(ConstrainBooleanKind {
+            Exact: support::new_leak_box_ptr(wire_ConstrainBoolean_Exact {
+                field0: Default::default(),
+            }),
+        })
+    }
+
+    #[no_mangle]
+    pub extern "C" fn inflate_ConstrainBoolean_Ideal(
+    ) -> *mut ConstrainBooleanKind {
+        support::new_leak_box_ptr(ConstrainBooleanKind {
+            Ideal: support::new_leak_box_ptr(wire_ConstrainBoolean_Ideal {
+                field0: Default::default(),
+            }),
+        })
     }
 
     impl Default for wire_ConstrainU32 {
