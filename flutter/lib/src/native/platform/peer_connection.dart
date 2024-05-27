@@ -143,6 +143,8 @@ Map<String, dynamic> convertRtcOutboundRtpStreamStatsToMap(
       'frameHeight': mediaType.frameHeight,
       'framesPerSecond': mediaType.framesPerSecond,
     };
+  } else if (stats.mediaType == null) {
+    // It can be null, so do nothing.
   } else {
     throw 'Unreachable';
   }
@@ -188,6 +190,8 @@ Map<String, dynamic> convertRtcInboundRtpStreamStatsToMap(
       'framesReceived': mediaType.framesReceived,
       'sliCount': mediaType.sliCount,
     };
+  } else if (stats.mediaType == null) {
+    // Do nothing, because it can be null
   } else {
     throw 'Unreachable';
   }
@@ -236,8 +240,8 @@ Map<String, dynamic> convertRtcTransportStatsToMap(RtcTransportStats stats) {
   };
 }
 
-String? convertIceRoleToString(IceRole role) {
-  if (rol == null) {
+String? convertIceRoleToString(IceRole? role) {
+  if (role == null) {
     return null;
   } else {
     return switch (role) {
