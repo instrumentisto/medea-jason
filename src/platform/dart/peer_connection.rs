@@ -24,7 +24,7 @@ use crate::{
             },
         },
         IceCandidate, IceCandidateError, RtcPeerConnectionError, RtcStats,
-        SdpType,
+        RtcStatsError, SdpType,
     },
 };
 
@@ -183,18 +183,17 @@ impl RtcPeerConnection {
     }
 
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
-    // TODO(fix): error propagating
     #[allow(clippy::missing_errors_doc, clippy::unused_async)]
     pub async fn get_stats(&self) -> RtcPeerConnectionResult<RtcStats> {
         let fut = unsafe { peer_connection::get_stats(self.handle.get()) };
-        // TODO(fix): propagate error here
         let stats_json: String = unsafe { FutureFromDart::execute(fut) }
             .await
-            .map_err(tracerr::wrap!())
-            .unwrap();
-        // TODO(fix): propagate error here
-        let rtc_stats: Vec<RtcStat> =
-            serde_json::from_str(&stats_json).map_err(Rc::new).unwrap();
+            .map_err(RtcStatsError::Platform)
+            .map_err(tracerr::from_and_wrap!())?;
+        let rtc_stats: Vec<RtcStat> = serde_json::from_str(&stats_json)
+            .map_err(Rc::new)
+            .map_err(RtcStatsError::ParseError)
+            .map_err(tracerr::from_and_wrap!())?;
         Ok(RtcStats(rtc_stats))
     }
 
