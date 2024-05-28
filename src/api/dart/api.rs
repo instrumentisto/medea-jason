@@ -597,8 +597,8 @@ pub fn local_media_track_state(
     )
 }
 
-/// Indicates whether `OnAudioLevelChangedCallback` is
-/// supported for this [`LocalMediaTrack`].
+/// Indicates whether `OnAudioLevelChangedCallback` is supported for this
+/// [`LocalMediaTrack`].
 #[must_use]
 pub fn is_on_audio_level_available(
     track: RustOpaque<LocalMediaTrack>,

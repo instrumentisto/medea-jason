@@ -30,7 +30,7 @@ class Call {
   /// Callback for creating/changing a render from a local video display track.
   late Function(webrtc.MediaStreamTrack) _onLocalDisplayTrack;
 
-  /// Callback for creating/changing a render from a local video display track.
+  /// Callback which will be called when new local audio track is added.
   late Function(LocalMediaTrack) _onLocalAudioTrack;
 
   /// Errors handler.
@@ -104,8 +104,7 @@ class Call {
     for (var track in tracks) {
       if (track.kind() == MediaKind.video) {
         _onLocalDeviceTrack(track.getTrack());
-      }
-      if (track.kind() == MediaKind.audio) {
+      } else if (track.kind() == MediaKind.audio) {
         _onLocalAudioTrack(track);
       }
     }
@@ -118,8 +117,7 @@ class Call {
         } else {
           _onLocalDisplayTrack(track.getTrack());
         }
-      }
-      if (track.kind() == MediaKind.audio) {
+      } else if (track.kind() == MediaKind.audio) {
         _onLocalAudioTrack(track);
       }
     });
@@ -168,8 +166,7 @@ class Call {
         } else {
           _onLocalDeviceTrack(track.getTrack());
         }
-      }
-      if (track.kind() == MediaKind.audio) {
+      } else if (track.kind() == MediaKind.audio) {
         _onLocalAudioTrack(track);
       }
     }
@@ -184,6 +181,7 @@ class Call {
     _jason.closeRoom(_room);
   }
 
+  /// Sets the callback for a new local audio track.
   void onLocalAudioTrack(Function(LocalMediaTrack) f) {
     _onLocalAudioTrack = f;
   }

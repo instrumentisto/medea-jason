@@ -177,8 +177,8 @@ impl LocalMediaTrack {
         self.0.state().await
     }
 
-    /// Indicates whether `OnAudioLevelChangedCallback` is
-    /// supported for this [`LocalMediaTrack`].
+    /// Indicates whether `OnAudioLevelChangedCallback` is supported for this
+    /// [`LocalMediaTrack`].
     #[must_use]
     pub fn is_on_audio_level_available(&self) -> bool {
         self.get_track().is_on_audio_level_available()
