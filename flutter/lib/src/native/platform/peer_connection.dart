@@ -74,7 +74,7 @@ extension RtcMediaSourceStatsMapConverter on RtcMediaSourceStats {
         'width': stat.width,
         'height': stat.height,
         'frames': stat.frames,
-        'framesPerSecond': stat.framesPerSecond?.toInt(),
+        'framesPerSecond': stat.framesPerSecond,
       };
     } else {
       throw 'Unreachable';
@@ -149,7 +149,7 @@ extension RtcOutboundRtpStreamStatsMapConverter on RtcOutboundRtpStreamStats {
       additionalData = {
         'frameWidth': mediaType.frameWidth,
         'frameHeight': mediaType.frameHeight,
-        'framesPerSecond': mediaType.framesPerSecond?.toInt(),
+        'framesPerSecond': mediaType.framesPerSecond,
       };
     } else if (this.mediaType == null) {
       // It can be null, so do nothing.
@@ -192,7 +192,7 @@ extension RtcInboundRtpStreamStatsMapConverter on RtcInboundRtpStreamStats {
         'frameWidth': mediaType.frameWidth,
         'frameHeight': mediaType.frameHeight,
         'totalInterFrameDelay': mediaType.totalInterFrameDelay,
-        'framesPerSecond': mediaType.framesPerSecond?.toInt(),
+        'framesPerSecond': mediaType.framesPerSecond,
         'firCount': mediaType.firCount,
         'pliCount': mediaType.pliCount,
         'concealmentEvents': mediaType.concealmentEvents,

@@ -1085,7 +1085,7 @@ pub enum RtcInboundRtpStreamMediaType {
         total_inter_frame_delay: Option<Float>,
 
         /// Number of decoded frames in the last second.
-        frames_per_second: Option<u64>,
+        frames_per_second: Option<Float>,
 
         /// Bit depth per pixel of the last decoded frame.
         ///
@@ -1234,7 +1234,7 @@ pub enum TrackStatsKind {
 /// [`RtcStat`] fields of [`RtcStatsType::OutboundRtp`] type based on
 /// `mediaType`.
 #[serde_with::skip_serializing_none]
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Hash, PartialEq, Serialize)]
 #[serde(tag = "mediaType", rename_all = "camelCase")]
 pub enum RtcOutboundRtpStreamMediaType {
     /// Fields when `mediaType` is `audio`.
@@ -1277,7 +1277,7 @@ pub enum RtcOutboundRtpStreamMediaType {
         /// [RTCVideoSourceStats.framesPerSecond][1]).
         ///
         /// [1]: https://tinyurl.com/rrmkrfk
-        frames_per_second: Option<u64>,
+        frames_per_second: Option<Float>,
     },
 }
 
@@ -1305,7 +1305,7 @@ pub enum RtcOutboundRtpStreamMediaType {
 /// [4]: https://tinyurl.com/rkuvpl4
 /// [5]: https://w3.org/TR/webrtc-stats/#outboundrtpstats-dict%2A
 #[serde_with::skip_serializing_none]
-#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RtcOutboundRtpStreamStats {
     /// ID of the stats object representing the current track attachment to the
@@ -1401,7 +1401,7 @@ pub enum MediaKind {
         /// Number of frames originating from the source, measured during the
         /// last second. For the first second of this object's lifetime this
         /// attribute is missing.
-        frames_per_second: Option<u32>,
+        frames_per_second: Option<Float>,
     },
 
     /// Fields when `kind` is `audio`.
