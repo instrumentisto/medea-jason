@@ -98,8 +98,6 @@ extension RtcOutboundRtpStreamStatsMapConverter on RtcOutboundRtpStreamStats {
         'frameHeight': mediaType.frameHeight,
         'framesPerSecond': mediaType.framesPerSecond,
       };
-    } else if (mediaType == null) {
-      // It can be null, so do nothing.
     } else {
       throw 'Unreachable';
     }
@@ -146,8 +144,6 @@ extension RtcInboundRtpStreamStatsMapConverter on RtcInboundRtpStreamStats {
         'framesReceived': mediaType.framesReceived,
         'sliCount': mediaType.sliCount,
       };
-    } else if (mediaType == null) {
-      // Do nothing, because it can be null
     } else {
       throw 'Unreachable';
     }
