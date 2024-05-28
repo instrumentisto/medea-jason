@@ -18,17 +18,21 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Returns the provided [IceCandidate] [String].
-Pointer<Utf8> _candidate(webrtc.IceCandidate iceCandidate) {
+Pointer<Utf8> _candidate(Object iceCandidate) {
+  iceCandidate as webrtc.IceCandidate;
   return iceCandidate.candidate.toNativeUtf8();
 }
 
 /// Returns SDP M line index of the provided [IceCandidate].
-int _sdpMLineIndex(webrtc.IceCandidate iceCandidate) {
+int _sdpMLineIndex(Object iceCandidate) {
+  iceCandidate as webrtc.IceCandidate;
   return iceCandidate.sdpMLineIndex;
 }
 
 /// Returns SDP MID of the provided [IceCandidate].
-Pointer<Utf8> _sdpMid(webrtc.IceCandidate iceCandidate) {
+Pointer<Utf8> _sdpMid(Object iceCandidate) {
+  iceCandidate as webrtc.IceCandidate;
+
   return iceCandidate.sdpMid.toNativeUtf8();
 }
 

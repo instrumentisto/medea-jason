@@ -26,7 +26,8 @@ void registerFunctions(DynamicLibrary dl) {
 
 /// Registers callbacks on the provided [Future] completing Rust's
 /// `FutureFromDart`.
-void _completeProxy(Function f, Pointer rustFuture) {
+void _completeProxy(Object f, Pointer rustFuture) {
+  f as Function;
   Future fut = f();
   fut.then((val) {
     var arg = ForeignValue.fromDart(val);

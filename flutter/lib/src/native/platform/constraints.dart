@@ -39,6 +39,7 @@ enum VideoConstraintKind {
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
 enum AudioConstraintKind {
   deviceId,
+  autoGainControl,
 }
 
 /// Indicates necessity of a [AudioConstraints] or [VideoConstraints] setting.
@@ -72,8 +73,9 @@ Object _newAudioConstraints() {
 /// Specifies the provided setting of a [MediaStreamConstraints.video][0].
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-video
-void _setVideoConstraintValue(
-    webrtc.DeviceVideoConstraints cons, int kind, ForeignValue value) {
+void _setVideoConstraintValue(Object cons, int kind, ForeignValue value) {
+  cons as webrtc.DeviceVideoConstraints;
+
   switch (VideoConstraintKind.values[kind]) {
     case VideoConstraintKind.deviceId:
       cons.deviceId = value.toDart() as String;
@@ -96,19 +98,24 @@ void _setVideoConstraintValue(
 /// Specifies the provided setting of a [MediaStreamConstraints.audio][0].
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
-void _setAudioConstraintValue(
-    webrtc.AudioConstraints cons, int kind, ForeignValue value) {
+void _setAudioConstraintValue(Object cons, int kind, ForeignValue value) {
+  cons as webrtc.AudioConstraints;
+
   switch (AudioConstraintKind.values[kind]) {
     case AudioConstraintKind.deviceId:
       cons.deviceId = value.toDart() as String;
+    case AudioConstraintKind.autoGainControl:
+      cons.autoGainControl = value.toDart() as bool;
       break;
   }
 }
 
 /// Specifies the provided nature and settings of a video track to the given
 /// [DeviceConstraints].
-void _setVideoConstraint(webrtc.DeviceConstraints cons, int type,
-    webrtc.DeviceVideoConstraints video) {
+void _setVideoConstraint(Object cons, int type, Object video) {
+  cons as webrtc.DeviceConstraints;
+  video as webrtc.DeviceVideoConstraints;
+
   switch (ConstraintType.values[type]) {
     case ConstraintType.optional:
       cons.video.optional = video;
@@ -121,8 +128,10 @@ void _setVideoConstraint(webrtc.DeviceConstraints cons, int type,
 
 /// Specifies the provided nature and settings of a audio track to the given
 /// [DeviceConstraints].
-void _setAudioConstraint(
-    webrtc.DeviceConstraints cons, int type, webrtc.AudioConstraints audio) {
+void _setAudioConstraint(Object cons, int type, Object audio) {
+  cons as webrtc.DeviceConstraints;
+  audio as webrtc.AudioConstraints;
+
   switch (ConstraintType.values[type]) {
     case ConstraintType.optional:
       cons.audio.optional = audio;

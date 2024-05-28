@@ -30,12 +30,14 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Returns ID of the provided [MediaStreamTrack].
-Pointer<Utf8> _id(MediaStreamTrack track) {
+Pointer<Utf8> _id(Object track) {
+  track as MediaStreamTrack;
   return track.id().toNativeUtf8();
 }
 
 /// Returns kind of the provided [MediaStreamTrack].
-int _kind(MediaStreamTrack track) {
+int _kind(Object track) {
+  track as MediaStreamTrack;
   if (track.kind() == MediaKind.audio) {
     return 0;
   } else {
@@ -45,46 +47,56 @@ int _kind(MediaStreamTrack track) {
 
 /// Subscribes on the [MediaStreamTrack.onEnded] of the provided
 /// [MediaStreamTrack].
-void _onEnded(MediaStreamTrack track, Function f) {
+void _onEnded(Object track, Object f) {
+  track as MediaStreamTrack;
+  f as Function;
+
   track.onEnded(() {
     f(null);
   });
 }
 
 /// Returns device ID of the provided [MediaStreamTrack].
-Pointer<Utf8> _deviceId(MediaStreamTrack track) {
+Pointer<Utf8> _deviceId(Object track) {
+  track as MediaStreamTrack;
   return track.deviceId().toNativeUtf8();
 }
 
-Object _readyState(MediaStreamTrack track) {
+Object _readyState(Object track) {
+  track as MediaStreamTrack;
   return () => track.state().then((s) => s.index);
 }
 
 /// Returns facingMode of the provided [MediaStreamTrack].
-Pointer _facingMode(MediaStreamTrack track) {
+Pointer _facingMode(Object track) {
+  track as MediaStreamTrack;
   // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return ForeignValue.fromInt(0).intoRustOwned();
 }
 
 /// Returns height of the video of the provided [MediaStreamTrack].
-Pointer _height(MediaStreamTrack track) {
+Pointer _height(Object track) {
+  track as MediaStreamTrack;
   // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return ForeignValue.fromInt(1600).intoRustOwned();
 }
 
 /// Returns width of the video of the provided [MediaStreamTrack].
-Pointer _width(MediaStreamTrack track) {
+Pointer _width(Object track) {
+  track as MediaStreamTrack;
   // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return ForeignValue.fromInt(1300).intoRustOwned();
 }
 
 /// Sets [MediaStreamTrack.enabled] state of the provided [MediaStreamTrack].
-void _setEnabled(MediaStreamTrack track, bool enabled) {
+void _setEnabled(Object track, bool enabled) {
+  track = track as MediaStreamTrack;
   track.setEnabled(enabled);
 }
 
 /// Stops the provided [MediaStreamTrack].
-Object _stop(MediaStreamTrack track) {
+Object _stop(Object track) {
+  track as MediaStreamTrack;
   return () => track.stop();
 }
 
@@ -103,16 +115,19 @@ bool _isOnAudioLevelAvailable(MediaStreamTrack track) {
 }
 
 /// Indicates whether the provided [MediaStreamTrack] is enabled.
-bool _enabled(MediaStreamTrack track) {
+bool _enabled(Object track) {
+  track as MediaStreamTrack;
   return track.isEnabled();
 }
 
 /// Clones the provided [MediaStreamTrack] preserving the same media source.
-Object _clone(MediaStreamTrack track) {
+Object _clone(Object track) {
+  track as MediaStreamTrack;
   return () => track.clone();
 }
 
 /// Disposes of this [MediaStreamTrack].
-Object _dispose(MediaStreamTrack track) {
+Object _dispose(Object track) {
+  track as MediaStreamTrack;
   return () => track.dispose();
 }

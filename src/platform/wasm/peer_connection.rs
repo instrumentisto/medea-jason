@@ -19,19 +19,20 @@ use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
     RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
     RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceErrorEvent,
-    RtcPeerConnectionIceEvent, RtcRtpTransceiver, RtcRtpTransceiverInit,
-    RtcSdpType, RtcSessionDescription, RtcSessionDescriptionInit,
-    RtcTrackEvent,
+    RtcPeerConnectionIceEvent, RtcRtpTransceiver, RtcSdpType,
+    RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
 };
 
 use crate::{
     media::MediaKind,
     platform::{
         self,
-        wasm::{get_property_by_name, utils::EventListener},
+        wasm::{
+            get_property_by_name, transceiver::TransceiverInit,
+            utils::EventListener,
+        },
         IceCandidate, IceCandidateError, MediaStreamTrack,
         RtcPeerConnectionError, RtcStats, SdpType, Transceiver,
-        TransceiverDirection,
     },
 };
 
@@ -47,7 +48,7 @@ type RtcPeerConnectionResult<T> = Result<T, Traced<RtcPeerConnectionError>>;
 pub struct RtcPeerConnection {
     /// Underlying [RTCPeerConnection][1].
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     peer: Rc<SysRtcPeerConnection>,
 
     /// Flag which indicates that ICE restart will be performed on next
@@ -58,9 +59,9 @@ pub struct RtcPeerConnection {
     /// [`icecandidate`][3] event. It fires when [RTCPeerConnection][1]
     /// discovers a new [RTCIceCandidate][4].
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-onicecandidate
-    /// [3]: https://w3.org/TR/webrtc/#event-icecandidate
+    /// [3]: https://w3.org/TR/webrtc#event-icecandidate
     /// [4]: https://w3.org/TR/webrtc#dom-rtcicecandidate
     on_ice_candidate: RefCell<
         Option<EventListener<SysRtcPeerConnection, RtcPeerConnectionIceEvent>>,
@@ -85,9 +86,9 @@ pub struct RtcPeerConnection {
     /// [`iceconnectionstatechange`][2] callback of [RTCPeerConnection][1],
     /// fires whenever [ICE connection state][3] changes.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
-    /// [2]: https://w3.org/TR/webrtc/#event-iceconnectionstatechange
-    /// [3]: https://w3.org/TR/webrtc/#dfn-ice-connection-state
+    /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
+    /// [2]: https://w3.org/TR/webrtc#event-iceconnectionstatechange
+    /// [3]: https://w3.org/TR/webrtc#dfn-ice-connection-state
     on_ice_connection_state_changed:
         RefCell<Option<EventListener<SysRtcPeerConnection, Event>>>,
 
@@ -100,8 +101,8 @@ pub struct RtcPeerConnection {
     /// Tracking issue for Firefox:
     /// <https://bugzilla.mozilla.org/show_bug.cgi?id=1265827>
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
-    /// [2]: https://w3.org/TR/webrtc/#event-connectionstatechange
+    /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
+    /// [2]: https://w3.org/TR/webrtc#event-connectionstatechange
     on_connection_state_changed:
         RefCell<Option<EventListener<SysRtcPeerConnection, Event>>>,
 
@@ -109,9 +110,9 @@ pub struct RtcPeerConnection {
     /// [`track`][3] event. It fires when [RTCPeerConnection][1] receives
     /// new [MediaStreamTrack][4] from remote peer.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-ontrack
-    /// [3]: https://w3.org/TR/webrtc/#event-track
+    /// [3]: https://w3.org/TR/webrtc#event-track
     /// [4]: https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamTrack
     on_track:
         RefCell<Option<EventListener<SysRtcPeerConnection, RtcTrackEvent>>>,
@@ -186,9 +187,9 @@ impl RtcPeerConnection {
     ///
     /// If binding to the [`track`][3] event fails. Not supposed to ever happen.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtctrackevent
+    /// [1]: https://w3.org/TR/webrtc#rtctrackevent
     /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-ontrack
-    /// [3]: https://w3.org/TR/webrtc/#event-track
+    /// [3]: https://w3.org/TR/webrtc#event-track
     pub fn on_track<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(MediaStreamTrack, Transceiver),
@@ -269,7 +270,7 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnectioniceevent
     /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-onicecandidate
-    /// [3]: https://w3.org/TR/webrtc/#event-icecandidate
+    /// [3]: https://w3.org/TR/webrtc#event-icecandidate
     pub fn on_ice_candidate<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(IceCandidate),
@@ -325,7 +326,7 @@ impl RtcPeerConnection {
     /// If binding to the [`iceconnectionstatechange`][1] event fails. Not
     /// supposed to ever happen.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#event-iceconnectionstatechange
+    /// [1]: https://w3.org/TR/webrtc#event-iceconnectionstatechange
     pub fn on_ice_connection_state_change<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(IceConnectionState),
@@ -361,7 +362,7 @@ impl RtcPeerConnection {
     /// If binding to the [`connectionstatechange`][1] event fails. Not supposed
     /// to ever happen.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#event-connectionstatechange
+    /// [1]: https://w3.org/TR/webrtc#event-connectionstatechange
     pub fn on_connection_state_change<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(PeerConnectionState),
@@ -416,7 +417,7 @@ impl RtcPeerConnection {
     /// With [`RtcPeerConnectionError::AddIceCandidateFailed`] if
     /// [RtcPeerConnection.addIceCandidate()][3] fails.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     /// [2]: https://tools.ietf.org/html/rfc5245#section-2
     /// [3]: https://w3.org/TR/webrtc#dom-peerconnection-addicecandidate
     pub async fn add_ice_candidate(
@@ -632,20 +633,18 @@ impl RtcPeerConnection {
     /// and adds it to the [set of this RTCPeerConnection's transceivers][2].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-    /// [2]: https://w3.org/TR/webrtc/#transceivers-set
-    pub fn add_transceiver(
+    /// [2]: https://w3.org/TR/webrtc#transceivers-set
+    // Async is needed for consistency with Dart implementation.
+    #[allow(clippy::unused_async)]
+    pub async fn add_transceiver(
         &self,
         kind: MediaKind,
-        direction: TransceiverDirection,
-    ) -> impl Future<Output = Transceiver> + 'static {
+        init: TransceiverInit,
+    ) -> Transceiver {
         let peer = Rc::clone(&self.peer);
-        async move {
-            let mut init = RtcRtpTransceiverInit::new();
-            _ = init.direction(direction.into());
-            let transceiver =
-                peer.add_transceiver_with_str_and_init(kind.as_str(), &init);
-            Transceiver::from(transceiver)
-        }
+        let transceiver = peer
+            .add_transceiver_with_str_and_init(kind.as_str(), init.handle());
+        Transceiver::from(transceiver)
     }
 
     /// Returns [`RtcRtpTransceiver`] (see [RTCRtpTransceiver][1]) from a
@@ -657,7 +656,7 @@ impl RtcPeerConnection {
     /// Not supposed to ever happen.
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-    /// [2]: https://w3.org/TR/webrtc/#transceivers-set
+    /// [2]: https://w3.org/TR/webrtc#transceivers-set
     pub fn get_transceiver_by_mid(
         &self,
         mid: String,

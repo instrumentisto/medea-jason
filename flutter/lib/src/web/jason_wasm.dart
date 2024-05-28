@@ -47,6 +47,8 @@ class AudioTrackConstraints {
   external void free();
   external factory AudioTrackConstraints();
   external void device_id(String device_id);
+  external void exact_auto_gain_control(bool auto_gain_control);
+  external void ideal_auto_gain_control(bool auto_gain_control);
 }
 
 @JS()

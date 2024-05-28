@@ -6,4 +6,14 @@ abstract class AudioTrackConstraints implements SyncPlatformHandle {
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
   void deviceId(String deviceId);
+
+  /// Sets an exact [autoGainControl][1] constraint.
+  ///
+  /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
+  void exactAutoGainControl(bool autoGainControl);
+
+  /// Sets an ideal [autoGainControl][1] constraint.
+  ///
+  /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
+  void idealAutoGainControl(bool autoGainControl);
 }

@@ -1,13 +1,14 @@
 //! Media tracks and streams constraints functionality.
 
 use crate::media::{
-    constraints::{ConstrainString, ConstrainU32},
+    constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
     AudioTrackConstraints, DeviceVideoTrackConstraints,
     DisplayVideoTrackConstraints,
 };
 use derive_more::{AsRef, Into};
 use web_sys::{
-    ConstrainDomStringParameters, ConstrainDoubleRange, MediaTrackConstraints,
+    ConstrainBooleanParameters, ConstrainDomStringParameters,
+    ConstrainDoubleRange, MediaTrackConstraints,
 };
 
 /// [MediaStreamConstraints][1] wrapper.
@@ -47,6 +48,12 @@ impl Default for MediaStreamConstraints {
 impl From<AudioTrackConstraints> for MediaTrackConstraints {
     fn from(track_constraints: AudioTrackConstraints) -> Self {
         let mut constraints = Self::new();
+
+        if let Some(auto_gain_control) = track_constraints.auto_gain_control {
+            _ = constraints.auto_gain_control(
+                &ConstrainBooleanParameters::from(auto_gain_control),
+            );
+        }
 
         if let Some(device_id) = track_constraints.device_id {
             _ = constraints
@@ -89,6 +96,17 @@ impl From<ConstrainU32> for ConstrainDoubleRange {
             ConstrainU32::Range(min, max) => {
                 constraint.min(f64::from(min)).max(f64::from(max))
             }
+        };
+        constraint
+    }
+}
+
+impl From<ConstrainBoolean> for ConstrainBooleanParameters {
+    fn from(from: ConstrainBoolean) -> Self {
+        let mut constraint = Self::new();
+        _ = match from {
+            ConstrainBoolean::Exact(val) => constraint.exact(val),
+            ConstrainBoolean::Ideal(val) => constraint.ideal(val),
         };
         constraint
     }

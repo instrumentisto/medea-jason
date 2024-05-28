@@ -11,6 +11,16 @@ class AudioTrackConstraints implements base.AudioTrackConstraints {
     fallibleFunction(() => obj.device_id(deviceId));
   }
 
+  @override
+  void exactAutoGainControl(bool autoGainControl) {
+    fallibleFunction(() => obj.exact_auto_gain_control(autoGainControl));
+  }
+
+  @override
+  void idealAutoGainControl(bool autoGainControl) {
+    fallibleFunction(() => obj.ideal_auto_gain_control(autoGainControl));
+  }
+
   @moveSemantics
   @override
   void free() {

@@ -24,7 +24,7 @@ use crate::{
             },
         },
         IceCandidate, IceCandidateError, RtcPeerConnectionError, RtcStats,
-        SdpType, TransceiverDirection,
+        SdpType,
     },
 };
 
@@ -34,6 +34,7 @@ use super::{
         IceCandidateError as PlatformIceCandidateError,
     },
     media_track::MediaStreamTrack,
+    transceiver::TransceiverInit,
     utils::string_into_c_str,
 };
 
@@ -54,7 +55,7 @@ mod peer_connection {
         /// Sets the provided callback to a [`connectionstatechange`][1] event
         /// of the provided [`PeerConnection`].
         ///
-        /// [1]: https://w3.org/TR/webrtc/#event-connectionstatechange
+        /// [1]: https://w3.org/TR/webrtc#event-connectionstatechange
         pub fn on_connection_state_change(peer: Dart_Handle, cb: Dart_Handle);
 
         /// Returns a [`ConnectionState`] of the provided [`PeerConnection`].
@@ -106,11 +107,11 @@ mod peer_connection {
             is_force_relayed: bool,
         ) -> Dart_Handle;
 
-        /// Creates a new [`Transceiver`[ in the provided [`PeerConnection`].
+        /// Creates a new [`Transceiver`] in the provided [`PeerConnection`].
         pub fn add_transceiver(
             peer: Dart_Handle,
             kind: i64,
-            direction: i64,
+            init: Dart_Handle,
         ) -> Dart_Handle;
 
         /// Returns newly created SDP offer of the provided [`PeerConnection`].
@@ -187,7 +188,7 @@ impl RtcPeerConnection {
 
     /// Sets `handler` for a [RTCTrackEvent][1] (see [`ontrack` callback][2]).
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtctrackevent
+    /// [1]: https://w3.org/TR/webrtc#rtctrackevent
     /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-ontrack
     pub fn on_track<F>(&self, handler: Option<F>)
     where
@@ -298,7 +299,7 @@ impl RtcPeerConnection {
 
     /// Sets `handler` for an [`iceconnectionstatechange`][1] event.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#event-iceconnectionstatechange
+    /// [1]: https://w3.org/TR/webrtc#event-iceconnectionstatechange
     pub fn on_ice_connection_state_change<F>(&self, handler: Option<F>)
     where
         F: 'static + FnMut(IceConnectionState),
@@ -318,7 +319,7 @@ impl RtcPeerConnection {
 
     /// Sets `handler` for a [`connectionstatechange`][1] event.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#event-connectionstatechange
+    /// [1]: https://w3.org/TR/webrtc#event-connectionstatechange
     pub fn on_connection_state_change<F>(&self, handler: Option<F>)
     where
         F: 'static + FnMut(PeerConnectionState),
@@ -344,7 +345,7 @@ impl RtcPeerConnection {
     /// With [`RtcPeerConnectionError::AddIceCandidateFailed`] if
     /// [RtcPeerConnection.addIceCandidate()][3] fails.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     /// [2]: https://tools.ietf.org/html/rfc5245#section-2
     /// [3]: https://w3.org/TR/webrtc#dom-peerconnection-addicecandidate
     pub async fn add_ice_candidate(
@@ -505,32 +506,29 @@ impl RtcPeerConnection {
     /// to the [set of this RTCPeerConnection's transceivers][2].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-    /// [2]: https://w3.org/TR/webrtc/#transceivers-set
-    pub fn add_transceiver(
+    /// [2]: https://w3.org/TR/webrtc#transceivers-set
+    pub async fn add_transceiver(
         &self,
         kind: MediaKind,
-        direction: TransceiverDirection,
-    ) -> impl Future<Output = Transceiver> + 'static {
-        let handle = self.handle.get();
-        async move {
-            let fut = unsafe {
-                peer_connection::add_transceiver(
-                    handle,
-                    kind as i64,
-                    direction.into(),
-                )
-            };
-            let trnsvr: DartHandle =
-                unsafe { FutureFromDart::execute(fut) }.await.unwrap();
-            Transceiver::from(trnsvr)
-        }
+        init: TransceiverInit,
+    ) -> Transceiver {
+        let fut = unsafe {
+            peer_connection::add_transceiver(
+                self.handle.get(),
+                kind as i64,
+                init.handle(),
+            )
+        };
+        let trnsvr: DartHandle =
+            unsafe { FutureFromDart::execute(fut) }.await.unwrap();
+        Transceiver::from(trnsvr)
     }
 
     /// Returns [`Transceiver`] (see [RTCRtpTransceiver][1]) from a
     /// [set of this RTCPeerConnection's transceivers][2] by provided `mid`.
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-    /// [2]: https://w3.org/TR/webrtc/#transceivers-set
+    /// [2]: https://w3.org/TR/webrtc#transceivers-set
     pub fn get_transceiver_by_mid(
         &self,
         mid: String,

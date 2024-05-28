@@ -968,6 +968,10 @@ pub struct AudioTrackConstraints {
     /// Identifier of the device generating the content for the media track.
     pub device_id: Option<ConstrainString<String>>,
 
+    /// Automatically manages changes in the volume of its source media to
+    /// maintain a steady overall volume level.
+    pub auto_gain_control: Option<ConstrainBoolean>,
+
     /// Importance of this [`AudioTrackConstraints`].
     ///
     /// If `true` then without this [`AudioTrackConstraints`] call session
@@ -987,6 +991,22 @@ impl AudioTrackConstraints {
     /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
     pub fn device_id(&mut self, device_id: String) {
         self.device_id = Some(ConstrainString::Exact(device_id));
+    }
+
+    /// Sets an exact [autoGainControl][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
+    pub fn exact_auto_gain_control(&mut self, auto_gain_control: bool) {
+        self.auto_gain_control =
+            Some(ConstrainBoolean::Exact(auto_gain_control));
+    }
+
+    /// Sets an ideal [autoGainControl][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
+    pub fn ideal_auto_gain_control(&mut self, auto_gain_control: bool) {
+        self.auto_gain_control =
+            Some(ConstrainBoolean::Ideal(auto_gain_control));
     }
 
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
@@ -1028,6 +1048,7 @@ impl From<ProtoAudioConstraints> for AudioTrackConstraints {
         Self {
             required: caps.required,
             device_id: None,
+            auto_gain_control: None,
         }
     }
 }
@@ -1091,6 +1112,21 @@ pub enum ConstrainString<T> {
 
     /// Ideal (target) value for this property.
     Ideal(T),
+}
+
+/// Representation of a [ConstrainBoolean][1].
+///
+/// Can set exact (must be the parameter's value) and ideal (should be used if
+/// possible) constrain.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ConstrainBoolean {
+    /// Exact value required for this property.
+    Exact(bool),
+
+    /// Ideal (target) value for this property.
+    Ideal(bool),
 }
 
 impl<T: AsRef<str>> ConstrainString<T> {
