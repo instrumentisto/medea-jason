@@ -995,6 +995,7 @@ pub type CandidateType = NonExhaustive<KnownCandidateType>;
 #[serde(tag = "mediaType", rename_all = "camelCase")]
 pub enum RtcInboundRtpStreamMediaType {
     /// Fields when `mediaType` is `audio`.
+    #[serde(rename_all = "camelCase")]
     Audio {
         /// Indicator whether the last RTP packet whose frame was delivered to
         /// the [RTCRtpReceiver]'s [MediaStreamTrack][1] for playout contained
@@ -1049,6 +1050,7 @@ pub enum RtcInboundRtpStreamMediaType {
     },
 
     /// Fields when `mediaType` is `video`.
+    #[serde(rename_all = "camelCase")]
     Video {
         /// Total number of frames correctly decoded for this RTP stream, i.e.
         /// frames that would be displayed if no frames are dropped.
@@ -1236,6 +1238,7 @@ pub enum TrackStatsKind {
 #[serde(tag = "mediaType", rename_all = "camelCase")]
 pub enum RtcOutboundRtpStreamMediaType {
     /// Fields when `mediaType` is `audio`.
+    #[serde(rename_all = "camelCase")]
     Audio {
         /// Total number of samples that have been sent over this RTP stream.
         total_samples_sent: Option<u64>,
@@ -1246,6 +1249,7 @@ pub enum RtcOutboundRtpStreamMediaType {
     },
 
     /// Fields when `mediaType` is `video`.
+    #[serde(rename_all = "camelCase")]
     Video {
         /// Width of the last encoded frame.
         ///
@@ -1384,6 +1388,7 @@ pub struct RtcIceCandidateStats {
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum MediaKind {
     /// Fields when `kind` is `video`.
+    #[serde(rename_all = "camelCase")]
     Video {
         /// Width (in pixels) of the last frame originating from the source.
         /// Before a frame has been produced this attribute is missing.
@@ -1400,6 +1405,7 @@ pub enum MediaKind {
     },
 
     /// Fields when `kind` is `audio`.
+    #[serde(rename_all = "camelCase")]
     Audio {
         /// Audio level of the media source.
         audio_level: Option<Float>,

@@ -74,7 +74,7 @@ extension RtcMediaSourceStatsMapConverter on RtcMediaSourceStats {
         'width': stat.width,
         'height': stat.height,
         'frames': stat.frames,
-        'framesPerSecond': stat.framesPerSecond,
+        'framesPerSecond': stat.framesPerSecond?.toInt(),
       };
     } else {
       throw 'Unreachable';
@@ -149,7 +149,7 @@ extension RtcOutboundRtpStreamStatsMapConverter on RtcOutboundRtpStreamStats {
       additionalData = {
         'frameWidth': mediaType.frameWidth,
         'frameHeight': mediaType.frameHeight,
-        'framesPerSecond': mediaType.framesPerSecond,
+        'framesPerSecond': mediaType.framesPerSecond?.toInt(),
       };
     } else if (this.mediaType == null) {
       // It can be null, so do nothing.
@@ -192,7 +192,7 @@ extension RtcInboundRtpStreamStatsMapConverter on RtcInboundRtpStreamStats {
         'frameWidth': mediaType.frameWidth,
         'frameHeight': mediaType.frameHeight,
         'totalInterFrameDelay': mediaType.totalInterFrameDelay,
-        'framesPerSecond': mediaType.framesPerSecond,
+        'framesPerSecond': mediaType.framesPerSecond?.toInt(),
         'firCount': mediaType.firCount,
         'pliCount': mediaType.pliCount,
         'concealmentEvents': mediaType.concealmentEvents,
@@ -225,7 +225,7 @@ extension RtcIceCandidatePairStatsMapConverter on RtcIceCandidatePairStats {
       'bytesReceived': this.bytesReceived,
       'totalRoundTripTime': this.totalRoundTripTime,
       'currentRoundTripTime': this.currentRoundTripTime,
-      'availableOutgoingBitrate': this.availableOutgoingBitrate,
+      'availableOutgoingBitrate': this.availableOutgoingBitrate?.toInt(),
     };
   }
 }
@@ -313,7 +313,7 @@ extension RtcStatsTypeMapConverter on RtcStatsType {
       additionalData = stats_type.toMap();
     } else if (this is RtcIceCandidatePairStats) {
       var stats_type = this as RtcIceCandidatePairStats;
-      statsName = 'ice-candidate-pair';
+      statsName = 'candidate-pair';
       additionalData = stats_type.toMap();
     } else if (this is RtcTransportStats) {
       var stats_type = this as RtcTransportStats;
