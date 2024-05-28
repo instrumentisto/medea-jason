@@ -169,6 +169,9 @@ class Call {
           _onLocalDeviceTrack(track.getTrack());
         }
       }
+      if (track.kind() == MediaKind.audio) {
+        _onLocalAudioTrack(track);
+      }
     }
   }
 
