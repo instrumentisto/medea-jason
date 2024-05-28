@@ -6,8 +6,7 @@ use std::{future::Future, rc::Rc};
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    stats::{RtcStat, RtcStatsType},
-    IceConnectionState, IceServer, PeerConnectionState,
+    stats::RtcStat, IceConnectionState, IceServer, PeerConnectionState,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -194,14 +193,9 @@ impl RtcPeerConnection {
             .map_err(tracerr::wrap!())
             .unwrap();
         // TODO(fix): propagate error here
-        let rtc_stats: Result<Vec<RtcStat>, _> =
-            serde_json::from_str(&stats_json).map_err(Rc::new);
-        println!("stats_json: {:?}", rtc_stats);
-        if let Ok(stats) = rtc_stats {
-            Ok(RtcStats(stats))
-        } else {
-            Ok(RtcStats(Vec::new()))
-        }
+        let rtc_stats: Vec<RtcStat> =
+            serde_json::from_str(&stats_json).map_err(Rc::new).unwrap();
+        Ok(RtcStats(rtc_stats))
     }
 
     /// Sets `handler` for a [RTCTrackEvent][1] (see [`ontrack` callback][2]).
