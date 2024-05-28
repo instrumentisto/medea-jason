@@ -70,7 +70,8 @@ mod peer_connection {
         /// Rollbacks SDP offer of the provided [`PeerConnection`].
         pub fn rollback(peer: Dart_Handle) -> Dart_Handle;
 
-        // TODO(docs): add docs
+        /// Returns JSON encoded [`Vec`] of [`RtcStats`] from the provided
+        /// [`PeerConnection`].
         pub fn get_stats(peer: Dart_Handle) -> Dart_Handle;
 
         /// Sets `onTrack` callback of the provided [`PeerConnection`].

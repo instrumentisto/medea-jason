@@ -300,7 +300,7 @@ extension RtcStatsMapConverter on RtcStats {
     return {
       'id': id,
       'timestamp':
-          timestampUs.toDouble() / 1000.0, // convert microsecs in millisecs
+          timestampUs.toDouble() / 1000.0, // convert microsecs to millisecs
       ...type.toMap(),
     };
   }
