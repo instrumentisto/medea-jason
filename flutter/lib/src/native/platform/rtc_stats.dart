@@ -1,6 +1,7 @@
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
 extension RtcMediaSourceStatsMapConverter on RtcMediaSourceStats {
+  /// Converts this [RtcMediaSourceStats] into convertable to JSON [Map].
   Map<String, dynamic> toMap() {
     String kind;
     var additionalData = {};
@@ -35,6 +36,7 @@ extension RtcMediaSourceStatsMapConverter on RtcMediaSourceStats {
 }
 
 extension RtcIceCandidateStatsMapConverter on RtcIceCandidateStats {
+  /// Converts this [RtcIceCandidateStats] into convertable to JSON [Map].
   Map<String, dynamic> toMap() {
     String type;
     if (this is RtcLocalIceCandidateStats) {
@@ -59,6 +61,7 @@ extension RtcIceCandidateStatsMapConverter on RtcIceCandidateStats {
 }
 
 extension CandidateTypeJsonStringConverter on CandidateType {
+  /// Converts this [CandidateType] into [String] suitable in the JSON reports.
   String toJsonString() {
     return switch (this) {
       CandidateType.host => 'host',
@@ -70,6 +73,7 @@ extension CandidateTypeJsonStringConverter on CandidateType {
 }
 
 extension ProtocolJsonStringConverter on Protocol? {
+  /// Converts this [Protocol] into [String] suitable in the JSON reports.
   String? toJsonString() {
     return switch (this) {
       Protocol.tcp => 'tcp',
@@ -80,6 +84,7 @@ extension ProtocolJsonStringConverter on Protocol? {
 }
 
 extension RtcOutboundRtpStreamStatsMapConverter on RtcOutboundRtpStreamStats {
+  /// Converts this [RtcOutboundRtpStreamStats] into convertable to JSON [Map].
   Map<String, dynamic> toMap() {
     var additionalData = {};
     String? mediaTypeString;
@@ -113,6 +118,7 @@ extension RtcOutboundRtpStreamStatsMapConverter on RtcOutboundRtpStreamStats {
 }
 
 extension RtcInboundRtpStreamStatsMapConverter on RtcInboundRtpStreamStats {
+  /// Converts this [RtcInboundRtpStreamStats] into convertable to JSON [Map].
   Map<String, dynamic> toMap() {
     var additionalData = {};
     String? mediaTypeString;
@@ -160,6 +166,7 @@ extension RtcInboundRtpStreamStatsMapConverter on RtcInboundRtpStreamStats {
 }
 
 extension RtcIceCandidatePairStatsMapConverter on RtcIceCandidatePairStats {
+  /// Converts this [RtcIceCandidatePairStats] into convertable to JSON [Map].
   Map<String, dynamic> toMap() {
     return {
       'state': state.toJsonString(),
@@ -175,6 +182,7 @@ extension RtcIceCandidatePairStatsMapConverter on RtcIceCandidatePairStats {
 
 extension RtcStatsIceCandidatePairStateJsonStringConverter
     on RtcStatsIceCandidatePairState {
+  /// Converts this [RtcStatsIceCandidatePairState] into [String] suitable in the JSON reports.
   String toJsonString() {
     return switch (this) {
       RtcStatsIceCandidatePairState.frozen => 'frozen',
@@ -187,6 +195,7 @@ extension RtcStatsIceCandidatePairStateJsonStringConverter
 }
 
 extension RtcTransportStatsMapConverter on RtcTransportStats {
+  /// Converts this [RtcTransportStats] into convertable to JSON [Map].
   Map<String, dynamic> toMap() {
     return {
       'packetsSent': packetsSent,
@@ -199,6 +208,7 @@ extension RtcTransportStatsMapConverter on RtcTransportStats {
 }
 
 extension IceRoleJsonStringConverter on IceRole? {
+  /// Converts this [IceRole] into [String] suitable in the JSON reports.
   String? toJsonString() {
     return switch (this) {
       IceRole.unknown => 'unknown',
@@ -211,6 +221,7 @@ extension IceRoleJsonStringConverter on IceRole? {
 
 extension RtcRemoteInboundRtpStreamStatsMapConverter
     on RtcRemoteInboundRtpStreamStats {
+  /// Converts this [RtcRemoteInboundRtpStreamStats] into convertable to JSON [Map].
   Map<String, dynamic> toMap() {
     return {
       'localId': localId,
@@ -225,6 +236,7 @@ extension RtcRemoteInboundRtpStreamStatsMapConverter
 
 extension RtcRemoteOutboundRtpStreamStatsMapConverter
     on RtcRemoteOutboundRtpStreamStats {
+  /// Converts this [RtcRemoteOutboundRtpStreamStats] into convertable to JSON [Map].
   Map<String, dynamic> toMap() {
     return {
       'localId': localId,
@@ -235,6 +247,7 @@ extension RtcRemoteOutboundRtpStreamStatsMapConverter
 }
 
 extension RtcStatsTypeMapConverter on RtcStatsType {
+  /// Converts this [RtcStatsType] into convertable to JSON [Map].
   Map<String, dynamic> toMap() {
     String? statsName;
     var additionalData = {};
@@ -282,6 +295,7 @@ extension RtcStatsTypeMapConverter on RtcStatsType {
 }
 
 extension RtcStatsMapConverter on RtcStats {
+  /// Converts this [RtcStats] into convertable to JSON [Map].
   Map<String, dynamic> toMap() {
     return {
       'id': id,
