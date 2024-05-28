@@ -174,8 +174,8 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackStateConstMeta;
 
-  /// Indicates whether `OnAudioLevelChangedCallback` is
-  /// supported for this [`LocalMediaTrack`].
+  /// Indicates whether `OnAudioLevelChangedCallback` is supported for this
+  /// [`LocalMediaTrack`].
   bool isOnAudioLevelAvailable({required LocalMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kIsOnAudioLevelAvailableConstMeta;
