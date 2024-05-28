@@ -173,11 +173,8 @@ class _CallState extends State<CallRoute> {
       );
     });
 
-    print('Subscribed to onLocalAudioTrack');
     _call.onLocalAudioTrack((track) {
-      print('Subscriber to onAudioLevelChanged');
       track.onAudioLevelChanged((volume) {
-        print("Volume changed: $volume");
         setState(() {
           currentAudioLevel = volume / 100;
         });
@@ -294,21 +291,30 @@ class _CallState extends State<CallRoute> {
               }),
         ]),
         body: Center(
-            child: Column(children: [
-          LinearProgressIndicator(
-            value: currentAudioLevel,
-            minHeight: 10.0,
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              children: [
+                LinearProgressIndicator(
+                  value: currentAudioLevel,
+                  minHeight: 10.0,
+                ),
+                Expanded(
+                  child: Row(
+                    children: _widgets.values
+                        .map((videoMap) => Expanded(
+                              child: Column(
+                                children: videoMap.all().toList(),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                )
+              ],
+            ),
           ),
-          SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: Row(
-                children: _widgets.values
-                    .map((videoMap) => Expanded(
-                        child: Column(children: videoMap.all().toList())))
-                    .toList(),
-              )),
-        ])),
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: Padding(
             padding: const EdgeInsets.only(bottom: 50.0),
