@@ -18,10 +18,14 @@ void _callFn(Object fn, ForeignValue value) {
   try {
     var arg = value.toDart();
     if (arg != null) {
-      var res = (fn as dynamic Function(dynamic))(arg);
-      if (res is Future<void>) {
-        res.catchError((e, stack) => api.logDartException(
-            message: e.toString(), stackTrace: stack.toString()));
+      if (fn is void Function(dynamic)) {
+        (fn as void Function(dynamic))(arg);
+      } else if (fn is dynamic Function(dynamic)) {
+        var res = (fn as dynamic Function(dynamic))(arg);
+        if (res is Future<void>) {
+          res.catchError((e, stack) => api.logDartException(
+              message: e.toString(), stackTrace: stack.toString()));
+        }
       }
     } else {
       var res = (fn as dynamic Function())();

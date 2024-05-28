@@ -103,10 +103,12 @@ Object _stop(Object track) {
 /// Sets the provided [OnAudioLevelChangedCallback] for this [MediaStreamTrack].
 ///
 /// It's called for live tracks when audio level of this track changes.
-void _onAudioLevelChanged(Object track, Object cb) {
+void _onAudioLevelChanged(Object track, Object f) {
   track as MediaStreamTrack;
-  cb as OnAudioLevelChangedCallback;
-  track.onAudioLevelChanged(cb);
+  f as Function;
+  track.onAudioLevelChanged((lvl) {
+    f(lvl);
+  });
 }
 
 /// Indicates whether [MediaStreamTrack.onAudioLevelChanged] callback is
