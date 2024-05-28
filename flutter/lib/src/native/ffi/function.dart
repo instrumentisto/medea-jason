@@ -18,14 +18,16 @@ void _callFn(Object fn, ForeignValue value) {
   try {
     var arg = value.toDart();
     if (arg != null) {
-      if (fn is void Function(dynamic)) {
-        (fn as void Function(dynamic))(arg);
+      if (fn is void Function(int)) {
+        (fn as void Function(int))(arg);
       } else if (fn is dynamic Function(dynamic)) {
         var res = (fn as dynamic Function(dynamic))(arg);
         if (res is Future<void>) {
           res.catchError((e, stack) => api.logDartException(
               message: e.toString(), stackTrace: stack.toString()));
         }
+      } else {
+        throw "Unknown Function signature, this typecast needs to be extended";
       }
     } else {
       var res = (fn as dynamic Function())();
