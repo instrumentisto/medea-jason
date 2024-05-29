@@ -67,6 +67,8 @@ class _CallState extends State<CallRoute> {
   VideoView? localScreenVideo;
   VideoView? localCameraVideo;
 
+  double currentAudioLevel = 0.0;
+
   final Map<String, ConnectWidgets> _widgets = {};
 
   final Call _call = Call();
@@ -169,6 +171,14 @@ class _CallState extends State<CallRoute> {
           });
         },
       );
+    });
+
+    _call.onLocalAudioTrack((track) {
+      track.onAudioLevelChanged((volume) {
+        setState(() {
+          currentAudioLevel = volume / 100;
+        });
+      });
     });
 
     _call.onLocalDeviceStream((track) async {
@@ -281,15 +291,30 @@ class _CallState extends State<CallRoute> {
               }),
         ]),
         body: Center(
-            child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Row(
-                  children: _widgets.values
-                      .map((videoMap) => Expanded(
-                          child: Column(children: videoMap.all().toList())))
-                      .toList(),
-                ))),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              children: [
+                LinearProgressIndicator(
+                  value: currentAudioLevel,
+                  minHeight: 10.0,
+                ),
+                Expanded(
+                  child: Row(
+                    children: _widgets.values
+                        .map((videoMap) => Expanded(
+                              child: Column(
+                                children: videoMap.all().toList(),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: Padding(
             padding: const EdgeInsets.only(bottom: 50.0),

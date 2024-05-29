@@ -23,6 +23,9 @@ void registerFunctions(DynamicLibrary dl) {
     clone: Pointer.fromFunction(_clone),
     readyState: Pointer.fromFunction(_readyState),
     dispose: Pointer.fromFunction(_dispose),
+    onAudioLevelChanged: Pointer.fromFunction(_onAudioLevelChanged),
+    isOnAudioLevelAvailable:
+        Pointer.fromFunction(_isOnAudioLevelAvailable, false),
   );
 }
 
@@ -95,6 +98,24 @@ void _setEnabled(Object track, bool enabled) {
 Object _stop(Object track) {
   track as MediaStreamTrack;
   return () => track.stop();
+}
+
+/// Sets the provided [OnAudioLevelChangedCallback] for this [MediaStreamTrack].
+///
+/// It's called for live [MediaStreamTrack]s when their audio level changes.
+void _onAudioLevelChanged(Object track, Object f) {
+  track as MediaStreamTrack;
+  f as Function;
+  track.onAudioLevelChanged((lvl) {
+    f(lvl);
+  });
+}
+
+/// Indicates whether a [MediaStreamTrack.onAudioLevelChanged] callback is
+/// supported for this [MediaStreamTrack].
+bool _isOnAudioLevelAvailable(Object track) {
+  track as MediaStreamTrack;
+  return track.isOnAudioLevelAvailable();
 }
 
 /// Indicates whether the provided [MediaStreamTrack] is enabled.

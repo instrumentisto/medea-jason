@@ -55,4 +55,14 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
         await (api.localMediaTrackState(track: opaque.innerOpaque) as Future);
     return MediaStreamTrackState.values[index];
   }
+
+  @override
+  bool isOnAudioLevelAvailable() {
+    return api.isOnAudioLevelAvailable(track: opaque.innerOpaque);
+  }
+
+  @override
+  void onAudioLevelChanged(OnAudioLevelChangedCallback f) {
+    api.onAudioLevelChanged(track: opaque.innerOpaque, f: f);
+  }
 }

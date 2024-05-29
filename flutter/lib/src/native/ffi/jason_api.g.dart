@@ -174,12 +174,27 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackStateConstMeta;
 
+  /// Indicates whether an `OnAudioLevelChangedCallback` is supported for this
+  /// [`LocalMediaTrack`].
+  bool isOnAudioLevelAvailable({required LocalMediaTrack track, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kIsOnAudioLevelAvailableConstMeta;
+
+  /// Sets the provided `OnAudioLevelChangedCallback` for this
+  /// [`LocalMediaTrack`].
+  ///
+  /// It's called for live [`LocalMediaTrack`]s when their audio level changes.
+  void onAudioLevelChanged(
+      {required LocalMediaTrack track, required Object f, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kOnAudioLevelChangedConstMeta;
+
   /// Returns a [`MediaSourceKind::Device`] if the provided [`LocalMediaTrack`] is
   /// sourced from some device (webcam/microphone), or a
   /// [`MediaSourceKind::Display`] if it's captured via
   /// [MediaDevices.getDisplayMedia()][1].
   ///
-  /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
+  /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
   MediaSourceKind localMediaTrackMediaSourceKind(
       {required LocalMediaTrack track, dynamic hint});
 
@@ -791,8 +806,8 @@ class ApiAudioConstraints {
   /// Identifier of the device generating the content for the media track.
   String? deviceId;
 
-  /// Automatically manages changes in the volume of its source
-  /// media to maintain a steady overall volume level.
+  /// Automatically manages changes in the volume of its source media to
+  /// maintain a steady overall volume level.
   ConstrainBoolean? autoGainControl;
 
   ApiAudioConstraints({
@@ -1496,6 +1511,44 @@ class MedeaJasonImpl implements MedeaJason {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "local_media_track_state",
         argNames: ["track"],
+      );
+
+  bool isOnAudioLevelAvailable({required LocalMediaTrack track, dynamic hint}) {
+    var arg0 = _platform.api2wire_LocalMediaTrack(track);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_is_on_audio_level_available(arg0),
+      parseSuccessData: _wire2api_bool,
+      parseErrorData: null,
+      constMeta: kIsOnAudioLevelAvailableConstMeta,
+      argValues: [track],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kIsOnAudioLevelAvailableConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "is_on_audio_level_available",
+        argNames: ["track"],
+      );
+
+  void onAudioLevelChanged(
+      {required LocalMediaTrack track, required Object f, dynamic hint}) {
+    var arg0 = _platform.api2wire_LocalMediaTrack(track);
+    var arg1 = _platform.api2wire_DartOpaque(f);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_on_audio_level_changed(arg0, arg1),
+      parseSuccessData: _wire2api_unit,
+      parseErrorData: null,
+      constMeta: kOnAudioLevelChangedConstMeta,
+      argValues: [track, f],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kOnAudioLevelChangedConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "on_audio_level_changed",
+        argNames: ["track", "f"],
       );
 
   MediaSourceKind localMediaTrackMediaSourceKind(
@@ -3796,6 +3849,39 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_local_media_track_state = _wire_local_media_track_statePtr
       .asFunction<WireSyncReturn Function(wire_LocalMediaTrack)>();
 
+  WireSyncReturn wire_is_on_audio_level_available(
+    wire_LocalMediaTrack track,
+  ) {
+    return _wire_is_on_audio_level_available(
+      track,
+    );
+  }
+
+  late final _wire_is_on_audio_level_availablePtr = _lookup<
+          ffi.NativeFunction<WireSyncReturn Function(wire_LocalMediaTrack)>>(
+      'wire_is_on_audio_level_available');
+  late final _wire_is_on_audio_level_available =
+      _wire_is_on_audio_level_availablePtr
+          .asFunction<WireSyncReturn Function(wire_LocalMediaTrack)>();
+
+  WireSyncReturn wire_on_audio_level_changed(
+    wire_LocalMediaTrack track,
+    wire_DartOpaque f,
+  ) {
+    return _wire_on_audio_level_changed(
+      track,
+      f,
+    );
+  }
+
+  late final _wire_on_audio_level_changedPtr = _lookup<
+      ffi.NativeFunction<
+          WireSyncReturn Function(wire_LocalMediaTrack,
+              wire_DartOpaque)>>('wire_on_audio_level_changed');
+  late final _wire_on_audio_level_changed =
+      _wire_on_audio_level_changedPtr.asFunction<
+          WireSyncReturn Function(wire_LocalMediaTrack, wire_DartOpaque)>();
+
   WireSyncReturn wire_local_media_track_media_source_kind(
     wire_LocalMediaTrack track,
   ) {
@@ -5775,6 +5861,36 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _disposePtr =
       _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>('dispose');
   late final _dispose = _disposePtr.asFunction<Object Function(Object)>();
+
+  bool is_on_audio_level_available(
+    Object track,
+  ) {
+    return _is_on_audio_level_available(
+      track,
+    );
+  }
+
+  late final _is_on_audio_level_availablePtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(ffi.Handle)>>(
+          'is_on_audio_level_available');
+  late final _is_on_audio_level_available =
+      _is_on_audio_level_availablePtr.asFunction<bool Function(Object)>();
+
+  void on_audio_level_changed(
+    Object track,
+    Object cb,
+  ) {
+    return _on_audio_level_changed(
+      track,
+      cb,
+    );
+  }
+
+  late final _on_audio_level_changedPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, ffi.Handle)>>(
+          'on_audio_level_changed');
+  late final _on_audio_level_changed =
+      _on_audio_level_changedPtr.asFunction<void Function(Object, Object)>();
 
   Object encodings(
     Object parameters,
