@@ -992,9 +992,9 @@ pub type CandidateType = NonExhaustive<KnownCandidateType>;
 /// Fields of [`RtcStatsType::InboundRtp`] variant.
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Copy, Debug, Deserialize, Hash, PartialEq, Serialize)]
-#[serde(tag = "mediaType", rename_all = "camelCase")]
+#[serde(tag = "kind", rename_all = "camelCase")]
 pub enum RtcInboundRtpStreamMediaType {
-    /// Fields when `mediaType` is `audio`.
+    /// Fields when `kind` is `audio`.
     #[serde(rename_all = "camelCase")]
     Audio {
         /// Indicator whether the last RTP packet whose frame was delivered to
@@ -1049,7 +1049,7 @@ pub enum RtcInboundRtpStreamMediaType {
         total_samples_duration: Option<HighResTimeStamp>,
     },
 
-    /// Fields when `mediaType` is `video`.
+    /// Fields when `kind` is `video`.
     #[serde(rename_all = "camelCase")]
     Video {
         /// Total number of frames correctly decoded for this RTP stream, i.e.
@@ -1139,7 +1139,7 @@ pub struct RtcInboundRtpStreamStats {
     /// ID of the stats object representing the receiving track.
     pub track_id: Option<String>,
 
-    /// Fields which should be in the [`RtcStat`] based on `mediaType`.
+    /// Fields which should be in the [`RtcStat`] based on `kind`.
     #[serde(flatten)]
     pub media_specific_stats: RtcInboundRtpStreamMediaType,
 
@@ -1232,12 +1232,12 @@ pub enum TrackStatsKind {
 }
 
 /// [`RtcStat`] fields of [`RtcStatsType::OutboundRtp`] type based on
-/// `mediaType`.
+/// `kind`.
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Copy, Debug, Deserialize, Hash, PartialEq, Serialize)]
-#[serde(tag = "mediaType", rename_all = "camelCase")]
+#[serde(tag = "kind", rename_all = "camelCase")]
 pub enum RtcOutboundRtpStreamMediaType {
-    /// Fields when `mediaType` is `audio`.
+    /// Fields when `kind` is `audio`.
     #[serde(rename_all = "camelCase")]
     Audio {
         /// Total number of samples that have been sent over this RTP stream.
@@ -1248,7 +1248,7 @@ pub enum RtcOutboundRtpStreamMediaType {
         voice_activity_flag: Option<bool>,
     },
 
-    /// Fields when `mediaType` is `video`.
+    /// Fields when `kind` is `video`.
     #[serde(rename_all = "camelCase")]
     Video {
         /// Width of the last encoded frame.
@@ -1312,7 +1312,7 @@ pub struct RtcOutboundRtpStreamStats {
     /// sender of this stream.
     pub track_id: Option<String>,
 
-    /// Fields which should be in the [`RtcStat`] based on `mediaType`.
+    /// Fields which should be in the [`RtcStat`] based on `kind`.
     #[serde(flatten)]
     pub media_type: RtcOutboundRtpStreamMediaType,
 
