@@ -791,8 +791,13 @@ class ApiAudioConstraints {
   /// Identifier of the device generating the content for the media track.
   String? deviceId;
 
+  /// Automatically manages changes in the volume of its source
+  /// media to maintain a steady overall volume level.
+  ConstrainBoolean? autoGainControl;
+
   ApiAudioConstraints({
     this.deviceId,
+    this.autoGainControl,
   });
 }
 
@@ -940,6 +945,19 @@ class ApiMediaStreamSettings {
     this.deviceVideo,
     this.displayVideo,
   });
+}
+
+@freezed
+sealed class ConstrainBoolean with _$ConstrainBoolean {
+  /// Exact value required for this property.
+  const factory ConstrainBoolean.exact(
+    bool field0,
+  ) = ConstrainBoolean_Exact;
+
+  /// Ideal (target) value for this property.
+  const factory ConstrainBoolean.ideal(
+    bool field0,
+  ) = ConstrainBoolean_Ideal;
 }
 
 @freezed
@@ -2789,6 +2807,14 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   }
 
   @protected
+  ffi.Pointer<wire_ConstrainBoolean> api2wire_box_autoadd_constrain_boolean(
+      ConstrainBoolean raw) {
+    final ptr = inner.new_box_autoadd_constrain_boolean_0();
+    _api_fill_to_wire_constrain_boolean(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
   ffi.Pointer<wire_ConstrainU32> api2wire_box_autoadd_constrain_u_32(
       ConstrainU32 raw) {
     final ptr = inner.new_box_autoadd_constrain_u_32_0();
@@ -2851,6 +2877,14 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
     return raw == null
         ? ffi.nullptr
         : api2wire_box_autoadd_api_display_video_track_constraints(raw);
+  }
+
+  @protected
+  ffi.Pointer<wire_ConstrainBoolean> api2wire_opt_box_autoadd_constrain_boolean(
+      ConstrainBoolean? raw) {
+    return raw == null
+        ? ffi.nullptr
+        : api2wire_box_autoadd_constrain_boolean(raw);
   }
 
   @protected
@@ -2949,6 +2983,8 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   void _api_fill_to_wire_api_audio_constraints(
       ApiAudioConstraints apiObj, wire_ApiAudioConstraints wireObj) {
     wireObj.device_id = api2wire_opt_String(apiObj.deviceId);
+    wireObj.auto_gain_control =
+        api2wire_opt_box_autoadd_constrain_boolean(apiObj.autoGainControl);
   }
 
   void _api_fill_to_wire_api_constrain_facing_mode(
@@ -3031,9 +3067,32 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
     _api_fill_to_wire_api_media_stream_settings(apiObj, wireObj.ref);
   }
 
+  void _api_fill_to_wire_box_autoadd_constrain_boolean(
+      ConstrainBoolean apiObj, ffi.Pointer<wire_ConstrainBoolean> wireObj) {
+    _api_fill_to_wire_constrain_boolean(apiObj, wireObj.ref);
+  }
+
   void _api_fill_to_wire_box_autoadd_constrain_u_32(
       ConstrainU32 apiObj, ffi.Pointer<wire_ConstrainU32> wireObj) {
     _api_fill_to_wire_constrain_u_32(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_constrain_boolean(
+      ConstrainBoolean apiObj, wire_ConstrainBoolean wireObj) {
+    if (apiObj is ConstrainBoolean_Exact) {
+      var pre_field0 = api2wire_bool(apiObj.field0);
+      wireObj.tag = 0;
+      wireObj.kind = inner.inflate_ConstrainBoolean_Exact();
+      wireObj.kind.ref.Exact.ref.field0 = pre_field0;
+      return;
+    }
+    if (apiObj is ConstrainBoolean_Ideal) {
+      var pre_field0 = api2wire_bool(apiObj.field0);
+      wireObj.tag = 1;
+      wireObj.kind = inner.inflate_ConstrainBoolean_Ideal();
+      wireObj.kind.ref.Ideal.ref.field0 = pre_field0;
+      return;
+    }
   }
 
   void _api_fill_to_wire_constrain_u_32(
@@ -4657,6 +4716,17 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _new_box_autoadd_api_media_stream_settings_0Ptr
           .asFunction<ffi.Pointer<wire_ApiMediaStreamSettings> Function()>();
 
+  ffi.Pointer<wire_ConstrainBoolean> new_box_autoadd_constrain_boolean_0() {
+    return _new_box_autoadd_constrain_boolean_0();
+  }
+
+  late final _new_box_autoadd_constrain_boolean_0Ptr = _lookup<
+          ffi.NativeFunction<ffi.Pointer<wire_ConstrainBoolean> Function()>>(
+      'new_box_autoadd_constrain_boolean_0');
+  late final _new_box_autoadd_constrain_boolean_0 =
+      _new_box_autoadd_constrain_boolean_0Ptr
+          .asFunction<ffi.Pointer<wire_ConstrainBoolean> Function()>();
+
   ffi.Pointer<wire_ConstrainU32> new_box_autoadd_constrain_u_32_0() {
     return _new_box_autoadd_constrain_u_32_0();
   }
@@ -4942,6 +5012,28 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _inflate_ApiConstrainFacingMode_Ideal =
       _inflate_ApiConstrainFacingMode_IdealPtr
           .asFunction<ffi.Pointer<ApiConstrainFacingModeKind> Function()>();
+
+  ffi.Pointer<ConstrainBooleanKind> inflate_ConstrainBoolean_Exact() {
+    return _inflate_ConstrainBoolean_Exact();
+  }
+
+  late final _inflate_ConstrainBoolean_ExactPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ConstrainBooleanKind> Function()>>(
+          'inflate_ConstrainBoolean_Exact');
+  late final _inflate_ConstrainBoolean_Exact =
+      _inflate_ConstrainBoolean_ExactPtr
+          .asFunction<ffi.Pointer<ConstrainBooleanKind> Function()>();
+
+  ffi.Pointer<ConstrainBooleanKind> inflate_ConstrainBoolean_Ideal() {
+    return _inflate_ConstrainBoolean_Ideal();
+  }
+
+  late final _inflate_ConstrainBoolean_IdealPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ConstrainBooleanKind> Function()>>(
+          'inflate_ConstrainBoolean_Ideal');
+  late final _inflate_ConstrainBoolean_Ideal =
+      _inflate_ConstrainBoolean_IdealPtr
+          .asFunction<ffi.Pointer<ConstrainBooleanKind> Function()>();
 
   ffi.Pointer<ConstrainU32Kind> inflate_ConstrainU32_Exact() {
     return _inflate_ConstrainU32_Exact();
@@ -6925,8 +7017,33 @@ final class wire_uint_8_list extends ffi.Struct {
   external int len;
 }
 
+final class wire_ConstrainBoolean_Exact extends ffi.Struct {
+  @ffi.Bool()
+  external bool field0;
+}
+
+final class wire_ConstrainBoolean_Ideal extends ffi.Struct {
+  @ffi.Bool()
+  external bool field0;
+}
+
+final class ConstrainBooleanKind extends ffi.Union {
+  external ffi.Pointer<wire_ConstrainBoolean_Exact> Exact;
+
+  external ffi.Pointer<wire_ConstrainBoolean_Ideal> Ideal;
+}
+
+final class wire_ConstrainBoolean extends ffi.Struct {
+  @ffi.Int32()
+  external int tag;
+
+  external ffi.Pointer<ConstrainBooleanKind> kind;
+}
+
 final class wire_ApiAudioConstraints extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> device_id;
+
+  external ffi.Pointer<wire_ConstrainBoolean> auto_gain_control;
 }
 
 final class wire_ApiConstrainFacingMode_Exact extends ffi.Struct {

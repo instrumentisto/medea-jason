@@ -152,6 +152,7 @@ let closeApp = document.getElementById('control__close_app');
 let audioSelect = document.getElementById('connect__select-device_audio');
 let videoSelect = document.getElementById('connect__select-device_video');
 let screenshareSwitchEl = document.getElementById('connection-settings__screenshare');
+let disableAudioGainControlSwitchEl = document.getElementById('connection-settings__audio_gain_control');
 let localVideo = document.getElementById('local-video');
 
 function getMemberId() {
@@ -716,6 +717,7 @@ window.onload = async function() {
       if (audioSource) {
         audio.device_id(audioSource.value);
       }
+      audio.exact_auto_gain_control(!disableAudioGainControlSwitchEl.checked);
       constraints.audio(audio);
     }
 
@@ -997,22 +999,24 @@ window.onload = async function() {
   }
 
   try {
-    audioSelect.addEventListener('change', async () => {
+    let audioSwitch = async () => {
       try {
-        let constraints = await build_constraints(audioSelect, videoSelect);
-        for (const track of localTracks) {
-          if (track.ptr > 0) {
-            track.free();
+            let constraints = await build_constraints(audioSelect, videoSelect);
+            for (const track of localTracks) {
+              if (track.ptr > 0) {
+                track.free();
+              }
+            }
+            if (!isAudioSendEnabled) {
+              constraints = await initLocalStream();
+            }
+            await room.set_local_media_settings(constraints, true, true);
+          } catch (e) {
+            console.error('Changing audio source failed: ' + e);
           }
-        }
-        if (!isAudioSendEnabled) {
-          constraints = await initLocalStream();
-        }
-        await room.set_local_media_settings(constraints, false, true);
-      } catch (e) {
-        console.error('Changing audio source failed: ' + e);
-      }
-    });
+    };
+    audioSelect.addEventListener('change', audioSwitch);
+    disableAudioGainControlSwitchEl.addEventListener('change', audioSwitch);
 
     let videoSwitch = async () => {
       try {

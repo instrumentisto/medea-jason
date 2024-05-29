@@ -39,6 +39,7 @@ enum VideoConstraintKind {
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
 enum AudioConstraintKind {
   deviceId,
+  autoGainControl,
 }
 
 /// Indicates necessity of a [AudioConstraints] or [VideoConstraints] setting.
@@ -103,6 +104,8 @@ void _setAudioConstraintValue(Object cons, int kind, ForeignValue value) {
   switch (AudioConstraintKind.values[kind]) {
     case AudioConstraintKind.deviceId:
       cons.deviceId = value.toDart() as String;
+    case AudioConstraintKind.autoGainControl:
+      cons.autoGainControl = value.toDart() as bool;
       break;
   }
 }
