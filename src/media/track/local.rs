@@ -177,7 +177,7 @@ impl LocalMediaTrack {
         self.0.state().await
     }
 
-    /// Indicates whether `OnAudioLevelChangedCallback` is supported for this
+    /// Indicates whether an `OnAudioLevelChangedCallback` is supported for this
     /// [`LocalMediaTrack`].
     #[must_use]
     pub fn is_on_audio_level_available(&self) -> bool {
@@ -187,7 +187,8 @@ impl LocalMediaTrack {
     /// Sets the provided `OnAudioLevelChangedCallback` for this
     /// [`LocalMediaTrack`].
     ///
-    /// It's called for live tracks when audio level of this track changes.
+    /// It's called for live [`LocalMediaTrack`]s when their audio level
+    /// changes.
     pub fn on_audio_level_changed(&self, callback: platform::Function<i32>) {
         self.get_track()
             .on_audio_level_changed(move |v| callback.call1(v));
@@ -198,7 +199,7 @@ impl LocalMediaTrack {
     /// a [`MediaSourceKind::Display`] if it's captured via
     /// [MediaDevices.getDisplayMedia()][1].
     ///
-    /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
+    /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
     #[must_use]
     pub fn media_source_kind(&self) -> MediaSourceKind {
         self.0.media_source_kind().into()

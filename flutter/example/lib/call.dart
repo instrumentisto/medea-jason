@@ -30,7 +30,7 @@ class Call {
   /// Callback for creating/changing a render from a local video display track.
   late Function(webrtc.MediaStreamTrack) _onLocalDisplayTrack;
 
-  /// Callback which will be called when new local audio track is added.
+  /// Callback which will be called once new local audio track is added.
   late Function(LocalMediaTrack) _onLocalAudioTrack;
 
   /// Errors handler.

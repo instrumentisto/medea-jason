@@ -174,7 +174,7 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackStateConstMeta;
 
-  /// Indicates whether `OnAudioLevelChangedCallback` is supported for this
+  /// Indicates whether an `OnAudioLevelChangedCallback` is supported for this
   /// [`LocalMediaTrack`].
   bool isOnAudioLevelAvailable({required LocalMediaTrack track, dynamic hint});
 
@@ -183,7 +183,7 @@ abstract class MedeaJason {
   /// Sets the provided `OnAudioLevelChangedCallback` for this
   /// [`LocalMediaTrack`].
   ///
-  /// It's called for live tracks when audio level of this track changes.
+  /// It's called for live [`LocalMediaTrack`]s when their audio level changes.
   void onAudioLevelChanged(
       {required LocalMediaTrack track, required Object f, dynamic hint});
 
@@ -194,7 +194,7 @@ abstract class MedeaJason {
   /// [`MediaSourceKind::Display`] if it's captured via
   /// [MediaDevices.getDisplayMedia()][1].
   ///
-  /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
+  /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
   MediaSourceKind localMediaTrackMediaSourceKind(
       {required LocalMediaTrack track, dynamic hint});
 

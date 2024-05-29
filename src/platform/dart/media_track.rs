@@ -114,15 +114,17 @@ mod media_stream_track {
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn dispose(track: Dart_Handle) -> Dart_Handle;
 
-        /// Indicates whether `OnAudioLevelChangedCallback` is
-        /// supported for this [MediaStreamTrack].
+        /// Indicates whether an `OnAudioLevelChangedCallback` is supported for
+        /// this [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn is_on_audio_level_available(track: Dart_Handle) -> bool;
 
         /// Sets the provided `OnAudioLevelChangedCallback` for this
-        /// [MediaStreamTrack].
-        /// It's called for live tracks when audio level of this track changes.
+        /// [MediaStreamTrack][0].
+        ///
+        /// It's called for live [MediaStreamTrack][0]s when their audio level
+        /// changes.
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn on_audio_level_changed(track: Dart_Handle, cb: Dart_Handle);
@@ -324,8 +326,8 @@ impl MediaStreamTrack {
         }
     }
 
-    /// Indicates whether `OnAudioLevelChangedCallback` is
-    /// supported for this [`MediaStreamTrack`].
+    /// Indicates whether an `OnAudioLevelChangedCallback` is supported for this
+    /// [`MediaStreamTrack`].
     #[must_use]
     pub fn is_on_audio_level_available(&self) -> bool {
         unsafe {
@@ -336,7 +338,8 @@ impl MediaStreamTrack {
     /// Sets the provided `OnAudioLevelChangedCallback` for this
     /// [`MediaStreamTrack`].
     ///
-    /// It's called for live tracks when audio level of this track changes.
+    /// It's called for live [`MediaStreamTrack`]s when their audio level
+    /// changes.
     pub fn on_audio_level_changed<F>(&self, mut f: F)
     where
         F: 'static + FnMut(i32),

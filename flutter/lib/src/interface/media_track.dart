@@ -45,13 +45,13 @@ abstract class LocalMediaTrack implements MediaTrack {
   /// This only works on Web.
   void onEnded(OnEndedCallback f);
 
-  /// Indicates whether [OnAudioLevelChangedCallback] is
-  /// supported for this [MediaTrack].
+  /// Indicates whether an [OnAudioLevelChangedCallback] is supported for this
+  /// [MediaTrack].
   bool isOnAudioLevelAvailable();
 
   /// Sets the provided [OnAudioLevelChangedCallback] for this [MediaTrack].
   ///
-  /// It's called for live tracks when audio level of this track changes.
+  /// It's called for live [MediaTrack]s when their audio level changes.
   void onAudioLevelChanged(OnAudioLevelChangedCallback f);
 
   /// Returns a [MediaStreamTrackState.live] if this [LocalMediaTrack] is

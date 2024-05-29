@@ -597,7 +597,7 @@ pub fn local_media_track_state(
     )
 }
 
-/// Indicates whether `OnAudioLevelChangedCallback` is supported for this
+/// Indicates whether an `OnAudioLevelChangedCallback` is supported for this
 /// [`LocalMediaTrack`].
 #[must_use]
 pub fn is_on_audio_level_available(
@@ -609,7 +609,7 @@ pub fn is_on_audio_level_available(
 /// Sets the provided `OnAudioLevelChangedCallback` for this
 /// [`LocalMediaTrack`].
 ///
-/// It's called for live tracks when audio level of this track changes.
+/// It's called for live [`LocalMediaTrack`]s when their audio level changes.
 #[must_use]
 pub fn on_audio_level_changed(
     track: RustOpaque<LocalMediaTrack>,
@@ -626,7 +626,7 @@ pub fn on_audio_level_changed(
 /// [`MediaSourceKind::Display`] if it's captured via
 /// [MediaDevices.getDisplayMedia()][1].
 ///
-/// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
+/// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
 #[must_use]
 pub fn local_media_track_media_source_kind(
     track: RustOpaque<LocalMediaTrack>,
