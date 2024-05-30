@@ -363,6 +363,38 @@ fn wire_local_media_track_state_impl(
         },
     )
 }
+fn wire_is_on_audio_level_available_impl(
+    track: impl Wire2Api<RustOpaque<LocalMediaTrack>> + UnwindSafe,
+) -> support::WireSyncReturn {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "is_on_audio_level_available",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_track = track.wire2api();
+            Result::<_, ()>::Ok(is_on_audio_level_available(api_track))
+        },
+    )
+}
+fn wire_on_audio_level_changed_impl(
+    track: impl Wire2Api<RustOpaque<LocalMediaTrack>> + UnwindSafe,
+    f: impl Wire2Api<DartOpaque> + UnwindSafe,
+) -> support::WireSyncReturn {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "on_audio_level_changed",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_track = track.wire2api();
+            let api_f = f.wire2api();
+            Result::<_, ()>::Ok(on_audio_level_changed(api_track, api_f))
+        },
+    )
+}
 fn wire_local_media_track_media_source_kind_impl(
     track: impl Wire2Api<RustOpaque<LocalMediaTrack>> + UnwindSafe,
 ) -> support::WireSyncReturn {
@@ -1540,6 +1572,21 @@ mod io {
         track: wire_LocalMediaTrack,
     ) -> support::WireSyncReturn {
         wire_local_media_track_state_impl(track)
+    }
+
+    #[no_mangle]
+    pub extern "C" fn wire_is_on_audio_level_available(
+        track: wire_LocalMediaTrack,
+    ) -> support::WireSyncReturn {
+        wire_is_on_audio_level_available_impl(track)
+    }
+
+    #[no_mangle]
+    pub extern "C" fn wire_on_audio_level_changed(
+        track: wire_LocalMediaTrack,
+        f: wire_DartOpaque,
+    ) -> support::WireSyncReturn {
+        wire_on_audio_level_changed_impl(track, f)
     }
 
     #[no_mangle]

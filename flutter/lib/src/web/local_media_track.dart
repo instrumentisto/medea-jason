@@ -48,4 +48,12 @@ class WebLocalMediaTrack implements LocalMediaTrack {
     var index = await fallibleFuture(obj.state());
     return MediaStreamTrackState.values[index];
   }
+
+  @override
+  bool isOnAudioLevelAvailable() {
+    return false;
+  }
+
+  @override
+  void onAudioLevelChanged(OnAudioLevelChangedCallback f) {}
 }

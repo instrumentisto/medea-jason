@@ -270,4 +270,22 @@ impl MediaStreamTrack {
             }
         });
     }
+
+    /// Indicates whether an `OnAudioLevelChangedCallback` is supported for this
+    /// [`MediaStreamTrack`].
+    #[must_use]
+    pub const fn is_on_audio_level_available(&self) -> bool {
+        false
+    }
+
+    /// Sets the provided `OnAudioLevelChangedCallback` for this
+    /// [`MediaStreamTrack`].
+    ///
+    /// It's called for live [`MediaStreamTrack`]s when their audio level
+    /// changes.
+    pub fn on_audio_level_changed<F>(&self, _callback: F)
+    where
+        F: 'static + FnMut(i32),
+    {
+    }
 }
