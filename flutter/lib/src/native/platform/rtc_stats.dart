@@ -108,6 +108,7 @@ extension RtcOutboundRtpStreamStatsMapConverter on RtcOutboundRtpStreamStats {
     }
     return {
       'trackId': trackId,
+      'kind': mediaTypeString,
       'mediaType': mediaTypeString,
       'bytesSent': bytesSent,
       'packetsSent': packetsSent,
@@ -154,6 +155,7 @@ extension RtcInboundRtpStreamStatsMapConverter on RtcInboundRtpStreamStats {
       throw 'Unreachable';
     }
     return {
+      'kind': mediaTypeString,
       'mediaType': mediaTypeString,
       'remoteId': remoteId,
       'bytesReceived': bytesReceived,
