@@ -17,13 +17,15 @@ void registerFunction(
   required Pointer<NativeFunction<Void Function(Handle, Int64, Handle)>>
       setVideoConstraint,
   required Pointer<NativeFunction<Void Function(Handle, Int64, Handle)>>
+      setDisplayVideoConstraint,
+  required Pointer<NativeFunction<Void Function(Handle, Int64, Handle)>>
       setAudioConstraint,
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer),
+          Pointer, Pointer, Pointer),
       void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer)>('register_constraints')(
+          Pointer, Pointer, Pointer)>('register_constraints')(
     initDeviceConstraints,
     initDisplayConstraints,
     newVideoConstraints,
@@ -31,6 +33,7 @@ void registerFunction(
     setVideoConstraintValue,
     setAudioConstraintValue,
     setVideoConstraint,
+    setDisplayVideoConstraint,
     setAudioConstraint,
   );
 }
