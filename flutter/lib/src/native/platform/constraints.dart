@@ -127,8 +127,8 @@ void _setVideoConstraint(Object cons, int type, Object video) {
   }
 }
 
-/// Specifies the provided nature and settings of a video track to the given
-/// [DisplayConstraints].
+/// Specifies the provided nature and settings of a display video track to the
+/// given [DisplayConstraints].
 void _setDisplayVideoConstraint(Object cons, int type, Object video) {
   cons as webrtc.DisplayConstraints;
   video as webrtc.DeviceVideoConstraints;
