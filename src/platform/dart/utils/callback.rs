@@ -233,7 +233,7 @@ pub mod tests {
 
     use dart_sys::Dart_Handle;
 
-    use crate::api::DartValueArg;
+    use crate::{api::DartValueArg};
 
     use super::Callback;
 
@@ -246,6 +246,16 @@ pub mod tests {
             assert_eq!(val, expects, "`Callback` received invalid value");
         })
         .into_dart()
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test_rtc_stats_parse(
+        expects: DartValueArg<String>,
+    ) {
+        use medea_client_api_proto::stats::RtcStat;
+        let expects: String = expects.try_into().unwrap();
+        let stats: Vec<RtcStat> = serde_json::from_str(&expects).unwrap();
+        assert!(!stats.is_empty());
     }
 
     #[no_mangle]

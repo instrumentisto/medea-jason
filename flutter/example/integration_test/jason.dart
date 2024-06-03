@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ffi';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -8,6 +9,7 @@ import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'package:medea_jason/src/native/media_device_details.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
+import 'package:medea_jason/src/native/platform/rtc_stats.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 void main() {
@@ -191,6 +193,54 @@ void main() {
 
     expect(intVal as int, equals(45));
     expect(stringVal as String, 'test string');
+  });
+
+  testWidgets('GetStats() works',
+      (WidgetTester widgetTester) async {
+    var pc1 = await webrtc.PeerConnection.create(webrtc.IceTransportType.all, []);
+    var pc2 = await webrtc.PeerConnection.create(webrtc.IceTransportType.all, []);
+
+    pc1.onIceCandidate((candidate) async {
+      if (!pc2.closed) {
+        await pc2.addIceCandidate(candidate);
+      }
+    });
+
+    pc2.onIceCandidate((candidate) async {
+      if (!pc1.closed) {
+        await pc1.addIceCandidate(candidate);
+      }
+    });
+    var tVideo = await pc1.addTransceiver(
+        webrtc.MediaKind.video, webrtc.RtpTransceiverInit(webrtc.TransceiverDirection.sendRecv));
+    var tAudio = await pc1.addTransceiver(
+        webrtc.MediaKind.audio, webrtc.RtpTransceiverInit(webrtc.TransceiverDirection.sendRecv));
+
+    var offer = await pc1.createOffer();
+    await pc1.setLocalDescription(offer);
+    await pc2.setRemoteDescription(offer);
+
+    var answer = await pc2.createAnswer();
+    await pc2.setLocalDescription(answer);
+    await pc1.setRemoteDescription(answer);
+
+    var senderStats = await pc1.getStats();
+    var convetedSenderStats = senderStats.map((stat) => stat.toMap()).toList();
+    var receiverStats = await pc2.getStats();
+    var convetedReceiverStats = receiverStats.map((stat) =>
+    stat.toMap()).toList();
+    var senderJson = jsonEncode(convetedSenderStats);
+    var receiverJson = jsonEncode(convetedSenderStats);
+    final stringListener = dl.lookupFunction<Void Function(ForeignValue), void Function(ForeignValue)>('test_rtc_stats_parse');
+    var stringVal1 = ForeignValue.fromString(senderJson);
+    var stringVal2 = ForeignValue.fromString(receiverJson);
+    stringListener(stringVal1.ref);
+    stringListener(stringVal2.ref);
+
+    await pc1.close();
+    await pc2.close();
+    await tVideo.dispose();
+    await tAudio.dispose();
   });
 
   testWidgets('DartHandle argument Future validation',
