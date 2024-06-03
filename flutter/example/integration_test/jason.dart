@@ -195,10 +195,14 @@ void main() {
     expect(stringVal as String, 'test string');
   });
 
-  testWidgets('GetStats() works',
-      (WidgetTester widgetTester) async {
-    var pc1 = await webrtc.PeerConnection.create(webrtc.IceTransportType.all, []);
-    var pc2 = await webrtc.PeerConnection.create(webrtc.IceTransportType.all, []);
+  testWidgets('GetStats() works', (WidgetTester widgetTester) async {
+    final stringListener = dl.lookupFunction<Void Function(ForeignValue),
+        void Function(ForeignValue)>('test_rtc_stats_parse');
+
+    var pc1 =
+        await webrtc.PeerConnection.create(webrtc.IceTransportType.all, []);
+    var pc2 =
+        await webrtc.PeerConnection.create(webrtc.IceTransportType.all, []);
 
     pc1.onIceCandidate((candidate) async {
       if (!pc2.closed) {
@@ -211,10 +215,10 @@ void main() {
         await pc1.addIceCandidate(candidate);
       }
     });
-    var tVideo = await pc1.addTransceiver(
-        webrtc.MediaKind.video, webrtc.RtpTransceiverInit(webrtc.TransceiverDirection.sendRecv));
-    var tAudio = await pc1.addTransceiver(
-        webrtc.MediaKind.audio, webrtc.RtpTransceiverInit(webrtc.TransceiverDirection.sendRecv));
+    var tVideo = await pc1.addTransceiver(webrtc.MediaKind.video,
+        webrtc.RtpTransceiverInit(webrtc.TransceiverDirection.sendRecv));
+    var tAudio = await pc1.addTransceiver(webrtc.MediaKind.audio,
+        webrtc.RtpTransceiverInit(webrtc.TransceiverDirection.sendRecv));
 
     var offer = await pc1.createOffer();
     await pc1.setLocalDescription(offer);
@@ -225,17 +229,14 @@ void main() {
     await pc1.setRemoteDescription(answer);
 
     var senderStats = await pc1.getStats();
-    var convetedSenderStats = senderStats.map((stat) => stat.toMap()).toList();
     var receiverStats = await pc2.getStats();
-    var convetedReceiverStats = receiverStats.map((stat) =>
-    stat.toMap()).toList();
-    var senderJson = jsonEncode(convetedSenderStats);
-    var receiverJson = jsonEncode(convetedSenderStats);
-    final stringListener = dl.lookupFunction<Void Function(ForeignValue), void Function(ForeignValue)>('test_rtc_stats_parse');
-    var stringVal1 = ForeignValue.fromString(senderJson);
-    var stringVal2 = ForeignValue.fromString(receiverJson);
-    stringListener(stringVal1.ref);
-    stringListener(stringVal2.ref);
+
+    var senderStatsJson =
+        jsonEncode(senderStats.map((stat) => stat.toMap()).toList());
+    var receiverStatsJson =
+        jsonEncode(receiverStats.map((stat) => stat.toMap()).toList());
+    stringListener(ForeignValue.fromString(senderStatsJson).ref);
+    stringListener(ForeignValue.fromString(receiverStatsJson).ref);
 
     await pc1.close();
     await pc2.close();
