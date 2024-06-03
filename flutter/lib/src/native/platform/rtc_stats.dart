@@ -25,7 +25,7 @@ extension RtcMediaSourceStatsMapConverter on RtcMediaSourceStats {
         'framesPerSecond': stat.framesPerSecond,
       };
     } else {
-      throw 'Unreachable';
+      throw UnsupportedError('Unsupported `media-source` kind');
     }
     return {
       'trackIdentifier': trackIdentifier,
@@ -44,7 +44,7 @@ extension RtcIceCandidateStatsMapConverter on RtcIceCandidateStats {
     } else if (this is RtcRemoteIceCandidateStats) {
       type = 'remote-candidate';
     } else {
-      throw 'Unreachable';
+      throw UnsupportedError('Unsupported `candidate` type');
     }
     return {
       'type': type,
@@ -104,7 +104,7 @@ extension RtcOutboundRtpStreamStatsMapConverter on RtcOutboundRtpStreamStats {
         'framesPerSecond': mediaType.framesPerSecond,
       };
     } else {
-      throw 'Unreachable';
+      throw UnsupportedError('Unsupported `outbound-rtp` media type');
     }
     return {
       'trackId': trackId,
@@ -152,7 +152,7 @@ extension RtcInboundRtpStreamStatsMapConverter on RtcInboundRtpStreamStats {
         'sliCount': mediaType.sliCount,
       };
     } else {
-      throw 'Unreachable';
+      throw UnsupportedError('Unsupported `inbound-rtp` media type');
     }
     return {
       'kind': mediaTypeString,
@@ -286,7 +286,7 @@ extension RtcStatsTypeMapConverter on RtcStatsType {
       statsName = 'remote-outbound-rtp';
       additionalData = statsType.toMap();
     } else {
-      throw 'Unreachable';
+      throw UnsupportedError('Unsupported `RtcStats` type');
     }
 
     return {
