@@ -22,6 +22,6 @@ pub mod tests {
         use medea_client_api_proto::stats::RtcStat;
         let expects: String = expects.try_into().unwrap();
         let stats: Vec<RtcStat> = serde_json::from_str(&expects).unwrap();
-        assert!(!stats.is_empty());
+        assert!(!stats.is_empty(), "Parsed `Vec` of `RtcStats` is empty");
     }
 }
