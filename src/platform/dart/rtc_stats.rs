@@ -24,8 +24,6 @@ pub mod tests {
         let stats: Vec<RtcStat> = serde_json::from_str(&expects).unwrap();
         assert!(!stats.is_empty(), "Parsed `Vec` of `RtcStats` is empty");
 
-        println!("RUST: {}; {stats:?}", stats.len());
-
         stats.len() as u64
     }
 }
