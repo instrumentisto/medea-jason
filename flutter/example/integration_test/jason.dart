@@ -197,7 +197,7 @@ void main() {
 
   testWidgets('GetStats() works', (WidgetTester widgetTester) async {
     final testRtcStatsParse = dl.lookupFunction<Void Function(ForeignValue),
-        void Function(ForeignValue)>('testRtcStatsParse');
+        void Function(ForeignValue)>('test_rtc_stats_parse');
 
     var pc1 =
         await webrtc.PeerConnection.create(webrtc.IceTransportType.all, []);
