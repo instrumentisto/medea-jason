@@ -18,10 +18,14 @@ pub mod tests {
     #[no_mangle]
     pub unsafe extern "C" fn test_rtc_stats_parse(
         expects: DartValueArg<String>,
-    ) {
+    ) -> u64 {
         use medea_client_api_proto::stats::RtcStat;
         let expects: String = expects.try_into().unwrap();
         let stats: Vec<RtcStat> = serde_json::from_str(&expects).unwrap();
         assert!(!stats.is_empty(), "Parsed `Vec` of `RtcStats` is empty");
+
+        println!("RUST: {}; {stats:?}", stats.len());
+
+        stats.len() as u64
     }
 }

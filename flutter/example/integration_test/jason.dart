@@ -196,8 +196,8 @@ void main() {
   });
 
   testWidgets('GetStats() works', (WidgetTester widgetTester) async {
-    final testRtcStatsParse = dl.lookupFunction<Void Function(ForeignValue),
-        void Function(ForeignValue)>('test_rtc_stats_parse');
+    final testRtcStatsParse = dl.lookupFunction<Uint64 Function(ForeignValue),
+        int Function(ForeignValue)>('test_rtc_stats_parse');
 
     var pc1 =
         await webrtc.PeerConnection.create(webrtc.IceTransportType.all, []);
@@ -235,13 +235,22 @@ void main() {
         jsonEncode(senderStats.map((stat) => stat.toMap()).toList());
     var receiverStatsJson =
         jsonEncode(receiverStats.map((stat) => stat.toMap()).toList());
-    testRtcStatsParse(ForeignValue.fromString(senderStatsJson).ref);
-    testRtcStatsParse(ForeignValue.fromString(receiverStatsJson).ref);
+
+    var senderStatsString = ForeignValue.fromString(senderStatsJson);
+    var receiverStatsString = ForeignValue.fromString(receiverStatsJson);
+
+    expect(
+        testRtcStatsParse(senderStatsString.ref), equals(senderStats.length));
+    expect(testRtcStatsParse(receiverStatsString.ref),
+        equals(receiverStats.length));
 
     await pc1.close();
     await pc2.close();
     await tVideo.dispose();
     await tAudio.dispose();
+
+    senderStatsString.free();
+    receiverStatsString.free();
   });
 
   testWidgets('DartHandle argument Future validation',
