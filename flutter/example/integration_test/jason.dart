@@ -196,7 +196,7 @@ void main() {
   });
 
   testWidgets('GetStats() works', (WidgetTester widgetTester) async {
-    final stringListener = dl.lookupFunction<Void Function(ForeignValue),
+    final test_rtc_stats_parse = dl.lookupFunction<Void Function(ForeignValue),
         void Function(ForeignValue)>('test_rtc_stats_parse');
 
     var pc1 =
@@ -235,8 +235,8 @@ void main() {
         jsonEncode(senderStats.map((stat) => stat.toMap()).toList());
     var receiverStatsJson =
         jsonEncode(receiverStats.map((stat) => stat.toMap()).toList());
-    stringListener(ForeignValue.fromString(senderStatsJson).ref);
-    stringListener(ForeignValue.fromString(receiverStatsJson).ref);
+    test_rtc_stats_parse(ForeignValue.fromString(senderStatsJson).ref);
+    test_rtc_stats_parse(ForeignValue.fromString(receiverStatsJson).ref);
 
     await pc1.close();
     await pc2.close();
