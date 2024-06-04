@@ -196,8 +196,8 @@ void main() {
   });
 
   testWidgets('GetStats() works', (WidgetTester widgetTester) async {
-    final test_rtc_stats_parse = dl.lookupFunction<Void Function(ForeignValue),
-        void Function(ForeignValue)>('test_rtc_stats_parse');
+    final testRtcStatsParse = dl.lookupFunction<Void Function(ForeignValue),
+        void Function(ForeignValue)>('testRtcStatsParse');
 
     var pc1 =
         await webrtc.PeerConnection.create(webrtc.IceTransportType.all, []);
@@ -235,8 +235,8 @@ void main() {
         jsonEncode(senderStats.map((stat) => stat.toMap()).toList());
     var receiverStatsJson =
         jsonEncode(receiverStats.map((stat) => stat.toMap()).toList());
-    test_rtc_stats_parse(ForeignValue.fromString(senderStatsJson).ref);
-    test_rtc_stats_parse(ForeignValue.fromString(receiverStatsJson).ref);
+    testRtcStatsParse(ForeignValue.fromString(senderStatsJson).ref);
+    testRtcStatsParse(ForeignValue.fromString(receiverStatsJson).ref);
 
     await pc1.close();
     await pc2.close();
