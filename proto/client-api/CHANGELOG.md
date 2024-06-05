@@ -14,8 +14,8 @@ All user visible changes to this project will be documented in this file. This p
 - Added `PeerMetrics::PeerConnectionError` variant ([#151]).
 - Added `TrackPatchEvent::encoding_parameters` field ([#164]).
 - Added `VideoSettings::svc_settings` and `VideoSettings::encoding_parameters` fields ([#164]).
-- Fields of `RtcInboundRtpStreamMediaType`, `RtcOutboundRtpStreamMediaType` and `MediaKind` renamed to camelCase ([#173]).
-- The `frames_per_second` fields is now of type `Float` instead of `u32`/`u64` ([#173]).
+- Fields of `RtcInboundRtpStreamMediaType`, `RtcOutboundRtpStreamMediaType` and `MediaKind` renamed in `camelCase` ([#173]).
+- Converted `frames_per_second` fields to `Float` instead of `u32`/`u64` ([#173]).
 
 ## Added
 

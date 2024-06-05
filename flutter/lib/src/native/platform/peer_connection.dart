@@ -101,7 +101,8 @@ void _onConnectionStateChange(Object conn, Object f) {
   });
 }
 
-/// Returns JSON encoded [Array] of [RtcStats] from the provided [PeerConnection].
+/// Returns JSON encoded [Array] of [RtcStats] from the provided
+/// [PeerConnection].
 Object _getStats(Object conn) {
   conn as PeerConnection;
   return () async {

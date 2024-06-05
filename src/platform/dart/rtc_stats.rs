@@ -10,7 +10,7 @@ use medea_client_api_proto::stats::RtcStat;
 pub struct RtcStats(pub Vec<RtcStat>);
 
 #[cfg(feature = "mockable")]
-pub mod tests {
+pub mod mock {
     #![allow(clippy::missing_safety_doc)]
 
     use crate::api::DartValueArg;
@@ -22,7 +22,7 @@ pub mod tests {
         use medea_client_api_proto::stats::RtcStat;
         let expects: String = expects.try_into().unwrap();
         let stats: Vec<RtcStat> = serde_json::from_str(&expects).unwrap();
-        assert!(!stats.is_empty(), "Parsed `Vec` of `RtcStats` is empty");
+        assert!(!stats.is_empty(), "parsed `Vec` of `RtcStats` is empty");
 
         stats.len() as u64
     }
