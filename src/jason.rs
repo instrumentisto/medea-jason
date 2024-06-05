@@ -13,13 +13,6 @@ use crate::{
     },
 };
 
-/// Creates new RPC connection with a media server.
-fn create_rpc_client() -> Rc<WebSocketRpcClient> {
-    Rc::new(WebSocketRpcClient::new(Box::new(|| {
-        Rc::new(platform::WebSocketRpcTransport::new())
-    })))
-}
-
 /// General library interface.
 ///
 /// Responsible for managing shared transports, local media and room
@@ -74,12 +67,11 @@ impl Jason {
     /// Creates a new [`Room`] and returns its [`RoomHandle`].
     #[must_use]
     pub fn init_room(&self) -> RoomHandle {
-        let rpc = self
-            .0
-            .borrow()
-            .rpc
-            .clone()
-            .unwrap_or_else(create_rpc_client);
+        let rpc = self.0.borrow().rpc.clone().unwrap_or_else(|| {
+            Rc::new(WebSocketRpcClient::new(Box::new(|| {
+                Rc::new(platform::WebSocketRpcTransport::new())
+            })))
+        });
         self.inner_init_room(WebSocketRpcSession::new(rpc))
     }
 
