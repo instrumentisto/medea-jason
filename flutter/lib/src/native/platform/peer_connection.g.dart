@@ -12,6 +12,7 @@ void registerFunction(
   required Pointer<NativeFunction<Pointer Function(Handle)>> connectionState,
   required Pointer<NativeFunction<Void Function(Handle)>> restartIce,
   required Pointer<NativeFunction<Handle Function(Handle)>> rollback,
+  required Pointer<NativeFunction<Handle Function(Handle)>> getStats,
   required Pointer<NativeFunction<Void Function(Handle, Handle)>> onTrack,
   required Pointer<NativeFunction<Void Function(Handle, Handle)>>
       onIceCandidate,
@@ -55,8 +56,10 @@ void registerFunction(
           Pointer,
           Pointer,
           Pointer,
+          Pointer,
           Pointer),
       void Function(
+          Pointer,
           Pointer,
           Pointer,
           Pointer,
@@ -80,6 +83,7 @@ void registerFunction(
     connectionState,
     restartIce,
     rollback,
+    getStats,
     onTrack,
     onIceCandidate,
     onIceCandidateError,

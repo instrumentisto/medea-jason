@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
@@ -6,11 +7,13 @@ import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 import 'package:medea_jason/src/native/ffi/native_string.dart';
 import '../ffi/foreign_value.dart';
 import 'peer_connection.g.dart' as bridge;
+import 'rtc_stats.dart';
 
 /// Registers [PeerConnection] related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
+    getStats: Pointer.fromFunction(_getStats),
     setRemoteDescription: Pointer.fromFunction(_setRemoteDescription),
     setLocalDescription: Pointer.fromFunction(_setLocalDescription),
     addIceCandidate: Pointer.fromFunction(_addIceCandidate),
@@ -96,6 +99,17 @@ void _onConnectionStateChange(Object conn, Object f) {
   conn.onConnectionStateChange((e) {
     f(e.index);
   });
+}
+
+/// Returns JSON encoded [Array] of [RtcStats] from the provided
+/// [PeerConnection].
+Object _getStats(Object conn) {
+  conn as PeerConnection;
+  return () async {
+    var stats = await conn.getStats();
+    var statsToEncode = stats.map((stat) => stat.toMap()).toList();
+    return jsonEncode(statsToEncode);
+  };
 }
 
 /// Lookups an [RtpTransceiver] in the provided [PeerConnection] by the provided

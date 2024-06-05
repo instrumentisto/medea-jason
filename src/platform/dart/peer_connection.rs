@@ -2,11 +2,11 @@
 //!
 //! [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 
-use std::future::Future;
+use std::{future::Future, rc::Rc};
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    IceConnectionState, IceServer, PeerConnectionState,
+    stats::RtcStat, IceConnectionState, IceServer, PeerConnectionState,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -24,7 +24,7 @@ use crate::{
             },
         },
         IceCandidate, IceCandidateError, RtcPeerConnectionError, RtcStats,
-        SdpType,
+        RtcStatsError, SdpType,
     },
 };
 
@@ -69,6 +69,10 @@ mod peer_connection {
 
         /// Rollbacks SDP offer of the provided [`PeerConnection`].
         pub fn rollback(peer: Dart_Handle) -> Dart_Handle;
+
+        /// Returns JSON encoded [`Vec`] of [`RtcStats`] from the provided
+        /// [`PeerConnection`].
+        pub fn get_stats(peer: Dart_Handle) -> Dart_Handle;
 
         /// Sets `onTrack` callback of the provided [`PeerConnection`].
         pub fn on_track(peer: Dart_Handle, cb: Dart_Handle);
@@ -182,8 +186,16 @@ impl RtcPeerConnection {
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
     #[allow(clippy::missing_errors_doc, clippy::unused_async)]
     pub async fn get_stats(&self) -> RtcPeerConnectionResult<RtcStats> {
-        // TODO: Correct implementation requires `flutter_webrtc`-side rework.
-        Ok(RtcStats(Vec::new()))
+        let fut = unsafe { peer_connection::get_stats(self.handle.get()) };
+        let stats_json: String = unsafe { FutureFromDart::execute(fut) }
+            .await
+            .map_err(RtcStatsError::Platform)
+            .map_err(tracerr::from_and_wrap!())?;
+        let rtc_stats: Vec<RtcStat> = serde_json::from_str(&stats_json)
+            .map_err(Rc::new)
+            .map_err(RtcStatsError::ParseError)
+            .map_err(tracerr::from_and_wrap!())?;
+        Ok(RtcStats(rtc_stats))
     }
 
     /// Sets `handler` for a [RTCTrackEvent][1] (see [`ontrack` callback][2]).
