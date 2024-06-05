@@ -49,7 +49,10 @@ impl Jason {
             platform::init_logger();
         }
 
-        Self::with_rpc_client()
+        Self(Rc::new(RefCell::new(Inner {
+            rooms: Vec::new(),
+            media_manager: Rc::new(MediaManager::default()),
+        })))
     }
 
     /// Creates a new [`Room`] and returns its [`RoomHandle`].
@@ -94,24 +97,15 @@ impl Jason {
         });
     }
 
-    /// Returns a new [`Jason`] with the provided [`WebSocketRpcClient`].
-    pub fn with_rpc_client() -> Self {
-        Self(Rc::new(RefCell::new(Inner {
-            rooms: Vec::new(),
-            media_manager: Rc::new(MediaManager::default()),
-        })))
-    }
-
     /// Returns a [`RoomHandle`] for an initialized  [`Room`].
     fn inner_init_room(&self, rpc: Rc<dyn RpcSession>) -> RoomHandle {
         let on_normal_close = rpc.on_normal_close();
-        let room =
-            Room::new(rpc.clone(), Rc::clone(&self.0.borrow().media_manager));
+        let room = Room::new(rpc, Rc::clone(&self.0.borrow().media_manager));
 
         let weak_room = room.downgrade();
         let weak_inner = Rc::downgrade(&self.0);
         platform::spawn(on_normal_close.map(move |reason| {
-            _ = (move || {
+            _ = (|| {
                 let this_room = weak_room.upgrade()?;
                 let inner = weak_inner.upgrade()?;
                 let mut inner = inner.borrow_mut();
