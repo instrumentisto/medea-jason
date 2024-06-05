@@ -79,7 +79,7 @@ impl Jason {
             .borrow()
             .rpc
             .clone()
-            .unwrap_or_else(|| create_rpc_client());
+            .unwrap_or_else(create_rpc_client);
         self.inner_init_room(WebSocketRpcSession::new(rpc))
     }
 
