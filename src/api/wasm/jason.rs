@@ -22,7 +22,7 @@ impl Jason {
     #[must_use]
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        Self(jason::Jason::new())
+        Self(jason::Jason::new(None))
     }
 
     /// Creates a new `Room` and returns its [`RoomHandle`].

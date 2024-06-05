@@ -41,14 +41,24 @@ struct Inner {
 
     /// Connection with a media server.
     ///
-    /// Only one [`WebSocketRpcClient`] is supported at the moment.
+    /// [`Jason`] will reuse this [`WebSocketRpcClient`] for each [`Room`] if
+    /// it's `Some`.
+    ///
+    /// New [`WebSocketRpcClient`] will be created for each [`Room`] if it's
+    /// `None`.
     rpc: Option<Rc<WebSocketRpcClient>>,
 }
 
 impl Jason {
     /// Instantiates a new [`Jason`] interface to interact with this library.
+    ///
+    /// If [`WebSocketRpcClient`] is provided then [`Jason`] will reuse it for
+    /// the all [`Room`]s created in this [`Jason`].
+    ///
+    /// If [`WebSocketRpcClient`] is not provided, then new separate
+    /// [`WebSocketRpcClient`] will be created for each [`Room`].
     #[must_use]
-    pub fn new() -> Self {
+    pub fn new(rpc: Option<Rc<WebSocketRpcClient>>) -> Self {
         platform::set_panic_hook();
         if !log::logger().enabled(&log::Metadata::builder().build()) {
             platform::init_logger();
@@ -57,7 +67,7 @@ impl Jason {
         Self(Rc::new(RefCell::new(Inner {
             rooms: Vec::new(),
             media_manager: Rc::new(MediaManager::default()),
-            rpc: None,
+            rpc,
         })))
     }
 
@@ -115,15 +125,6 @@ impl Jason {
         });
     }
 
-    /// Returns a new [`Jason`] with the provided [`WebSocketRpcClient`].
-    pub fn with_rpc_client(rpc: Rc<WebSocketRpcClient>) -> Self {
-        Self(Rc::new(RefCell::new(Inner {
-            rpc: Some(rpc),
-            rooms: Vec::new(),
-            media_manager: Rc::new(MediaManager::default()),
-        })))
-    }
-
     /// Returns a [`RoomHandle`] for an initialized  [`Room`].
     fn inner_init_room(&self, rpc: Rc<dyn RpcSession>) -> RoomHandle {
         let on_normal_close = rpc.on_normal_close();
@@ -153,6 +154,6 @@ impl Jason {
 
 impl Default for Jason {
     fn default() -> Self {
-        Self::new()
+        Self::new(None)
     }
 }
