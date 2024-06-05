@@ -52,7 +52,7 @@ struct Inner {
 impl Jason {
     /// Instantiates a new [`Jason`] interface to interact with this library.
     ///
-    /// If [`WebSocketRpcClient`] is provided then [`Jason`] will reuse it for
+    /// If [`WebSocketRpcClient`] is provided, then [`Jason`] will reuse it for
     /// the all [`Room`]s created in this [`Jason`].
     ///
     /// If [`WebSocketRpcClient`] is not provided, then new separate
@@ -106,12 +106,6 @@ impl Jason {
             let room = this.rooms.swap_remove(i);
             room.set_close_reason(ClientDisconnect::RoomClosed.into());
             drop(room);
-            if this.rooms.is_empty() && this.rpc.is_some() {
-                this.rpc =
-                    Some(Rc::new(WebSocketRpcClient::new(Box::new(|| {
-                        Rc::new(platform::WebSocketRpcTransport::new())
-                    }))));
-            }
         }
     }
 
