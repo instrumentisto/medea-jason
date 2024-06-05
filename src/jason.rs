@@ -38,6 +38,11 @@ struct Inner {
 
     /// [`Room`]s maintained by this [`Jason`] instance.
     rooms: Vec<Room>,
+
+    /// Connection with a media server.
+    ///
+    /// Only one [`WebSocketRpcClient`] is supported at the moment.
+    rpc: Option<Rc<WebSocketRpcClient>>,
 }
 
 impl Jason {
@@ -52,13 +57,20 @@ impl Jason {
         Self(Rc::new(RefCell::new(Inner {
             rooms: Vec::new(),
             media_manager: Rc::new(MediaManager::default()),
+            rpc: None,
         })))
     }
 
     /// Creates a new [`Room`] and returns its [`RoomHandle`].
     #[must_use]
     pub fn init_room(&self) -> RoomHandle {
-        self.inner_init_room(WebSocketRpcSession::new(create_rpc_client()))
+        let rpc = self
+            .0
+            .borrow()
+            .rpc
+            .clone()
+            .unwrap_or_else(|| create_rpc_client());
+        self.inner_init_room(WebSocketRpcSession::new(rpc))
     }
 
     /// Returns a [`MediaManagerHandle`].
@@ -84,6 +96,12 @@ impl Jason {
             let room = this.rooms.swap_remove(i);
             room.set_close_reason(ClientDisconnect::RoomClosed.into());
             drop(room);
+            if this.rooms.is_empty() && this.rpc.is_some() {
+                this.rpc =
+                    Some(Rc::new(WebSocketRpcClient::new(Box::new(|| {
+                        Rc::new(platform::WebSocketRpcTransport::new())
+                    }))));
+            }
         }
     }
 
@@ -95,6 +113,15 @@ impl Jason {
         self.0.borrow_mut().rooms.drain(..).for_each(|room| {
             room.close(ClientDisconnect::RoomClosed.into());
         });
+    }
+
+    /// Returns a new [`Jason`] with the provided [`WebSocketRpcClient`].
+    pub fn with_rpc_client(rpc: Rc<WebSocketRpcClient>) -> Self {
+        Self(Rc::new(RefCell::new(Inner {
+            rpc: Some(rpc),
+            rooms: Vec::new(),
+            media_manager: Rc::new(MediaManager::default()),
+        })))
     }
 
     /// Returns a [`RoomHandle`] for an initialized  [`Room`].
