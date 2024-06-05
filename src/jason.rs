@@ -13,6 +13,13 @@ use crate::{
     },
 };
 
+/// Creates new RPC connection with a media server.
+fn create_rpc_client() -> Rc<WebSocketRpcClient> {
+    Rc::new(WebSocketRpcClient::new(Box::new(|| {
+        Rc::new(platform::WebSocketRpcTransport::new())
+    })))
+}
+
 /// General library interface.
 ///
 /// Responsible for managing shared transports, local media and room
@@ -31,11 +38,6 @@ struct Inner {
 
     /// [`Room`]s maintained by this [`Jason`] instance.
     rooms: Vec<Room>,
-
-    /// Connection with a media server.
-    ///
-    /// Only one [`WebSocketRpcClient`] is supported at the moment.
-    rpc: Rc<WebSocketRpcClient>,
 }
 
 impl Jason {
@@ -47,16 +49,13 @@ impl Jason {
             platform::init_logger();
         }
 
-        Self::with_rpc_client(Rc::new(WebSocketRpcClient::new(Box::new(
-            || Rc::new(platform::WebSocketRpcTransport::new()),
-        ))))
+        Self::with_rpc_client()
     }
 
     /// Creates a new [`Room`] and returns its [`RoomHandle`].
     #[must_use]
     pub fn init_room(&self) -> RoomHandle {
-        let rpc = Rc::clone(&self.0.borrow().rpc);
-        self.inner_init_room(WebSocketRpcSession::new(rpc))
+        self.inner_init_room(WebSocketRpcSession::new(create_rpc_client()))
     }
 
     /// Returns a [`MediaManagerHandle`].
@@ -82,11 +81,6 @@ impl Jason {
             let room = this.rooms.swap_remove(i);
             room.set_close_reason(ClientDisconnect::RoomClosed.into());
             drop(room);
-            if this.rooms.is_empty() {
-                this.rpc = Rc::new(WebSocketRpcClient::new(Box::new(|| {
-                    Rc::new(platform::WebSocketRpcTransport::new())
-                })));
-            }
         }
     }
 
@@ -101,9 +95,8 @@ impl Jason {
     }
 
     /// Returns a new [`Jason`] with the provided [`WebSocketRpcClient`].
-    pub fn with_rpc_client(rpc: Rc<WebSocketRpcClient>) -> Self {
+    pub fn with_rpc_client() -> Self {
         Self(Rc::new(RefCell::new(Inner {
-            rpc,
             rooms: Vec::new(),
             media_manager: Rc::new(MediaManager::default()),
         })))
@@ -112,12 +105,13 @@ impl Jason {
     /// Returns a [`RoomHandle`] for an initialized  [`Room`].
     fn inner_init_room(&self, rpc: Rc<dyn RpcSession>) -> RoomHandle {
         let on_normal_close = rpc.on_normal_close();
-        let room = Room::new(rpc, Rc::clone(&self.0.borrow().media_manager));
+        let room =
+            Room::new(rpc.clone(), Rc::clone(&self.0.borrow().media_manager));
 
         let weak_room = room.downgrade();
         let weak_inner = Rc::downgrade(&self.0);
         platform::spawn(on_normal_close.map(move |reason| {
-            _ = (|| {
+            _ = (move || {
                 let this_room = weak_room.upgrade()?;
                 let inner = weak_inner.upgrade()?;
                 let mut inner = inner.borrow_mut();
