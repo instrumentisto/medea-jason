@@ -14,6 +14,8 @@ All user visible changes to this project will be documented in this file. This p
 ### BC Breaks
 
 - Minimal supported version of `medea-client-api-proto` is `0.6.0` ([#151]).
+- Library API:
+    - Removed `with_rpc_client()` constructor and added `WebSocketRpcClient` as argument to `new()` constructor in `Jason` ([#175]).
 
 ### Added
 
@@ -42,6 +44,7 @@ All user visible changes to this project will be documented in this file. This p
 [#166]: /../../pull/166
 [#167]: /../../pull/167
 [#172]: /../../pull/172
+[#175]: /../../pull/175
 
 
 
