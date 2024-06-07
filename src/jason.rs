@@ -35,20 +35,20 @@ struct Inner {
     /// Connection with a media server.
     ///
     /// [`Jason`] will reuse this [`WebSocketRpcClient`] for each [`Room`] if
-    /// it's `Some`.
+    /// it's [`Some`].
     ///
     /// New [`WebSocketRpcClient`] will be created for each [`Room`] if it's
-    /// `None`.
+    /// [`None`].
     rpc: Option<Rc<WebSocketRpcClient>>,
 }
 
 impl Jason {
     /// Instantiates a new [`Jason`] interface to interact with this library.
     ///
-    /// If [`WebSocketRpcClient`] is provided, then [`Jason`] will reuse it for
-    /// the all [`Room`]s created in this [`Jason`].
+    /// If a [`WebSocketRpcClient`] is provided, then [`Jason`] will reuse it
+    /// for all the [`Room`]s created in this [`Jason`].
     ///
-    /// If [`WebSocketRpcClient`] is not provided, then new separate
+    /// If [`WebSocketRpcClient`] is not provided, then a new separate
     /// [`WebSocketRpcClient`] will be created for each [`Room`].
     #[must_use]
     pub fn new(rpc: Option<Rc<WebSocketRpcClient>>) -> Self {
