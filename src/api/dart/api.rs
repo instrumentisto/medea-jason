@@ -479,7 +479,7 @@ pub fn on_panic(cb: DartOpaque) -> SyncReturn<()> {
 /// Instantiates a new [`Jason`] interface to interact with this library.
 #[must_use]
 pub fn jason_new() -> SyncReturn<RustOpaque<Jason>> {
-    SyncReturn(RustOpaque::new(Jason::new()))
+    SyncReturn(RustOpaque::new(Jason::new(None)))
 }
 
 /// Creates a new [`Room`] and returns its [`RoomHandle`].
