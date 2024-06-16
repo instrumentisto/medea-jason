@@ -225,7 +225,7 @@ impl Component {
     /// Watcher for the [`State::connections`] insert update.
     ///
     /// Creates a new [`Connection`] for the given [`PeerConnection`].
-    #[allow(clippy::needless_pass_by_value)]
+    #[allow(clippy::needless_pass_by_value)] // required by macro
     #[watch(
         self.maybe_update_connections.subscribe().filter_map(future::ready)
     )]

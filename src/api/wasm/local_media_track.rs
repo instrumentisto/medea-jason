@@ -41,7 +41,7 @@ impl LocalMediaTrack {
 
     /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
     /// audio track, or a [`MediaKind::Video`] if it represents a video track.
-    #[allow(clippy::as_conversions)]
+    #[allow(clippy::as_conversions)] // TODO: Needs refactoring.
     pub fn state(&self) -> Promise {
         let this = self.0.clone();
         future_to_promise(

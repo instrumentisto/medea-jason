@@ -116,7 +116,7 @@ where
 pub fn window() -> Window {
     // Cannot use `lazy_static` since `window` is `!Sync`.
     // Safe to unwrap.
-    #![allow(clippy::unwrap_used)]
+    #![allow(clippy::unwrap_used)] // intentional
     web_sys::window().unwrap()
 }
 

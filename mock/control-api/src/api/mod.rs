@@ -441,7 +441,7 @@ impl Element {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<proto::Element> for Element {
     fn from(proto: proto::Element) -> Self {
         use proto::element::El;
@@ -459,7 +459,7 @@ impl From<proto::Element> for Element {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<proto::room::Element> for Element {
     fn from(proto: proto::room::Element) -> Self {
         match proto.el.unwrap() {

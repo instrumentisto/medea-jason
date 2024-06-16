@@ -51,7 +51,7 @@ pub struct Member {
 
 impl Member {
     /// Converts [`Member`] into protobuf [`proto::Member`].
-    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::missing_panics_doc)] // intentional
     #[must_use]
     pub fn into_proto(self, member_id: String) -> proto::Member {
         let member_elements = self

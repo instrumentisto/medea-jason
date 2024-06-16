@@ -45,7 +45,7 @@ impl<T: CallbackApi> CallbackApiServer<T> {
 }
 
 /// Direct in-process [`ControlApi`] client.
-#[allow(clippy::module_name_repetitions)]
+#[allow(clippy::module_name_repetitions)] // TODO: Refactor?
 #[derive(Debug)]
 pub struct ControlApiClient<Error> {
     /// [`mpsc::UnboundedSender`] to send [`ControlApiRequest`]s to linked

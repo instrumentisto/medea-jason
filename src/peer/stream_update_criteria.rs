@@ -1,7 +1,6 @@
 //! [`MediaKind`] + [`MediaSourceKind`] criteria for local stream updates.
 
-// Because of uncontrolled names in the generated code.
-#![allow(clippy::same_name_method)]
+#![allow(clippy::same_name_method)] // uncontrolled names in the generated code
 
 use std::ops::BitOrAssign;
 

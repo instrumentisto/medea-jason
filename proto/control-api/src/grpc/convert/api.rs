@@ -374,7 +374,7 @@ impl TryFrom<proto::Member> for Member {
             member_id: &str,
             field: &'static str,
         ) -> Result<Option<Duration>, ProtobufError> {
-            #[allow(clippy::map_err_ignore)]
+            #[allow(clippy::map_err_ignore)] // intentional
             duration.map(TryInto::try_into).transpose().map_err(|_| {
                 ProtobufError::InvalidDuration(member_id.into(), field)
             })
@@ -424,7 +424,7 @@ impl From<Member> for proto::Member {
     fn from(member: Member) -> Self {
         // PANIC: Unwrapping `Duration` conversion is OK here, because its
         //        values are not expected to be large.
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         Self {
             id: member.id.into(),
             on_join: member

@@ -507,7 +507,7 @@ pub fn jason_close_room(
     room_to_delete: RustOpaque<RoomHandle>,
 ) -> SyncReturn<()> {
     let room_to_delete = room_to_delete.try_unwrap().unwrap();
-    jason.close_room(room_to_delete);
+    jason.close_room(&room_to_delete);
 
     SyncReturn(())
 }

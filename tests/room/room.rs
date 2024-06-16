@@ -260,7 +260,7 @@ mod connection_mode {
     #[wasm_bindgen_test]
     async fn p2p() {
         let (event_tx, event_rx) = mpsc::unbounded();
-        let (room, commands_rx) = get_test_room(Box::pin(event_rx));
+        let (room, _commands_rx) = get_test_room(Box::pin(event_rx));
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         JsFuture::from(room_handle.set_local_media_settings(
@@ -286,7 +286,7 @@ mod connection_mode {
     #[wasm_bindgen_test]
     async fn sfu() {
         let (event_tx, event_rx) = mpsc::unbounded();
-        let (room, commands_rx) = get_test_room(Box::pin(event_rx));
+        let (room, _commands_rx) = get_test_room(Box::pin(event_rx));
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         JsFuture::from(room_handle.set_local_media_settings(
@@ -1857,7 +1857,7 @@ mod patches_generation {
     /// Checks that correct [`TrackPatchCommand`] generated on muting.
     #[wasm_bindgen_test]
     async fn track_patch_on_muting() {
-        let (room, mut command_rx) = get_room_and_commands_receiver(
+        let (room, command_rx) = get_room_and_commands_receiver(
             1,
             |_| mute_state::Stable::Unmuted.into(),
             audio_and_device_video_tracks_content(),
@@ -1885,7 +1885,7 @@ mod patches_generation {
     /// Checks that correct [`TrackPatchCommand`] generated on unmuting.
     #[wasm_bindgen_test]
     async fn track_patch_on_unmuting() {
-        let (room, mut command_rx) = get_room_and_commands_receiver(
+        let (room, command_rx) = get_room_and_commands_receiver(
             1,
             |_| mute_state::Stable::Muted.into(),
             audio_and_device_video_tracks_content(),
@@ -2894,7 +2894,6 @@ mod state_synchronization {
         media::MediaManager, platform::delay_for, room::Room,
         rpc::MockRpcSession, utils::AsProtoState,
     };
-    use wasm_bindgen::{closure::Closure, JsValue};
     use wasm_bindgen_test::*;
 
     use crate::{get_test_tracks, timeout};

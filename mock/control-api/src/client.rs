@@ -29,7 +29,7 @@ impl Fid {
     /// Returns `Room`'s ID from this [`Fid`].
     fn room_id(&self) -> &str {
         // PANIC: Slicing is OK here, as the index is taken from the source.
-        #[allow(clippy::string_slice)]
+        #[allow(clippy::string_slice)] // intentional
         self.0.find('/').map_or(self.0.as_str(), |i| &self.0[..i])
     }
 }

@@ -227,7 +227,7 @@ impl MediaDevices {
     /// # Panics
     ///
     /// Always.
-    #[allow(clippy::unused_async)]
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn set_output_audio_id(
         &self,
         _: String,
@@ -263,7 +263,7 @@ impl MediaDevices {
 
     /// Always returns `false` since accessing microphone cannot be implemented
     /// on web platform.
-    #[allow(clippy::unused_async)]
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn microphone_volume_is_available(&self) -> bool {
         false
     }
@@ -278,7 +278,7 @@ impl MediaDevices {
     /// # Panics
     ///
     /// Always.
-    #[allow(clippy::unused_async)]
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn microphone_volume(
         &self,
     ) -> Result<i64, Traced<MicVolumeError>> {
@@ -297,7 +297,7 @@ impl MediaDevices {
     /// # Panics
     ///
     /// Always.
-    #[allow(clippy::unused_async)]
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn set_microphone_volume(
         &self,
         _: i64,

@@ -39,7 +39,7 @@ impl Jason {
 
     /// Closes the provided [`RoomHandle`].
     pub fn close_room(&self, room_to_delete: RoomHandle) {
-        self.0.close_room(room_to_delete.into());
+        self.0.close_room(&room_to_delete.into());
     }
 
     /// Drops [`Jason`] API object, so all the related objects (rooms,

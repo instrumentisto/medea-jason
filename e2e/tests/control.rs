@@ -13,7 +13,7 @@ pub enum Error {
     Reqwest(reqwest::Error),
 }
 
-#[allow(clippy::absolute_paths)]
+#[allow(clippy::absolute_paths)] // intentional
 type Result<T> = std::result::Result<T, Error>;
 
 /// Client of a Control API.

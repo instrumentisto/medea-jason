@@ -1,6 +1,6 @@
 //! Implementations of reactive collections based on [`std::collections`].
 
-#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::module_name_repetitions)] // TODO: Refactor?
 
 pub mod hash_map;
 pub mod hash_set;

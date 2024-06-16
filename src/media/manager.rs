@@ -303,7 +303,7 @@ impl InnerMediaManager {
 
         // PANIC: It's OK to unwrap `Weak` here as we have cleaned the absent
         //        ones in the line above.
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let storage: Vec<_> = self
             .tracks
             .borrow()
@@ -428,7 +428,7 @@ impl InnerMediaManager {
         &self,
         device_id: String,
     ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
-        #[allow(clippy::map_err_ignore)]
+        #[allow(clippy::map_err_ignore)] // intentional
         self.media_devices
             .set_output_audio_id(device_id)
             .await

@@ -45,7 +45,7 @@ pub enum AwaitCompletion {
 }
 
 /// Pointer to a JS object on a browser's side.
-#[allow(clippy::module_name_repetitions)]
+#[allow(clippy::module_name_repetitions)] // TODO: Refactor?
 #[derive(Clone, Debug, Display)]
 pub struct ObjectPtr(String);
 

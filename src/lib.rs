@@ -50,7 +50,6 @@
     clippy::let_underscore_untyped,
     clippy::lossy_float_literal,
     clippy::manual_c_str_literals,
-    clippy::manual_clamp,
     clippy::map_err_ignore,
     clippy::mem_forget,
     clippy::missing_assert_message,
@@ -77,7 +76,6 @@
     clippy::rc_buffer,
     clippy::rc_mutex,
     clippy::read_zero_byte_vec,
-    clippy::readonly_write_lock,
     clippy::redundant_clone,
     clippy::redundant_type_annotations,
     clippy::ref_patterns,
@@ -126,9 +124,11 @@
     missing_copy_implementations,
     missing_debug_implementations,
     missing_docs,
+    redundant_lifetimes,
     semicolon_in_expressions_from_macros,
     single_use_lifetimes,
     unit_bindings,
+    unnameable_types,
     unreachable_pub,
     unsafe_op_in_unsafe_fn,
     unstable_features,
@@ -142,6 +142,7 @@
     variant_size_differences
 )]
 #![cfg_attr(feature = "mockable", allow(missing_docs))]
+// TODO: Needs refactoring.
 #![allow(
     clippy::module_name_repetitions,
     clippy::unimplemented,

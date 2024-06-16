@@ -152,14 +152,14 @@ impl Transceiver {
         encodings: Vec<EncodingParameters>,
     ) -> Result<(), Error> {
         let params = self.0.sender().get_parameters();
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let encs = get_property_by_name(&params, "encodings", |v| {
             v.is_array().then_some(Array::from(&v))
         })
         .unwrap();
 
         for mut enc in encs.iter().map(RtcRtpEncodingParameters::from) {
-            #[allow(clippy::unwrap_used)]
+            #[allow(clippy::unwrap_used)] // intentional
             let rid =
                 get_property_by_name(&enc, "rid", |v| v.as_string()).unwrap();
 

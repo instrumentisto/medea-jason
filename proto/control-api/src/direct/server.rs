@@ -13,7 +13,7 @@ use crate::{callback, CallbackApi, ControlApi};
 use super::{CallbackApiRequest, ControlApiRequest};
 
 /// Direct in-process [`ControlApi`] server.
-#[allow(clippy::module_name_repetitions)]
+#[allow(clippy::module_name_repetitions)] // TODO: Refactor?
 #[derive(Debug)]
 pub struct ControlApiServer<T: ControlApi> {
     /// Inner [`ControlApi`] implementation.

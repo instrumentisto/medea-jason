@@ -162,7 +162,7 @@ impl Repository {
     ) -> TaskHandle {
         let (fut, abort) = future::abortable(async move {
             // Cannot annotate `async` block with `-> !`.
-            #[allow(clippy::infinite_loop)]
+            #[allow(clippy::infinite_loop)] // intentional
             loop {
                 platform::delay_for(Duration::from_secs(1)).await;
 

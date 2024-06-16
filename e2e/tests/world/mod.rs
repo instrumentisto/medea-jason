@@ -47,7 +47,7 @@ pub enum Error {
     MemberNotFound(#[error(not(source))] String),
 }
 
-#[allow(clippy::absolute_paths)]
+#[allow(clippy::absolute_paths)] // intentional
 type Result<T> = std::result::Result<T, Error>;
 
 /// [`World`][1] used by all E2E tests.

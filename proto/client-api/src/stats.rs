@@ -2,7 +2,7 @@
 //!
 //! [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 
-#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::module_name_repetitions)] // TODO: Needs refactoring.
 
 use std::{
     hash::{Hash, Hasher},

@@ -117,7 +117,6 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
-        #[allow(clippy::unwrap_used)]
         get_property_by_name(&self.sys_track.get_settings(), "deviceId", |v| {
             v.as_string()
         })
@@ -257,7 +256,7 @@ impl MediaStreamTrack {
                 on_ended.replace(
                     // PANIC: Unwrapping is OK here, because this function
                     //        shouldn't error ever.
-                    #[allow(clippy::unwrap_used)]
+                    #[allow(clippy::unwrap_used)] // intentional
                     EventListener::new_once(
                         Rc::clone(&self.sys_track),
                         "ended",

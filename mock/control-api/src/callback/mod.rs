@@ -42,7 +42,7 @@ pub struct CallbackItem {
     pub at: String,
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<proto::Request> for CallbackItem {
     fn from(proto: proto::Request) -> Self {
         Self {
@@ -53,8 +53,9 @@ impl From<proto::Request> for CallbackItem {
     }
 }
 
-/// `on_join` callback's related entities and implementations.
-mod join {
+pub mod join {
+    //! `on_join` callback's related entities and implementations.
+
     use medea_control_api_proto::grpc::callback as proto;
     use serde::{Deserialize, Serialize};
 
@@ -69,8 +70,9 @@ mod join {
     }
 }
 
-/// `on_leave` callback's related entities and implementations.
-mod leave {
+pub mod leave {
+    //! `on_leave` callback's related entities and implementations.
+
     use derive_more::Display;
     use medea_control_api_proto::grpc::callback as proto;
     use serde::{Deserialize, Serialize};

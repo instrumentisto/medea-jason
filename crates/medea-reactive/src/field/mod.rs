@@ -1,6 +1,6 @@
 //! Implementations of basic reactive containers.
 
-#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::module_name_repetitions)] // TODO: Refactor?
 
 pub mod cell;
 pub mod progressable_cell;
@@ -311,7 +311,7 @@ impl<D: Clone> OnObservableFieldModification<D>
     fn on_modify(&mut self, data: &D) {
         self.borrow_mut().retain(|sub| match sub {
             UniversalSubscriber::When { assert_fn, sender } => {
-                #[allow(clippy::expect_used)]
+                #[allow(clippy::expect_used)] // intentional
                 if (assert_fn)(data) {
                     sender
                         .borrow_mut()

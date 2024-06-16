@@ -82,15 +82,14 @@ impl Jason {
     }
 
     /// Closes the provided [`RoomHandle`].
-    #[allow(clippy::needless_pass_by_value)]
-    pub fn close_room(&self, room_to_delete: RoomHandle) {
+    pub fn close_room(&self, room_to_delete: &RoomHandle) {
         let index = self
             .0
             .borrow()
             .rooms
             .iter()
             .enumerate()
-            .find(|(_, room)| room.inner_ptr_eq(&room_to_delete))
+            .find(|(_, room)| room.inner_ptr_eq(room_to_delete))
             .map(|(i, _)| i);
 
         if let Some(i) = index {

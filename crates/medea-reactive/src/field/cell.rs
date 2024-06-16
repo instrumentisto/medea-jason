@@ -6,7 +6,7 @@
 //! [`Cell`]: std::cell::Cell
 //! [`ObservableField`]: crate::ObservableField
 
-#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::module_name_repetitions)] // TODO: Refactor?
 
 use std::{
     cell::{Ref, RefCell},

@@ -24,7 +24,7 @@ use crate::{
 /// [`Box`]ed [`Error`] with [`Send`] and [`Sync`].
 ///
 /// [`Error`]: std::error::Error
-#[allow(clippy::absolute_paths)]
+#[allow(clippy::absolute_paths)] // intentional
 type StdError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 #[async_trait]

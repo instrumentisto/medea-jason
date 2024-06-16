@@ -23,7 +23,7 @@ pub enum Error {
 /// Shortcut for a [`Result`] containing an [`Error`](enum@Error).
 ///
 /// [`Result`]: std::result::Result
-#[allow(clippy::absolute_paths)]
+#[allow(clippy::absolute_paths)] // intentional
 type Result<T> = std::result::Result<T, Error>;
 
 /// Builder of a [`Member`].

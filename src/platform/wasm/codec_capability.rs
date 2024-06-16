@@ -25,8 +25,7 @@ impl CodecCapability {
     /// capabilities.
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#dom-rtcrtpsender
-    // Async is needed for consistency with Dart implementation.
-    #[allow(clippy::unused_async)]
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn get_sender_codec_capabilities(
         kind: MediaKind,
     ) -> Result<Vec<Self>, Error> {
