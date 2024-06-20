@@ -37,6 +37,8 @@ Member _$MemberFromJson(Map<String, dynamic> json) => Member(
           : Credentials.fromJson(json['credentials'] as Map<String, dynamic>),
       json['on_join'] as String?,
       json['on_leave'] as String?,
+      json['on_start'] as String?,
+      json['on_stop'] as String?,
     )
       ..idle_timeout = json['idle_timeout'] as String?
       ..reconnect_timeout = json['reconnect_timeout'] as String?
@@ -57,6 +59,8 @@ Map<String, dynamic> _$MemberToJson(Member instance) {
 
   writeNotNull('on_join', instance.on_join);
   writeNotNull('on_leave', instance.on_leave);
+  writeNotNull('on_start', instance.on_start);
+  writeNotNull('on_stop', instance.on_stop);
   val['idle_timeout'] = instance.idle_timeout;
   val['reconnect_timeout'] = instance.reconnect_timeout;
   val['ping_interval'] = instance.ping_interval;

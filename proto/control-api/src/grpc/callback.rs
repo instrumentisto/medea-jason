@@ -10,7 +10,7 @@ pub struct Request {
     #[prost(string, tag = "2")]
     pub at: ::prost::alloc::string::String,
     /// Occurred event.
-    #[prost(oneof = "request::Event", tags = "3, 4")]
+    #[prost(oneof = "request::Event", tags = "3, 4, 5, 6")]
     pub event: ::core::option::Option<request::Event>,
 }
 /// Nested message and enum types in `Request`.
@@ -23,6 +23,85 @@ pub mod request {
         OnJoin(super::OnJoin),
         #[prost(message, tag = "4")]
         OnLeave(super::OnLeave),
+        #[prost(message, tag = "5")]
+        OnStart(super::OnStart),
+        #[prost(message, tag = "6")]
+        OnStop(super::OnStop),
+    }
+}
+/// Event which fires when Endpoint starts sending/receiving media traffic.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OnStart {
+    /// Media type of the traffic which starts flowing in some Endpoint.
+    #[prost(enumeration = "MediaType", tag = "1")]
+    pub media_type: i32,
+    /// Media direction of the Endpoint for which this callback was received.
+    #[prost(enumeration = "MediaDirection", tag = "2")]
+    pub media_direction: i32,
+}
+/// Event which fires when Endpoint stops sending/receiving media traffic.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OnStop {
+    /// Media type of the traffic which stops flowing in some Endpoint.
+    #[prost(enumeration = "MediaType", tag = "1")]
+    pub media_type: i32,
+    /// Media Endpoint for which this callback was received.
+    #[prost(enumeration = "MediaDirection", tag = "2")]
+    pub media_direction: i32,
+    /// Reason of why Endpoint was stopped.
+    #[prost(enumeration = "on_stop::Reason", tag = "3")]
+    pub reason: i32,
+}
+/// Nested message and enum types in `OnStop`.
+pub mod on_stop {
+    /// Reason of why some Endpoint was stopped.
+    #[derive(
+        Clone,
+        Copy,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash,
+        PartialOrd,
+        Ord,
+        ::prost::Enumeration
+    )]
+    #[repr(i32)]
+    pub enum Reason {
+        /// All traffic of some Endpoint was stopped flowing.
+        TrafficNotFlowing = 0,
+        /// Endpoint was muted.
+        Muted = 1,
+        /// Some traffic flows within Endpoint, but incorrectly.
+        WrongTrafficFlowing = 2,
+        /// Traffic stopped because Endpoint was removed.
+        EndpointRemoved = 3,
+    }
+    impl Reason {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Reason::TrafficNotFlowing => "TRAFFIC_NOT_FLOWING",
+                Reason::Muted => "MUTED",
+                Reason::WrongTrafficFlowing => "WRONG_TRAFFIC_FLOWING",
+                Reason::EndpointRemoved => "ENDPOINT_REMOVED",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "TRAFFIC_NOT_FLOWING" => Some(Self::TrafficNotFlowing),
+                "MUTED" => Some(Self::Muted),
+                "WRONG_TRAFFIC_FLOWING" => Some(Self::WrongTrafficFlowing),
+                "ENDPOINT_REMOVED" => Some(Self::EndpointRemoved),
+                _ => None,
+            }
+        }
     }
 }
 /// Empty response of the `Callback` service.
@@ -91,6 +170,69 @@ pub mod on_leave {
                 "SHUTDOWN" => Some(Self::Shutdown),
                 _ => None,
             }
+        }
+    }
+}
+/// Media type of the traffic which starts/stops flowing in some Endpoint.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum MediaType {
+    /// / Started/stopped audio traffic.
+    Audio = 0,
+    /// / Started/stopped video traffic.
+    Video = 1,
+    /// / Started/stopped audio and video traffic.
+    Both = 2,
+}
+impl MediaType {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            MediaType::Audio => "AUDIO",
+            MediaType::Video => "VIDEO",
+            MediaType::Both => "BOTH",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "AUDIO" => Some(Self::Audio),
+            "VIDEO" => Some(Self::Video),
+            "BOTH" => Some(Self::Both),
+            _ => None,
+        }
+    }
+}
+/// Media direction of the Endpoint for which OnStart or OnStop Control API callback
+/// was received.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum MediaDirection {
+    /// Endpoint is a publisher.
+    Publish = 0,
+    /// Endpoint is a player.
+    Play = 1,
+}
+impl MediaDirection {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            MediaDirection::Publish => "PUBLISH",
+            MediaDirection::Play => "PLAY",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "PUBLISH" => Some(Self::Publish),
+            "PLAY" => Some(Self::Play),
+            _ => None,
         }
     }
 }

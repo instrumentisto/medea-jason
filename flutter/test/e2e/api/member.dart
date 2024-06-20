@@ -85,6 +85,14 @@ class Member {
   @JsonKey(includeIfNull: false)
   String? on_leave;
 
+  /// URL to which [OnStart] Control API callback will be sent.
+  @JsonKey(includeIfNull: false)
+  String? on_start;
+
+  /// URL to which [OnStop] Control API callback will be sent.
+  @JsonKey(includeIfNull: false)
+  String? on_stop;
+
   /// Timeout of receiving heartbeat messages from this [Member] via Client API.
   ///
   /// Once reached, this [Member] is considered being idle.
@@ -99,7 +107,8 @@ class Member {
   /// API.
   String? ping_interval;
 
-  Member(this.id, this.pipeline, this.credentials, this.on_join, this.on_leave);
+  Member(this.id, this.pipeline, this.credentials, this.on_join, this.on_leave,
+      this.on_start, this.on_stop);
 
   factory Member.fromJson(Map<String, dynamic> json) {
     json.remove('kind');

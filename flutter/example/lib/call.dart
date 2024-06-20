@@ -254,8 +254,14 @@ class Call {
     var resp = await client.create(
         roomId,
         Room(roomId, {
-          memberId: Member(memberId, pipeline, Plain('test'),
-              'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099')
+          memberId: Member(
+              memberId,
+              pipeline,
+              Plain('test'),
+              'grpc://127.0.0.1:9099',
+              'grpc://127.0.0.1:9099',
+              'grpc://127.0.0.1:9099',
+              'grpc://127.0.0.1:9099')
         }));
     return jsonDecode(resp.body)['sids'][memberId];
   }
@@ -287,7 +293,13 @@ class Call {
 
     var resp = await client.create(
         '$roomId/$memberId',
-        Member(memberId, pipeline, Plain('test'), 'grpc://127.0.0.1:9099',
+        Member(
+            memberId,
+            pipeline,
+            Plain('test'),
+            'grpc://127.0.0.1:9099',
+            'grpc://127.0.0.1:9099',
+            'grpc://127.0.0.1:9099',
             'grpc://127.0.0.1:9099'));
 
     if (isPublish) {
