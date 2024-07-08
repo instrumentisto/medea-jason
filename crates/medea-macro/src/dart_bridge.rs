@@ -376,8 +376,12 @@ struct FnExpander {
     /// [`syn::FnArg`]s of extern Dart function.
     input_args: Punctuated<syn::FnArg, token::Comma>,
 
-    /// [`syn::ReturnType`] of the extern Dart function.
+    /// [`syn::ReturnType`] of the extern Dart function. This is always a
+    /// [`Result`].
     ret_ty: syn::ReturnType,
+
+    /// [`Result::Ok`] type of the functions return type.
+    ret_ok_ty: syn::Type,
 
     /// `#[doc = "..."]` [`syn::Attribute`]s injected to the generated extern
     /// Dart function caller.
@@ -415,6 +419,45 @@ impl FnExpander {
             }
         }
 
+        let ret_ok_ty = {
+            let syn::ReturnType::Type(_, ret_ty) = item.sig.output.clone()
+            else {
+                return Err(syn::Error::new(
+                    item.sig.output.span(),
+                    "Must return `Result<T,E>`",
+                ));
+            };
+            let syn::Type::Path(ret_ty_path) = *ret_ty else {
+                return Err(syn::Error::new(
+                    item.sig.output.span(),
+                    "Must return `Result<T,E>`",
+                ));
+            };
+            let Some(ret_ty_last) = ret_ty_path.path.segments.last() else {
+                return Err(syn::Error::new(
+                    item.sig.output.span(),
+                    "Must return `Result<T,E>`",
+                ));
+            };
+            let syn::PathArguments::AngleBracketed(res) =
+                &ret_ty_last.arguments
+            else {
+                return Err(syn::Error::new(
+                    item.sig.output.span(),
+                    "Must return `Result<T,E>`",
+                ));
+            };
+            let Some(syn::GenericArgument::Type(res_ok_ty)) = res.args.first()
+            else {
+                return Err(syn::Error::new(
+                    item.sig.output.span(),
+                    "Must return `Result<T,E>`",
+                ));
+            };
+
+            res_ok_ty.clone()
+        };
+
         let ident_generator = IdentGenerator::new(prefix, &item.sig.ident);
         Ok(Self {
             type_alias_ident: ident_generator.type_alias(),
@@ -424,6 +467,7 @@ impl FnExpander {
             ident: item.sig.ident,
             input_args: item.sig.inputs,
             ret_ty: item.sig.output,
+            ret_ok_ty,
             doc_attrs: item
                 .attrs
                 .into_iter()
@@ -485,33 +529,11 @@ impl FnExpander {
     /// ```
     fn gen_fn_type(&self) -> TokenStream {
         let name = &self.type_alias_ident;
-
+        let ret_ok_ty = &self.ret_ok_ty;
         let args = &self.input_args;
 
-        let ret_ty = {
-            let syn::ReturnType::Type(_, res) = self.ret_ty.clone() else {
-                // Must return Result error
-                unreachable!("0000");
-            };
-            let syn::Type::Path(res) = *res else {
-                unreachable!("1111");
-            };
-            let res = res.path.segments.last().expect("11111");
-            assert_eq!(res.ident.to_string(), "Result");
-            let syn::PathArguments::AngleBracketed(res) = res.arguments.clone()
-            else {
-                unreachable!("2222");
-            };
-            let Some(syn::GenericArgument::Type(res_ty)) = res.args.first()
-            else {
-                unreachable!("333333");
-            };
-
-            res_ty.clone()
-        };
-
         quote! {
-            type #name = extern "C" fn (#args) -> #ret_ty;
+            type #name = extern "C" fn (#args) -> #ret_ok_ty;
         }
     }
 
@@ -520,7 +542,9 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// static mut PEER_CONNECTION__CREATE_OFFER__ERROR: Option<Error> = None;
+    /// static mut PEER_CONNECTION__CREATE_OFFER__FUNCTION:
+    ///     std::mem::MaybeUninit<PeerConnectionCreateOfferFunction> =
+    ///     std::mem::MaybeUninit::uninit();
     /// ```
     fn gen_fn_static_mut(&self) -> TokenStream {
         let name = &self.static_mut_ident;
@@ -533,6 +557,21 @@ impl FnExpander {
     }
 
     /// Generates Dart function caller for Rust.
+    ///
+    /// # Example of generated code
+    ///
+    /// ```ignore
+    /// pub unsafe fn create_offer(peer: Dart_Handle) -> Result<
+    ///                                                     Dart_Handle,
+    ///                                                     Error
+    ///                                                  > {
+    ///   let res =
+    ///     (PEER_CONNECTION__CREATE_OFFER__FUNCTION.assume_init_ref())(peer);
+    ///
+    ///   if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take()
+    ///         { Err(e) } else { Ok(res) }
+    ///  }
+    /// ```
     fn gen_caller_fn(&self) -> TokenStream {
         let doc_attrs = &self.doc_attrs;
         let name = &self.ident;

@@ -154,6 +154,8 @@ impl DartType {
         }
     }
 
+    /// Converts this [`DartType`] to the string representation that can be
+    /// used in Dart code.
     pub(crate) const fn to_dart_type(self) -> &'static str {
         match self {
             Self::Void => "void",
@@ -311,6 +313,7 @@ impl TryFrom<FnRegistrationBuilder> for FnRegistration {
             })
             .collect::<syn::Result<_>>()?;
 
+        // asdasdasdasd
         let syn::ReturnType::Type(_, res) = from.output else {
             // Must return Result error
             unreachable!("0000 {:?}", from.output);

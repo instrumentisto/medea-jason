@@ -80,7 +80,7 @@ impl<T: Into<DartValue>> Function<T> {
     pub fn call1(&self, arg: T) {
         let fn_handle =
             unsafe { dart_api::handle_from_persistent(self.dart_fn) };
-        unsafe { function::caller(fn_handle, arg.into()) }.unwrap()
+        unsafe { function::caller(fn_handle, arg.into()) }.unwrap();
     }
 }
 

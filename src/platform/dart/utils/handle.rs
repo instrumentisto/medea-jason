@@ -81,6 +81,7 @@ impl DartHandle {
 }
 
 impl fmt::Display for DartHandle {
+    #[allow(clippy::unwrap_in_result)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string = unsafe { handle::to_string(self.get()) }.unwrap();
         let string = unsafe { dart_string_into_rust(string) };

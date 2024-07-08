@@ -84,6 +84,7 @@ mod media_devices {
     }
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl From<Error> for GetUserMediaError {
     fn from(err: Error) -> Self {
         let kind = unsafe {

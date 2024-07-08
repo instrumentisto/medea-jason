@@ -66,7 +66,7 @@ impl DartMap {
     /// Sets the provided `value` under the provided `key` to this [`DartMap`].
     pub fn set(&mut self, key: String, value: DartValue) {
         unsafe { map::set(self.0.get(), string_into_c_str(key), value) }
-            .unwrap()
+            .unwrap();
     }
 
     /// Returns the underlying [`Dart_Handle`] of this [`DartMap`].

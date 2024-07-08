@@ -275,6 +275,7 @@ impl DisplayMediaStreamConstraints {
     }
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl From<AudioTrackConstraints> for MediaTrackConstraints {
     fn from(from: AudioTrackConstraints) -> Self {
         let optional = {
@@ -337,6 +338,7 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
     }
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
     fn from(from: DeviceVideoTrackConstraints) -> Self {
         let optional = {
@@ -408,6 +410,7 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
     }
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
     fn from(from: DisplayVideoTrackConstraints) -> Self {
         let optional = {

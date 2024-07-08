@@ -45,6 +45,7 @@ impl RtcIceServers {
     }
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl<I> From<I> for RtcIceServers
 where
     I: IntoIterator<Item = IceServer>,
@@ -62,7 +63,7 @@ where
                         srv.credential.clone().into(),
                     )
                 }
-                .unwrap()
+                .unwrap();
             }
         }
         Self(ice_servers)

@@ -68,7 +68,7 @@ impl DartList {
     /// Adds the provided [`DartValue`] to the end of this [`DartList`],
     /// extending the length by one.
     pub fn add(&mut self, value: DartValue) {
-        unsafe { list::add(self.0.get(), value) }.unwrap()
+        unsafe { list::add(self.0.get(), value) }.unwrap();
     }
 
     /// Returns an element by the provided `index` from this [`DartList`].
