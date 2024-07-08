@@ -27,26 +27,28 @@ mod media_stream_track {
 
     use dart_sys::Dart_Handle;
 
-    use crate::api::DartValueArg;
+    use crate::{api::DartValueArg, platform::Error};
 
     extern "C" {
         /// Returns [ID][1] of the provided [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
-        pub fn id(track: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn id(track: Dart_Handle) -> Result<ptr::NonNull<c_char>, Error>;
 
         /// Returns [device ID][1] of the provided [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://w3.org/TR/mediacapture-streams#dfn-deviceid
-        pub fn device_id(track: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn device_id(
+            track: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
 
         /// Returns [kind][1] of the provided [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-kind
-        pub fn kind(track: Dart_Handle) -> i64;
+        pub fn kind(track: Dart_Handle) -> Result<i64, Error>;
 
         /// Returns [facing mode][1] of the provided [MediaStreamTrack][0].
         ///
@@ -54,7 +56,7 @@ mod media_stream_track {
         /// [1]: https://tinyurl.com/w3-streams#def-constraint-facingMode
         pub fn facing_mode(
             track: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<i64>>>;
+        ) -> Result<ptr::NonNull<DartValueArg<Option<i64>>>, Error>;
 
         /// Returns [height][1] of the provided [MediaStreamTrack][0].
         ///
@@ -62,7 +64,7 @@ mod media_stream_track {
         /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-height
         pub fn height(
             track: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+        ) -> Result<ptr::NonNull<DartValueArg<Option<u32>>>, Error>;
 
         /// Returns [width][1] of the provided [MediaStreamTrack][0].
         ///
@@ -70,55 +72,63 @@ mod media_stream_track {
         /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-width
         pub fn width(
             track: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+        ) -> Result<ptr::NonNull<DartValueArg<Option<u32>>>, Error>;
 
         /// Returns [enabled][1] field of the provided [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-enabled
-        pub fn enabled(track: Dart_Handle) -> bool;
+        pub fn enabled(track: Dart_Handle) -> Result<bool, Error>;
 
         /// Sets [enabled][1] field of the provided [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-enabled
-        pub fn set_enabled(track: Dart_Handle, is_enabled: bool);
+        pub fn set_enabled(
+            track: Dart_Handle,
+            is_enabled: bool,
+        ) -> Result<(), Error>;
 
         /// Returns [readiness state][1] of the provided [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
-        pub fn ready_state(track: Dart_Handle) -> Dart_Handle;
+        pub fn ready_state(track: Dart_Handle) -> Result<Dart_Handle, Error>;
 
         /// [Stops][1] the provided [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-stop
-        pub fn stop(track: Dart_Handle) -> Dart_Handle;
+        pub fn stop(track: Dart_Handle) -> Result<Dart_Handle, Error>;
 
         /// Sets [`onended`][1] event handler of the provided
         /// [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-onended
-        pub fn on_ended(track: Dart_Handle, cb: Dart_Handle);
+        pub fn on_ended(
+            track: Dart_Handle,
+            cb: Dart_Handle,
+        ) -> Result<(), Error>;
 
         /// Creates a new instance of [MediaStreamTrack][0] depending on the
         /// same media source as the provided one has.
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-        pub fn clone(track: Dart_Handle) -> Dart_Handle;
+        pub fn clone(track: Dart_Handle) -> Result<Dart_Handle, Error>;
 
         /// Disposes the provided [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-        pub fn dispose(track: Dart_Handle) -> Dart_Handle;
+        pub fn dispose(track: Dart_Handle) -> Result<Dart_Handle, Error>;
 
         /// Indicates whether an `OnAudioLevelChangedCallback` is supported for
         /// this [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-        pub fn is_on_audio_level_available(track: Dart_Handle) -> bool;
+        pub fn is_on_audio_level_available(
+            track: Dart_Handle,
+        ) -> Result<bool, Error>;
 
         /// Sets the provided `OnAudioLevelChangedCallback` for this
         /// [MediaStreamTrack][0].
@@ -127,7 +137,10 @@ mod media_stream_track {
         /// changes.
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-        pub fn on_audio_level_changed(track: Dart_Handle, cb: Dart_Handle);
+        pub fn on_audio_level_changed(
+            track: Dart_Handle,
+            cb: Dart_Handle,
+        ) -> Result<(), Error>;
     }
 }
 
@@ -169,7 +182,8 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     #[must_use]
     pub fn id(&self) -> String {
-        let id = unsafe { media_stream_track::id(self.inner.get()) };
+        let id = unsafe { media_stream_track::id(self.inner.get()) }.unwrap();
+
         unsafe { dart_string_into_rust(id) }
     }
 
@@ -180,7 +194,8 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
         let device_id =
-            unsafe { media_stream_track::device_id(self.inner.get()) };
+            unsafe { media_stream_track::device_id(self.inner.get()) }.unwrap();
+
         Some(unsafe { dart_string_into_rust(device_id) })
     }
 
@@ -190,9 +205,9 @@ impl MediaStreamTrack {
     #[inline]
     #[must_use]
     pub fn kind(&self) -> MediaKind {
-        MediaKind::try_from(unsafe {
-            media_stream_track::kind(self.inner.get())
-        })
+        MediaKind::try_from(
+            unsafe { media_stream_track::kind(self.inner.get()) }.unwrap(),
+        )
         .unwrap()
     }
 
@@ -203,7 +218,9 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
         let facing_mode =
-            unsafe { media_stream_track::facing_mode(self.inner.get()) };
+            unsafe { media_stream_track::facing_mode(self.inner.get()) }
+                .unwrap();
+
         Option::<i64>::try_from(unsafe { facing_mode.unbox() })
             .unwrap()
             .map(FacingMode::try_from)
@@ -217,7 +234,9 @@ impl MediaStreamTrack {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn height(&self) -> Option<u32> {
-        let height = unsafe { media_stream_track::height(self.inner.get()) };
+        let height =
+            unsafe { media_stream_track::height(self.inner.get()) }.unwrap();
+
         Option::try_from(unsafe { height.unbox() }).unwrap()
     }
 
@@ -227,7 +246,9 @@ impl MediaStreamTrack {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn width(&self) -> Option<u32> {
-        let width = unsafe { media_stream_track::width(self.inner.get()) };
+        let width =
+            unsafe { media_stream_track::width(self.inner.get()) }.unwrap();
+
         Option::try_from(unsafe { width.unbox() }).unwrap()
     }
 
@@ -237,16 +258,15 @@ impl MediaStreamTrack {
     #[inline]
     #[must_use]
     pub fn enabled(&self) -> bool {
-        unsafe { media_stream_track::enabled(self.inner.get()) }
+        unsafe { media_stream_track::enabled(self.inner.get()) }.unwrap()
     }
 
     /// Sets [enabled][1] field of this [`MediaStreamTrack`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     pub fn set_enabled(&self, enabled: bool) {
-        unsafe {
-            media_stream_track::set_enabled(self.inner.get(), enabled);
-        }
+        unsafe { media_stream_track::set_enabled(self.inner.get(), enabled) }
+            .unwrap();
     }
 
     /// Returns [readiness state][1] of this [`MediaStreamTrack`].
@@ -254,7 +274,7 @@ impl MediaStreamTrack {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
     pub async fn ready_state(&self) -> MediaStreamTrackState {
         let handle = self.inner.get();
-        let state = unsafe { media_stream_track::ready_state(handle) };
+        let state = unsafe { media_stream_track::ready_state(handle) }.unwrap();
         let state = unsafe { FutureFromDart::execute::<i64>(state) }
             .await
             .unwrap();
@@ -273,7 +293,8 @@ impl MediaStreamTrack {
     pub fn stop(&self) -> impl Future<Output = ()> + 'static {
         let inner = self.inner.clone();
         async move {
-            let fut = unsafe { media_stream_track::stop(inner.get()) };
+            let fut = unsafe { media_stream_track::stop(inner.get()) }.unwrap();
+
             unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
         }
     }
@@ -304,7 +325,7 @@ impl MediaStreamTrack {
         let handle = self.inner.get();
         let source_kind = self.source_kind;
         async move {
-            let fut = unsafe { media_stream_track::clone(handle) };
+            let fut = unsafe { media_stream_track::clone(handle) }.unwrap();
             let new_track: DartHandle =
                 unsafe { FutureFromDart::execute(fut) }.await.unwrap();
             Self::new(new_track, source_kind)
@@ -321,8 +342,9 @@ impl MediaStreamTrack {
         if let Some(cb) = f {
             let cb = Callback::from_once(|(): ()| cb());
             unsafe {
-                media_stream_track::on_ended(self.inner.get(), cb.into_dart());
-            };
+                media_stream_track::on_ended(self.inner.get(), cb.into_dart())
+            }
+            .unwrap();
         }
     }
 
@@ -333,6 +355,7 @@ impl MediaStreamTrack {
         unsafe {
             media_stream_track::is_on_audio_level_available(self.inner.get())
         }
+        .unwrap()
     }
 
     /// Sets the provided `OnAudioLevelChangedCallback` for this
@@ -350,8 +373,9 @@ impl MediaStreamTrack {
             media_stream_track::on_audio_level_changed(
                 self.inner.get(),
                 cb.into_dart(),
-            );
-        };
+            )
+        }
+        .unwrap();
     }
 }
 
@@ -359,7 +383,9 @@ impl Drop for MediaStreamTrack {
     fn drop(&mut self) {
         let track = self.inner.clone();
         platform::spawn(async move {
-            let fut = unsafe { media_stream_track::dispose(track.get()) };
+            let fut =
+                unsafe { media_stream_track::dispose(track.get()) }.unwrap();
+
             unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
         });
     }

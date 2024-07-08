@@ -16,13 +16,13 @@ mod map {
 
     use dart_sys::Dart_Handle;
 
-    use crate::api::DartValue;
+    use crate::{api::DartValue, platform::Error};
 
     extern "C" {
         /// Initializes a new empty [`Map`].
         ///
         /// [`Map`]: https://api.dart.dev/stable/dart-core/Map-class.html
-        pub fn init() -> Dart_Handle;
+        pub fn init() -> Result<Dart_Handle, Error>;
 
         /// Sets the provided `value` under the provided `key` to the provided
         /// [`Map`].
@@ -32,7 +32,7 @@ mod map {
             map: Dart_Handle,
             key: ptr::NonNull<c_char>,
             value: DartValue,
-        );
+        ) -> Result<(), Error>;
     }
 }
 
@@ -58,15 +58,15 @@ impl DartMap {
     /// Creates a new empty [`DartMap`].
     #[must_use]
     pub fn new() -> Self {
-        let map = unsafe { map::init() };
+        let map = unsafe { map::init() }.unwrap();
+
         Self(unsafe { DartHandle::new(map) })
     }
 
     /// Sets the provided `value` under the provided `key` to this [`DartMap`].
     pub fn set(&mut self, key: String, value: DartValue) {
-        unsafe {
-            map::set(self.0.get(), string_into_c_str(key), value);
-        }
+        unsafe { map::set(self.0.get(), string_into_c_str(key), value) }
+            .unwrap()
     }
 
     /// Returns the underlying [`Dart_Handle`] of this [`DartMap`].

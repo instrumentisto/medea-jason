@@ -4,22 +4,121 @@ import 'package:ffi/ffi.dart';
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
+typedef _ErrorSetterFnC = Void Function(Handle);
+typedef _ErrorSetterFnDart = void Function(Object);
+
+Pointer<Utf8> Function(Object)? _address;
+int Function(Object)? _port;
+Pointer<Utf8> Function(Object)? _url;
+int Function(Object)? _errorCode;
+Pointer<Utf8> Function(Object)? _errorText;
+
+_ErrorSetterFnDart? _ice_candidate_error__address__set_error;
+_ErrorSetterFnDart? _ice_candidate_error__port__set_error;
+_ErrorSetterFnDart? _ice_candidate_error__url__set_error;
+_ErrorSetterFnDart? _ice_candidate_error__error_code__set_error;
+_ErrorSetterFnDart? _ice_candidate_error__error_text__set_error;
+
 void registerFunction(
   DynamicLibrary dl, {
-  required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> address,
-  required Pointer<NativeFunction<Uint32 Function(Handle)>> port,
-  required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> url,
-  required Pointer<NativeFunction<Int32 Function(Handle)>> errorCode,
-  required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> errorText,
+  required Pointer<Utf8> Function(Object) address,
+  required int Function(Object) port,
+  required Pointer<Utf8> Function(Object) url,
+  required int Function(Object) errorCode,
+  required Pointer<Utf8> Function(Object) errorText,
 }) {
+  _address = address;
+  _port = port;
+  _url = url;
+  _errorCode = errorCode;
+  _errorText = errorText;
+
+  _ice_candidate_error__address__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'ice_candidate_error__address__set_error');
+  _ice_candidate_error__port__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'ice_candidate_error__port__set_error');
+  _ice_candidate_error__url__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'ice_candidate_error__url__set_error');
+  _ice_candidate_error__error_code__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'ice_candidate_error__error_code__set_error');
+  _ice_candidate_error__error_text__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'ice_candidate_error__error_text__set_error');
+
+  Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> address_native =
+      Pointer.fromFunction(
+    _addressProxy,
+  );
+  Pointer<NativeFunction<Uint32 Function(Handle)>> port_native =
+      Pointer.fromFunction(_portProxy, 0);
+  Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> url_native =
+      Pointer.fromFunction(
+    _urlProxy,
+  );
+  Pointer<NativeFunction<Int32 Function(Handle)>> errorCode_native =
+      Pointer.fromFunction(_errorCodeProxy, 0);
+  Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> errorText_native =
+      Pointer.fromFunction(
+    _errorTextProxy,
+  );
+
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
       void Function(Pointer, Pointer, Pointer, Pointer,
           Pointer)>('register_ice_candidate_error')(
-    address,
-    port,
-    url,
-    errorCode,
-    errorText,
+    address_native,
+    port_native,
+    url_native,
+    errorCode_native,
+    errorText_native,
   );
+}
+
+Pointer<Utf8> _addressProxy(Object a) {
+  try {
+    return _address!(a);
+  } catch (e) {
+    _ice_candidate_error__address__set_error!(e);
+    return Pointer.fromAddress(0);
+  }
+}
+
+int _portProxy(Object a) {
+  try {
+    return _port!(a);
+  } catch (e) {
+    _ice_candidate_error__port__set_error!(e);
+    return 0;
+  }
+}
+
+Pointer<Utf8> _urlProxy(Object a) {
+  try {
+    return _url!(a);
+  } catch (e) {
+    _ice_candidate_error__url__set_error!(e);
+    return Pointer.fromAddress(0);
+  }
+}
+
+int _errorCodeProxy(Object a) {
+  try {
+    return _errorCode!(a);
+  } catch (e) {
+    _ice_candidate_error__error_code__set_error!(e);
+    return 0;
+  }
+}
+
+Pointer<Utf8> _errorTextProxy(Object a) {
+  try {
+    return _errorText!(a);
+  } catch (e) {
+    _ice_candidate_error__error_text__set_error!(e);
+    return Pointer.fromAddress(0);
+  }
 }

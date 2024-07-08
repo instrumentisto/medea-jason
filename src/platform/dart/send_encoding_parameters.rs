@@ -18,6 +18,8 @@ mod send_encoding_parameters {
 
     use dart_sys::Dart_Handle;
 
+    use crate::platform::Error;
+
     extern "C" {
         /// Creates new [RTCRtpEncodingParameters][0].
         ///
@@ -25,25 +27,33 @@ mod send_encoding_parameters {
         pub fn new_send_encoding_parameters(
             rid: ptr::NonNull<c_char>,
             active: bool,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Returns [RID] from the provided [RTCRtpEncodingParameters][0].
         ///
         /// [RID]: https://w3.org/TR/webrtc#dom-rtcrtpcodingparameters-rid
         /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
-        pub fn get_rid(encoding: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn get_rid(
+            encoding: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
 
         /// Sets [activeness][1] of the provided [RTCRtpEncodingParameters][0].
         ///
         /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
         /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-active
-        pub fn set_active(encoding: Dart_Handle, active: bool);
+        pub fn set_active(
+            encoding: Dart_Handle,
+            active: bool,
+        ) -> Result<(), Error>;
 
         /// Sets [maxBitrate][1] of the provided [RTCRtpEncodingParameters][0].
         ///
         /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
         /// [1]:https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
-        pub fn set_max_bitrate(encoding: Dart_Handle, max_bitrate: i64);
+        pub fn set_max_bitrate(
+            encoding: Dart_Handle,
+            max_bitrate: i64,
+        ) -> Result<(), Error>;
 
         /// Sets [scaleResolutionDownBy][1] of the provided
         /// [RTCRtpEncodingParameters][0].
@@ -53,7 +63,7 @@ mod send_encoding_parameters {
         pub fn set_scale_resolution_down_by(
             encoding: Dart_Handle,
             scale_resolution_down_by: i64,
-        );
+        ) -> Result<(), Error>;
 
         /// Sets [scalabilityMode][1] of the provided
         /// [RTCRtpEncodingParameters][0].
@@ -63,7 +73,7 @@ mod send_encoding_parameters {
         pub fn set_scalability_mode(
             encoding: Dart_Handle,
             scalability_mode: ptr::NonNull<c_char>,
-        );
+        ) -> Result<(), Error>;
     }
 }
 
@@ -89,7 +99,8 @@ impl SendEncodingParameters {
                 string_into_c_str(rid),
                 active,
             )
-        };
+        }
+        .unwrap();
         Self(unsafe { DartHandle::new(handle) })
     }
 
@@ -106,7 +117,7 @@ impl SendEncodingParameters {
     #[must_use]
     pub fn rid(&self) -> String {
         let handle = self.0.get();
-        let rid = unsafe { send_encoding_parameters::get_rid(handle) };
+        let rid = unsafe { send_encoding_parameters::get_rid(handle) }.unwrap();
         unsafe { c_str_into_string(rid) }
     }
 
@@ -115,9 +126,8 @@ impl SendEncodingParameters {
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-active
     pub fn set_active(&mut self, active: bool) {
         let handle = self.0.get();
-        unsafe {
-            send_encoding_parameters::set_active(handle, active);
-        };
+        unsafe { send_encoding_parameters::set_active(handle, active) }
+            .unwrap();
     }
 
     /// Sets [maxBitrate][1] of these [`SendEncodingParameters`].
@@ -126,8 +136,9 @@ impl SendEncodingParameters {
     pub fn set_max_bitrate(&mut self, max_bitrate: i64) {
         let handle = self.0.get();
         unsafe {
-            send_encoding_parameters::set_max_bitrate(handle, max_bitrate);
-        };
+            send_encoding_parameters::set_max_bitrate(handle, max_bitrate)
+        }
+        .unwrap();
     }
 
     /// Sets [scaleResolutionDownBy][1] of these [`SendEncodingParameters`].
@@ -142,8 +153,9 @@ impl SendEncodingParameters {
             send_encoding_parameters::set_scale_resolution_down_by(
                 handle,
                 scale_resolution_down_by,
-            );
-        };
+            )
+        }
+        .unwrap();
     }
 
     /// Sets [scalabilityMode][1] of these [`SendEncodingParameters`].
@@ -155,8 +167,9 @@ impl SendEncodingParameters {
             send_encoding_parameters::set_scalability_mode(
                 handle,
                 string_into_c_str(scalability_mode.to_string()),
-            );
-        };
+            )
+        }
+        .unwrap();
     }
 }
 

@@ -21,8 +21,8 @@ final _callbackTwoArgCall =
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    callProxy: Pointer.fromFunction(_callProxy),
-    callTwoArgProxy: Pointer.fromFunction(_callTwoArgProxy),
+    callProxy: _callProxy,
+    callTwoArgProxy: _callTwoArgProxy,
   );
 }
 

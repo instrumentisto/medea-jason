@@ -30,19 +30,23 @@ mod media_devices {
 
     use dart_sys::Dart_Handle;
 
+    use crate::platform::Error;
+
     extern "C" {
         /// Returns information about available media input devices.
-        pub fn enumerate_devices() -> Dart_Handle;
+        pub fn enumerate_devices() -> Result<Dart_Handle, Error>;
 
         /// Returns information about available displays.
-        pub fn enumerate_displays() -> Dart_Handle;
+        pub fn enumerate_displays() -> Result<Dart_Handle, Error>;
 
         /// Prompts a user for permissions to use a media input device,
         /// producing a vector of [MediaStreamTrack][1]s containing the
         /// requested types of media.
         ///
         /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-        pub fn get_user_media(constraints: Dart_Handle) -> Dart_Handle;
+        pub fn get_user_media(
+            constraints: Dart_Handle,
+        ) -> Result<Dart_Handle, Error>;
 
         /// Prompts a user to select and grant permissions to capture contents
         /// of a display or portion thereof (such as a single window), producing
@@ -50,29 +54,33 @@ mod media_devices {
         /// of media.
         ///
         /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-        pub fn get_display_media(constraints: Dart_Handle) -> Dart_Handle;
+        pub fn get_display_media(
+            constraints: Dart_Handle,
+        ) -> Result<Dart_Handle, Error>;
 
         /// Switches the current output audio device to the device with the
         /// provided `device_id`.
         pub fn set_output_audio_id(
             device_id: ptr::NonNull<c_char>,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Indicates whether it's possible to access microphone volume
         /// settings.
-        pub fn microphone_volume_is_available() -> Dart_Handle;
+        pub fn microphone_volume_is_available() -> Result<Dart_Handle, Error>;
 
         /// Returns the current microphone volume level in percents.
-        pub fn microphone_volume() -> Dart_Handle;
+        pub fn microphone_volume() -> Result<Dart_Handle, Error>;
 
         /// Sets the microphone volume level in percents.
-        pub fn set_microphone_volume(level: i64) -> Dart_Handle;
+        pub fn set_microphone_volume(level: i64) -> Result<Dart_Handle, Error>;
 
         /// Subscribes onto the `MediaDevices`'s `devicechange` event.
-        pub fn on_device_change(cb: Dart_Handle);
+        pub fn on_device_change(cb: Dart_Handle) -> Result<(), Error>;
 
         /// Returns the kind of the Dart side `GetMediaException`.
-        pub fn get_media_exception_kind(exception: Dart_Handle) -> i64;
+        pub fn get_media_exception_kind(
+            exception: Dart_Handle,
+        ) -> Result<i64, Error>;
     }
 }
 
@@ -80,7 +88,8 @@ impl From<Error> for GetUserMediaError {
     fn from(err: Error) -> Self {
         let kind = unsafe {
             media_devices::get_media_exception_kind(err.get_handle())
-        };
+        }
+        .unwrap();
 
         match kind {
             0 => Self::Audio(err),
@@ -109,7 +118,7 @@ impl MediaDevices {
     pub async fn enumerate_devices(
         &self,
     ) -> Result<Vec<MediaDeviceInfo>, Traced<Error>> {
-        let fut = unsafe { media_devices::enumerate_devices() };
+        let fut = unsafe { media_devices::enumerate_devices() }.unwrap();
         let devices = unsafe { FutureFromDart::execute::<DartHandle>(fut) }
             .await
             .map(DartList::from)
@@ -134,7 +143,7 @@ impl MediaDevices {
     pub async fn enumerate_displays(
         &self,
     ) -> Result<Vec<MediaDisplayInfo>, Traced<Error>> {
-        let fut = unsafe { media_devices::enumerate_displays() };
+        let fut = unsafe { media_devices::enumerate_displays() }.unwrap();
         let displays = unsafe { FutureFromDart::execute::<DartHandle>(fut) }
             .await
             .map(DartList::from)
@@ -166,7 +175,8 @@ impl MediaDevices {
         &self,
         caps: MediaStreamConstraints,
     ) -> Result<Vec<MediaStreamTrack>, Traced<GetUserMediaError>> {
-        let fut = unsafe { media_devices::get_user_media(caps.into()) };
+        let fut =
+            unsafe { media_devices::get_user_media(caps.into()) }.unwrap();
         let tracks = unsafe { FutureFromDart::execute::<DartHandle>(fut) }
             .await
             .map_err(tracerr::from_and_wrap!())?;
@@ -198,7 +208,8 @@ impl MediaDevices {
         &self,
         caps: DisplayMediaStreamConstraints,
     ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
-        let fut = unsafe { media_devices::get_display_media(caps.into()) };
+        let fut =
+            unsafe { media_devices::get_display_media(caps.into()) }.unwrap();
         let tracks = unsafe { FutureFromDart::execute::<DartHandle>(fut) }
             .await
             .map_err(tracerr::wrap!())?;
@@ -225,7 +236,8 @@ impl MediaDevices {
     ) -> Result<(), Traced<Error>> {
         let fut = unsafe {
             media_devices::set_output_audio_id(string_into_c_str(device_id))
-        };
+        }
+        .unwrap();
         unsafe { FutureFromDart::execute::<()>(fut) }
             .await
             .map_err(tracerr::wrap!())
@@ -233,7 +245,8 @@ impl MediaDevices {
 
     /// Indicates whether it's possible to access microphone volume settings.
     pub async fn microphone_volume_is_available(&self) -> bool {
-        let fut = unsafe { media_devices::microphone_volume_is_available() };
+        let fut =
+            unsafe { media_devices::microphone_volume_is_available() }.unwrap();
         let result = unsafe { FutureFromDart::execute::<i64>(fut) }
             .await
             .unwrap();
@@ -248,7 +261,7 @@ impl MediaDevices {
     /// If it the "Audio Device Module" is not initialized or there is no
     /// connected audio input devices.
     pub async fn microphone_volume(&self) -> Result<i64, Traced<Error>> {
-        let fut = unsafe { media_devices::microphone_volume() };
+        let fut = unsafe { media_devices::microphone_volume() }.unwrap();
         unsafe { FutureFromDart::execute::<i64>(fut) }
             .await
             .map_err(tracerr::wrap!())
@@ -264,7 +277,8 @@ impl MediaDevices {
         &self,
         level: i64,
     ) -> Result<(), Traced<Error>> {
-        let fut = unsafe { media_devices::set_microphone_volume(level) };
+        let fut =
+            unsafe { media_devices::set_microphone_volume(level) }.unwrap();
         unsafe { FutureFromDart::execute::<()>(fut) }
             .await
             .map_err(tracerr::wrap!())
@@ -282,8 +296,9 @@ impl MediaDevices {
                         h();
                     })
                     .into_dart(),
-                );
-            };
+                )
+            }
+            .unwrap();
         }
     }
 }

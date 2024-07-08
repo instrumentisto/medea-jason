@@ -13,16 +13,18 @@ mod media_display_info {
 
     use dart_sys::Dart_Handle;
 
-    use crate::api::DartValueArg;
+    use crate::{api::DartValueArg, platform::Error};
 
     extern "C" {
         /// Returns a unique identifier of the provided display.
-        pub fn device_id(info: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn device_id(
+            info: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
 
         /// Returns a title describing the represented display.
         pub fn title(
             info: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        ) -> Result<ptr::NonNull<DartValueArg<Option<String>>>, Error>;
     }
 }
 
@@ -35,7 +37,9 @@ impl MediaDisplayInfo {
     /// [`MediaDisplayInfo`].
     #[must_use]
     pub fn device_id(&self) -> String {
-        let device_id = unsafe { media_display_info::device_id(self.0.get()) };
+        let device_id =
+            unsafe { media_display_info::device_id(self.0.get()) }.unwrap();
+
         unsafe { dart_string_into_rust(device_id) }
     }
 
@@ -43,7 +47,8 @@ impl MediaDisplayInfo {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn title(&self) -> Option<String> {
-        let title = unsafe { media_display_info::title(self.0.get()) };
+        let title = unsafe { media_display_info::title(self.0.get()) }.unwrap();
+
         Option::try_from(unsafe { title.unbox() }).unwrap()
     }
 }

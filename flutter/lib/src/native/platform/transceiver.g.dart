@@ -4,44 +4,161 @@ import 'package:ffi/ffi.dart';
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
+typedef _ErrorSetterFnC = Void Function(Handle);
+typedef _ErrorSetterFnDart = void Function(Object);
+
+Object Function(Object)? _getDirection;
+Object Function(Object, Object)? _replaceTrack;
+Object Function(Object)? _dropSender;
+bool Function(Object)? _isStopped;
+Pointer Function(Object)? _mid;
+Object Function(Object, bool)? _setRecv;
+Object Function(Object, bool)? _setSend;
+Object Function(Object)? _dispose;
+Object Function(int)? _createTransceiverInit;
+void Function(Object, Object)? _addSendingEncodings;
+Object Function(Object)? _getSendParameters;
+Object Function(Object, Object)? _setSendParameters;
+void Function(Object, Object)? _setCodecPreferences;
+
+_ErrorSetterFnDart? _transceiver__get_direction__set_error;
+_ErrorSetterFnDart? _transceiver__replace_track__set_error;
+_ErrorSetterFnDart? _transceiver__drop_sender__set_error;
+_ErrorSetterFnDart? _transceiver__is_stopped__set_error;
+_ErrorSetterFnDart? _transceiver__mid__set_error;
+_ErrorSetterFnDart? _transceiver__set_recv__set_error;
+_ErrorSetterFnDart? _transceiver__set_send__set_error;
+_ErrorSetterFnDart? _transceiver__dispose__set_error;
+_ErrorSetterFnDart? _transceiver__create_transceiver_init__set_error;
+_ErrorSetterFnDart? _transceiver__add_sending_encodings__set_error;
+_ErrorSetterFnDart? _transceiver__get_send_parameters__set_error;
+_ErrorSetterFnDart? _transceiver__set_send_parameters__set_error;
+_ErrorSetterFnDart? _transceiver__set_codec_preferences__set_error;
+
 void registerFunction(
   DynamicLibrary dl, {
-  required Pointer<NativeFunction<Handle Function(Handle)>> getDirection,
-  required Pointer<NativeFunction<Pointer Function(Handle)>> getSendTrack,
-  required Pointer<NativeFunction<Handle Function(Handle, Handle)>>
-      replaceTrack,
-  required Pointer<NativeFunction<Handle Function(Handle)>> dropSender,
-  required Pointer<NativeFunction<Bool Function(Handle)>> isStopped,
-  required Pointer<NativeFunction<Pointer Function(Handle)>> mid,
-  required Pointer<NativeFunction<Handle Function(Handle, Bool)>> setRecv,
-  required Pointer<NativeFunction<Handle Function(Handle, Bool)>> setSend,
-  required Pointer<NativeFunction<Handle Function(Handle)>> dispose,
-  required Pointer<NativeFunction<Handle Function(Int64)>>
-      createTransceiverInit,
-  required Pointer<NativeFunction<Void Function(Handle, Handle)>>
-      addSendingEncodings,
-  required Pointer<NativeFunction<Handle Function(Handle)>> getSendParameters,
-  required Pointer<NativeFunction<Handle Function(Handle, Handle)>>
-      setSendParameters,
-  required Pointer<NativeFunction<Void Function(Handle, Handle)>>
-      setCodecPreferences,
+  required Object Function(Object) getDirection,
+  required Object Function(Object, Object) replaceTrack,
+  required Object Function(Object) dropSender,
+  required bool Function(Object) isStopped,
+  required Pointer Function(Object) mid,
+  required Object Function(Object, bool) setRecv,
+  required Object Function(Object, bool) setSend,
+  required Object Function(Object) dispose,
+  required Object Function(int) createTransceiverInit,
+  required void Function(Object, Object) addSendingEncodings,
+  required Object Function(Object) getSendParameters,
+  required Object Function(Object, Object) setSendParameters,
+  required void Function(Object, Object) setCodecPreferences,
 }) {
+  _getDirection = getDirection;
+  _replaceTrack = replaceTrack;
+  _dropSender = dropSender;
+  _isStopped = isStopped;
+  _mid = mid;
+  _setRecv = setRecv;
+  _setSend = setSend;
+  _dispose = dispose;
+  _createTransceiverInit = createTransceiverInit;
+  _addSendingEncodings = addSendingEncodings;
+  _getSendParameters = getSendParameters;
+  _setSendParameters = setSendParameters;
+  _setCodecPreferences = setCodecPreferences;
+
+  _transceiver__get_direction__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__get_direction__set_error');
+  _transceiver__replace_track__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__replace_track__set_error');
+  _transceiver__drop_sender__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__drop_sender__set_error');
+  _transceiver__is_stopped__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__is_stopped__set_error');
+  _transceiver__mid__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__mid__set_error');
+  _transceiver__set_recv__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__set_recv__set_error');
+  _transceiver__set_send__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__set_send__set_error');
+  _transceiver__dispose__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__dispose__set_error');
+  _transceiver__create_transceiver_init__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__create_transceiver_init__set_error');
+  _transceiver__add_sending_encodings__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__add_sending_encodings__set_error');
+  _transceiver__get_send_parameters__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__get_send_parameters__set_error');
+  _transceiver__set_send_parameters__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__set_send_parameters__set_error');
+  _transceiver__set_codec_preferences__set_error =
+      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+          'transceiver__set_codec_preferences__set_error');
+
+  Pointer<NativeFunction<Handle Function(Handle)>> getDirection_native =
+      Pointer.fromFunction(
+    _getDirectionProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle, Handle)>> replaceTrack_native =
+      Pointer.fromFunction(
+    _replaceTrackProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle)>> dropSender_native =
+      Pointer.fromFunction(
+    _dropSenderProxy,
+  );
+  Pointer<NativeFunction<Bool Function(Handle)>> isStopped_native =
+      Pointer.fromFunction(_isStoppedProxy, false);
+  Pointer<NativeFunction<Pointer Function(Handle)>> mid_native =
+      Pointer.fromFunction(
+    _midProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle, Bool)>> setRecv_native =
+      Pointer.fromFunction(
+    _setRecvProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle, Bool)>> setSend_native =
+      Pointer.fromFunction(
+    _setSendProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle)>> dispose_native =
+      Pointer.fromFunction(
+    _disposeProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Int64)>> createTransceiverInit_native =
+      Pointer.fromFunction(
+    _createTransceiverInitProxy,
+  );
+  Pointer<NativeFunction<Void Function(Handle, Handle)>>
+      addSendingEncodings_native = Pointer.fromFunction(
+    _addSendingEncodingsProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle)>> getSendParameters_native =
+      Pointer.fromFunction(
+    _getSendParametersProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle, Handle)>>
+      setSendParameters_native = Pointer.fromFunction(
+    _setSendParametersProxy,
+  );
+  Pointer<NativeFunction<Void Function(Handle, Handle)>>
+      setCodecPreferences_native = Pointer.fromFunction(
+    _setCodecPreferencesProxy,
+  );
+
   dl.lookupFunction<
-      Void Function(
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer),
+      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
+          Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
       void Function(
           Pointer,
           Pointer,
@@ -55,21 +172,136 @@ void registerFunction(
           Pointer,
           Pointer,
           Pointer,
-          Pointer,
           Pointer)>('register_transceiver')(
-    getDirection,
-    getSendTrack,
-    replaceTrack,
-    dropSender,
-    isStopped,
-    mid,
-    setRecv,
-    setSend,
-    dispose,
-    createTransceiverInit,
-    addSendingEncodings,
-    getSendParameters,
-    setSendParameters,
-    setCodecPreferences,
+    getDirection_native,
+    replaceTrack_native,
+    dropSender_native,
+    isStopped_native,
+    mid_native,
+    setRecv_native,
+    setSend_native,
+    dispose_native,
+    createTransceiverInit_native,
+    addSendingEncodings_native,
+    getSendParameters_native,
+    setSendParameters_native,
+    setCodecPreferences_native,
   );
+}
+
+Object _getDirectionProxy(Object a) {
+  try {
+    return _getDirection!(a);
+  } catch (e) {
+    _transceiver__get_direction__set_error!(e);
+    return 0;
+  }
+}
+
+Object _replaceTrackProxy(Object a, Object b) {
+  try {
+    return _replaceTrack!(a, b);
+  } catch (e) {
+    _transceiver__replace_track__set_error!(e);
+    return 0;
+  }
+}
+
+Object _dropSenderProxy(Object a) {
+  try {
+    return _dropSender!(a);
+  } catch (e) {
+    _transceiver__drop_sender__set_error!(e);
+    return 0;
+  }
+}
+
+bool _isStoppedProxy(Object a) {
+  try {
+    return _isStopped!(a);
+  } catch (e) {
+    _transceiver__is_stopped__set_error!(e);
+    return false;
+  }
+}
+
+Pointer _midProxy(Object a) {
+  try {
+    return _mid!(a);
+  } catch (e) {
+    _transceiver__mid__set_error!(e);
+    return Pointer.fromAddress(0);
+  }
+}
+
+Object _setRecvProxy(Object a, bool b) {
+  try {
+    return _setRecv!(a, b);
+  } catch (e) {
+    _transceiver__set_recv__set_error!(e);
+    return 0;
+  }
+}
+
+Object _setSendProxy(Object a, bool b) {
+  try {
+    return _setSend!(a, b);
+  } catch (e) {
+    _transceiver__set_send__set_error!(e);
+    return 0;
+  }
+}
+
+Object _disposeProxy(Object a) {
+  try {
+    return _dispose!(a);
+  } catch (e) {
+    _transceiver__dispose__set_error!(e);
+    return 0;
+  }
+}
+
+Object _createTransceiverInitProxy(int a) {
+  try {
+    return _createTransceiverInit!(a);
+  } catch (e) {
+    _transceiver__create_transceiver_init__set_error!(e);
+    return 0;
+  }
+}
+
+void _addSendingEncodingsProxy(Object a, Object b) {
+  try {
+    return _addSendingEncodings!(a, b);
+  } catch (e) {
+    _transceiver__add_sending_encodings__set_error!(e);
+    return;
+  }
+}
+
+Object _getSendParametersProxy(Object a) {
+  try {
+    return _getSendParameters!(a);
+  } catch (e) {
+    _transceiver__get_send_parameters__set_error!(e);
+    return 0;
+  }
+}
+
+Object _setSendParametersProxy(Object a, Object b) {
+  try {
+    return _setSendParameters!(a, b);
+  } catch (e) {
+    _transceiver__set_send_parameters__set_error!(e);
+    return 0;
+  }
+}
+
+void _setCodecPreferencesProxy(Object a, Object b) {
+  try {
+    return _setCodecPreferences!(a, b);
+  } catch (e) {
+    _transceiver__set_codec_preferences__set_error!(e);
+    return;
+  }
 }

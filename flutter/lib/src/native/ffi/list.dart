@@ -7,15 +7,15 @@ import 'list.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    get: Pointer.fromFunction(_get),
-    length: Pointer.fromFunction(_len, 0),
-    add: Pointer.fromFunction(_add),
-    init: Pointer.fromFunction(_init),
+    get: _get,
+    length: _len,
+    add: _add,
+    init: _init,
   );
 }
 
 /// Creates a new empty [List].
-Object _init() {
+List _init() {
   return [];
 }
 

@@ -9,25 +9,24 @@ import 'transceiver.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    getDirection: Pointer.fromFunction(_getDirection),
-    replaceTrack: Pointer.fromFunction(_replaceSendTrack),
-    getSendTrack: Pointer.fromFunction(_getSendTrack),
-    dropSender: Pointer.fromFunction(_dropSender),
-    isStopped: Pointer.fromFunction(_isStopped, true),
-    mid: Pointer.fromFunction(_mid),
-    setRecv: Pointer.fromFunction(_setRecv),
-    setSend: Pointer.fromFunction(_setSend),
-    dispose: Pointer.fromFunction(_dispose),
-    createTransceiverInit: Pointer.fromFunction(_createTransceiverInit),
-    addSendingEncodings: Pointer.fromFunction(_addSendingEncodings),
-    getSendParameters: Pointer.fromFunction(_getSendParameters),
-    setSendParameters: Pointer.fromFunction(_setSendParameters),
-    setCodecPreferences: Pointer.fromFunction(_setCodecPreferences),
+    getDirection: _getDirection,
+    replaceTrack: _replaceSendTrack,
+    dropSender: _dropSender,
+    isStopped: _isStopped,
+    mid: _mid,
+    setRecv: _setRecv,
+    setSend: _setSend,
+    dispose: _dispose,
+    createTransceiverInit: _createTransceiverInit,
+    addSendingEncodings: _addSendingEncodings,
+    getSendParameters: _getSendParameters,
+    setSendParameters: _setSendParameters,
+    setCodecPreferences: _setCodecPreferences,
   );
 }
 
 /// Creates a new [RtpTransceiverInit].
-Object _createTransceiverInit(int direction) {
+RtpTransceiverInit _createTransceiverInit(int direction) {
   return RtpTransceiverInit(TransceiverDirection.values[direction]);
 }
 
@@ -40,19 +39,19 @@ void _addSendingEncodings(Object init, Object encoding) {
 }
 
 /// Changes the receive direction of the provided [RtpTransceiver].
-Object _setRecv(Object transceiver, bool active) {
+Future<void> Function() _setRecv(Object transceiver, bool active) {
   transceiver as RtpTransceiver;
   return () => transceiver.setRecv(active);
 }
 
 /// Changes the send direction of the provided [RtpTransceiver].
-Object _setSend(Object transceiver, bool active) {
+Future<void> Function() _setSend(Object transceiver, bool active) {
   transceiver as RtpTransceiver;
   return () => transceiver.setSend(active);
 }
 
 /// Returns the current [TransceiverDirection] of the provided [RtpTransceiver].
-Object _getDirection(Object transceiver) {
+Future<int> Function() _getDirection(Object transceiver) {
   transceiver as RtpTransceiver;
   return () => transceiver.getDirection().then((d) => d.index);
 }
@@ -67,27 +66,16 @@ Pointer _mid(Object transceiver) {
   }
 }
 
-/// Returns the current [RtpTransceiver.sender]'s track of the provided
-/// [RtpTransceiver].
-Pointer _getSendTrack(Object transceiver) {
-  transceiver as RtpTransceiver;
-  if (transceiver.sender.track != null) {
-    return ForeignValue.fromHandle(transceiver.sender.track!).intoRustOwned();
-  } else {
-    return ForeignValue.none().intoRustOwned();
-  }
-}
-
 /// Replaces [RtpTransceiver.sender]'s [MediaStreamTrack] of the provided
 /// [RtpTransceiver] with a provided [MediaStreamTrack].
-Object _replaceSendTrack(Object transceiver, Object track) {
+Future<void> Function() _replaceSendTrack(Object transceiver, Object track) {
   transceiver as RtpTransceiver;
   track as MediaStreamTrack;
   return () => transceiver.sender.replaceTrack(track);
 }
 
 /// Drops the [RtpTransceiver.sender] of the provided [RtpTransceiver].
-Object _dropSender(Object transceiver) {
+Future Function() _dropSender(Object transceiver) {
   transceiver as RtpTransceiver;
   if (transceiver.sender.track == null) {
     return () => transceiver.sender.replaceTrack(null);
@@ -104,19 +92,20 @@ bool _isStopped(Object transceiver) {
 }
 
 /// Disposes of this [RtpTransceiver].
-Object _dispose(Object transceiver) {
+Future<void> Function() _dispose(Object transceiver) {
   transceiver as RtpTransceiver;
   return () => transceiver.dispose();
 }
 
 /// Returns [RtpParameters] from the provided [RtpTransceiver.sender].
-Object _getSendParameters(Object transceiver) {
+Future<RtpParameters> Function() _getSendParameters(Object transceiver) {
   transceiver as RtpTransceiver;
   return () => transceiver.sender.getParameters();
 }
 
 /// Sets [RtpParameters] into the provided [RtpTransceiver.sender].
-Object _setSendParameters(Object transceiver, Object parameters) {
+Future<void> Function() _setSendParameters(
+    Object transceiver, Object parameters) {
   transceiver as RtpTransceiver;
   parameters as RtpParameters;
   return () => transceiver.sender.setParameters(parameters);

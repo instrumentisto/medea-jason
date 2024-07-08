@@ -21,11 +21,11 @@ use crate::{
 mod function {
     use dart_sys::Dart_Handle;
 
-    use crate::api::DartValue;
+    use crate::{api::DartValue, platform::Error};
 
     /// Invokes other Dart closures that accept a [`DartValue`] argument.
     extern "C" {
-        pub fn caller(f: Dart_Handle, val: DartValue);
+        pub fn caller(f: Dart_Handle, val: DartValue) -> Result<(), Error>;
     }
 }
 
@@ -80,9 +80,7 @@ impl<T: Into<DartValue>> Function<T> {
     pub fn call1(&self, arg: T) {
         let fn_handle =
             unsafe { dart_api::handle_from_persistent(self.dart_fn) };
-        unsafe {
-            function::caller(fn_handle, arg.into());
-        }
+        unsafe { function::caller(fn_handle, arg.into()) }.unwrap()
     }
 }
 

@@ -13,33 +13,33 @@ import 'rtc_stats.dart';
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    getStats: Pointer.fromFunction(_getStats),
-    setRemoteDescription: Pointer.fromFunction(_setRemoteDescription),
-    setLocalDescription: Pointer.fromFunction(_setLocalDescription),
-    addIceCandidate: Pointer.fromFunction(_addIceCandidate),
-    iceConnectionState: Pointer.fromFunction(_iceConnectionState, 0),
-    connectionState: Pointer.fromFunction(_connectionState),
-    restartIce: Pointer.fromFunction(_restartIce),
-    rollback: Pointer.fromFunction(_rollback),
-    onTrack: Pointer.fromFunction(_onTrack),
-    onIceCandidate: Pointer.fromFunction(_onIceCandidate),
-    onIceCandidateError: Pointer.fromFunction(_onIceCandidateError),
-    onIceConnectionStateChange:
-        Pointer.fromFunction(_onIceConnectionStateChange),
-    newPeer: Pointer.fromFunction(_newPeer),
-    addTransceiver: Pointer.fromFunction(_addTransceiver),
-    createOffer: Pointer.fromFunction(_createOffer),
-    createAnswer: Pointer.fromFunction(_createAnswer),
-    getTransceiverByMid: Pointer.fromFunction(_getTransceiverByMid),
-    onConnectionStateChange: Pointer.fromFunction(_onConnectionStateChange),
-    close: Pointer.fromFunction(_close),
+    getStats: _getStats,
+    setRemoteDescription: _setRemoteDescription,
+    setLocalDescription: _setLocalDescription,
+    addIceCandidate: _addIceCandidate,
+    iceConnectionState: _iceConnectionState,
+    connectionState: _connectionState,
+    restartIce: _restartIce,
+    rollback: _rollback,
+    onTrack: _onTrack,
+    onIceCandidate: _onIceCandidate,
+    onIceCandidateError: _onIceCandidateError,
+    onIceConnectionStateChange: _onIceConnectionStateChange,
+    newPeer: _newPeer,
+    addTransceiver: _addTransceiver,
+    createOffer: _createOffer,
+    createAnswer: _createAnswer,
+    getTransceiverByMid: _getTransceiverByMid,
+    onConnectionStateChange: _onConnectionStateChange,
+    close: _close,
   );
 }
 
 /// Adds an [RtpTransceiverInit] to the provided [PeerConnection].
 ///
 /// Returns [Future] which will be resolved into created [RtpTransceiver].
-Object _addTransceiver(Object peer, int kind, Object init) {
+Future<RtpTransceiver> Function() _addTransceiver(
+    Object peer, int kind, Object init) {
   peer as PeerConnection;
   init as RtpTransceiverInit;
   return () => peer.addTransceiver(MediaKind.values[kind], init);
@@ -47,7 +47,8 @@ Object _addTransceiver(Object peer, int kind, Object init) {
 
 /// Returns a newly created [PeerConnection] with the provided `iceServers`
 /// [List].
-Object _newPeer(Object iceServers, bool isForceRelayed) {
+Future<PeerConnection> Function() _newPeer(
+    Object iceServers, bool isForceRelayed) {
   var servers = iceServers as List<dynamic>;
   var iceType = isForceRelayed ? IceTransportType.relay : IceTransportType.all;
   return () => PeerConnection.create(
@@ -103,7 +104,7 @@ void _onConnectionStateChange(Object conn, Object f) {
 
 /// Returns JSON encoded [Array] of [RtcStats] from the provided
 /// [PeerConnection].
-Object _getStats(Object conn) {
+Future<String> Function() _getStats(Object conn) {
   conn as PeerConnection;
   return () async {
     var stats = await conn.getStats();
@@ -114,7 +115,8 @@ Object _getStats(Object conn) {
 
 /// Lookups an [RtpTransceiver] in the provided [PeerConnection] by the provided
 /// [mid].
-Object _getTransceiverByMid(Object peer, Pointer<Utf8> mid) {
+Future<RtpTransceiver?> Function() _getTransceiverByMid(
+    Object peer, Pointer<Utf8> mid) {
   peer as PeerConnection;
   return () => peer.getTransceivers().then((transceivers) {
         var mMid = mid.nativeStringToDartString();
@@ -131,7 +133,7 @@ Object _getTransceiverByMid(Object peer, Pointer<Utf8> mid) {
 }
 
 /// Sets a remote SDP offer in the provided [PeerConnection].
-Object _setRemoteDescription(
+Future<void> Function() _setRemoteDescription(
     Object conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   conn as PeerConnection;
   SessionDescriptionType sdpType;
@@ -145,7 +147,7 @@ Object _setRemoteDescription(
 }
 
 /// Sets a local SDP offer in the provided [PeerConnection].
-Object _setLocalDescription(
+Future<void> Function() _setLocalDescription(
     Object conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   conn as PeerConnection;
   SessionDescriptionType sdpType;
@@ -159,13 +161,13 @@ Object _setLocalDescription(
 }
 
 /// Creates a new SDP offer for the provided [PeerConnection].
-Object _createOffer(Object conn) {
+Future<String> Function() _createOffer(Object conn) {
   conn as PeerConnection;
   return () => conn.createOffer().then((val) => val.description);
 }
 
 /// Creates a new SDP answer for the provided [PeerConnection].
-Object _createAnswer(Object conn) {
+Future<String> Function() _createAnswer(Object conn) {
   conn as PeerConnection;
   return () => conn.createAnswer().then((val) => val.description);
 }
@@ -178,7 +180,7 @@ void _restartIce(Object conn) {
 }
 
 /// Adds the specified [IceCandidate] to the provided [PeerConnection].
-Object _addIceCandidate(Object conn, Object candidate) {
+Future<void> Function() _addIceCandidate(Object conn, Object candidate) {
   conn as PeerConnection;
   candidate as IceCandidate;
   return () => conn.addIceCandidate(candidate);
@@ -199,14 +201,14 @@ int _iceConnectionState(Object conn) {
 }
 
 /// Rollbacks the local SDP offer of the provided [PeerConnection].
-Object _rollback(Object conn) {
+Future<void> Function() _rollback(Object conn) {
   conn as PeerConnection;
   return () => conn.setLocalDescription(
       SessionDescription(SessionDescriptionType.rollback, ''));
 }
 
 /// Returns all the [RtpTransceiver]s of the provided [PeerConnection].
-Object getTransceivers(Object conn) {
+Future<List<RtpTransceiver>> Function() getTransceivers(Object conn) {
   conn as PeerConnection;
   return () => conn.getTransceivers();
 }

@@ -22,28 +22,28 @@ use crate::{
 mod constraints {
     use dart_sys::Dart_Handle;
 
-    use crate::api::DartValue;
+    use crate::{api::DartValue, platform::Error};
 
     extern "C" {
         /// Initializes new empty [MediaStreamConstraints][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
-        pub fn init_device_constraints() -> Dart_Handle;
+        pub fn init_device_constraints() -> Result<Dart_Handle, Error>;
 
         /// Initializes new empty [MediaStreamConstraints][0] for display.
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
-        pub fn init_display_constraints() -> Dart_Handle;
+        pub fn init_display_constraints() -> Result<Dart_Handle, Error>;
 
         /// Initializes a new empty [MediaStreamConstraints.video][0].
         ///
         /// [0]: https://tinyurl.com/3yvnbb9e
-        pub fn new_video_constraints() -> Dart_Handle;
+        pub fn new_video_constraints() -> Result<Dart_Handle, Error>;
 
         /// Initializes a new empty [MediaStreamConstraints.audio][0].
         ///
         /// [0]: https://tinyurl.com/5bmrr4w5
-        pub fn new_audio_constraints() -> Dart_Handle;
+        pub fn new_audio_constraints() -> Result<Dart_Handle, Error>;
 
         /// Specifies the provided setting of a
         /// [MediaStreamConstraints.video][0] (for example `facingMode`).
@@ -53,7 +53,7 @@ mod constraints {
             constraints: Dart_Handle,
             kind: i64,
             value: DartValue,
-        );
+        ) -> Result<(), Error>;
 
         /// Specifies the provided setting of a
         /// [MediaStreamConstraints.audio][0] (for example `deviceId`).
@@ -63,7 +63,7 @@ mod constraints {
             constraints: Dart_Handle,
             kind: i64,
             value: DartValue,
-        );
+        ) -> Result<(), Error>;
 
         /// Specifies the provided nature and settings of a `video`
         /// [MediaStreamTrack][1] to the given [MediaStreamConstraints][0].
@@ -74,7 +74,7 @@ mod constraints {
             constraints: Dart_Handle,
             ty: i64,
             video: Dart_Handle,
-        );
+        ) -> Result<(), Error>;
 
         /// Specifies the provided nature and settings of a display `video`
         /// [MediaStreamTrack][1] to the given [MediaStreamConstraints][0].
@@ -85,7 +85,7 @@ mod constraints {
             constraints: Dart_Handle,
             ty: i64,
             video: Dart_Handle,
-        );
+        ) -> Result<(), Error>;
 
         /// Specifies the provided nature and settings of an `audio`
         /// [MediaStreamTrack][1] to the given [MediaStreamConstraints][0].
@@ -96,7 +96,7 @@ mod constraints {
             constraints: Dart_Handle,
             ty: i64,
             audio: Dart_Handle,
-        );
+        ) -> Result<(), Error>;
     }
 }
 
@@ -168,7 +168,9 @@ impl MediaStreamConstraints {
     /// Creates new empty [`MediaStreamConstraints`].
     #[must_use]
     pub fn new() -> Self {
-        let constraints = unsafe { constraints::init_device_constraints() };
+        let constraints =
+            unsafe { constraints::init_device_constraints() }.unwrap();
+
         unsafe { Self(DartHandle::new(constraints)) }
     }
 
@@ -183,15 +185,17 @@ impl MediaStreamConstraints {
                 self.0.get(),
                 ConstraintType::Mandatory as i64,
                 audio.mandatory.get(),
-            );
+            )
         }
+        .unwrap();
         unsafe {
             constraints::set_audio_constraint(
                 self.0.get(),
                 ConstraintType::Optional as i64,
                 audio.optional.get(),
-            );
+            )
         }
+        .unwrap();
     }
 
     /// Specifies the provided nature and settings of a `video`
@@ -205,15 +209,17 @@ impl MediaStreamConstraints {
                 self.0.get(),
                 ConstraintType::Mandatory as i64,
                 video.mandatory.get(),
-            );
+            )
         }
+        .unwrap();
         unsafe {
             constraints::set_video_constraint(
                 self.0.get(),
                 ConstraintType::Optional as i64,
                 video.optional.get(),
-            );
+            )
         }
+        .unwrap();
     }
 }
 
@@ -239,7 +245,8 @@ impl DisplayMediaStreamConstraints {
     /// Creates new empty [`DisplayMediaStreamConstraints`] .
     #[must_use]
     pub fn new() -> Self {
-        let constraints = unsafe { constraints::init_display_constraints() };
+        let constraints =
+            unsafe { constraints::init_display_constraints() }.unwrap();
         unsafe { Self(DartHandle::new(constraints)) }
     }
 
@@ -254,26 +261,30 @@ impl DisplayMediaStreamConstraints {
                 self.0.get(),
                 ConstraintType::Mandatory as i64,
                 video.mandatory.get(),
-            );
+            )
         }
+        .unwrap();
         unsafe {
             constraints::set_display_video_constraint(
                 self.0.get(),
                 ConstraintType::Optional as i64,
                 video.optional.get(),
-            );
+            )
         }
+        .unwrap();
     }
 }
 
 impl From<AudioTrackConstraints> for MediaTrackConstraints {
     fn from(from: AudioTrackConstraints) -> Self {
         let optional = {
-            let audio = unsafe { constraints::new_audio_constraints() };
+            let audio =
+                unsafe { constraints::new_audio_constraints() }.unwrap();
             unsafe { DartHandle::new(audio) }
         };
         let mandatory = {
-            let audio = unsafe { constraints::new_audio_constraints() };
+            let audio =
+                unsafe { constraints::new_audio_constraints() }.unwrap();
             unsafe { DartHandle::new(audio) }
         };
 
@@ -284,15 +295,17 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
                         mandatory.get(),
                         AudioConstraintKind::AutoGainControl as i64,
                         DartValue::from(auto_gain_control),
-                    );
-                },
+                    )
+                }
+                .unwrap(),
                 ConstrainBoolean::Ideal(auto_gain_control) => unsafe {
                     constraints::set_audio_constraint_value(
                         optional.get(),
                         AudioConstraintKind::AutoGainControl as i64,
                         DartValue::from(auto_gain_control),
-                    );
-                },
+                    )
+                }
+                .unwrap(),
             }
         }
 
@@ -303,15 +316,17 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
                         mandatory.get(),
                         AudioConstraintKind::DeviceId as i64,
                         DartValue::from(device_id),
-                    );
-                },
+                    )
+                }
+                .unwrap(),
                 ConstrainString::Ideal(device_id) => unsafe {
                     constraints::set_audio_constraint_value(
                         optional.get(),
                         AudioConstraintKind::DeviceId as i64,
                         DartValue::from(device_id),
-                    );
-                },
+                    )
+                }
+                .unwrap(),
             }
         }
 
@@ -325,11 +340,13 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
 impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
     fn from(from: DeviceVideoTrackConstraints) -> Self {
         let optional = {
-            let video = unsafe { constraints::new_video_constraints() };
+            let video =
+                unsafe { constraints::new_video_constraints() }.unwrap();
             unsafe { DartHandle::new(video) }
         };
         let mandatory = {
-            let video = unsafe { constraints::new_video_constraints() };
+            let video =
+                unsafe { constraints::new_video_constraints() }.unwrap();
             unsafe { DartHandle::new(video) }
         };
 
@@ -350,15 +367,17 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
                         mandatory.get(),
                         VideoConstraintKind::FacingMode as i64,
                         DartValue::from(facing_mode as i64),
-                    );
-                },
+                    )
+                }
+                .unwrap(),
                 ConstrainString::Ideal(facing_mode) => unsafe {
                     constraints::set_video_constraint_value(
                         optional.get(),
                         VideoConstraintKind::FacingMode as i64,
                         DartValue::from(facing_mode as i64),
-                    );
-                },
+                    )
+                }
+                .unwrap(),
             }
         }
         if let Some(width) = from.width {
@@ -392,11 +411,13 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
 impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
     fn from(from: DisplayVideoTrackConstraints) -> Self {
         let optional = {
-            let video = unsafe { constraints::new_video_constraints() };
+            let video =
+                unsafe { constraints::new_video_constraints() }.unwrap();
             unsafe { DartHandle::new(video) }
         };
         let mandatory = {
-            let video = unsafe { constraints::new_video_constraints() };
+            let video =
+                unsafe { constraints::new_video_constraints() }.unwrap();
             unsafe { DartHandle::new(video) }
         };
 
@@ -464,15 +485,17 @@ unsafe fn set_constrain_string<T>(
                 mandatory.get(),
                 kind as i64,
                 DartValue::from(val),
-            );
-        },
+            )
+        }
+        .unwrap(),
         ConstrainString::Ideal(val) => unsafe {
             constraints::set_video_constraint_value(
                 optional.get(),
                 kind as i64,
                 DartValue::from(val),
-            );
-        },
+            )
+        }
+        .unwrap(),
     }
 }
 
@@ -490,21 +513,24 @@ unsafe fn set_video_constrain_u32(
                 optional.get(),
                 kind as i64,
                 DartValue::from(val),
-            );
-        },
+            )
+        }
+        .unwrap(),
         ConstrainU32::Exact(val) => unsafe {
             constraints::set_video_constraint_value(
                 mandatory.get(),
                 kind as i64,
                 DartValue::from(val),
-            );
-        },
+            )
+        }
+        .unwrap(),
         ConstrainU32::Range(min, max) => unsafe {
             constraints::set_video_constraint_value(
                 mandatory.get(),
                 kind as i64,
                 DartValue::from(min),
-            );
-        },
+            )
+        }
+        .unwrap(),
     }
 }

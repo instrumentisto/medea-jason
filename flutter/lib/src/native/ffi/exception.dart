@@ -11,22 +11,18 @@ import 'native_string.dart';
 /// Registers functions allowing Rust to create Dart [Exception]s and [Error]s.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(dl,
-      newStateError: Pointer.fromFunction(_newStateError),
-      newFormatException: Pointer.fromFunction(_newFormatException),
-      newLocalMediaInitException:
-          Pointer.fromFunction(_newLocalMediaInitException),
-      newEnumerateDevicesException:
-          Pointer.fromFunction(_newEnumerateDevicesException),
-      newRpcClientException: Pointer.fromFunction(_newRpcClientException),
-      newMediaStateTransitionException:
-          Pointer.fromFunction(_newMediaStateTransitionException),
-      newInternalException: Pointer.fromFunction(_newInternalException),
-      newMediaSettingsUpdateException:
-          Pointer.fromFunction(_newMediaSettingsUpdateException),
+      newStateError: _newStateError,
+      newFormatException: _newFormatException,
+      newLocalMediaInitException: _newLocalMediaInitException,
+      newEnumerateDevicesException: _newEnumerateDevicesException,
+      newRpcClientException: _newRpcClientException,
+      newMediaStateTransitionException: _newMediaStateTransitionException,
+      newInternalException: _newInternalException,
+      newMediaSettingsUpdateException: _newMediaSettingsUpdateException,
       newInvalidOutputAudioDeviceIdException:
-          Pointer.fromFunction(_newInvalidOutputAudioDeviceIdException),
-      throwPanicException: Pointer.fromFunction(_throwPanicException),
-      newMicVolumeException: Pointer.fromFunction(_newMicVolumeException));
+          _newInvalidOutputAudioDeviceIdException,
+      throwPanicException: _throwPanicException,
+      newMicVolumeException: _newMicVolumeException);
 }
 
 /// Creates a new [StateError] with the provided [message].
@@ -85,7 +81,7 @@ Object _newRpcClientException(int kind, Pointer<Utf8> message,
 
 /// Creates a new [NativeMediaStateTransitionException] with the provided error
 /// [message] and [stacktrace].
-Object _newMediaStateTransitionException(
+NativeMediaStateTransitionException _newMediaStateTransitionException(
     Pointer<Utf8> message, Pointer<Utf8> stacktrace, int kind) {
   return NativeMediaStateTransitionException(
       message.nativeStringToDartString(),
@@ -95,7 +91,7 @@ Object _newMediaStateTransitionException(
 
 /// Creates a new [InternalException] with the provided error [message], error
 /// [cause] and [stacktrace].
-Object _newInternalException(
+NativeInternalException _newInternalException(
     Pointer<Utf8> message, ForeignValue cause, Pointer<Utf8> stacktrace) {
   return NativeInternalException(message.nativeStringToDartString(),
       cause.toDart(), stacktrace.nativeStringToDartString());
@@ -103,14 +99,14 @@ Object _newInternalException(
 
 /// Creates a new [NativeMediaSettingsUpdateException] with the provided error
 /// [message], error [cause] and [rolledBack] property.
-Object _newMediaSettingsUpdateException(
+NativeMediaSettingsUpdateException _newMediaSettingsUpdateException(
     Pointer<Utf8> message, Pointer<Handle> cause, bool rolledBack) {
   return NativeMediaSettingsUpdateException(
       message.nativeStringToDartString(), unboxDartHandle(cause), rolledBack);
 }
 
-/// Throws a new [NativePanicException].
-Object _throwPanicException() {
+/// Throws a new [NativePanicException]. TODO: asdasdasdasd
+String _throwPanicException() {
   throw NativePanicException();
 }
 

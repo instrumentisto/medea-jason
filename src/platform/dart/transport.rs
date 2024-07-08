@@ -29,6 +29,8 @@ mod transport {
 
     use dart_sys::Dart_Handle;
 
+    use crate::platform::Error;
+
     extern "C" {
         /// [Connects][1] to the provided `url` and returns the created
         /// [`WebSocket`][0].
@@ -43,13 +45,16 @@ mod transport {
             url: ptr::NonNull<c_char>,
             on_message: Dart_Handle,
             on_close: Dart_Handle,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// [Sends][1] the provided `message` via the provided [`WebSocket`][0].
         ///
         /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
         /// [1]: https://api.dart.dev/stable/dart-io/WebSocket/add.html
-        pub fn send(transport: Dart_Handle, message: ptr::NonNull<c_char>);
+        pub fn send(
+            transport: Dart_Handle,
+            message: ptr::NonNull<c_char>,
+        ) -> Result<(), Error>;
 
         /// [Closes][1] the provided [`WebSocket`][0] connection.
         ///
@@ -59,19 +64,21 @@ mod transport {
             transport: Dart_Handle,
             close_code: i32,
             close_msg: ptr::NonNull<c_char>,
-        );
+        ) -> Result<(), Error>;
 
         /// Returns the [closeCode][0] of the [close frame][1].
         ///
         /// [0]: https://api.dart.dev/stable/dart-io/WebSocket/closeCode.html
         /// [1]: https://tools.ietf.org/html/rfc6455#section-5.5.1
-        pub fn close_code(close_frame: Dart_Handle) -> i32;
+        pub fn close_code(close_frame: Dart_Handle) -> Result<i32, Error>;
 
         /// Returns the [closeReason][0] of the [close frame][1].
         ///
         /// [0]: https://api.dart.dev/stable/dart-io/WebSocket/closeReason.html
         /// [1]: https://tools.ietf.org/html/rfc6455#section-5.5.1
-        pub fn close_reason(close_frame: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn close_reason(
+            close_frame: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
     }
 }
 
@@ -161,10 +168,12 @@ impl RpcTransport for WebSocketRpcTransport {
                 move |close_frame: DartHandle| {
                     let code =
                         unsafe { transport::close_code(close_frame.get()) }
+                            .unwrap()
                             .try_into()
                             .unwrap_or(1007);
                     let reason =
-                        unsafe { transport::close_reason(close_frame.get()) };
+                        unsafe { transport::close_reason(close_frame.get()) }
+                            .unwrap();
                     let reason = unsafe { dart_string_into_rust(reason) };
 
                     socket_state.set(TransportState::Closed(CloseMsg::from((
@@ -180,7 +189,9 @@ impl RpcTransport for WebSocketRpcTransport {
                     on_message,
                     on_close,
                 )
-            };
+            }
+            .unwrap();
+
             unsafe { FutureFromDart::execute::<DartHandle>(fut) }
         }
         .await
@@ -214,7 +225,8 @@ impl RpcTransport for WebSocketRpcTransport {
         match state {
             TransportState::Open => unsafe {
                 let msg = serde_json::to_string(msg).unwrap();
-                transport::send(handle.get(), string_into_c_str(msg));
+                transport::send(handle.get(), string_into_c_str(msg)).unwrap();
+
                 Ok(())
             },
             TransportState::Connecting
@@ -238,8 +250,9 @@ impl Drop for WebSocketRpcTransport {
             });
         if let Some(handle) = self.handle.borrow().as_ref() {
             unsafe {
-                transport::close(handle.get(), 1000, string_into_c_str(rsn));
+                transport::close(handle.get(), 1000, string_into_c_str(rsn))
             }
+            .unwrap();
         }
     }
 }

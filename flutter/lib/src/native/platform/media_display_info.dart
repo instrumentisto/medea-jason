@@ -10,8 +10,8 @@ import 'media_display_info.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    deviceId: Pointer.fromFunction(_deviceId),
-    title: Pointer.fromFunction(_title),
+    deviceId: _deviceId,
+    title: _title,
   );
 }
 

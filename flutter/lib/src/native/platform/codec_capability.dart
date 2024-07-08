@@ -9,14 +9,14 @@ import 'codec_capability.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    getSenderCodecCapabilities:
-        Pointer.fromFunction(_getSenderCodecCapabilities),
-    mimeType: Pointer.fromFunction(_mimeType),
+    getSenderCodecCapabilities: _getSenderCodecCapabilities,
+    mimeType: _mimeType,
   );
 }
 
 /// Returns available [RtpCodecCapability]s for an [RtpSender].
-Object _getSenderCodecCapabilities(int kind) {
+Future<List<RtpCodecCapability>> Function() _getSenderCodecCapabilities(
+    int kind) {
   return () => RtpSender.getCapabilities(MediaKind.values[kind])
       .then((res) => res.codecs);
 }

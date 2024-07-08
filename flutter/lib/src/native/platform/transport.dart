@@ -15,20 +15,20 @@ void registerFunctions(DynamicLibrary dl) {
   if (mockable) {
     bridge.registerFunction(
       dl,
-      connect: Pointer.fromFunction(MockWebSocket.connect),
-      send: Pointer.fromFunction(_send),
-      close: Pointer.fromFunction(_close),
-      closeCode: Pointer.fromFunction(_closeCode, 0),
-      closeReason: Pointer.fromFunction(_closeReason),
+      connect: MockWebSocket.connect,
+      send: _send,
+      close: _close,
+      closeCode: _closeCode,
+      closeReason: _closeReason,
     );
   } else {
     bridge.registerFunction(
       dl,
-      connect: Pointer.fromFunction(_connect),
-      send: Pointer.fromFunction(_send),
-      close: Pointer.fromFunction(_close),
-      closeCode: Pointer.fromFunction(_closeCode, 0),
-      closeReason: Pointer.fromFunction(_closeReason),
+      connect: _connect,
+      send: _send,
+      close: _close,
+      closeCode: _closeCode,
+      closeReason: _closeReason,
     );
   }
 }
@@ -98,7 +98,8 @@ class MockWebSocket {
 ///
 /// Subscribes to the created [WebSocket] messages with the given [onMessage]
 /// and [onClose] callbacks.
-Object _connect(Pointer<Utf8> addr, Object onMessage, Object onClose) {
+Future<WebSocket> Function() _connect(
+    Pointer<Utf8> addr, Object onMessage, Object onClose) {
   onMessage as Function;
   onClose as Function;
   return () async {

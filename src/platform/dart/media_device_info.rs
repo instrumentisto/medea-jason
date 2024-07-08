@@ -17,30 +17,32 @@ mod media_device_info {
 
     use dart_sys::Dart_Handle;
 
-    use crate::api::DartValueArg;
+    use crate::{api::DartValueArg, platform::Error};
 
     extern "C" {
         /// Returns an unique identifier of the provided device.
-        pub fn device_id(info: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn device_id(
+            info: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
 
         /// Returns a kind of the provided device.
-        pub fn kind(info: Dart_Handle) -> i64;
+        pub fn kind(info: Dart_Handle) -> Result<i64, Error>;
 
         /// Returns a label describing the provided device (for example,
         /// "External USB Webcam").
         ///
         /// If the provided device has no associated label, then returns an
         /// empty string.
-        pub fn label(info: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn label(info: Dart_Handle) -> Result<ptr::NonNull<c_char>, Error>;
 
         /// Returns a group identifier of the provided device.
         pub fn group_id(
             info: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        ) -> Result<ptr::NonNull<DartValueArg<Option<String>>>, Error>;
 
         /// Indicates whether the last attempt to use the provided device
         /// failed.
-        pub fn is_failed(info: Dart_Handle) -> bool;
+        pub fn is_failed(info: Dart_Handle) -> Result<bool, Error>;
     }
 }
 
@@ -62,7 +64,7 @@ impl MediaDeviceInfo {
     #[must_use]
     pub fn device_id(&self) -> String {
         let device_id =
-            unsafe { media_device_info::device_id(self.handle.get()) };
+            unsafe { media_device_info::device_id(self.handle.get()) }.unwrap();
         unsafe { dart_string_into_rust(device_id) }
     }
 
@@ -78,7 +80,8 @@ impl MediaDeviceInfo {
     /// If the device has no associated label, then returns an empty string.
     #[must_use]
     pub fn label(&self) -> String {
-        let label = unsafe { media_device_info::label(self.handle.get()) };
+        let label =
+            unsafe { media_device_info::label(self.handle.get()) }.unwrap();
         unsafe { dart_string_into_rust(label) }
     }
 
@@ -95,14 +98,14 @@ impl MediaDeviceInfo {
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
         let group_id =
-            unsafe { media_device_info::group_id(self.handle.get()) };
+            unsafe { media_device_info::group_id(self.handle.get()) }.unwrap();
         Option::try_from(unsafe { group_id.unbox() }).unwrap()
     }
 
     /// Indicates whether the last attempt to use this device failed.
     #[must_use]
     pub fn is_failed(&self) -> bool {
-        unsafe { media_device_info::is_failed(self.handle.get()) }
+        unsafe { media_device_info::is_failed(self.handle.get()) }.unwrap()
     }
 }
 
@@ -112,6 +115,7 @@ impl TryFrom<DartHandle> for MediaDeviceInfo {
     fn try_from(value: DartHandle) -> Result<Self, Self::Error> {
         #[allow(clippy::map_err_ignore)]
         let kind = unsafe { media_device_info::kind(value.get()) }
+            .unwrap()
             .try_into()
             .map_err(|_| NotInput)?;
 

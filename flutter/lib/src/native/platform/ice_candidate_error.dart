@@ -9,11 +9,11 @@ import 'ice_candidate_error.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    address: Pointer.fromFunction(_address),
-    port: Pointer.fromFunction(_port, 0),
-    url: Pointer.fromFunction(_url),
-    errorCode: Pointer.fromFunction(_errorCode, 0),
-    errorText: Pointer.fromFunction(_errorText),
+    address: _address,
+    port: _port,
+    url: _url,
+    errorCode: _errorCode,
+    errorText: _errorText,
   );
 }
 

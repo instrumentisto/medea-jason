@@ -10,17 +10,18 @@ import 'send_encoding_parameters.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    newSendEncodingParameters: Pointer.fromFunction(_newSendEncodingParameters),
-    getRid: Pointer.fromFunction(_getRid),
-    setActive: Pointer.fromFunction(_setActive),
-    setMaxBitrate: Pointer.fromFunction(_setMaxBitrate),
-    setScaleResolutionDownBy: Pointer.fromFunction(_setScaleResolutionDownBy),
-    setScalabilityMode: Pointer.fromFunction(_setScalabilityMode),
+    newSendEncodingParameters: _newSendEncodingParameters,
+    getRid: _getRid,
+    setActive: _setActive,
+    setMaxBitrate: _setMaxBitrate,
+    setScaleResolutionDownBy: _setScaleResolutionDownBy,
+    setScalabilityMode: _setScalabilityMode,
   );
 }
 
 /// Creates new [SendEncodingParameters].
-Object _newSendEncodingParameters(Pointer<Utf8> rid, bool active) {
+SendEncodingParameters _newSendEncodingParameters(
+    Pointer<Utf8> rid, bool active) {
   return SendEncodingParameters.create(rid.nativeStringToDartString(), active);
 }
 

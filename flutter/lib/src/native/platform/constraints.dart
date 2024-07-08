@@ -12,15 +12,15 @@ import 'constraints.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    initDeviceConstraints: Pointer.fromFunction(_newDeviceConstraints),
-    initDisplayConstraints: Pointer.fromFunction(_newDisplayConstraints),
-    newVideoConstraints: Pointer.fromFunction(_newVideoConstraints),
-    newAudioConstraints: Pointer.fromFunction(_newAudioConstraints),
-    setVideoConstraintValue: Pointer.fromFunction(_setVideoConstraintValue),
-    setAudioConstraintValue: Pointer.fromFunction(_setAudioConstraintValue),
-    setVideoConstraint: Pointer.fromFunction(_setVideoConstraint),
-    setAudioConstraint: Pointer.fromFunction(_setAudioConstraint),
-    setDisplayVideoConstraint: Pointer.fromFunction(_setDisplayVideoConstraint),
+    initDeviceConstraints: _newDeviceConstraints,
+    initDisplayConstraints: _newDisplayConstraints,
+    newVideoConstraints: _newVideoConstraints,
+    newAudioConstraints: _newAudioConstraints,
+    setVideoConstraintValue: _setVideoConstraintValue,
+    setAudioConstraintValue: _setAudioConstraintValue,
+    setVideoConstraint: _setVideoConstraint,
+    setAudioConstraint: _setAudioConstraint,
+    setDisplayVideoConstraint: _setDisplayVideoConstraint,
   );
 }
 
@@ -52,22 +52,22 @@ enum ConstraintType {
 }
 
 /// Returns new empty [DeviceConstraints].
-Object _newDeviceConstraints() {
+webrtc.DeviceConstraints _newDeviceConstraints() {
   return webrtc.DeviceConstraints();
 }
 
 ///Returns new empty [DisplayConstraints].
-Object _newDisplayConstraints() {
+webrtc.DisplayConstraints _newDisplayConstraints() {
   return webrtc.DisplayConstraints();
 }
 
 /// Returns new empty [DeviceVideoConstraints].
-Object _newVideoConstraints() {
+webrtc.DeviceVideoConstraints _newVideoConstraints() {
   return webrtc.DeviceVideoConstraints();
 }
 
 /// Returns new empty [AudioConstraints].
-Object _newAudioConstraints() {
+webrtc.AudioConstraints _newAudioConstraints() {
   return webrtc.AudioConstraints();
 }
 

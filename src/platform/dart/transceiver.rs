@@ -31,57 +31,66 @@ mod transceiver {
 
     use dart_sys::Dart_Handle;
 
-    use crate::{api::DartValueArg, platform::dart::utils::handle::DartHandle};
+    use crate::{api::DartValueArg, platform::Error};
 
     extern "C" {
         /// Returns current direction of the provided [`Transceiver`].
-        pub fn get_direction(transceiver: Dart_Handle) -> Dart_Handle;
-
-        /// Returns `Send` [`MediaStreamTrack`] of the provided [`Transceiver`].
-        pub fn get_send_track(
+        pub fn get_direction(
             transceiver: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<DartHandle>>>;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Replaces `Send` [`MediaStreamTrack`] of the provided
         /// [`Transceiver`].
         pub fn replace_track(
             transceiver: Dart_Handle,
             track: Dart_Handle,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Drops `Send` [`MediaStreamTrack`] of the provided [`Transceiver`].
-        pub fn drop_sender(transceiver: Dart_Handle) -> Dart_Handle;
+        pub fn drop_sender(
+            transceiver: Dart_Handle,
+        ) -> Result<Dart_Handle, Error>;
 
         /// Returns stopped status of the provided [`Transceiver`].
-        pub fn is_stopped(transceiver: Dart_Handle) -> bool;
+        pub fn is_stopped(transceiver: Dart_Handle) -> Result<bool, Error>;
 
         /// Returns MID of the provided [`Transceiver`].
         pub fn mid(
             transceiver: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        ) -> Result<ptr::NonNull<DartValueArg<Option<String>>>, Error>;
 
         /// Changes the receive direction of the specified [`Transceiver`].
-        pub fn set_recv(transceiver: Dart_Handle, active: bool) -> Dart_Handle;
+        pub fn set_recv(
+            transceiver: Dart_Handle,
+            active: bool,
+        ) -> Result<Dart_Handle, Error>;
 
         /// Changes the send direction of the specified [`Transceiver`].
-        pub fn set_send(transceiver: Dart_Handle, active: bool) -> Dart_Handle;
+        pub fn set_send(
+            transceiver: Dart_Handle,
+            active: bool,
+        ) -> Result<Dart_Handle, Error>;
 
         /// Disposes the provided [`Transceiver`].
-        pub fn dispose(transceiver: Dart_Handle) -> Dart_Handle;
+        pub fn dispose(transceiver: Dart_Handle) -> Result<Dart_Handle, Error>;
 
         /// Creates a new [`TransceiverInit`].
-        pub fn create_transceiver_init(direction: i64) -> Dart_Handle;
+        pub fn create_transceiver_init(
+            direction: i64,
+        ) -> Result<Dart_Handle, Error>;
 
         /// Adds [`SendEncodingParameters`] to the provided [`TransceiverInit`].
         pub fn add_sending_encodings(
             transceiver_init: Dart_Handle,
             encoding: Dart_Handle,
-        );
+        ) -> Result<(), Error>;
 
         /// Returns [`Parameters`] of the underlying [RTCRtpSender].
         ///
         /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-        pub fn get_send_parameters(transceiver: Dart_Handle) -> Dart_Handle;
+        pub fn get_send_parameters(
+            transceiver: Dart_Handle,
+        ) -> Result<Dart_Handle, Error>;
 
         /// Sets [`Parameters`] into the underlying [RTCRtpSender].
         ///
@@ -89,14 +98,14 @@ mod transceiver {
         pub fn set_send_parameters(
             transceiver: Dart_Handle,
             parameters: Dart_Handle,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Overrides the default receive codec preferences, used by the user
         /// agent for the provided [`Transceiver`].
         pub fn set_codec_preferences(
             transceiver: Dart_Handle,
             codec_capabilities: Dart_Handle,
-        );
+        ) -> Result<(), Error>;
     }
 }
 
@@ -119,7 +128,7 @@ impl Transceiver {
     pub fn set_recv(&self, active: bool) -> LocalBoxFuture<'static, ()> {
         let handle = self.0.get();
         Box::pin(async move {
-            let fut = unsafe { transceiver::set_recv(handle, active) };
+            let fut = unsafe { transceiver::set_recv(handle, active) }.unwrap();
 
             // TODO: Not supposed to error, but seems to. Log for further
             //       investigation.
@@ -135,7 +144,7 @@ impl Transceiver {
     pub fn set_send(&self, active: bool) -> LocalBoxFuture<'static, ()> {
         let handle = self.0.get();
         Box::pin(async move {
-            let fut = unsafe { transceiver::set_send(handle, active) };
+            let fut = unsafe { transceiver::set_send(handle, active) }.unwrap();
 
             // TODO: Not supposed to error, but seems to. Log for further
             //       investigation.
@@ -167,12 +176,15 @@ impl Transceiver {
         new_track: Option<&Rc<local::Track>>,
     ) -> Result<(), platform::Error> {
         let fut = new_track.map_or_else(
-            || unsafe { transceiver::drop_sender(self.0.get()) },
-            |track| unsafe {
-                transceiver::replace_track(
-                    self.0.get(),
-                    track.platform_track().handle(),
-                )
+            || unsafe { transceiver::drop_sender(self.0.get()) }.unwrap(),
+            |track| {
+                unsafe {
+                    transceiver::replace_track(
+                        self.0.get(),
+                        track.platform_track().handle(),
+                    )
+                }
+                .unwrap()
             },
         );
         unsafe { FutureFromDart::execute::<()>(fut) }.await
@@ -184,7 +196,7 @@ impl Transceiver {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn mid(&self) -> Option<String> {
-        let mid = unsafe { transceiver::mid(self.0.get()) };
+        let mid = unsafe { transceiver::mid(self.0.get()) }.unwrap();
         unsafe { (*Box::from_raw(mid.as_ptr())).try_into().unwrap() }
     }
 
@@ -193,14 +205,15 @@ impl Transceiver {
     /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     #[must_use]
     pub fn is_stopped(&self) -> bool {
-        unsafe { transceiver::is_stopped(self.0.get()) }
+        unsafe { transceiver::is_stopped(self.0.get()) }.unwrap()
     }
 
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
     fn direction(&self) -> impl Future<Output = TransceiverDirection> {
         let handle = self.0.get();
         async move {
-            let fut = unsafe { transceiver::get_direction(handle) };
+            let fut = unsafe { transceiver::get_direction(handle) }.unwrap();
+
             unsafe { FutureFromDart::execute::<i32>(fut) }
                 .await
                 .unwrap()
@@ -214,7 +227,9 @@ impl Transceiver {
     pub fn get_send_parameters(&self) -> impl Future<Output = Parameters> {
         let handle = self.0.get();
         async move {
-            let fut = unsafe { transceiver::get_send_parameters(handle) };
+            let fut =
+                unsafe { transceiver::get_send_parameters(handle) }.unwrap();
+
             let params: DartHandle =
                 unsafe { FutureFromDart::execute(fut) }.await.unwrap();
             Parameters::from(params)
@@ -239,7 +254,8 @@ impl Transceiver {
         async move {
             let fut = unsafe {
                 transceiver::set_send_parameters(handle, params_handle)
-            };
+            }
+            .unwrap();
 
             unsafe { FutureFromDart::execute::<()>(fut) }.await?;
 
@@ -259,8 +275,9 @@ impl Transceiver {
             codecs_dart.add(codec_handle.into());
         }
         unsafe {
-            transceiver::set_codec_preferences(handle, codecs_dart.handle());
-        };
+            transceiver::set_codec_preferences(handle, codecs_dart.handle())
+        }
+        .unwrap();
     }
 
     /// Updates [`EncodingParameters`] for the underlying [RTCRtpSender].
@@ -312,7 +329,9 @@ impl Drop for Transceiver {
         if Rc::get_mut(&mut self.0).is_some() {
             let transceiver = Rc::clone(&self.0);
             platform::spawn(async move {
-                let fut = unsafe { transceiver::dispose(transceiver.get()) };
+                let fut =
+                    unsafe { transceiver::dispose(transceiver.get()) }.unwrap();
+
                 unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
             });
         }
@@ -330,7 +349,8 @@ impl TransceiverInit {
     #[must_use]
     pub fn new(direction: TransceiverDirection) -> Self {
         let handle =
-            unsafe { transceiver::create_transceiver_init(direction.into()) };
+            unsafe { transceiver::create_transceiver_init(direction.into()) }
+                .unwrap();
         Self(unsafe { DartHandle::new(handle) })
     }
 
@@ -351,8 +371,9 @@ impl TransceiverInit {
                 transceiver::add_sending_encodings(
                     self.0.get(),
                     encoding.handle(),
-                );
+                )
             }
+            .unwrap();
         }
     }
 }
