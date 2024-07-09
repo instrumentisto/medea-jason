@@ -22,7 +22,7 @@ Object Function(Pointer<Utf8>, Pointer<Handle>, bool)?
     _newMediaSettingsUpdateException;
 Object Function(Pointer<Utf8>)? _newInvalidOutputAudioDeviceIdException;
 Object Function(Pointer<Handle>, Pointer<Utf8>)? _newMicVolumeException;
-Object Function()? _throwPanicException;
+Object Function()? _newPanicException;
 
 _ErrorSetterFnDart? _exception__new_state_error__set_error;
 _ErrorSetterFnDart? _exception__new_format_exception__set_error;
@@ -35,7 +35,7 @@ _ErrorSetterFnDart? _exception__new_media_settings_update_exception__set_error;
 _ErrorSetterFnDart?
     _exception__new_invalid_output_audio_device_id_exception__set_error;
 _ErrorSetterFnDart? _exception__new_mic_volume_exception__set_error;
-_ErrorSetterFnDart? _exception__throw_panic_exception__set_error;
+_ErrorSetterFnDart? _exception__new_panic_exception__set_error;
 
 void registerFunction(
   DynamicLibrary dl, {
@@ -57,7 +57,7 @@ void registerFunction(
       newInvalidOutputAudioDeviceIdException,
   required Object Function(Pointer<Handle>, Pointer<Utf8>)
       newMicVolumeException,
-  required Object Function() throwPanicException,
+  required Object Function() newPanicException,
 }) {
   _newStateError = newStateError;
   _newFormatException = newFormatException;
@@ -70,7 +70,7 @@ void registerFunction(
   _newInvalidOutputAudioDeviceIdException =
       newInvalidOutputAudioDeviceIdException;
   _newMicVolumeException = newMicVolumeException;
-  _throwPanicException = throwPanicException;
+  _newPanicException = newPanicException;
 
   _exception__new_state_error__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
@@ -102,9 +102,9 @@ void registerFunction(
   _exception__new_mic_volume_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
           'exception__new_mic_volume_exception__set_error');
-  _exception__throw_panic_exception__set_error =
+  _exception__new_panic_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__throw_panic_exception__set_error');
+          'exception__new_panic_exception__set_error');
 
   Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>> newStateError_native =
       Pointer.fromFunction(
@@ -154,9 +154,9 @@ void registerFunction(
       newMicVolumeException_native = Pointer.fromFunction(
     _newMicVolumeExceptionProxy,
   );
-  Pointer<NativeFunction<Handle Function()>> throwPanicException_native =
+  Pointer<NativeFunction<Handle Function()>> newPanicException_native =
       Pointer.fromFunction(
-    _throwPanicExceptionProxy,
+    _newPanicExceptionProxy,
   );
 
   dl.lookupFunction<
@@ -174,7 +174,7 @@ void registerFunction(
     newMediaSettingsUpdateException_native,
     newInvalidOutputAudioDeviceIdException_native,
     newMicVolumeException_native,
-    throwPanicException_native,
+    newPanicException_native,
   );
 }
 
@@ -274,11 +274,11 @@ Object _newMicVolumeExceptionProxy(Pointer<Handle> arg0, Pointer<Utf8> arg1) {
   }
 }
 
-Object _throwPanicExceptionProxy() {
+Object _newPanicExceptionProxy() {
   try {
-    return _throwPanicException!();
+    return _newPanicException!();
   } catch (e) {
-    _exception__throw_panic_exception__set_error!(e);
+    _exception__new_panic_exception__set_error!(e);
     return 0;
   }
 }

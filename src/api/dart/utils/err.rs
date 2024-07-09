@@ -110,23 +110,15 @@ mod exception {
         ) -> Result<Dart_Handle, Error>;
 
         /// Returns a new Dart `NativePanicException`.
-        ///
-        /// Returned [`Dart_Handle`] will be recognized by Dart runtime as an
-        /// error, so `Dart_IsError` function will return `true` on the returned
-        /// [`Dart_Handle`].
-        pub fn throw_panic_exception() -> Result<Dart_Handle, Error>;
+        pub fn new_panic_exception() -> Result<Dart_Handle, Error>;
     }
 }
 
 /// Creates and returns a new Dart `NativePanicException`.
-///
-/// Returned [`Dart_Handle`] will be recognized by Dart runtime as an error, so
-/// `Dart_IsError` function will return `true` on the returned [`Dart_Handle`].
 #[must_use]
 pub unsafe fn new_panic_error() -> Dart_Handle {
-    // asdasdasd TODO:
-    // unsafe { exception::throw_panic_exception() }
-    unimplemented!()
+    #[allow(clippy::unwrap_used)]
+    unsafe { exception::new_panic_exception() }.unwrap()
 }
 
 /// An error that can be returned from Rust to Dart.

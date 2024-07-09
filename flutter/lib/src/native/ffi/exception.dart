@@ -21,7 +21,7 @@ void registerFunctions(DynamicLibrary dl) {
       newMediaSettingsUpdateException: _newMediaSettingsUpdateException,
       newInvalidOutputAudioDeviceIdException:
           _newInvalidOutputAudioDeviceIdException,
-      throwPanicException: _throwPanicException,
+      newPanicException: _newPanicException,
       newMicVolumeException: _newMicVolumeException);
 }
 
@@ -105,13 +105,9 @@ NativeMediaSettingsUpdateException _newMediaSettingsUpdateException(
       message.nativeStringToDartString(), unboxDartHandle(cause), rolledBack);
 }
 
-/// Throws a new [NativePanicException]. TODO: asdasdasdasd
-NativePanicException _throwPanicException() {
-  try {
-    throw NativePanicException();
-  } on NativePanicException catch (e) {
-    return e;
-  }
+/// Creates a new [NativePanicException].
+NativePanicException _newPanicException() {
+  return NativePanicException();
 }
 
 /// Exception thrown whenever Rust side panics.
