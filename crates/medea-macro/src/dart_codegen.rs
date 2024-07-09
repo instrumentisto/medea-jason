@@ -524,8 +524,7 @@ impl DartCodegen {
         Ok(())
     }
 
-    /// Generates variables that store Dart bindings to Rust functions that
-    /// save execution errors.
+    /// Generates code that convert Dart function to a C function pointers.
     ///
     /// # Example of generated code
     ///
@@ -564,15 +563,17 @@ impl DartCodegen {
         Ok(())
     }
 
-    /// Generates variables that store Dart bindings to Rust functions that
-    /// save execution errors.
+    /// Generates code that performs lookup of Rust-side error setter functions.
     ///
     /// # Example of generated code
     ///
     /// ```ignore
-    /// _ErrorSetterFnDart? _peer_connection__rollback__set_error;
-    /// _ErrorSetterFnDart? _peer_connection__get_stats__set_error;
-    /// _ErrorSetterFnDart? _peer_connection__on_track__set_error;
+    ///   _peer_connection__ice_connection_state__set_error =
+    ///       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+    ///           'peer_connection__ice_connection_state__set_error');
+    ///   _peer_connection__on_connection_state_change__set_error =
+    ///       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+    ///           'peer_connection__on_connection_state_change__set_error');
     /// ```
     fn gen_set_error_lookup<T: Write>(&self, out: &mut T) -> fmt::Result {
         for f in &self.registrators {
