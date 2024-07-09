@@ -404,48 +404,13 @@ impl DartCodegen {
         self.generate_pointers_to_proxy_fns(&mut out)?;
         writeln!(out)?;
 
-        // -----------------------------------
-
         self.generate_lookup(&mut out)?;
+        writeln!(out)?;
+
         self.generate_functions_registration(&mut out)?;
         writeln!(out, ");}}")?;
 
-        // Generate proxy functions
-        //
-        // Object _callProxyProxy(Pointer cb) {
-        //   return _callProxy!(cb);
-        // }
-        for f in &self.registrators {
-            let mut inputs = String::new();
-            let mut arg_names = String::new();
-
-            for (i, t) in f.inputs.iter().enumerate() {
-                write!(inputs, "{arg_t} arg{i}, ", arg_t = t.to_dart_type(),)?;
-                write!(arg_names, "arg{i}, ")?;
-            }
-            if !inputs.is_empty() {
-                inputs.truncate(inputs.len() - 2);
-                arg_names.truncate(arg_names.len() - 2);
-            }
-
-            // asdasdasdasdasd
-            writeln!(
-                out,
-                "{ret_ty} _{name}Proxy({inputs}) {{\
-                     try {{
-                        return _{name}!({arg_names}); \
-                     }} catch (e) {{ \
-                        _{error_setter}!(e); \
-                        return {return_value};
-                     }} \
-                }}",
-                ret_ty = f.output.to_dart_type(),
-                name = f.name.to_camel_case(),
-                error_setter = f.error_setter_fn_name,
-                inputs = inputs,
-                return_value = f.output.default_value(),
-            )?;
-        }
+        self.generate_proxy_fns(&mut out)?;
 
         Ok(out)
     }
@@ -617,6 +582,56 @@ impl DartCodegen {
                     _ErrorSetterFnC,\
                     _ErrorSetterFnDart>('{name}');",
                 name = f.error_setter_fn_name
+            )?;
+        }
+
+        Ok(())
+    }
+
+    /// Generates proxy functions that wrap calls in a try-catch blocks that
+    /// pass any exceptions to Rust.
+    ///
+    /// # Example of generated code
+    ///
+    /// ```ignore
+    /// int _iceConnectionStateProxy(Object arg0) {
+    ///   try {
+    ///     return _iceConnectionState!(arg0);
+    ///   } catch (e) {
+    ///     _peer_connection__ice_connection_state__set_error!(e);
+    ///     return 0;
+    ///   }
+    /// }
+    /// ```
+    fn generate_proxy_fns<T: Write>(&self, out: &mut T) -> fmt::Result {
+        for f in &self.registrators {
+            let mut inputs = String::new();
+            let mut arg_names = String::new();
+
+            for (i, t) in f.inputs.iter().enumerate() {
+                write!(inputs, "{arg_t} arg{i}, ", arg_t = t.to_dart_type())?;
+                write!(arg_names, "arg{i}, ")?;
+            }
+            if !inputs.is_empty() {
+                inputs.truncate(inputs.len() - 2);
+                arg_names.truncate(arg_names.len() - 2);
+            }
+
+            writeln!(
+                out,
+                "{ret_ty} _{name}Proxy({inputs}) {{\
+                     try {{
+                        return _{name}!({arg_names}); \
+                     }} catch (e) {{ \
+                        _{error_setter}!(e); \
+                        return {return_value};
+                     }} \
+                }}",
+                ret_ty = f.output.to_dart_type(),
+                name = f.name.to_camel_case(),
+                error_setter = f.error_setter_fn_name,
+                inputs = inputs,
+                return_value = f.output.default_value(),
             )?;
         }
 
