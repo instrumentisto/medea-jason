@@ -65,18 +65,18 @@ void registerFunction(
   );
 }
 
-Pointer _getProxy(Object a, int b) {
+Pointer _getProxy(Object arg0, int arg1) {
   try {
-    return _get!(a, b);
+    return _get!(arg0, arg1);
   } catch (e) {
     _list__get__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-int _lengthProxy(Object a) {
+int _lengthProxy(Object arg0) {
   try {
-    return _length!(a);
+    return _length!(arg0);
   } catch (e) {
     _list__length__set_error!(e);
     return 0;
@@ -92,9 +92,9 @@ Object _initProxy() {
   }
 }
 
-void _addProxy(Object a, ForeignValue b) {
+void _addProxy(Object arg0, ForeignValue arg1) {
   try {
-    return _add!(a, b);
+    return _add!(arg0, arg1);
   } catch (e) {
     _list__add__set_error!(e);
     return;

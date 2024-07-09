@@ -70,36 +70,36 @@ void registerFunction(
   );
 }
 
-Object _initProxy(ForeignValue a, ForeignValue b, ForeignValue c) {
+Object _initProxy(ForeignValue arg0, ForeignValue arg1, ForeignValue arg2) {
   try {
-    return _init!(a, b, c);
+    return _init!(arg0, arg1, arg2);
   } catch (e) {
     _ice_candidate__init__set_error!(e);
     return 0;
   }
 }
 
-Pointer<Utf8> _candidateProxy(Object a) {
+Pointer<Utf8> _candidateProxy(Object arg0) {
   try {
-    return _candidate!(a);
+    return _candidate!(arg0);
   } catch (e) {
     _ice_candidate__candidate__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-int _sdpMLineIndexProxy(Object a) {
+int _sdpMLineIndexProxy(Object arg0) {
   try {
-    return _sdpMLineIndex!(a);
+    return _sdpMLineIndex!(arg0);
   } catch (e) {
     _ice_candidate__sdp_m_line_index__set_error!(e);
     return 0;
   }
 }
 
-Pointer<Utf8> _sdpMidProxy(Object a) {
+Pointer<Utf8> _sdpMidProxy(Object arg0) {
   try {
-    return _sdpMid!(a);
+    return _sdpMid!(arg0);
   } catch (e) {
     _ice_candidate__sdp_mid__set_error!(e);
     return Pointer.fromAddress(0);

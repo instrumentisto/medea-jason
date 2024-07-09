@@ -44,18 +44,18 @@ void registerFunction(
   );
 }
 
-Object _encodingsProxy(Object a) {
+Object _encodingsProxy(Object arg0) {
   try {
-    return _encodings!(a);
+    return _encodings!(arg0);
   } catch (e) {
     _parameters__encodings__set_error!(e);
     return 0;
   }
 }
 
-Object _setEncodingProxy(Object a, Object b) {
+Object _setEncodingProxy(Object arg0, Object arg1) {
   try {
-    return _setEncoding!(a, b);
+    return _setEncoding!(arg0, arg1);
   } catch (e) {
     _parameters__set_encoding__set_error!(e);
     return 0;

@@ -32,9 +32,9 @@ void registerFunction(
   );
 }
 
-void _callerProxy(Object a, ForeignValue b) {
+void _callerProxy(Object arg0, ForeignValue arg1) {
   try {
-    return _caller!(a, b);
+    return _caller!(arg0, arg1);
   } catch (e) {
     _function__caller__set_error!(e);
     return;

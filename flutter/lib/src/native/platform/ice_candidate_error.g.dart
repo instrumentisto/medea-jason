@@ -78,45 +78,45 @@ void registerFunction(
   );
 }
 
-Pointer<Utf8> _addressProxy(Object a) {
+Pointer<Utf8> _addressProxy(Object arg0) {
   try {
-    return _address!(a);
+    return _address!(arg0);
   } catch (e) {
     _ice_candidate_error__address__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-int _portProxy(Object a) {
+int _portProxy(Object arg0) {
   try {
-    return _port!(a);
+    return _port!(arg0);
   } catch (e) {
     _ice_candidate_error__port__set_error!(e);
     return 0;
   }
 }
 
-Pointer<Utf8> _urlProxy(Object a) {
+Pointer<Utf8> _urlProxy(Object arg0) {
   try {
-    return _url!(a);
+    return _url!(arg0);
   } catch (e) {
     _ice_candidate_error__url__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-int _errorCodeProxy(Object a) {
+int _errorCodeProxy(Object arg0) {
   try {
-    return _errorCode!(a);
+    return _errorCode!(arg0);
   } catch (e) {
     _ice_candidate_error__error_code__set_error!(e);
     return 0;
   }
 }
 
-Pointer<Utf8> _errorTextProxy(Object a) {
+Pointer<Utf8> _errorTextProxy(Object arg0) {
   try {
-    return _errorText!(a);
+    return _errorText!(arg0);
   } catch (e) {
     _ice_candidate_error__error_text__set_error!(e);
     return Pointer.fromAddress(0);

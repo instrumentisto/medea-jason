@@ -78,45 +78,45 @@ void registerFunction(
   );
 }
 
-Pointer<Utf8> _deviceIdProxy(Object a) {
+Pointer<Utf8> _deviceIdProxy(Object arg0) {
   try {
-    return _deviceId!(a);
+    return _deviceId!(arg0);
   } catch (e) {
     _media_device_info__device_id__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-int _kindProxy(Object a) {
+int _kindProxy(Object arg0) {
   try {
-    return _kind!(a);
+    return _kind!(arg0);
   } catch (e) {
     _media_device_info__kind__set_error!(e);
     return 0;
   }
 }
 
-Pointer<Utf8> _labelProxy(Object a) {
+Pointer<Utf8> _labelProxy(Object arg0) {
   try {
-    return _label!(a);
+    return _label!(arg0);
   } catch (e) {
     _media_device_info__label__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-Pointer _groupIdProxy(Object a) {
+Pointer _groupIdProxy(Object arg0) {
   try {
-    return _groupId!(a);
+    return _groupId!(arg0);
   } catch (e) {
     _media_device_info__group_id__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-bool _isFailedProxy(Object a) {
+bool _isFailedProxy(Object arg0) {
   try {
-    return _isFailed!(a);
+    return _isFailed!(arg0);
   } catch (e) {
     _media_device_info__is_failed__set_error!(e);
     return false;

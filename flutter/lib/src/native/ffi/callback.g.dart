@@ -44,18 +44,18 @@ void registerFunction(
   );
 }
 
-Object _callTwoArgProxyProxy(Pointer a) {
+Object _callTwoArgProxyProxy(Pointer arg0) {
   try {
-    return _callTwoArgProxy!(a);
+    return _callTwoArgProxy!(arg0);
   } catch (e) {
     _callback__call_two_arg_proxy__set_error!(e);
     return 0;
   }
 }
 
-Object _callProxyProxy(Pointer a) {
+Object _callProxyProxy(Pointer arg0) {
   try {
-    return _callProxy!(a);
+    return _callProxy!(arg0);
   } catch (e) {
     _callback__call_proxy__set_error!(e);
     return 0;

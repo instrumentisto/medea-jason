@@ -80,45 +80,45 @@ void registerFunction(
   );
 }
 
-Object _connectProxy(Pointer<Utf8> a, Object b, Object c) {
+Object _connectProxy(Pointer<Utf8> arg0, Object arg1, Object arg2) {
   try {
-    return _connect!(a, b, c);
+    return _connect!(arg0, arg1, arg2);
   } catch (e) {
     _transport__connect__set_error!(e);
     return 0;
   }
 }
 
-void _sendProxy(Object a, Pointer<Utf8> b) {
+void _sendProxy(Object arg0, Pointer<Utf8> arg1) {
   try {
-    return _send!(a, b);
+    return _send!(arg0, arg1);
   } catch (e) {
     _transport__send__set_error!(e);
     return;
   }
 }
 
-void _closeProxy(Object a, int b, Pointer<Utf8> c) {
+void _closeProxy(Object arg0, int arg1, Pointer<Utf8> arg2) {
   try {
-    return _close!(a, b, c);
+    return _close!(arg0, arg1, arg2);
   } catch (e) {
     _transport__close__set_error!(e);
     return;
   }
 }
 
-int _closeCodeProxy(Object a) {
+int _closeCodeProxy(Object arg0) {
   try {
-    return _closeCode!(a);
+    return _closeCode!(arg0);
   } catch (e) {
     _transport__close_code__set_error!(e);
     return 0;
   }
 }
 
-Pointer<Utf8> _closeReasonProxy(Object a) {
+Pointer<Utf8> _closeReasonProxy(Object arg0) {
   try {
-    return _closeReason!(a);
+    return _closeReason!(arg0);
   } catch (e) {
     _transport__close_reason__set_error!(e);
     return Pointer.fromAddress(0);

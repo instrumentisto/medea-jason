@@ -44,18 +44,18 @@ void registerFunction(
   );
 }
 
-Pointer<Utf8> _runtimeTypeProxy(Object a) {
+Pointer<Utf8> _runtimeTypeProxy(Object arg0) {
   try {
-    return _runtimeType!(a);
+    return _runtimeType!(arg0);
   } catch (e) {
     _handle__runtime_type__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-Pointer<Utf8> _toStringProxy(Object a) {
+Pointer<Utf8> _toStringProxy(Object arg0) {
   try {
-    return _toString!(a);
+    return _toString!(arg0);
   } catch (e) {
     _handle__to_string__set_error!(e);
     return Pointer.fromAddress(0);

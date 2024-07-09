@@ -121,12 +121,12 @@ impl DartType {
         match self {
             Self::Void => "void",
             Self::Bool => "bool",
-            Self::Int8 => "int",
-            Self::Uint8 => "int",
-            Self::Int32 => "int",
-            Self::Uint32 => "int",
-            Self::Int64 => "int",
-            Self::Uint64 => "int",
+            Self::Int8
+            | Self::Uint8
+            | Self::Int32
+            | Self::Uint32
+            | Self::Int64
+            | Self::Uint64 => "int",
             Self::Handle => "Object",
             Self::Pointer => "Pointer",
             Self::HandlePointer => "Pointer<Handle>",
@@ -137,22 +137,20 @@ impl DartType {
 
     /// String representing the default value of this [`DartType`] intended to
     /// be used in return statement if the function have completed with error.
-    pub(crate) fn default_value(&self) -> &'static str {
+    pub(crate) const fn default_value(self) -> &'static str {
         match self {
-            DartType::Void => "",
-            DartType::Bool => "false",
-            DartType::Int8
-            | DartType::Uint8
-            | DartType::Int32
-            | DartType::Uint32
-            | DartType::Int64
-            | DartType::Uint64
-            | DartType::Handle => "0",
-            DartType::StringPointer | DartType::Pointer => {
-                "Pointer.fromAddress(0)"
-            }
-            DartType::HandlePointer => "0",
-            DartType::ForeignValue => "0",
+            Self::Void => "",
+            Self::Bool => "false",
+            Self::Int8
+            | Self::Uint8
+            | Self::Int32
+            | Self::Uint32
+            | Self::Int64
+            | Self::Uint64
+            | Self::Handle
+            | Self::HandlePointer
+            | Self::ForeignValue => "0",
+            Self::StringPointer | Self::Pointer => "Pointer.fromAddress(0)",
         }
     }
 
@@ -160,21 +158,20 @@ impl DartType {
     /// `exceptionalReturn` argument of [Pointer.fromFunction][1] method.
     ///
     /// [1]: https://api.dart.dev/stable/dart-ffi/Pointer/fromFunction.html
-    pub(crate) fn exceptional_return(&self) -> &'static str {
+    pub(crate) const fn exceptional_return(self) -> &'static str {
         match self {
-            DartType::Void => "",
-            DartType::Bool => "false",
-            DartType::Int8
-            | DartType::Uint8
-            | DartType::Int32
-            | DartType::Uint32
-            | DartType::Int64
-            | DartType::Uint64 => "0",
-            DartType::StringPointer | DartType::Pointer | DartType::Handle => {
+            Self::Bool => "false",
+            Self::Int8
+            | Self::Uint8
+            | Self::Int32
+            | Self::Uint32
+            | Self::Int64
+            | Self::Uint64
+            | Self::HandlePointer
+            | Self::ForeignValue => "0",
+            Self::StringPointer | Self::Pointer | Self::Handle | Self::Void => {
                 ""
             }
-            DartType::HandlePointer => "0",
-            DartType::ForeignValue => "0",
         }
     }
 
@@ -226,7 +223,7 @@ impl TryFrom<syn::Type> for DartType {
     type Error = syn::Error;
 
     fn try_from(value: syn::Type) -> syn::Result<Self> {
-        Ok(match value {
+        Ok(match &value {
             syn::Type::Path(p) => {
                 let ty =
                     p.path.segments.last().ok_or_else(|| {
@@ -252,7 +249,7 @@ impl TryFrom<syn::Type> for DartType {
                     }
                 }
             }
-            syn::Type::Tuple(ref t) => {
+            syn::Type::Tuple(t) => {
                 if t.elems.is_empty() {
                     Self::Void
                 } else {
@@ -317,34 +314,9 @@ impl TryFrom<FnRegistrationBuilder> for FnRegistration {
             })
             .collect::<syn::Result<_>>()?;
 
-        // asdasdasdasd
-        let syn::ReturnType::Type(_, res) = from.output else {
-            // Must return Result error
-            unreachable!("0000 {:?}", from.output);
-        };
-        let syn::Type::Path(res) = *res else {
-            unreachable!("1111");
-        };
-        let res = res.path.segments.last().expect("11111");
-        assert_eq!(res.ident.to_string(), "Result");
-        let syn::PathArguments::AngleBracketed(res) = res.arguments.clone()
-        else {
-            unreachable!("2222");
-        };
-        let Some(syn::GenericArgument::Type(res_ty)) = res.args.first() else {
-            unreachable!("333333");
-        };
-
-        let output = match DartType::try_from(res_ty.clone()) {
-            Ok(k) => k,
-            Err(err) => {
-                panic!("{:?}", res)
-            }
-        };
-
         Ok(Self {
             inputs,
-            output,
+            output: DartType::try_from(from.output)?,
             name: from.name.to_string(),
             error_setter_fn_name: from.error_setter_ident.to_string(),
         })
@@ -358,7 +330,7 @@ pub(crate) struct FnRegistrationBuilder {
     pub(crate) inputs: Vec<syn::FnArg>,
 
     /// Output of the registering function.
-    pub(crate) output: syn::ReturnType,
+    pub(crate) output: syn::Type,
 
     /// Name of the registering function.
     pub(crate) name: syn::Ident,
@@ -407,10 +379,10 @@ impl DartCodegen {
         writeln!(out, "typedef _ErrorSetterFnDart = void Function(Object);\n")?;
 
         self.generate_fns_storage(&mut out)?;
-        write!(out, "\n")?;
+        writeln!(out)?;
 
         self.generate_set_errors_storage(&mut out)?;
-        write!(out, "\n")?;
+        writeln!(out)?;
 
         writeln!(out, "void registerFunction(DynamicLibrary dl, {{")?;
         self.generate_args(&mut out)?;
@@ -424,13 +396,13 @@ impl DartCodegen {
         for f in &self.registrators {
             writeln!(out, "_{name} = {name};", name = f.name.to_camel_case())?;
         }
-        write!(out, "\n")?;
+        writeln!(out)?;
 
         self.gen_set_error_lookup(&mut out)?;
-        write!(out, "\n")?;
+        writeln!(out)?;
 
         self.generate_pointers_to_proxy_fns(&mut out)?;
-        write!(out, "\n")?;
+        writeln!(out)?;
 
         // -----------------------------------
 
@@ -446,14 +418,10 @@ impl DartCodegen {
         for f in &self.registrators {
             let mut inputs = String::new();
             let mut arg_names = String::new();
+
             for (i, t) in f.inputs.iter().enumerate() {
-                write!(
-                    inputs,
-                    "{arg_t} {arg_n}, ",
-                    arg_t = t.to_dart_type(),
-                    arg_n = char::from(i as u8 + 97)
-                )?;
-                write!(arg_names, "{}, ", char::from(i as u8 + 97))?;
+                write!(inputs, "{arg_t} arg{i}, ", arg_t = t.to_dart_type(),)?;
+                write!(arg_names, "arg{i}, ")?;
             }
             if !inputs.is_empty() {
                 inputs.truncate(inputs.len() - 2);

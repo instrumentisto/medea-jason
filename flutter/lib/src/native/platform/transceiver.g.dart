@@ -189,117 +189,117 @@ void registerFunction(
   );
 }
 
-Object _getDirectionProxy(Object a) {
+Object _getDirectionProxy(Object arg0) {
   try {
-    return _getDirection!(a);
+    return _getDirection!(arg0);
   } catch (e) {
     _transceiver__get_direction__set_error!(e);
     return 0;
   }
 }
 
-Object _replaceTrackProxy(Object a, Object b) {
+Object _replaceTrackProxy(Object arg0, Object arg1) {
   try {
-    return _replaceTrack!(a, b);
+    return _replaceTrack!(arg0, arg1);
   } catch (e) {
     _transceiver__replace_track__set_error!(e);
     return 0;
   }
 }
 
-Object _dropSenderProxy(Object a) {
+Object _dropSenderProxy(Object arg0) {
   try {
-    return _dropSender!(a);
+    return _dropSender!(arg0);
   } catch (e) {
     _transceiver__drop_sender__set_error!(e);
     return 0;
   }
 }
 
-bool _isStoppedProxy(Object a) {
+bool _isStoppedProxy(Object arg0) {
   try {
-    return _isStopped!(a);
+    return _isStopped!(arg0);
   } catch (e) {
     _transceiver__is_stopped__set_error!(e);
     return false;
   }
 }
 
-Pointer _midProxy(Object a) {
+Pointer _midProxy(Object arg0) {
   try {
-    return _mid!(a);
+    return _mid!(arg0);
   } catch (e) {
     _transceiver__mid__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-Object _setRecvProxy(Object a, bool b) {
+Object _setRecvProxy(Object arg0, bool arg1) {
   try {
-    return _setRecv!(a, b);
+    return _setRecv!(arg0, arg1);
   } catch (e) {
     _transceiver__set_recv__set_error!(e);
     return 0;
   }
 }
 
-Object _setSendProxy(Object a, bool b) {
+Object _setSendProxy(Object arg0, bool arg1) {
   try {
-    return _setSend!(a, b);
+    return _setSend!(arg0, arg1);
   } catch (e) {
     _transceiver__set_send__set_error!(e);
     return 0;
   }
 }
 
-Object _disposeProxy(Object a) {
+Object _disposeProxy(Object arg0) {
   try {
-    return _dispose!(a);
+    return _dispose!(arg0);
   } catch (e) {
     _transceiver__dispose__set_error!(e);
     return 0;
   }
 }
 
-Object _createTransceiverInitProxy(int a) {
+Object _createTransceiverInitProxy(int arg0) {
   try {
-    return _createTransceiverInit!(a);
+    return _createTransceiverInit!(arg0);
   } catch (e) {
     _transceiver__create_transceiver_init__set_error!(e);
     return 0;
   }
 }
 
-void _addSendingEncodingsProxy(Object a, Object b) {
+void _addSendingEncodingsProxy(Object arg0, Object arg1) {
   try {
-    return _addSendingEncodings!(a, b);
+    return _addSendingEncodings!(arg0, arg1);
   } catch (e) {
     _transceiver__add_sending_encodings__set_error!(e);
     return;
   }
 }
 
-Object _getSendParametersProxy(Object a) {
+Object _getSendParametersProxy(Object arg0) {
   try {
-    return _getSendParameters!(a);
+    return _getSendParameters!(arg0);
   } catch (e) {
     _transceiver__get_send_parameters__set_error!(e);
     return 0;
   }
 }
 
-Object _setSendParametersProxy(Object a, Object b) {
+Object _setSendParametersProxy(Object arg0, Object arg1) {
   try {
-    return _setSendParameters!(a, b);
+    return _setSendParameters!(arg0, arg1);
   } catch (e) {
     _transceiver__set_send_parameters__set_error!(e);
     return 0;
   }
 }
 
-void _setCodecPreferencesProxy(Object a, Object b) {
+void _setCodecPreferencesProxy(Object arg0, Object arg1) {
   try {
-    return _setCodecPreferences!(a, b);
+    return _setCodecPreferences!(arg0, arg1);
   } catch (e) {
     _transceiver__set_codec_preferences__set_error!(e);
     return;

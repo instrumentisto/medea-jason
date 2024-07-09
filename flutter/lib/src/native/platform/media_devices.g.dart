@@ -159,27 +159,27 @@ Object _enumerateDisplaysProxy() {
   }
 }
 
-Object _getUserMediaProxy(Object a) {
+Object _getUserMediaProxy(Object arg0) {
   try {
-    return _getUserMedia!(a);
+    return _getUserMedia!(arg0);
   } catch (e) {
     _media_devices__get_user_media__set_error!(e);
     return 0;
   }
 }
 
-Object _getDisplayMediaProxy(Object a) {
+Object _getDisplayMediaProxy(Object arg0) {
   try {
-    return _getDisplayMedia!(a);
+    return _getDisplayMedia!(arg0);
   } catch (e) {
     _media_devices__get_display_media__set_error!(e);
     return 0;
   }
 }
 
-Object _setOutputAudioIdProxy(Pointer<Utf8> a) {
+Object _setOutputAudioIdProxy(Pointer<Utf8> arg0) {
   try {
-    return _setOutputAudioId!(a);
+    return _setOutputAudioId!(arg0);
   } catch (e) {
     _media_devices__set_output_audio_id__set_error!(e);
     return 0;
@@ -204,27 +204,27 @@ Object _microphoneVolumeProxy() {
   }
 }
 
-Object _setMicrophoneVolumeProxy(int a) {
+Object _setMicrophoneVolumeProxy(int arg0) {
   try {
-    return _setMicrophoneVolume!(a);
+    return _setMicrophoneVolume!(arg0);
   } catch (e) {
     _media_devices__set_microphone_volume__set_error!(e);
     return 0;
   }
 }
 
-void _onDeviceChangeProxy(Object a) {
+void _onDeviceChangeProxy(Object arg0) {
   try {
-    return _onDeviceChange!(a);
+    return _onDeviceChange!(arg0);
   } catch (e) {
     _media_devices__on_device_change__set_error!(e);
     return;
   }
 }
 
-int _getMediaExceptionKindProxy(Object a) {
+int _getMediaExceptionKindProxy(Object arg0) {
   try {
-    return _getMediaExceptionKind!(a);
+    return _getMediaExceptionKind!(arg0);
   } catch (e) {
     _media_devices__get_media_exception_kind__set_error!(e);
     return 0;

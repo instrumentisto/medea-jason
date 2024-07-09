@@ -206,7 +206,7 @@ impl ModExpander {
             .iter()
             .map(|f| FnRegistrationBuilder {
                 inputs: f.input_args.iter().cloned().collect(),
-                output: f.ret_ty.clone(),
+                output: f.ret_ok_ty.clone(),
                 name: f.ident.clone(),
                 error_setter_ident: f.error_setter_ident.clone(),
             })

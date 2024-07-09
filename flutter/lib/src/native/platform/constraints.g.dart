@@ -167,45 +167,45 @@ Object _newAudioConstraintsProxy() {
   }
 }
 
-void _setVideoConstraintValueProxy(Object a, int b, ForeignValue c) {
+void _setVideoConstraintValueProxy(Object arg0, int arg1, ForeignValue arg2) {
   try {
-    return _setVideoConstraintValue!(a, b, c);
+    return _setVideoConstraintValue!(arg0, arg1, arg2);
   } catch (e) {
     _constraints__set_video_constraint_value__set_error!(e);
     return;
   }
 }
 
-void _setAudioConstraintValueProxy(Object a, int b, ForeignValue c) {
+void _setAudioConstraintValueProxy(Object arg0, int arg1, ForeignValue arg2) {
   try {
-    return _setAudioConstraintValue!(a, b, c);
+    return _setAudioConstraintValue!(arg0, arg1, arg2);
   } catch (e) {
     _constraints__set_audio_constraint_value__set_error!(e);
     return;
   }
 }
 
-void _setVideoConstraintProxy(Object a, int b, Object c) {
+void _setVideoConstraintProxy(Object arg0, int arg1, Object arg2) {
   try {
-    return _setVideoConstraint!(a, b, c);
+    return _setVideoConstraint!(arg0, arg1, arg2);
   } catch (e) {
     _constraints__set_video_constraint__set_error!(e);
     return;
   }
 }
 
-void _setDisplayVideoConstraintProxy(Object a, int b, Object c) {
+void _setDisplayVideoConstraintProxy(Object arg0, int arg1, Object arg2) {
   try {
-    return _setDisplayVideoConstraint!(a, b, c);
+    return _setDisplayVideoConstraint!(arg0, arg1, arg2);
   } catch (e) {
     _constraints__set_display_video_constraint__set_error!(e);
     return;
   }
 }
 
-void _setAudioConstraintProxy(Object a, int b, Object c) {
+void _setAudioConstraintProxy(Object arg0, int arg1, Object arg2) {
   try {
-    return _setAudioConstraint!(a, b, c);
+    return _setAudioConstraint!(arg0, arg1, arg2);
   } catch (e) {
     _constraints__set_audio_constraint__set_error!(e);
     return;

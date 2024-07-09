@@ -96,54 +96,54 @@ void registerFunction(
   );
 }
 
-Object _newSendEncodingParametersProxy(Pointer<Utf8> a, bool b) {
+Object _newSendEncodingParametersProxy(Pointer<Utf8> arg0, bool arg1) {
   try {
-    return _newSendEncodingParameters!(a, b);
+    return _newSendEncodingParameters!(arg0, arg1);
   } catch (e) {
     _send_encoding_parameters__new_send_encoding_parameters__set_error!(e);
     return 0;
   }
 }
 
-Pointer<Utf8> _getRidProxy(Object a) {
+Pointer<Utf8> _getRidProxy(Object arg0) {
   try {
-    return _getRid!(a);
+    return _getRid!(arg0);
   } catch (e) {
     _send_encoding_parameters__get_rid__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-void _setActiveProxy(Object a, bool b) {
+void _setActiveProxy(Object arg0, bool arg1) {
   try {
-    return _setActive!(a, b);
+    return _setActive!(arg0, arg1);
   } catch (e) {
     _send_encoding_parameters__set_active__set_error!(e);
     return;
   }
 }
 
-void _setMaxBitrateProxy(Object a, int b) {
+void _setMaxBitrateProxy(Object arg0, int arg1) {
   try {
-    return _setMaxBitrate!(a, b);
+    return _setMaxBitrate!(arg0, arg1);
   } catch (e) {
     _send_encoding_parameters__set_max_bitrate__set_error!(e);
     return;
   }
 }
 
-void _setScaleResolutionDownByProxy(Object a, int b) {
+void _setScaleResolutionDownByProxy(Object arg0, int arg1) {
   try {
-    return _setScaleResolutionDownBy!(a, b);
+    return _setScaleResolutionDownBy!(arg0, arg1);
   } catch (e) {
     _send_encoding_parameters__set_scale_resolution_down_by__set_error!(e);
     return;
   }
 }
 
-void _setScalabilityModeProxy(Object a, Pointer<Utf8> b) {
+void _setScalabilityModeProxy(Object arg0, Pointer<Utf8> arg1) {
   try {
-    return _setScalabilityMode!(a, b);
+    return _setScalabilityMode!(arg0, arg1);
   } catch (e) {
     _send_encoding_parameters__set_scalability_mode__set_error!(e);
     return;

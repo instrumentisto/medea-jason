@@ -54,9 +54,10 @@ Object _initProxy() {
   }
 }
 
-void _addProxy(Object a, Pointer<Utf8> b, ForeignValue c, ForeignValue d) {
+void _addProxy(
+    Object arg0, Pointer<Utf8> arg1, ForeignValue arg2, ForeignValue arg3) {
   try {
-    return _add!(a, b, c, d);
+    return _add!(arg0, arg1, arg2, arg3);
   } catch (e) {
     _ice_servers__add__set_error!(e);
     return;

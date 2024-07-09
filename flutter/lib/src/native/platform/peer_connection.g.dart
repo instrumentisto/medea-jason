@@ -287,171 +287,173 @@ void registerFunction(
   );
 }
 
-int _iceConnectionStateProxy(Object a) {
+int _iceConnectionStateProxy(Object arg0) {
   try {
-    return _iceConnectionState!(a);
+    return _iceConnectionState!(arg0);
   } catch (e) {
     _peer_connection__ice_connection_state__set_error!(e);
     return 0;
   }
 }
 
-void _onConnectionStateChangeProxy(Object a, Object b) {
+void _onConnectionStateChangeProxy(Object arg0, Object arg1) {
   try {
-    return _onConnectionStateChange!(a, b);
+    return _onConnectionStateChange!(arg0, arg1);
   } catch (e) {
     _peer_connection__on_connection_state_change__set_error!(e);
     return;
   }
 }
 
-Pointer _connectionStateProxy(Object a) {
+Pointer _connectionStateProxy(Object arg0) {
   try {
-    return _connectionState!(a);
+    return _connectionState!(arg0);
   } catch (e) {
     _peer_connection__connection_state__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-void _restartIceProxy(Object a) {
+void _restartIceProxy(Object arg0) {
   try {
-    return _restartIce!(a);
+    return _restartIce!(arg0);
   } catch (e) {
     _peer_connection__restart_ice__set_error!(e);
     return;
   }
 }
 
-Object _rollbackProxy(Object a) {
+Object _rollbackProxy(Object arg0) {
   try {
-    return _rollback!(a);
+    return _rollback!(arg0);
   } catch (e) {
     _peer_connection__rollback__set_error!(e);
     return 0;
   }
 }
 
-Object _getStatsProxy(Object a) {
+Object _getStatsProxy(Object arg0) {
   try {
-    return _getStats!(a);
+    return _getStats!(arg0);
   } catch (e) {
     _peer_connection__get_stats__set_error!(e);
     return 0;
   }
 }
 
-void _onTrackProxy(Object a, Object b) {
+void _onTrackProxy(Object arg0, Object arg1) {
   try {
-    return _onTrack!(a, b);
+    return _onTrack!(arg0, arg1);
   } catch (e) {
     _peer_connection__on_track__set_error!(e);
     return;
   }
 }
 
-void _onIceCandidateProxy(Object a, Object b) {
+void _onIceCandidateProxy(Object arg0, Object arg1) {
   try {
-    return _onIceCandidate!(a, b);
+    return _onIceCandidate!(arg0, arg1);
   } catch (e) {
     _peer_connection__on_ice_candidate__set_error!(e);
     return;
   }
 }
 
-void _onIceCandidateErrorProxy(Object a, Object b) {
+void _onIceCandidateErrorProxy(Object arg0, Object arg1) {
   try {
-    return _onIceCandidateError!(a, b);
+    return _onIceCandidateError!(arg0, arg1);
   } catch (e) {
     _peer_connection__on_ice_candidate_error__set_error!(e);
     return;
   }
 }
 
-Object _getTransceiverByMidProxy(Object a, Pointer<Utf8> b) {
+Object _getTransceiverByMidProxy(Object arg0, Pointer<Utf8> arg1) {
   try {
-    return _getTransceiverByMid!(a, b);
+    return _getTransceiverByMid!(arg0, arg1);
   } catch (e) {
     _peer_connection__get_transceiver_by_mid__set_error!(e);
     return 0;
   }
 }
 
-Object _addIceCandidateProxy(Object a, Object b) {
+Object _addIceCandidateProxy(Object arg0, Object arg1) {
   try {
-    return _addIceCandidate!(a, b);
+    return _addIceCandidate!(arg0, arg1);
   } catch (e) {
     _peer_connection__add_ice_candidate__set_error!(e);
     return 0;
   }
 }
 
-void _onIceConnectionStateChangeProxy(Object a, Object b) {
+void _onIceConnectionStateChangeProxy(Object arg0, Object arg1) {
   try {
-    return _onIceConnectionStateChange!(a, b);
+    return _onIceConnectionStateChange!(arg0, arg1);
   } catch (e) {
     _peer_connection__on_ice_connection_state_change__set_error!(e);
     return;
   }
 }
 
-Object _newPeerProxy(Object a, bool b) {
+Object _newPeerProxy(Object arg0, bool arg1) {
   try {
-    return _newPeer!(a, b);
+    return _newPeer!(arg0, arg1);
   } catch (e) {
     _peer_connection__new_peer__set_error!(e);
     return 0;
   }
 }
 
-Object _addTransceiverProxy(Object a, int b, Object c) {
+Object _addTransceiverProxy(Object arg0, int arg1, Object arg2) {
   try {
-    return _addTransceiver!(a, b, c);
+    return _addTransceiver!(arg0, arg1, arg2);
   } catch (e) {
     _peer_connection__add_transceiver__set_error!(e);
     return 0;
   }
 }
 
-Object _createOfferProxy(Object a) {
+Object _createOfferProxy(Object arg0) {
   try {
-    return _createOffer!(a);
+    return _createOffer!(arg0);
   } catch (e) {
     _peer_connection__create_offer__set_error!(e);
     return 0;
   }
 }
 
-Object _createAnswerProxy(Object a) {
+Object _createAnswerProxy(Object arg0) {
   try {
-    return _createAnswer!(a);
+    return _createAnswer!(arg0);
   } catch (e) {
     _peer_connection__create_answer__set_error!(e);
     return 0;
   }
 }
 
-Object _setLocalDescriptionProxy(Object a, Pointer<Utf8> b, Pointer<Utf8> c) {
+Object _setLocalDescriptionProxy(
+    Object arg0, Pointer<Utf8> arg1, Pointer<Utf8> arg2) {
   try {
-    return _setLocalDescription!(a, b, c);
+    return _setLocalDescription!(arg0, arg1, arg2);
   } catch (e) {
     _peer_connection__set_local_description__set_error!(e);
     return 0;
   }
 }
 
-Object _setRemoteDescriptionProxy(Object a, Pointer<Utf8> b, Pointer<Utf8> c) {
+Object _setRemoteDescriptionProxy(
+    Object arg0, Pointer<Utf8> arg1, Pointer<Utf8> arg2) {
   try {
-    return _setRemoteDescription!(a, b, c);
+    return _setRemoteDescription!(arg0, arg1, arg2);
   } catch (e) {
     _peer_connection__set_remote_description__set_error!(e);
     return 0;
   }
 }
 
-void _closeProxy(Object a) {
+void _closeProxy(Object arg0) {
   try {
-    return _close!(a);
+    return _close!(arg0);
   } catch (e) {
     _peer_connection__close__set_error!(e);
     return;

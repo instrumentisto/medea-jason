@@ -44,18 +44,18 @@ void registerFunction(
   );
 }
 
-Pointer<Utf8> _deviceIdProxy(Object a) {
+Pointer<Utf8> _deviceIdProxy(Object arg0) {
   try {
-    return _deviceId!(a);
+    return _deviceId!(arg0);
   } catch (e) {
     _media_display_info__device_id__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-Pointer _titleProxy(Object a) {
+Pointer _titleProxy(Object arg0) {
   try {
-    return _title!(a);
+    return _title!(arg0);
   } catch (e) {
     _media_display_info__title__set_error!(e);
     return Pointer.fromAddress(0);

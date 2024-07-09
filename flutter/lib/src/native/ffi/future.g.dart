@@ -32,9 +32,9 @@ void registerFunction(
   );
 }
 
-void _completeProxyProxy(Object a, Pointer b) {
+void _completeProxyProxy(Object arg0, Pointer arg1) {
   try {
-    return _completeProxy!(a, b);
+    return _completeProxy!(arg0, arg1);
   } catch (e) {
     _future_from_dart__complete_proxy__set_error!(e);
     return;

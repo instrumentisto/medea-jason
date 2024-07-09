@@ -51,9 +51,9 @@ Object _initProxy() {
   }
 }
 
-void _setProxy(Object a, Pointer<Utf8> b, ForeignValue c) {
+void _setProxy(Object arg0, Pointer<Utf8> arg1, ForeignValue arg2) {
   try {
-    return _set!(a, b, c);
+    return _set!(arg0, arg1, arg2);
   } catch (e) {
     _map__set__set_error!(e);
     return;

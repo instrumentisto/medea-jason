@@ -90,36 +90,36 @@ Object _initProxy() {
   }
 }
 
-void _completeProxy(Object a, ForeignValue b) {
+void _completeProxy(Object arg0, ForeignValue arg1) {
   try {
-    return _complete!(a, b);
+    return _complete!(arg0, arg1);
   } catch (e) {
     _completer__complete__set_error!(e);
     return;
   }
 }
 
-void _completeErrorProxy(Object a, Pointer<Handle> b) {
+void _completeErrorProxy(Object arg0, Pointer<Handle> arg1) {
   try {
-    return _completeError!(a, b);
+    return _completeError!(arg0, arg1);
   } catch (e) {
     _completer__complete_error__set_error!(e);
     return;
   }
 }
 
-Object _futureProxy(Object a) {
+Object _futureProxy(Object arg0) {
   try {
-    return _future!(a);
+    return _future!(arg0);
   } catch (e) {
     _completer__future__set_error!(e);
     return 0;
   }
 }
 
-Object _delayedProxy(int a) {
+Object _delayedProxy(int arg0) {
   try {
-    return _delayed!(a);
+    return _delayed!(arg0);
   } catch (e) {
     _completer__delayed__set_error!(e);
     return 0;

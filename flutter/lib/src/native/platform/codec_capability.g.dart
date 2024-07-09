@@ -44,18 +44,18 @@ void registerFunction(
   );
 }
 
-Object _getSenderCodecCapabilitiesProxy(int a) {
+Object _getSenderCodecCapabilitiesProxy(int arg0) {
   try {
-    return _getSenderCodecCapabilities!(a);
+    return _getSenderCodecCapabilities!(arg0);
   } catch (e) {
     _codec_capability__get_sender_codec_capabilities__set_error!(e);
     return 0;
   }
 }
 
-Pointer<Utf8> _mimeTypeProxy(Object a) {
+Pointer<Utf8> _mimeTypeProxy(Object arg0) {
   try {
-    return _mimeType!(a);
+    return _mimeType!(arg0);
   } catch (e) {
     _codec_capability__mime_type__set_error!(e);
     return Pointer.fromAddress(0);

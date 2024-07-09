@@ -226,135 +226,135 @@ void registerFunction(
   );
 }
 
-Pointer<Utf8> _idProxy(Object a) {
+Pointer<Utf8> _idProxy(Object arg0) {
   try {
-    return _id!(a);
+    return _id!(arg0);
   } catch (e) {
     _media_stream_track__id__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-Pointer<Utf8> _deviceIdProxy(Object a) {
+Pointer<Utf8> _deviceIdProxy(Object arg0) {
   try {
-    return _deviceId!(a);
+    return _deviceId!(arg0);
   } catch (e) {
     _media_stream_track__device_id__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-int _kindProxy(Object a) {
+int _kindProxy(Object arg0) {
   try {
-    return _kind!(a);
+    return _kind!(arg0);
   } catch (e) {
     _media_stream_track__kind__set_error!(e);
     return 0;
   }
 }
 
-Pointer _facingModeProxy(Object a) {
+Pointer _facingModeProxy(Object arg0) {
   try {
-    return _facingMode!(a);
+    return _facingMode!(arg0);
   } catch (e) {
     _media_stream_track__facing_mode__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-Pointer _heightProxy(Object a) {
+Pointer _heightProxy(Object arg0) {
   try {
-    return _height!(a);
+    return _height!(arg0);
   } catch (e) {
     _media_stream_track__height__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-Pointer _widthProxy(Object a) {
+Pointer _widthProxy(Object arg0) {
   try {
-    return _width!(a);
+    return _width!(arg0);
   } catch (e) {
     _media_stream_track__width__set_error!(e);
     return Pointer.fromAddress(0);
   }
 }
 
-bool _enabledProxy(Object a) {
+bool _enabledProxy(Object arg0) {
   try {
-    return _enabled!(a);
+    return _enabled!(arg0);
   } catch (e) {
     _media_stream_track__enabled__set_error!(e);
     return false;
   }
 }
 
-void _setEnabledProxy(Object a, bool b) {
+void _setEnabledProxy(Object arg0, bool arg1) {
   try {
-    return _setEnabled!(a, b);
+    return _setEnabled!(arg0, arg1);
   } catch (e) {
     _media_stream_track__set_enabled__set_error!(e);
     return;
   }
 }
 
-Object _readyStateProxy(Object a) {
+Object _readyStateProxy(Object arg0) {
   try {
-    return _readyState!(a);
+    return _readyState!(arg0);
   } catch (e) {
     _media_stream_track__ready_state__set_error!(e);
     return 0;
   }
 }
 
-Object _stopProxy(Object a) {
+Object _stopProxy(Object arg0) {
   try {
-    return _stop!(a);
+    return _stop!(arg0);
   } catch (e) {
     _media_stream_track__stop__set_error!(e);
     return 0;
   }
 }
 
-void _onEndedProxy(Object a, Object b) {
+void _onEndedProxy(Object arg0, Object arg1) {
   try {
-    return _onEnded!(a, b);
+    return _onEnded!(arg0, arg1);
   } catch (e) {
     _media_stream_track__on_ended__set_error!(e);
     return;
   }
 }
 
-Object _cloneProxy(Object a) {
+Object _cloneProxy(Object arg0) {
   try {
-    return _clone!(a);
+    return _clone!(arg0);
   } catch (e) {
     _media_stream_track__clone__set_error!(e);
     return 0;
   }
 }
 
-Object _disposeProxy(Object a) {
+Object _disposeProxy(Object arg0) {
   try {
-    return _dispose!(a);
+    return _dispose!(arg0);
   } catch (e) {
     _media_stream_track__dispose__set_error!(e);
     return 0;
   }
 }
 
-bool _isOnAudioLevelAvailableProxy(Object a) {
+bool _isOnAudioLevelAvailableProxy(Object arg0) {
   try {
-    return _isOnAudioLevelAvailable!(a);
+    return _isOnAudioLevelAvailable!(arg0);
   } catch (e) {
     _media_stream_track__is_on_audio_level_available__set_error!(e);
     return false;
   }
 }
 
-void _onAudioLevelChangedProxy(Object a, Object b) {
+void _onAudioLevelChangedProxy(Object arg0, Object arg1) {
   try {
-    return _onAudioLevelChanged!(a, b);
+    return _onAudioLevelChanged!(arg0, arg1);
   } catch (e) {
     _media_stream_track__on_audio_level_changed__set_error!(e);
     return;

@@ -178,18 +178,18 @@ void registerFunction(
   );
 }
 
-Object _newStateErrorProxy(Pointer<Utf8> a) {
+Object _newStateErrorProxy(Pointer<Utf8> arg0) {
   try {
-    return _newStateError!(a);
+    return _newStateError!(arg0);
   } catch (e) {
     _exception__new_state_error__set_error!(e);
     return 0;
   }
 }
 
-Object _newFormatExceptionProxy(Pointer<Utf8> a) {
+Object _newFormatExceptionProxy(Pointer<Utf8> arg0) {
   try {
-    return _newFormatException!(a);
+    return _newFormatException!(arg0);
   } catch (e) {
     _exception__new_format_exception__set_error!(e);
     return 0;
@@ -197,18 +197,19 @@ Object _newFormatExceptionProxy(Pointer<Utf8> a) {
 }
 
 Object _newLocalMediaInitExceptionProxy(
-    int a, Pointer<Utf8> b, ForeignValue c, Pointer<Utf8> d) {
+    int arg0, Pointer<Utf8> arg1, ForeignValue arg2, Pointer<Utf8> arg3) {
   try {
-    return _newLocalMediaInitException!(a, b, c, d);
+    return _newLocalMediaInitException!(arg0, arg1, arg2, arg3);
   } catch (e) {
     _exception__new_local_media_init_exception__set_error!(e);
     return 0;
   }
 }
 
-Object _newEnumerateDevicesExceptionProxy(Pointer<Handle> a, Pointer<Utf8> b) {
+Object _newEnumerateDevicesExceptionProxy(
+    Pointer<Handle> arg0, Pointer<Utf8> arg1) {
   try {
-    return _newEnumerateDevicesException!(a, b);
+    return _newEnumerateDevicesException!(arg0, arg1);
   } catch (e) {
     _exception__new_enumerate_devices_exception__set_error!(e);
     return 0;
@@ -216,9 +217,9 @@ Object _newEnumerateDevicesExceptionProxy(Pointer<Handle> a, Pointer<Utf8> b) {
 }
 
 Object _newRpcClientExceptionProxy(
-    int a, Pointer<Utf8> b, ForeignValue c, Pointer<Utf8> d) {
+    int arg0, Pointer<Utf8> arg1, ForeignValue arg2, Pointer<Utf8> arg3) {
   try {
-    return _newRpcClientException!(a, b, c, d);
+    return _newRpcClientException!(arg0, arg1, arg2, arg3);
   } catch (e) {
     _exception__new_rpc_client_exception__set_error!(e);
     return 0;
@@ -226,9 +227,9 @@ Object _newRpcClientExceptionProxy(
 }
 
 Object _newMediaStateTransitionExceptionProxy(
-    Pointer<Utf8> a, Pointer<Utf8> b, int c) {
+    Pointer<Utf8> arg0, Pointer<Utf8> arg1, int arg2) {
   try {
-    return _newMediaStateTransitionException!(a, b, c);
+    return _newMediaStateTransitionException!(arg0, arg1, arg2);
   } catch (e) {
     _exception__new_media_state_transition_exception__set_error!(e);
     return 0;
@@ -236,9 +237,9 @@ Object _newMediaStateTransitionExceptionProxy(
 }
 
 Object _newInternalExceptionProxy(
-    Pointer<Utf8> a, ForeignValue b, Pointer<Utf8> c) {
+    Pointer<Utf8> arg0, ForeignValue arg1, Pointer<Utf8> arg2) {
   try {
-    return _newInternalException!(a, b, c);
+    return _newInternalException!(arg0, arg1, arg2);
   } catch (e) {
     _exception__new_internal_exception__set_error!(e);
     return 0;
@@ -246,27 +247,27 @@ Object _newInternalExceptionProxy(
 }
 
 Object _newMediaSettingsUpdateExceptionProxy(
-    Pointer<Utf8> a, Pointer<Handle> b, bool c) {
+    Pointer<Utf8> arg0, Pointer<Handle> arg1, bool arg2) {
   try {
-    return _newMediaSettingsUpdateException!(a, b, c);
+    return _newMediaSettingsUpdateException!(arg0, arg1, arg2);
   } catch (e) {
     _exception__new_media_settings_update_exception__set_error!(e);
     return 0;
   }
 }
 
-Object _newInvalidOutputAudioDeviceIdExceptionProxy(Pointer<Utf8> a) {
+Object _newInvalidOutputAudioDeviceIdExceptionProxy(Pointer<Utf8> arg0) {
   try {
-    return _newInvalidOutputAudioDeviceIdException!(a);
+    return _newInvalidOutputAudioDeviceIdException!(arg0);
   } catch (e) {
     _exception__new_invalid_output_audio_device_id_exception__set_error!(e);
     return 0;
   }
 }
 
-Object _newMicVolumeExceptionProxy(Pointer<Handle> a, Pointer<Utf8> b) {
+Object _newMicVolumeExceptionProxy(Pointer<Handle> arg0, Pointer<Utf8> arg1) {
   try {
-    return _newMicVolumeException!(a, b);
+    return _newMicVolumeException!(arg0, arg1);
   } catch (e) {
     _exception__new_mic_volume_exception__set_error!(e);
     return 0;
