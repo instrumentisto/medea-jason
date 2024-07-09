@@ -96,45 +96,6 @@ pub(crate) enum DartType {
 }
 
 impl DartType {
-    pub(crate) fn default_value(&self) -> &'static str {
-        match self {
-            DartType::Void => "",
-            DartType::Bool => "false",
-            DartType::Int8
-            | DartType::Uint8
-            | DartType::Int32
-            | DartType::Uint32
-            | DartType::Int64
-            | DartType::Uint64
-            | DartType::Handle => "0",
-            DartType::StringPointer | DartType::Pointer => {
-                "Pointer.fromAddress(0)"
-            }
-            DartType::HandlePointer => "0",
-            DartType::ForeignValue => "0",
-        }
-    }
-
-    pub(crate) fn exceptional_return(&self) -> &'static str {
-        match self {
-            DartType::Void => "",
-            DartType::Bool => "false",
-            DartType::Int8
-            | DartType::Uint8
-            | DartType::Int32
-            | DartType::Uint32
-            | DartType::Int64
-            | DartType::Uint64 => "0",
-            DartType::StringPointer | DartType::Pointer | DartType::Handle => {
-                ""
-            }
-            DartType::HandlePointer => "0",
-            DartType::ForeignValue => "0",
-        }
-    }
-}
-
-impl DartType {
     /// Converts this [`DartType`] to the Dart side FFI type.
     pub(crate) const fn to_ffi_type(self) -> &'static str {
         match self {
@@ -171,6 +132,49 @@ impl DartType {
             Self::HandlePointer => "Pointer<Handle>",
             Self::StringPointer => "Pointer<Utf8>",
             Self::ForeignValue => "ForeignValue",
+        }
+    }
+
+    /// String representing the default value of this [`DartType`] intended to
+    /// be used in return statement if the function have completed with error.
+    pub(crate) fn default_value(&self) -> &'static str {
+        match self {
+            DartType::Void => "",
+            DartType::Bool => "false",
+            DartType::Int8
+            | DartType::Uint8
+            | DartType::Int32
+            | DartType::Uint32
+            | DartType::Int64
+            | DartType::Uint64
+            | DartType::Handle => "0",
+            DartType::StringPointer | DartType::Pointer => {
+                "Pointer.fromAddress(0)"
+            }
+            DartType::HandlePointer => "0",
+            DartType::ForeignValue => "0",
+        }
+    }
+
+    /// String representing the value that should be passed as
+    /// `exceptionalReturn` argument of [Pointer.fromFunction][1] method.
+    ///
+    /// [1]: https://api.dart.dev/stable/dart-ffi/Pointer/fromFunction.html
+    pub(crate) fn exceptional_return(&self) -> &'static str {
+        match self {
+            DartType::Void => "",
+            DartType::Bool => "false",
+            DartType::Int8
+            | DartType::Uint8
+            | DartType::Int32
+            | DartType::Uint32
+            | DartType::Int64
+            | DartType::Uint64 => "0",
+            DartType::StringPointer | DartType::Pointer | DartType::Handle => {
+                ""
+            }
+            DartType::HandlePointer => "0",
+            DartType::ForeignValue => "0",
         }
     }
 
@@ -425,28 +429,8 @@ impl DartCodegen {
         self.gen_set_error_lookup(&mut out)?;
         write!(out, "\n")?;
 
-        //   Pointer<NativeFunction<Handle Function(Pointer)>>
-        //     callTwoArgProxy_native =  Pointer.fromFunction(_callTwoArgProxy);
-        //   Pointer<NativeFunction<Handle Function(Pointer)>>
-        //     callProxy_native = Pointer.fromFunction(_callProxy);
-        for f in &self.registrators {
-            let mut inputs = String::new();
-            for i in &f.inputs {
-                write!(inputs, "{}, ", i.to_ffi_type())?;
-            }
-            if !inputs.is_empty() {
-                inputs.truncate(inputs.len() - 2);
-            }
-            writeln!(
-                out,
-                "Pointer<NativeFunction<{ret_ty} Function({inputs})>> \
-                 {name}_native = Pointer.fromFunction(_{name}Proxy,{exc_ret});",
-                ret_ty = f.output.to_ffi_type(),
-                name = f.name.to_camel_case(),
-                exc_ret = f.output.exceptional_return(),
-            )?;
-        }
-        writeln!(out, "\n")?;
+        self.generate_pointers_to_proxy_fns(&mut out)?;
+        write!(out, "\n")?;
 
         // -----------------------------------
 
@@ -601,6 +585,46 @@ impl DartCodegen {
                 out,
                 "_ErrorSetterFnDart? _{name};",
                 name = f.error_setter_fn_name
+            )?;
+        }
+
+        Ok(())
+    }
+
+    /// Generates variables that store Dart bindings to Rust functions that
+    /// save execution errors.
+    ///
+    /// # Example of generated code
+    ///
+    /// ```ignore
+    /// Pointer<NativeFunction<Int32 Function(Handle)>>
+    ///     iceConnectionState_native =
+    ///         Pointer.fromFunction(_iceConnectionStateProxy, 0);
+    ///
+    /// Pointer<NativeFunction<Void Function(Handle, Handle)>>
+    ///       onConnectionStateChange_native = Pointer.fromFunction(
+    ///     _onConnectionStateChangeProxy,
+    ///   );
+    /// ```
+    fn generate_pointers_to_proxy_fns<T: Write>(
+        &self,
+        out: &mut T,
+    ) -> fmt::Result {
+        for f in &self.registrators {
+            let mut inputs = String::new();
+            for i in &f.inputs {
+                write!(inputs, "{}, ", i.to_ffi_type())?;
+            }
+            if !inputs.is_empty() {
+                inputs.truncate(inputs.len() - 2);
+            }
+            writeln!(
+                out,
+                "Pointer<NativeFunction<{ret_ty} Function({inputs})>> \
+                 {name}_native = Pointer.fromFunction(_{name}Proxy,{exc_ret});",
+                ret_ty = f.output.to_ffi_type(),
+                name = f.name.to_camel_case(),
+                exc_ret = f.output.exceptional_return(),
             )?;
         }
 

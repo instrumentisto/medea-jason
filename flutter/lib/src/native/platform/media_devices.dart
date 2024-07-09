@@ -2,7 +2,6 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
-import 'package:medea_flutter_webrtc/src/platform/native/media_stream_track.dart';
 
 import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'media_devices.g.dart' as bridge;
@@ -72,7 +71,7 @@ class MockMediaDevices {
 }
 
 /// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
-Future<List<NativeMediaStreamTrack>> Function() _getUserMedia(
+Future<List<webrtc.MediaStreamTrack>> Function() _getUserMedia(
     Object constraints) {
   constraints as webrtc.DeviceConstraints;
   return () => webrtc.getUserMedia(constraints);
@@ -90,7 +89,7 @@ Future<List<webrtc.MediaDisplayInfo>> Function() _enumerateDisplays() {
 
 /// Starts capturing the contents of a display and returns the created
 /// [webrtc.MediaStreamTrack]s.
-Future<List<NativeMediaStreamTrack>> Function() _getDisplayMedia(
+Future<List<webrtc.MediaStreamTrack>> Function() _getDisplayMedia(
     Object constraints) {
   constraints as webrtc.DisplayConstraints;
   return () => webrtc.getDisplayMedia(constraints);

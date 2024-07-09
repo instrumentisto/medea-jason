@@ -420,39 +420,32 @@ impl FnExpander {
         }
 
         let ret_ok_ty = {
+            let err = Err(syn::Error::new(
+                item.sig.output.span(),
+                "Must return `Result<T, platform::Error>`",
+            ));
+
             let syn::ReturnType::Type(_, ret_ty) = item.sig.output.clone()
             else {
-                return Err(syn::Error::new(
-                    item.sig.output.span(),
-                    "Must return `Result<T,E>`",
-                ));
+                return err;
             };
             let syn::Type::Path(ret_ty_path) = *ret_ty else {
-                return Err(syn::Error::new(
-                    item.sig.output.span(),
-                    "Must return `Result<T,E>`",
-                ));
+                return err;
             };
-            let Some(ret_ty_last) = ret_ty_path.path.segments.last() else {
-                return Err(syn::Error::new(
-                    item.sig.output.span(),
-                    "Must return `Result<T,E>`",
-                ));
-            };
-            let syn::PathArguments::AngleBracketed(res) =
-                &ret_ty_last.arguments
+            let Some(ret_ty_args) = ret_ty_path
+                .path
+                .segments
+                .last()
+                .map(|s| s.arguments.clone())
             else {
-                return Err(syn::Error::new(
-                    item.sig.output.span(),
-                    "Must return `Result<T,E>`",
-                ));
+                return err;
+            };
+            let syn::PathArguments::AngleBracketed(res) = &ret_ty_args else {
+                return err;
             };
             let Some(syn::GenericArgument::Type(res_ok_ty)) = res.args.first()
             else {
-                return Err(syn::Error::new(
-                    item.sig.output.span(),
-                    "Must return `Result<T,E>`",
-                ));
+                return err;
             };
 
             res_ok_ty.clone()

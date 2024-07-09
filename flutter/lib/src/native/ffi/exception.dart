@@ -106,8 +106,12 @@ NativeMediaSettingsUpdateException _newMediaSettingsUpdateException(
 }
 
 /// Throws a new [NativePanicException]. TODO: asdasdasdasd
-String _throwPanicException() {
-  throw NativePanicException();
+NativePanicException _throwPanicException() {
+  try {
+    throw NativePanicException();
+  } on NativePanicException catch (e) {
+    return e;
+  }
 }
 
 /// Exception thrown whenever Rust side panics.
