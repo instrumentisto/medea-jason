@@ -59,7 +59,6 @@ impl DartMap {
     #[must_use]
     pub fn new() -> Self {
         let map = unsafe { map::init() }.unwrap();
-
         Self(unsafe { DartHandle::new(map) })
     }
 

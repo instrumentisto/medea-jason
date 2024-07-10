@@ -100,7 +100,6 @@ impl<T: From<DartHandle>> From<DartList> for Vec<T> {
     fn from(list: DartList) -> Self {
         let len = list.length();
         let mut out = Self::with_capacity(len);
-
         for i in 0..len {
             if let Some(v) = list.get(i) {
                 out.push(v.into());

@@ -114,7 +114,6 @@ impl IceCandidateError {
     pub fn address(&self) -> String {
         let address =
             unsafe { ice_candidate_error::address(self.0.get()) }.unwrap();
-
         unsafe { dart_string_into_rust(address) }
     }
 
@@ -135,7 +134,6 @@ impl IceCandidateError {
     #[must_use]
     pub fn url(&self) -> String {
         let url = unsafe { ice_candidate_error::url(self.0.get()) }.unwrap();
-
         unsafe { dart_string_into_rust(url) }
     }
 
@@ -165,7 +163,6 @@ impl IceCandidateError {
     pub fn error_text(&self) -> String {
         let error_text =
             unsafe { ice_candidate_error::error_text(self.0.get()) }.unwrap();
-
         unsafe { dart_string_into_rust(error_text) }
     }
 }

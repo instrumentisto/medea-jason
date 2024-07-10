@@ -213,7 +213,6 @@ impl Transceiver {
         let handle = self.0.get();
         async move {
             let fut = unsafe { transceiver::get_direction(handle) }.unwrap();
-
             unsafe { FutureFromDart::execute::<i32>(fut) }
                 .await
                 .unwrap()
@@ -229,7 +228,6 @@ impl Transceiver {
         async move {
             let fut =
                 unsafe { transceiver::get_send_parameters(handle) }.unwrap();
-
             let params: DartHandle =
                 unsafe { FutureFromDart::execute(fut) }.await.unwrap();
             Parameters::from(params)
@@ -331,7 +329,6 @@ impl Drop for Transceiver {
             platform::spawn(async move {
                 let fut =
                     unsafe { transceiver::dispose(transceiver.get()) }.unwrap();
-
                 unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
             });
         }

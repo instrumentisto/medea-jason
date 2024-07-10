@@ -170,7 +170,6 @@ impl MediaStreamConstraints {
     pub fn new() -> Self {
         let constraints =
             unsafe { constraints::init_device_constraints() }.unwrap();
-
         unsafe { Self(DartHandle::new(constraints)) }
     }
 

@@ -191,7 +191,6 @@ impl RpcTransport for WebSocketRpcTransport {
                 )
             }
             .unwrap();
-
             unsafe { FutureFromDart::execute::<DartHandle>(fut) }
         }
         .await
@@ -226,7 +225,6 @@ impl RpcTransport for WebSocketRpcTransport {
             TransportState::Open => unsafe {
                 let msg = serde_json::to_string(msg).unwrap();
                 transport::send(handle.get(), string_into_c_str(msg)).unwrap();
-
                 Ok(())
             },
             TransportState::Connecting

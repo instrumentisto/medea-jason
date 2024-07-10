@@ -39,7 +39,6 @@ impl MediaDisplayInfo {
     pub fn device_id(&self) -> String {
         let device_id =
             unsafe { media_display_info::device_id(self.0.get()) }.unwrap();
-
         unsafe { dart_string_into_rust(device_id) }
     }
 
@@ -48,7 +47,6 @@ impl MediaDisplayInfo {
     #[must_use]
     pub fn title(&self) -> Option<String> {
         let title = unsafe { media_display_info::title(self.0.get()) }.unwrap();
-
         Option::try_from(unsafe { title.unbox() }).unwrap()
     }
 }

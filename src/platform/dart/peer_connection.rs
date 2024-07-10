@@ -456,7 +456,6 @@ impl RtcPeerConnection {
     pub async fn create_answer(&self) -> RtcPeerConnectionResult<String> {
         let fut = unsafe { peer_connection::create_answer(self.handle.get()) }
             .unwrap();
-
         unsafe { FutureFromDart::execute(fut) }
             .await
             .map_err(RtcPeerConnectionError::CreateAnswerFailed)
@@ -474,7 +473,6 @@ impl RtcPeerConnection {
     pub async fn rollback(&self) -> RtcPeerConnectionResult<()> {
         let fut =
             unsafe { peer_connection::rollback(self.handle.get()) }.unwrap();
-
         unsafe { FutureFromDart::execute(fut) }
             .await
             .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
@@ -495,7 +493,6 @@ impl RtcPeerConnection {
     pub async fn create_offer(&self) -> RtcPeerConnectionResult<String> {
         let fut = unsafe { peer_connection::create_offer(self.handle.get()) }
             .unwrap();
-
         unsafe { FutureFromDart::execute(fut) }
             .await
             .map_err(RtcPeerConnectionError::CreateOfferFailed)

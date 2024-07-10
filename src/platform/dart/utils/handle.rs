@@ -75,7 +75,6 @@ impl DartHandle {
     #[must_use]
     pub fn name(&self) -> String {
         let type_name = unsafe { handle::runtime_type(self.get()) }.unwrap();
-
         unsafe { dart_string_into_rust(type_name) }
     }
 }

@@ -597,7 +597,7 @@ impl FnExpander {
         }
     }
 
-    /// Generates `static mut` for the extern Dart function pointer storing.
+    /// Generates an error slot for this [`FnExpander`].
     ///
     /// # Example of generated code
     ///
@@ -612,22 +612,28 @@ impl FnExpander {
         }
     }
 
-    /// Generates Dart function caller for Rust.
+    /// Generates an error setter extern function.
     ///
     /// # Example of generated code
     ///
     /// ```ignore
-    /// static mut PEER_CONNECTION__CREATE_OFFER__ERROR: Option<Error> = None;
+    /// #[no_mangle]
+    /// pub unsafe extern "C" fn peer_connection__connection_state__set_error(
+    ///     err: Dart_Handle
+    /// ) {
+    ///     PEER_CONNECTION__CONNECTION_STATE__ERROR =
+    ///         Some(Error::from_handle(err));
+    /// }
     /// ```
     fn gen_error_setter(&self) -> TokenStream {
-        let doc_attrs = &self.doc_attrs;
-        let name = &self.error_setter_ident;
+        let doc = format!("Error setter for the `{}` function", self.ident);
+        let fn_name = &self.error_setter_ident;
         let error_slot = &self.error_slot_ident;
 
         quote! {
-            #( #doc_attrs )*
+            #[doc = #doc]
             #[no_mangle]
-            pub unsafe extern "C" fn #name(err: Dart_Handle) {
+            pub unsafe extern "C" fn #fn_name(err: Dart_Handle) {
                 #error_slot = Some(Error::from_handle(err));
             }
         }

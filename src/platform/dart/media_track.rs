@@ -183,7 +183,6 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn id(&self) -> String {
         let id = unsafe { media_stream_track::id(self.inner.get()) }.unwrap();
-
         unsafe { dart_string_into_rust(id) }
     }
 
@@ -196,7 +195,6 @@ impl MediaStreamTrack {
     pub fn device_id(&self) -> Option<String> {
         let device_id =
             unsafe { media_stream_track::device_id(self.inner.get()) }.unwrap();
-
         Some(unsafe { dart_string_into_rust(device_id) })
     }
 
@@ -221,7 +219,6 @@ impl MediaStreamTrack {
         let facing_mode =
             unsafe { media_stream_track::facing_mode(self.inner.get()) }
                 .unwrap();
-
         Option::<i64>::try_from(unsafe { facing_mode.unbox() })
             .unwrap()
             .map(FacingMode::try_from)
@@ -237,7 +234,6 @@ impl MediaStreamTrack {
     pub fn height(&self) -> Option<u32> {
         let height =
             unsafe { media_stream_track::height(self.inner.get()) }.unwrap();
-
         Option::try_from(unsafe { height.unbox() }).unwrap()
     }
 
@@ -249,7 +245,6 @@ impl MediaStreamTrack {
     pub fn width(&self) -> Option<u32> {
         let width =
             unsafe { media_stream_track::width(self.inner.get()) }.unwrap();
-
         Option::try_from(unsafe { width.unbox() }).unwrap()
     }
 
@@ -295,7 +290,6 @@ impl MediaStreamTrack {
         let inner = self.inner.clone();
         async move {
             let fut = unsafe { media_stream_track::stop(inner.get()) }.unwrap();
-
             unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
         }
     }
@@ -386,7 +380,6 @@ impl Drop for MediaStreamTrack {
         platform::spawn(async move {
             let fut =
                 unsafe { media_stream_track::dispose(track.get()) }.unwrap();
-
             unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
         });
     }

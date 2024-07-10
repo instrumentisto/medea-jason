@@ -88,7 +88,6 @@ impl Parameters {
         Box::pin(async move {
             let fut = unsafe { parameters::set_encoding(handle, enc_handle) }
                 .unwrap();
-
             unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
         })
     }

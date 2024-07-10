@@ -85,7 +85,6 @@ pub async fn delay_for(delay: Duration) {
     let delay = delay.as_millis() as i32;
     let delayed = unsafe { completer::delayed(delay) }.unwrap();
     let delayed_fut = unsafe { FutureFromDart::execute::<()>(delayed) };
-
     delayed_fut.await.unwrap();
 }
 
@@ -136,7 +135,6 @@ impl<T, E> Completer<T, E> {
     #[must_use]
     pub fn future(&self) -> Dart_Handle {
         let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
-
         unsafe { completer::future(handle) }.unwrap()
     }
 }
@@ -154,7 +152,6 @@ impl<T: Into<DartValue>, E> Completer<T, E> {
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete(&self, arg: T) {
         let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
-
         unsafe { completer::complete(handle, arg.into()) }.unwrap();
     }
 }
@@ -165,7 +162,6 @@ impl<T> Completer<T, DartError> {
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete_error(&self, e: DartError) {
         let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
-
         unsafe { completer::complete_error(handle, e) }.unwrap();
     }
 }
