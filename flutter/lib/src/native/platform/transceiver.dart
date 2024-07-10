@@ -115,6 +115,6 @@ Future<void> Function() _setSendParameters(
 /// [RtpCodecCapability] for the provided [RtpTransceiver].
 void _setCodecPreferences(Object transceiver, Object codecCapability) {
   transceiver as RtpTransceiver;
-  codecCapability as List<RtpCodecCapability>;
-  transceiver.setCodecPreferences(codecCapability);
+  codecCapability as List;
+  transceiver.setCodecPreferences(codecCapability.cast<RtpCodecCapability>());
 }
