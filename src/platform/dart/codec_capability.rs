@@ -92,7 +92,7 @@ impl CodecCapability {
     /// implementation.
     ///
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
-    #[allow(clippy::unwrap_in_result)]
+    #[allow(clippy::unwrap_in_result)] // intentional
     pub fn mime_type(&self) -> Result<String, Error> {
         let mime_type =
             unsafe { codec_capability::mime_type(self.0.get()) }.unwrap();

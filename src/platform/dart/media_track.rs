@@ -191,7 +191,7 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-deviceid
     #[inline]
     #[must_use]
-    #[allow(clippy::unwrap_in_result)]
+    #[allow(clippy::unwrap_in_result)] // intentional
     pub fn device_id(&self) -> Option<String> {
         let device_id =
             unsafe { media_stream_track::device_id(self.inner.get()) }.unwrap();

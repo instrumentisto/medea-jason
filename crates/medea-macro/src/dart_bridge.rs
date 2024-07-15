@@ -338,8 +338,8 @@ impl<'a> IdentGenerator<'a> {
         )
     }
 
-    /// Returns a [`syn::Ident`] for the [`FnExpander`]'s error setter
-    /// function name.
+    /// Returns a [`syn::Ident`] for the [`FnExpander`]'s error setter function
+    /// name.
     ///
     /// Generates something like `peer_connection__create_offer__set_error`.
     fn error_setter_name(&self) -> syn::Ident {
@@ -376,8 +376,9 @@ struct FnExpander {
     /// [`syn::FnArg`]s of extern Dart function.
     input_args: Punctuated<syn::FnArg, token::Comma>,
 
-    /// [`syn::ReturnType`] of the extern Dart function. This is always a
-    /// [`Result`].
+    /// [`syn::ReturnType`] of the extern Dart function.
+    ///
+    /// This is always a [`Result`].
     ret_ty: syn::ReturnType,
 
     /// [`Result::Ok`] type of the functions return type.
@@ -422,7 +423,7 @@ impl FnExpander {
         let ret_ok_ty = {
             let err = Err(syn::Error::new(
                 item.sig.output.span(),
-                "Must return `Result<T, platform::Error>`",
+                "must return `Result<T, platform::Error>`",
             ));
 
             let syn::ReturnType::Type(_, ret_ty) = item.sig.output.clone()
@@ -470,7 +471,7 @@ impl FnExpander {
                     } else {
                         Err(syn::Error::new(
                         attr.span(),
-                        "Only #[doc] attributes supported on extern functions",
+                        "only #[doc] attributes supported on extern functions",
                     ))
                     }
                 })
@@ -554,16 +555,15 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// pub unsafe fn create_offer(peer: Dart_Handle) -> Result<
-    ///                                                     Dart_Handle,
-    ///                                                     Error
-    ///                                                  > {
-    ///   let res =
-    ///     (PEER_CONNECTION__CREATE_OFFER__FUNCTION.assume_init_ref())(peer);
+    /// pub unsafe fn create_offer(
+    ///     peer: Dart_Handle,
+    /// ) -> Result<Dart_Handle, Error> {
+    ///     let res =
+    ///       (PEER_CONNECTION__CREATE_OFFER__FUNCTION.assume_init_ref())(peer);
     ///
-    ///   if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take()
+    ///     if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take()
     ///         { Err(e) } else { Ok(res) }
-    ///  }
+    /// }
     /// ```
     fn gen_caller_fn(&self) -> TokenStream {
         let doc_attrs = &self.doc_attrs;

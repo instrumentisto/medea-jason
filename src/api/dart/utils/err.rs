@@ -147,10 +147,10 @@ impl From<platform::Error> for DartError {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<StateError> for DartError {
     fn from(err: StateError) -> Self {
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let exception = unsafe {
             exception::new_state_error(string_into_c_str(err.message()))
         }
@@ -160,10 +160,10 @@ impl From<StateError> for DartError {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<LocalMediaInitException> for DartError {
     fn from(err: LocalMediaInitException) -> Self {
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let exception = unsafe {
             exception::new_local_media_init_exception(
                 err.kind() as i64,
@@ -178,10 +178,10 @@ impl From<LocalMediaInitException> for DartError {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<EnumerateDevicesException> for DartError {
     fn from(err: EnumerateDevicesException) -> Self {
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let exception = unsafe {
             exception::new_enumerate_devices_exception(
                 err.cause().into(),
@@ -194,10 +194,10 @@ impl From<EnumerateDevicesException> for DartError {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<InvalidOutputAudioDeviceIdException> for DartError {
     fn from(err: InvalidOutputAudioDeviceIdException) -> Self {
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let exception = unsafe {
             exception::new_invalid_output_audio_device_id_exception(
                 string_into_c_str(err.trace()),
@@ -209,10 +209,10 @@ impl From<InvalidOutputAudioDeviceIdException> for DartError {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<MicVolumeException> for DartError {
     fn from(err: MicVolumeException) -> Self {
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let exception = unsafe {
             exception::new_mic_volume_exception(
                 err.cause().into(),
@@ -225,10 +225,10 @@ impl From<MicVolumeException> for DartError {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<FormatException> for DartError {
     fn from(err: FormatException) -> Self {
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let exception = unsafe {
             exception::new_format_exception(string_into_c_str(err.message()))
         }
@@ -238,10 +238,10 @@ impl From<FormatException> for DartError {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<RpcClientException> for DartError {
     fn from(err: RpcClientException) -> Self {
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let exception = unsafe {
             exception::new_rpc_client_exception(
                 err.kind() as i64,
@@ -256,10 +256,10 @@ impl From<RpcClientException> for DartError {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<MediaStateTransitionException> for DartError {
     fn from(err: MediaStateTransitionException) -> Self {
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let exception = unsafe {
             exception::new_media_state_transition_exception(
                 string_into_c_str(err.message()),
@@ -273,10 +273,10 @@ impl From<MediaStateTransitionException> for DartError {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<InternalException> for DartError {
     fn from(err: InternalException) -> Self {
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let exception = unsafe {
             exception::new_internal_exception(
                 string_into_c_str(err.message()),
@@ -290,10 +290,10 @@ impl From<InternalException> for DartError {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<MediaSettingsUpdateException> for DartError {
     fn from(err: MediaSettingsUpdateException) -> Self {
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         let exception = unsafe {
             exception::new_media_settings_update_exception(
                 string_into_c_str(err.message()),

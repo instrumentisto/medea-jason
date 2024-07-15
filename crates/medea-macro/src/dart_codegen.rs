@@ -115,7 +115,7 @@ impl DartType {
         }
     }
 
-    /// Converts this [`DartType`] to the string representation that can be
+    /// Converts this [`DartType`] into the string representation that can be
     /// used in Dart code.
     pub(crate) const fn to_dart_type(self) -> &'static str {
         match self {
@@ -135,8 +135,9 @@ impl DartType {
         }
     }
 
-    /// String representing the default value of this [`DartType`] intended to
-    /// be used in return statement if the function have completed with error.
+    /// Returns a string representing the default value of this [`DartType`],
+    /// intended to be used in return statements if the function has completed
+    /// with an error.
     pub(crate) const fn default_value(self) -> &'static str {
         match self {
             Self::Void => "",
@@ -154,8 +155,8 @@ impl DartType {
         }
     }
 
-    /// String representing the value that should be passed as
-    /// `exceptionalReturn` argument of [Pointer.fromFunction][1] method.
+    /// Returns a string representing the value that should be passed as the
+    /// `exceptionalReturn` argument of the [Pointer.fromFunction][1] method.
     ///
     /// [1]: https://api.dart.dev/stable/dart-ffi/Pointer/fromFunction.html
     pub(crate) const fn exceptional_return(self) -> &'static str {
@@ -185,16 +186,16 @@ impl DartType {
         let syn::PathArguments::AngleBracketed(bracketed) = args else {
             return Err(syn::Error::new(
                 args.span(),
-                "Unsupported `NonNull` path arguments",
+                "unsupported `NonNull` path arguments",
             ));
         };
 
         match bracketed.args.last().ok_or_else(|| {
-            syn::Error::new(bracketed.span(), "Empty generics list")
+            syn::Error::new(bracketed.span(), "empty generics list")
         })? {
             syn::GenericArgument::Type(syn::Type::Path(p)) => {
                 let segment = p.path.segments.last().ok_or_else(|| {
-                    syn::Error::new(p.span(), "Empty generic path")
+                    syn::Error::new(p.span(), "empty generic path")
                 })?;
                 Ok(if segment.ident.to_string().as_str() == "c_char" {
                     Self::StringPointer
@@ -209,11 +210,11 @@ impl DartType {
             | syn::GenericArgument::AssocConst(_)
             | syn::GenericArgument::Constraint(_) => Err(syn::Error::new(
                 bracketed.span(),
-                "Unsupported generic argument",
+                "unsupported generic argument",
             )),
             _ => Err(syn::Error::new(
                 bracketed.span(),
-                "Unsupported unknown generic argument",
+                "unsupported unknown generic argument",
             )),
         }
     }
@@ -255,7 +256,7 @@ impl TryFrom<syn::Type> for DartType {
                 } else {
                     return Err(syn::Error::new(
                         value.span(),
-                        "Unsupported type",
+                        "unsupported type",
                     ));
                 }
             }
@@ -272,9 +273,9 @@ impl TryFrom<syn::Type> for DartType {
             | syn::Type::Slice(_)
             | syn::Type::TraitObject(_)
             | syn::Type::Verbatim(_) => {
-                return Err(syn::Error::new(value.span(), "Unsupported type"));
+                return Err(syn::Error::new(value.span(), "unsupported type"));
             }
-            _ => return Err(syn::Error::new(value.span(), "Unknown type")),
+            _ => return Err(syn::Error::new(value.span(), "unknown type")),
         })
     }
 }
@@ -335,7 +336,7 @@ pub(crate) struct FnRegistrationBuilder {
     /// Name of the registering function.
     pub(crate) name: syn::Ident,
 
-    /// [`syn::Ident`] of the extern function that saves error in its slot.
+    /// [`syn::Ident`] of the extern function that saves an error in its slot.
     pub(crate) error_setter_ident: syn::Ident,
 }
 
@@ -388,7 +389,7 @@ impl DartCodegen {
         self.generate_args(&mut out)?;
         writeln!(out, "}} ) {{")?;
 
-        // Save provided Dart functions. E.g.:
+        // Save the provided Dart functions, e.g.:
         //
         // _iceConnectionState = iceConnectionState;
         // _onConnectionStateChange = onConnectionStateChange;
@@ -467,8 +468,8 @@ impl DartCodegen {
         Ok(())
     }
 
-    /// Generates variables that stores Dart functions that will be called
-    /// by Rust side.
+    /// Generates variables storing Dart functions that will be called by Rust
+    /// side.
     ///
     /// # Example of generated code
     ///
@@ -499,8 +500,8 @@ impl DartCodegen {
         Ok(())
     }
 
-    /// Generates variables that store Dart bindings to Rust functions that
-    /// save execution errors.
+    /// Generates variables storing Dart bindings to Rust functions that save
+    /// execution errors.
     ///
     /// # Example of generated code
     ///

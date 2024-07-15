@@ -192,7 +192,7 @@ pub unsafe fn get_error(handle: Dart_Handle) -> *const ffi::c_char {
 /// [1]: https://api.dart.dev/dart-ffi/NativeApi/initializeApiDLData.html
 pub unsafe fn propagate_error(mut handle: Dart_Handle) {
     let is_error = unsafe {
-        #[allow(clippy::expect_used)]
+        #[allow(clippy::expect_used)] // intentional
         Dart_IsError_DL.expect("`dart_api_dl` has not been initialized")
     };
 
@@ -200,7 +200,7 @@ pub unsafe fn propagate_error(mut handle: Dart_Handle) {
 
     if !is_error {
         let make_unhandled = unsafe {
-            #[allow(clippy::expect_used)]
+            #[allow(clippy::expect_used)] // intentional
             Dart_NewUnhandledExceptionError_DL
                 .expect("`dart_api_dl` has not been initialized")
         };
@@ -209,7 +209,7 @@ pub unsafe fn propagate_error(mut handle: Dart_Handle) {
     };
 
     let propagate = unsafe {
-        #[allow(clippy::expect_used)]
+        #[allow(clippy::expect_used)] // intentional
         Dart_PropagateError_DL.expect("`dart_api_dl` has not been initialized")
     };
     unsafe {

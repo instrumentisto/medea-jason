@@ -45,7 +45,7 @@ impl RtcIceServers {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl<I> From<I> for RtcIceServers
 where
     I: IntoIterator<Item = IceServer>,

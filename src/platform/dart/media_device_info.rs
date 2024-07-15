@@ -112,9 +112,9 @@ impl MediaDeviceInfo {
 impl TryFrom<DartHandle> for MediaDeviceInfo {
     type Error = NotInput;
 
-    #[allow(clippy::unwrap_in_result)]
+    #[allow(clippy::unwrap_in_result)] // intentional
     fn try_from(value: DartHandle) -> Result<Self, Self::Error> {
-        #[allow(clippy::map_err_ignore)]
+        #[allow(clippy::map_err_ignore)] // intentional
         let kind = unsafe { media_device_info::kind(value.get()) }
             .unwrap()
             .try_into()
