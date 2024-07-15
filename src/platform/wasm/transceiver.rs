@@ -192,7 +192,7 @@ impl Transceiver {
     /// Sets the preferred [`CodecCapability`]s for this [`Transceiver`].
     pub fn set_codec_preferences(&self, codecs: Vec<CodecCapability>) {
         let is_api_available =
-            get_property_by_name(&self.0, "set_codec_preferences", |val| {
+            get_property_by_name(&self.0, "setCodecPreferences", |val| {
                 if val.is_undefined() {
                     None
                 } else {
@@ -200,12 +200,14 @@ impl Transceiver {
                 }
             })
             .is_some();
+
+        // Unsupported on Firefox < 128.
         if is_api_available {
-            return;
-        }
-        let arr = ::js_sys::Array::new();
-        for codec in codecs {
-            _ = arr.push(codec.handle());
+            let arr = ::js_sys::Array::new();
+            for codec in codecs {
+                _ = arr.push(codec.handle());
+            }
+            self.0.set_codec_preferences(&arr);
         }
     }
 }
