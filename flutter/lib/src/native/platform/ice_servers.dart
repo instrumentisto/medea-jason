@@ -11,13 +11,13 @@ import 'ice_servers.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    init: Pointer.fromFunction(_new),
-    add: Pointer.fromFunction(_add),
+    init: _new,
+    add: _add,
   );
 }
 
 /// Returns a new empty `IceServer`s [List].
-Object _new() {
+List _new() {
   return List.empty(growable: true);
 }
 

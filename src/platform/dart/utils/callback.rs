@@ -22,16 +22,20 @@ mod callback {
 
     use dart_sys::Dart_Handle;
 
-    use crate::platform::dart::utils::callback::Callback;
+    use crate::platform::{dart::utils::callback::Callback, Error};
 
     extern "C" {
         /// Returns a [`Dart_Handle`] to a newly created Dart callback accepting
         /// 2 arguments that will proxy calls to the given Rust callback.
-        pub fn call_two_arg_proxy(cb: ptr::NonNull<Callback>) -> Dart_Handle;
+        pub fn call_two_arg_proxy(
+            cb: ptr::NonNull<Callback>,
+        ) -> Result<Dart_Handle, Error>;
 
         /// Returns a [`Dart_Handle`] to a newly created Dart callback that will
         /// proxy calls to the associated Rust callback.
-        pub fn call_proxy(cb: ptr::NonNull<Callback>) -> Dart_Handle;
+        pub fn call_proxy(
+            cb: ptr::NonNull<Callback>,
+        ) -> Result<Dart_Handle, Error>;
     }
 }
 
@@ -192,9 +196,9 @@ impl Callback {
 
         let f = ptr::NonNull::from(Box::leak(Box::new(self)));
         let handle = if is_two_arg {
-            unsafe { callback::call_two_arg_proxy(f) }
+            unsafe { callback::call_two_arg_proxy(f) }.unwrap()
         } else {
-            unsafe { callback::call_proxy(f) }
+            unsafe { callback::call_proxy(f) }.unwrap()
         };
 
         if is_finalizable {

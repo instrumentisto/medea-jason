@@ -14,32 +14,30 @@ void registerFunctions(DynamicLibrary dl) {
   if (mockable) {
     bridge.registerFunction(
       dl,
-      enumerateDevices: Pointer.fromFunction(_enumerateDevices),
-      enumerateDisplays: Pointer.fromFunction(_enumerateDisplays),
-      getUserMedia: Pointer.fromFunction(MockMediaDevices.getUserMedia),
-      getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
-      setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
-      setMicrophoneVolume: Pointer.fromFunction(_setMicrophoneVolume),
-      microphoneVolumeIsAvailable:
-          Pointer.fromFunction(_microphoneVolumeIsAvailable),
-      microphoneVolume: Pointer.fromFunction(_microphoneVolume),
-      onDeviceChange: Pointer.fromFunction(_onDeviceChange),
-      getMediaExceptionKind: Pointer.fromFunction(_getMediaExceptionKind, 0),
+      enumerateDevices: _enumerateDevices,
+      enumerateDisplays: _enumerateDisplays,
+      getUserMedia: MockMediaDevices.getUserMedia,
+      getDisplayMedia: _getDisplayMedia,
+      setOutputAudioId: _setOutputAudioId,
+      setMicrophoneVolume: _setMicrophoneVolume,
+      microphoneVolumeIsAvailable: _microphoneVolumeIsAvailable,
+      microphoneVolume: _microphoneVolume,
+      onDeviceChange: _onDeviceChange,
+      getMediaExceptionKind: _getMediaExceptionKind,
     );
   } else {
     bridge.registerFunction(
       dl,
-      enumerateDevices: Pointer.fromFunction(_enumerateDevices),
-      enumerateDisplays: Pointer.fromFunction(_enumerateDisplays),
-      getUserMedia: Pointer.fromFunction(_getUserMedia),
-      getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
-      setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
-      setMicrophoneVolume: Pointer.fromFunction(_setMicrophoneVolume),
-      microphoneVolumeIsAvailable:
-          Pointer.fromFunction(_microphoneVolumeIsAvailable),
-      microphoneVolume: Pointer.fromFunction(_microphoneVolume),
-      onDeviceChange: Pointer.fromFunction(_onDeviceChange),
-      getMediaExceptionKind: Pointer.fromFunction(_getMediaExceptionKind, 0),
+      enumerateDevices: _enumerateDevices,
+      enumerateDisplays: _enumerateDisplays,
+      getUserMedia: _getUserMedia,
+      getDisplayMedia: _getDisplayMedia,
+      setOutputAudioId: _setOutputAudioId,
+      setMicrophoneVolume: _setMicrophoneVolume,
+      microphoneVolumeIsAvailable: _microphoneVolumeIsAvailable,
+      microphoneVolume: _microphoneVolume,
+      onDeviceChange: _onDeviceChange,
+      getMediaExceptionKind: _getMediaExceptionKind,
     );
   }
 }
@@ -73,47 +71,49 @@ class MockMediaDevices {
 }
 
 /// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
-Object _getUserMedia(Object constraints) {
+Future<List<webrtc.MediaStreamTrack>> Function() _getUserMedia(
+    Object constraints) {
   constraints as webrtc.DeviceConstraints;
   return () => webrtc.getUserMedia(constraints);
 }
 
 /// Returns all the available media devices.
-Object _enumerateDevices() {
+Future<List<webrtc.MediaDeviceInfo>> Function() _enumerateDevices() {
   return () => webrtc.enumerateDevices();
 }
 
 /// Returns all the available media displays.
-Object _enumerateDisplays() {
+Future<List<webrtc.MediaDisplayInfo>> Function() _enumerateDisplays() {
   return () => webrtc.enumerateDisplays();
 }
 
 /// Starts capturing the contents of a display and returns the created
 /// [webrtc.MediaStreamTrack]s.
-Object _getDisplayMedia(Object constraints) {
+Future<List<webrtc.MediaStreamTrack>> Function() _getDisplayMedia(
+    Object constraints) {
   constraints as webrtc.DisplayConstraints;
   return () => webrtc.getDisplayMedia(constraints);
 }
 
 /// Switches output audio device to the device with the provided [deviceId].
-Object _setOutputAudioId(Pointer<Utf8> deviceId) {
+Future<void> Function() _setOutputAudioId(Pointer<Utf8> deviceId) {
   return () => webrtc.setOutputAudioId(deviceId.nativeStringToDartString());
 }
 
 /// Sets the microphone volume level in percents.
-Object _setMicrophoneVolume(int level) {
+Future<void> Function() _setMicrophoneVolume(int level) {
   return () => webrtc.setMicrophoneVolume(level);
 }
 
 /// Indicates whether it's possible to access microphone volume settings.
-Object _microphoneVolumeIsAvailable() {
+Future<int> Function() _microphoneVolumeIsAvailable() {
   return () async {
     return await webrtc.microphoneVolumeIsAvailable() ? 1 : 0;
   };
 }
 
 /// Gets the current microphone volume level in percents.
-Object _microphoneVolume() {
+Future<int> Function() _microphoneVolume() {
   return () => webrtc.microphoneVolume();
 }
 

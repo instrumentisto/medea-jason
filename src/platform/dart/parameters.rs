@@ -17,13 +17,16 @@ use super::{
 mod parameters {
     use dart_sys::Dart_Handle;
 
+    use crate::platform::Error;
+
     extern "C" {
         /// Returns [RTCRtpEncodingParameters][1] from the provided
         /// [RTCRtpParameters].
         ///
         /// [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
         /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
-        pub fn encodings(parameters: Dart_Handle) -> Dart_Handle;
+        pub fn encodings(parameters: Dart_Handle)
+            -> Result<Dart_Handle, Error>;
 
         /// Sets the provided [RTCRtpEncodingParameters][1] into the provided
         /// [RTCRtpParameters].
@@ -33,7 +36,7 @@ mod parameters {
         pub fn set_encoding(
             parameters: Dart_Handle,
             encoding: Dart_Handle,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
     }
 }
 
@@ -59,7 +62,7 @@ impl Parameters {
         let handle = self.0.get();
 
         Box::pin(async move {
-            let fut = unsafe { parameters::encodings(handle) };
+            let fut = unsafe { parameters::encodings(handle) }.unwrap();
             let encodings =
                 unsafe { FutureFromDart::execute::<DartHandle>(fut) }.await?;
 
@@ -83,7 +86,8 @@ impl Parameters {
         let handle = self.0.get();
         let enc_handle = encoding.handle();
         Box::pin(async move {
-            let fut = unsafe { parameters::set_encoding(handle, enc_handle) };
+            let fut = unsafe { parameters::set_encoding(handle, enc_handle) }
+                .unwrap();
             unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
         })
     }

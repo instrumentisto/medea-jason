@@ -10,10 +10,10 @@ import 'ice_candidate.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    init: Pointer.fromFunction(_new),
-    candidate: Pointer.fromFunction(_candidate),
-    sdpMLineIndex: Pointer.fromFunction(_sdpMLineIndex, 0),
-    sdpMid: Pointer.fromFunction(_sdpMid),
+    init: _new,
+    candidate: _candidate,
+    sdpMLineIndex: _sdpMLineIndex,
+    sdpMid: _sdpMid,
   );
 }
 
@@ -37,7 +37,7 @@ Pointer<Utf8> _sdpMid(Object iceCandidate) {
 }
 
 /// Creates a new [IceCandidate] with the provided values.
-Object _new(
+webrtc.IceCandidate _new(
     ForeignValue candidate, ForeignValue sdpMid, ForeignValue sdpMlineIndex) {
   var candidateArg = candidate.toDart();
   var sdpMidArg = sdpMid.toDart();

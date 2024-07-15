@@ -16,13 +16,19 @@ mod handle {
 
     use dart_sys::Dart_Handle;
 
+    use crate::platform::Error;
+
     extern "C" {
         /// Returns a string representation of a Dart type behind the provided
         /// [`Dart_Handle`].
-        pub fn runtime_type(handle: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn runtime_type(
+            handle: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
 
         /// Returns a message of the provided Dart error.
-        pub fn to_string(handle: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn to_string(
+            handle: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
     }
 }
 
@@ -68,14 +74,15 @@ impl DartHandle {
     /// [`DartHandle`].
     #[must_use]
     pub fn name(&self) -> String {
-        let type_name = unsafe { handle::runtime_type(self.get()) };
+        let type_name = unsafe { handle::runtime_type(self.get()) }.unwrap();
         unsafe { dart_string_into_rust(type_name) }
     }
 }
 
 impl fmt::Display for DartHandle {
+    #[allow(clippy::unwrap_in_result)] // intentional
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string = unsafe { handle::to_string(self.get()) };
+        let string = unsafe { handle::to_string(self.get()) }.unwrap();
         let string = unsafe { dart_string_into_rust(string) };
         write!(f, "{string}")
     }

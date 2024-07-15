@@ -35,6 +35,7 @@ All user visible changes to this project will be documented in this file. This p
 - `ConnectionHandle.on_remote_track_added` callback might be called twice for the same track ([#162]).
 - `RemoteMediaTrack.on_media_direction_changed` callback might not be called on direction update ([#162]).
 - Segfault on Dart isolate shutdown ([#163]).
+- Exception in Dart code might be ignored by Rust caller ([#176]).
 
 [#135]: /../../pull/135
 [#138]: /../../pull/138
@@ -45,6 +46,7 @@ All user visible changes to this project will be documented in this file. This p
 [#167]: /../../pull/167
 [#172]: /../../pull/172
 [#175]: /../../pull/175
+[#176]: /../../pull/176
 
 
 

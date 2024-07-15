@@ -24,13 +24,16 @@ use crate::{
 mod completer {
     use dart_sys::Dart_Handle;
 
-    use crate::api::{utils::DartError, DartValue};
+    use crate::{
+        api::{utils::DartError, DartValue},
+        platform::Error,
+    };
 
     extern "C" {
         /// Returns a [`Dart_Handle`] to a new Dart [Completer].
         ///
         /// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
-        pub fn init() -> Dart_Handle;
+        pub fn init() -> Result<Dart_Handle, Error>;
 
         /// Pointer to an extern function that invokes the [complete()] method
         /// with the provided [`DartValue`] on the provided
@@ -39,7 +42,7 @@ mod completer {
         /// [complete()]:
         /// https://api.dart.dev/dart-async/Completer/complete.html
         /// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
-        pub fn complete(fut: Dart_Handle, val: DartValue);
+        pub fn complete(fut: Dart_Handle, val: DartValue) -> Result<(), Error>;
 
         /// Invokes the [completeError()][1] method with the provided
         /// [`DartError`] on the provided [`Dart_Handle`] pointing to the Dart
@@ -47,7 +50,10 @@ mod completer {
         ///
         /// [1]: https://api.dart.dev/dart-async/Completer/completeError.html
         /// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
-        pub fn complete_error(fut: Dart_Handle, val: DartError);
+        pub fn complete_error(
+            fut: Dart_Handle,
+            val: DartError,
+        ) -> Result<(), Error>;
 
         /// Calls the [future] getter on the provided [`Dart_Handle`] pointing
         /// to the Dart [Completer] object.
@@ -58,11 +64,11 @@ mod completer {
         /// [future]: https://api.dart.dev/dart-async/Completer/future.html
         /// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
         /// [Future]: https://api.dart.dev/dart-async/Future-class.html
-        pub fn future(fut: Dart_Handle) -> Dart_Handle;
+        pub fn future(fut: Dart_Handle) -> Result<Dart_Handle, Error>;
 
         /// Returns a [`Dart_Handle`] to the Dart `Future` waiting for the
         /// provided amount of time.
-        pub fn delayed(delay_ms: i32) -> Dart_Handle;
+        pub fn delayed(delay_ms: i32) -> Result<Dart_Handle, Error>;
     }
 }
 
@@ -77,7 +83,7 @@ mod completer {
 pub async fn delay_for(delay: Duration) {
     #[allow(clippy::cast_possible_truncation)]
     let delay = delay.as_millis() as i32;
-    let delayed = unsafe { completer::delayed(delay) };
+    let delayed = unsafe { completer::delayed(delay) }.unwrap();
     let delayed_fut = unsafe { FutureFromDart::execute::<()>(delayed) };
     delayed_fut.await.unwrap();
 }
@@ -113,7 +119,7 @@ impl<T, E> Completer<T, E> {
     /// [1]: https://api.dart.dev/dart-async/Completer-class.html
     #[must_use]
     pub fn new() -> Self {
-        let completer = unsafe { completer::init() };
+        let completer = unsafe { completer::init() }.unwrap();
         let handle = unsafe { dart_api::new_persistent_handle(completer) };
         Self {
             handle,
@@ -129,7 +135,7 @@ impl<T, E> Completer<T, E> {
     #[must_use]
     pub fn future(&self) -> Dart_Handle {
         let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
-        unsafe { completer::future(handle) }
+        unsafe { completer::future(handle) }.unwrap()
     }
 }
 
@@ -146,9 +152,7 @@ impl<T: Into<DartValue>, E> Completer<T, E> {
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete(&self, arg: T) {
         let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
-        unsafe {
-            completer::complete(handle, arg.into());
-        }
+        unsafe { completer::complete(handle, arg.into()) }.unwrap();
     }
 }
 
@@ -158,8 +162,6 @@ impl<T> Completer<T, DartError> {
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete_error(&self, e: DartError) {
         let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
-        unsafe {
-            completer::complete_error(handle, e);
-        }
+        unsafe { completer::complete_error(handle, e) }.unwrap();
     }
 }

@@ -9,27 +9,27 @@ import 'foreign_value.dart';
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    init: Pointer.fromFunction(_new),
-    future: Pointer.fromFunction(_future),
-    complete: Pointer.fromFunction(_complete),
-    completeError: Pointer.fromFunction(_completeError),
-    delayed: Pointer.fromFunction(_delayed),
+    init: _new,
+    future: _future,
+    complete: _complete,
+    completeError: _completeError,
+    delayed: _delayed,
   );
 }
 
 /// Returns closure returning a [Future.delayed] with the provided amount of
 /// milliseconds.
-Object _delayed(int delayMs) {
+Future Function() _delayed(int delayMs) {
   return () => Future.delayed(Duration(milliseconds: delayMs));
 }
 
 /// Returns a new [Completer].
-Object _new() {
+Completer _new() {
   return Completer();
 }
 
 /// Returns a [Future] that is completed by the provided [Completer].
-Object _future(Object completer) {
+Future _future(Object completer) {
   completer as Completer;
   return completer.future;
 }

@@ -148,6 +148,11 @@ impl ModExpander {
         let caller_fns =
             self.fn_expanders.iter().map(FnExpander::gen_caller_fn);
 
+        let errors_slots =
+            self.fn_expanders.iter().map(FnExpander::get_errors_slot);
+        let errors_setters =
+            self.fn_expanders.iter().map(FnExpander::gen_error_setter);
+
         quote! {
             #[automatically_derived]
             #( #attrs )*
@@ -158,12 +163,16 @@ impl ModExpander {
 
                 #( #static_muts )*
 
+                #( #errors_slots )*
+
                 #[no_mangle]
                 pub unsafe extern "C" fn #register_fn_name(
                     #( #register_fn_inputs, )*
                 ) {
                     #( #register_fn_assigns; )*
                 }
+
+                #( #errors_setters )*
 
                 #( #caller_fns )*
             }
@@ -197,8 +206,9 @@ impl ModExpander {
             .iter()
             .map(|f| FnRegistrationBuilder {
                 inputs: f.input_args.iter().cloned().collect(),
-                output: f.ret_ty.clone(),
+                output: f.ret_ok_ty.clone(),
                 name: f.ident.clone(),
+                error_setter_ident: f.error_setter_ident.clone(),
             })
             .collect::<Vec<_>>();
         let generated_code =
@@ -316,6 +326,29 @@ impl<'a> IdentGenerator<'a> {
             self.name.to_string().to_screaming_snake_case(),
         )
     }
+
+    /// Returns a [`syn::Ident`] for the [`FnExpander`]'s error slot name.
+    ///
+    /// Generates something like `PEER_CONNECTION__CREATE_OFFER__ERROR`
+    fn error_slot_name(&self) -> syn::Ident {
+        format_ident!(
+            "{}__{}__ERROR",
+            self.prefix.to_string().to_screaming_snake_case(),
+            self.name.to_string().to_screaming_snake_case(),
+        )
+    }
+
+    /// Returns a [`syn::Ident`] for the [`FnExpander`]'s error setter function
+    /// name.
+    ///
+    /// Generates something like `peer_connection__create_offer__set_error`.
+    fn error_setter_name(&self) -> syn::Ident {
+        format_ident!(
+            "{}__{}__set_error",
+            self.prefix.to_string().to_lowercase(),
+            self.name.to_string().to_lowercase(),
+        )
+    }
 }
 
 /// Expander of the Dart functions declarations.
@@ -334,11 +367,22 @@ struct FnExpander {
     /// pointer.
     static_mut_ident: syn::Ident,
 
+    /// [`syn::Ident`] of the function error slot (`static mut Option<Error>`).
+    error_slot_ident: syn::Ident,
+
+    /// [`syn::Ident`] of the extern function that saves error in its slot.
+    error_setter_ident: syn::Ident,
+
     /// [`syn::FnArg`]s of extern Dart function.
     input_args: Punctuated<syn::FnArg, token::Comma>,
 
     /// [`syn::ReturnType`] of the extern Dart function.
+    ///
+    /// This is always a [`Result`].
     ret_ty: syn::ReturnType,
+
+    /// [`Result::Ok`] type of the functions return type.
+    ret_ok_ty: syn::Type,
 
     /// `#[doc = "..."]` [`syn::Attribute`]s injected to the generated extern
     /// Dart function caller.
@@ -376,13 +420,48 @@ impl FnExpander {
             }
         }
 
+        let ret_ok_ty = {
+            let err = Err(syn::Error::new(
+                item.sig.output.span(),
+                "must return `Result<T, platform::Error>`",
+            ));
+
+            let syn::ReturnType::Type(_, ret_ty) = item.sig.output.clone()
+            else {
+                return err;
+            };
+            let syn::Type::Path(ret_ty_path) = *ret_ty else {
+                return err;
+            };
+            let Some(ret_ty_args) = ret_ty_path
+                .path
+                .segments
+                .last()
+                .map(|s| s.arguments.clone())
+            else {
+                return err;
+            };
+            let syn::PathArguments::AngleBracketed(res) = &ret_ty_args else {
+                return err;
+            };
+            let Some(syn::GenericArgument::Type(res_ok_ty)) = res.args.first()
+            else {
+                return err;
+            };
+
+            res_ok_ty.clone()
+        };
+
         let ident_generator = IdentGenerator::new(prefix, &item.sig.ident);
         Ok(Self {
             type_alias_ident: ident_generator.type_alias(),
             static_mut_ident: ident_generator.static_mut(),
+            error_slot_ident: ident_generator.error_slot_name(),
+            error_setter_ident: ident_generator.error_setter_name(),
             ident: item.sig.ident,
             input_args: item.sig.inputs,
             ret_ty: item.sig.output,
+            ret_ok_ty,
             doc_attrs: item
                 .attrs
                 .into_iter()
@@ -392,7 +471,7 @@ impl FnExpander {
                     } else {
                         Err(syn::Error::new(
                         attr.span(),
-                        "Only #[doc] attributes supported on extern functions",
+                        "only #[doc] attributes supported on extern functions",
                     ))
                     }
                 })
@@ -444,11 +523,11 @@ impl FnExpander {
     /// ```
     fn gen_fn_type(&self) -> TokenStream {
         let name = &self.type_alias_ident;
-        let ret_ty = &self.ret_ty;
+        let ret_ok_ty = &self.ret_ok_ty;
         let args = &self.input_args;
 
         quote! {
-            type #name = extern "C" fn (#args) #ret_ty;
+            type #name = extern "C" fn (#args) -> #ret_ok_ty;
         }
     }
 
@@ -472,9 +551,24 @@ impl FnExpander {
     }
 
     /// Generates Dart function caller for Rust.
+    ///
+    /// # Example of generated code
+    ///
+    /// ```ignore
+    /// pub unsafe fn create_offer(
+    ///     peer: Dart_Handle,
+    /// ) -> Result<Dart_Handle, Error> {
+    ///     let res =
+    ///       (PEER_CONNECTION__CREATE_OFFER__FUNCTION.assume_init_ref())(peer);
+    ///
+    ///     if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take()
+    ///         { Err(e) } else { Ok(res) }
+    /// }
+    /// ```
     fn gen_caller_fn(&self) -> TokenStream {
         let doc_attrs = &self.doc_attrs;
         let name = &self.ident;
+        let error_slot = &self.error_slot_ident;
 
         let args = &self.input_args;
         let args_idents = self.input_args.iter().filter_map(|arg| {
@@ -493,7 +587,54 @@ impl FnExpander {
         quote! {
             #( #doc_attrs )*
             pub unsafe fn #name(#args) #ret_ty {
-                (#static_mut.assume_init_ref())(#( #args_idents ),*)
+                let res = (#static_mut.assume_init_ref())(#( #args_idents ),*);
+                if let Some(e) = #error_slot.take() {
+                  Err(e)
+                } else {
+                  Ok(res)
+                }
+            }
+        }
+    }
+
+    /// Generates an error slot for this [`FnExpander`].
+    ///
+    /// # Example of generated code
+    ///
+    /// ```ignore
+    /// static mut PEER_CONNECTION__CREATE_OFFER__ERROR: Option<Error> = None;
+    /// ```
+    fn get_errors_slot(&self) -> TokenStream {
+        let name = &self.error_slot_ident;
+
+        quote! {
+            static mut #name: Option<Error> = None;
+        }
+    }
+
+    /// Generates an error setter extern function.
+    ///
+    /// # Example of generated code
+    ///
+    /// ```ignore
+    /// #[no_mangle]
+    /// pub unsafe extern "C" fn peer_connection__connection_state__set_error(
+    ///     err: Dart_Handle
+    /// ) {
+    ///     PEER_CONNECTION__CONNECTION_STATE__ERROR =
+    ///         Some(Error::from_handle(err));
+    /// }
+    /// ```
+    fn gen_error_setter(&self) -> TokenStream {
+        let doc = format!("Error setter for the `{}` function", self.ident);
+        let fn_name = &self.error_setter_ident;
+        let error_slot = &self.error_slot_ident;
+
+        quote! {
+            #[doc = #doc]
+            #[no_mangle]
+            pub unsafe extern "C" fn #fn_name(err: Dart_Handle) {
+                #error_slot = Some(Error::from_handle(err));
             }
         }
     }

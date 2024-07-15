@@ -10,22 +10,21 @@ import 'media_track.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    id: Pointer.fromFunction(_id),
-    deviceId: Pointer.fromFunction(_deviceId),
-    facingMode: Pointer.fromFunction(_facingMode),
-    kind: Pointer.fromFunction(_kind, 0),
-    height: Pointer.fromFunction(_height),
-    width: Pointer.fromFunction(_width),
-    setEnabled: Pointer.fromFunction(_setEnabled),
-    enabled: Pointer.fromFunction(_enabled, false),
-    stop: Pointer.fromFunction(_stop),
-    onEnded: Pointer.fromFunction(_onEnded),
-    clone: Pointer.fromFunction(_clone),
-    readyState: Pointer.fromFunction(_readyState),
-    dispose: Pointer.fromFunction(_dispose),
-    onAudioLevelChanged: Pointer.fromFunction(_onAudioLevelChanged),
-    isOnAudioLevelAvailable:
-        Pointer.fromFunction(_isOnAudioLevelAvailable, false),
+    id: _id,
+    deviceId: _deviceId,
+    facingMode: _facingMode,
+    kind: _kind,
+    height: _height,
+    width: _width,
+    setEnabled: _setEnabled,
+    enabled: _enabled,
+    stop: _stop,
+    onEnded: _onEnded,
+    clone: _clone,
+    readyState: _readyState,
+    dispose: _dispose,
+    onAudioLevelChanged: _onAudioLevelChanged,
+    isOnAudioLevelAvailable: _isOnAudioLevelAvailable,
   );
 }
 
@@ -62,7 +61,7 @@ Pointer<Utf8> _deviceId(Object track) {
   return track.deviceId().toNativeUtf8();
 }
 
-Object _readyState(Object track) {
+Future<int> Function() _readyState(Object track) {
   track as MediaStreamTrack;
   return () => track.state().then((s) => s.index);
 }
@@ -95,7 +94,7 @@ void _setEnabled(Object track, bool enabled) {
 }
 
 /// Stops the provided [MediaStreamTrack].
-Object _stop(Object track) {
+Future<void> Function() _stop(Object track) {
   track as MediaStreamTrack;
   return () => track.stop();
 }
@@ -125,13 +124,13 @@ bool _enabled(Object track) {
 }
 
 /// Clones the provided [MediaStreamTrack] preserving the same media source.
-Object _clone(Object track) {
+Future<MediaStreamTrack> Function() _clone(Object track) {
   track as MediaStreamTrack;
   return () => track.clone();
 }
 
 /// Disposes of this [MediaStreamTrack].
-Object _dispose(Object track) {
+Future<void> Function() _dispose(Object track) {
   track as MediaStreamTrack;
   return () => track.dispose();
 }

@@ -27,7 +27,7 @@ mod future_from_dart {
 
     use dart_sys::Dart_Handle;
 
-    use crate::platform::dart::utils::dart_future::FutureFromDart;
+    use crate::platform::{dart::utils::dart_future::FutureFromDart, Error};
 
     /// Resolves the provided [Dart `Future`][0] with the provided
     /// [`FutureFromDart`].
@@ -37,7 +37,7 @@ mod future_from_dart {
         pub fn complete_proxy(
             fut: Dart_Handle,
             resolver: ptr::NonNull<FutureFromDart>,
-        );
+        ) -> Result<(), Error>;
     }
 }
 
@@ -128,8 +128,9 @@ impl FutureFromDart {
             future_from_dart::complete_proxy(
                 dart_fut.get(),
                 ptr::NonNull::from(Box::leak(Box::new(this))),
-            );
+            )
         }
+        .unwrap();
 
         async move { rx.await.unwrap() }
     }

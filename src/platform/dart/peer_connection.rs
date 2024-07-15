@@ -46,84 +46,96 @@ mod peer_connection {
 
     use dart_sys::Dart_Handle;
 
-    use crate::api::DartValueArg;
+    use crate::{api::DartValueArg, platform::Error};
 
     extern "C" {
         /// Returns [`IceConnectionState`] of the provided [`PeerConnection`].
-        pub fn ice_connection_state(peer: Dart_Handle) -> i32;
+        pub fn ice_connection_state(peer: Dart_Handle) -> Result<i32, Error>;
 
         /// Sets the provided callback to a [`connectionstatechange`][1] event
         /// of the provided [`PeerConnection`].
         ///
         /// [1]: https://w3.org/TR/webrtc#event-connectionstatechange
-        pub fn on_connection_state_change(peer: Dart_Handle, cb: Dart_Handle);
+        pub fn on_connection_state_change(
+            peer: Dart_Handle,
+            cb: Dart_Handle,
+        ) -> Result<(), Error>;
 
         /// Returns a [`ConnectionState`] of the provided [`PeerConnection`].
         pub fn connection_state(
             peer: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<i32>>>;
+        ) -> Result<ptr::NonNull<DartValueArg<Option<i32>>>, Error>;
 
         /// Requests an ICE candidate gathering redoing on both ends of the
         /// connection.
-        pub fn restart_ice(peer: Dart_Handle);
+        pub fn restart_ice(peer: Dart_Handle) -> Result<(), Error>;
 
         /// Rollbacks SDP offer of the provided [`PeerConnection`].
-        pub fn rollback(peer: Dart_Handle) -> Dart_Handle;
+        pub fn rollback(peer: Dart_Handle) -> Result<Dart_Handle, Error>;
 
         /// Returns JSON encoded [`Vec`] of [`RtcStats`] from the provided
         /// [`PeerConnection`].
-        pub fn get_stats(peer: Dart_Handle) -> Dart_Handle;
+        pub fn get_stats(peer: Dart_Handle) -> Result<Dart_Handle, Error>;
 
         /// Sets `onTrack` callback of the provided [`PeerConnection`].
-        pub fn on_track(peer: Dart_Handle, cb: Dart_Handle);
+        pub fn on_track(
+            peer: Dart_Handle,
+            cb: Dart_Handle,
+        ) -> Result<(), Error>;
 
         /// Sets `onIceCandidate` callback of the provided [`PeerConnection`].
-        pub fn on_ice_candidate(peer: Dart_Handle, cb: Dart_Handle);
+        pub fn on_ice_candidate(
+            peer: Dart_Handle,
+            cb: Dart_Handle,
+        ) -> Result<(), Error>;
 
         /// Sets `onIceCandidateError` callback of the provided
         /// [`PeerConnection`].
-        pub fn on_ice_candidate_error(peer: Dart_Handle, cb: Dart_Handle);
+        pub fn on_ice_candidate_error(
+            peer: Dart_Handle,
+            cb: Dart_Handle,
+        ) -> Result<(), Error>;
 
         /// Looks ups [`Transceiver`] in the provided [`PeerConnection`] by the
         /// provided [`String`].
         pub fn get_transceiver_by_mid(
             peer: Dart_Handle,
             mid: ptr::NonNull<c_char>,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Adds the provided [`IceCandidate`] to the provided
         /// [`PeerConnection`].
         pub fn add_ice_candidate(
             peer: Dart_Handle,
             candidate: Dart_Handle,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Sets a callback for an [`iceconnectionstatechange`][1] event of the
         /// provided [`PeerConnection`].
         pub fn on_ice_connection_state_change(
             peer: Dart_Handle,
             cb: Dart_Handle,
-        );
+        ) -> Result<(), Error>;
 
         /// Returns a [`Dart_Handle`] to a newly created [`PeerConnection`].
         pub fn new_peer(
             ice_servers: Dart_Handle,
             is_force_relayed: bool,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Creates a new [`Transceiver`] in the provided [`PeerConnection`].
         pub fn add_transceiver(
             peer: Dart_Handle,
             kind: i64,
             init: Dart_Handle,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Returns newly created SDP offer of the provided [`PeerConnection`].
-        pub fn create_offer(peer: Dart_Handle) -> Dart_Handle;
+        pub fn create_offer(peer: Dart_Handle) -> Result<Dart_Handle, Error>;
 
         /// Returns a newly created SDP answer of the provided
         /// [`PeerConnection`].
-        pub fn create_answer(peer: Dart_Handle) -> Dart_Handle;
+        pub fn create_answer(peer: Dart_Handle) -> Result<Dart_Handle, Error>;
 
         /// Sets the provided SDP offer as a local description of the provided
         /// [`PeerConnection`].
@@ -131,7 +143,7 @@ mod peer_connection {
             peer: Dart_Handle,
             ty: ptr::NonNull<c_char>,
             offer: ptr::NonNull<c_char>,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Sets the provided SDP offer as a remote description of the provided
         /// [`PeerConnection`].
@@ -139,10 +151,10 @@ mod peer_connection {
             peer: Dart_Handle,
             ty: ptr::NonNull<c_char>,
             offer: ptr::NonNull<c_char>,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Closes the provided [`PeerConnection`].
-        pub fn close(peer: Dart_Handle);
+        pub fn close(peer: Dart_Handle) -> Result<(), Error>;
     }
 }
 
@@ -174,7 +186,8 @@ impl RtcPeerConnection {
                 ice_servers.get_handle(),
                 is_force_relayed,
             )
-        };
+        }
+        .unwrap();
         Ok(Self {
             handle: unsafe { FutureFromDart::execute(fut) }
                 .await
@@ -186,7 +199,8 @@ impl RtcPeerConnection {
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
     #[allow(clippy::missing_errors_doc, clippy::unused_async)]
     pub async fn get_stats(&self) -> RtcPeerConnectionResult<RtcStats> {
-        let fut = unsafe { peer_connection::get_stats(self.handle.get()) };
+        let fut =
+            unsafe { peer_connection::get_stats(self.handle.get()) }.unwrap();
         let stats_json: String = unsafe { FutureFromDart::execute(fut) }
             .await
             .map_err(RtcStatsError::Platform)
@@ -219,8 +233,9 @@ impl RtcPeerConnection {
                         },
                     )
                     .into_dart(),
-                );
-            };
+                )
+            }
+            .unwrap();
         }
     }
 
@@ -253,8 +268,9 @@ impl RtcPeerConnection {
                         }
                     })
                     .into_dart(),
-                );
+                )
             }
+            .unwrap();
         }
     }
 
@@ -282,8 +298,9 @@ impl RtcPeerConnection {
                         });
                     })
                     .into_dart(),
-                );
+                )
             }
+            .unwrap();
         }
     }
 
@@ -291,7 +308,8 @@ impl RtcPeerConnection {
     #[must_use]
     pub fn ice_connection_state(&self) -> IceConnectionState {
         let ice_connection_state =
-            unsafe { peer_connection::ice_connection_state(self.handle.get()) };
+            unsafe { peer_connection::ice_connection_state(self.handle.get()) }
+                .unwrap();
         ice_connection_from_int(ice_connection_state)
     }
 
@@ -302,7 +320,8 @@ impl RtcPeerConnection {
     #[must_use]
     pub fn connection_state(&self) -> Option<PeerConnectionState> {
         let conn_state =
-            unsafe { peer_connection::connection_state(self.handle.get()) };
+            unsafe { peer_connection::connection_state(self.handle.get()) }
+                .unwrap();
         let conn_state =
             Option::try_from(unsafe { *Box::from_raw(conn_state.as_ptr()) })
                 .unwrap()?;
@@ -324,8 +343,9 @@ impl RtcPeerConnection {
                         h(ice_connection_from_int(v));
                     })
                     .into_dart(),
-                );
+                )
             }
+            .unwrap();
         }
     }
 
@@ -344,8 +364,9 @@ impl RtcPeerConnection {
                         h(peer_connection_state_from_int(v));
                     })
                     .into_dart(),
-                );
+                )
             }
+            .unwrap();
         }
     }
 
@@ -372,7 +393,8 @@ impl RtcPeerConnection {
                 PlatformIceCandidate::new(candidate, sdp_m_line_index, sdp_mid)
                     .handle(),
             )
-        };
+        }
+        .unwrap();
         unsafe { FutureFromDart::execute::<()>(fut) }
             .await
             .map_err(|e| {
@@ -387,9 +409,7 @@ impl RtcPeerConnection {
     /// [`RtcPeerConnection::create_offer`] is automatically configured
     /// to trigger ICE restart.
     pub fn restart_ice(&self) {
-        unsafe {
-            peer_connection::restart_ice(self.handle.get());
-        }
+        unsafe { peer_connection::restart_ice(self.handle.get()) }.unwrap();
     }
 
     /// Sets provided [SDP offer][`SdpType::Offer`] as local description.
@@ -434,7 +454,8 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-createanswer
     pub async fn create_answer(&self) -> RtcPeerConnectionResult<String> {
-        let fut = unsafe { peer_connection::create_answer(self.handle.get()) };
+        let fut = unsafe { peer_connection::create_answer(self.handle.get()) }
+            .unwrap();
         unsafe { FutureFromDart::execute(fut) }
             .await
             .map_err(RtcPeerConnectionError::CreateAnswerFailed)
@@ -450,7 +471,8 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-peerconnection-setlocaldescription
     pub async fn rollback(&self) -> RtcPeerConnectionResult<()> {
-        let fut = unsafe { peer_connection::rollback(self.handle.get()) };
+        let fut =
+            unsafe { peer_connection::rollback(self.handle.get()) }.unwrap();
         unsafe { FutureFromDart::execute(fut) }
             .await
             .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
@@ -469,7 +491,8 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-createoffer
     pub async fn create_offer(&self) -> RtcPeerConnectionResult<String> {
-        let fut = unsafe { peer_connection::create_offer(self.handle.get()) };
+        let fut = unsafe { peer_connection::create_offer(self.handle.get()) }
+            .unwrap();
         unsafe { FutureFromDart::execute(fut) }
             .await
             .map_err(RtcPeerConnectionError::CreateOfferFailed)
@@ -499,14 +522,16 @@ impl RtcPeerConnection {
                     string_into_c_str(RtcSdpType::Offer.to_string()),
                     string_into_c_str(sdp),
                 )
-            },
+            }
+            .unwrap(),
             SdpType::Answer(sdp) => unsafe {
                 peer_connection::set_remote_description(
                     self.handle.get(),
                     string_into_c_str(RtcSdpType::Answer.to_string()),
                     string_into_c_str(sdp),
                 )
-            },
+            }
+            .unwrap(),
         };
         unsafe { FutureFromDart::execute::<()>(fut) }
             .await
@@ -530,7 +555,8 @@ impl RtcPeerConnection {
                 kind as i64,
                 init.handle(),
             )
-        };
+        }
+        .unwrap();
         let trnsvr: DartHandle =
             unsafe { FutureFromDart::execute(fut) }.await.unwrap();
         Transceiver::from(trnsvr)
@@ -552,7 +578,8 @@ impl RtcPeerConnection {
                     handle,
                     string_into_c_str(mid),
                 )
-            };
+            }
+            .unwrap();
             let transceiver: Option<DartHandle> =
                 unsafe { FutureFromDart::execute(fut) }.await.unwrap();
             transceiver.map(Transceiver::from)
@@ -571,7 +598,8 @@ impl RtcPeerConnection {
                 string_into_c_str(sdp_type.to_string()),
                 string_into_c_str(sdp),
             )
-        };
+        }
+        .unwrap();
         unsafe { FutureFromDart::execute(fut) }
             .await
             .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
@@ -581,9 +609,7 @@ impl RtcPeerConnection {
 
 impl Drop for RtcPeerConnection {
     fn drop(&mut self) {
-        unsafe {
-            peer_connection::close(self.handle.get());
-        }
+        unsafe { peer_connection::close(self.handle.get()) }.unwrap();
     }
 }
 

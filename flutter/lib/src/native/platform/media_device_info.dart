@@ -10,11 +10,11 @@ import 'media_device_info.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    deviceId: Pointer.fromFunction(_deviceId),
-    label: Pointer.fromFunction(_label),
-    groupId: Pointer.fromFunction(_groupId),
-    kind: Pointer.fromFunction(_kind, 2),
-    isFailed: Pointer.fromFunction(_isFailed, true),
+    deviceId: _deviceId,
+    label: _label,
+    groupId: _groupId,
+    kind: _kind,
+    isFailed: _isFailed,
   );
 }
 

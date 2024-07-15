@@ -14,12 +14,12 @@ mod ice_servers {
 
     use dart_sys::Dart_Handle;
 
-    use crate::api::DartValueArg;
+    use crate::{api::DartValueArg, platform::Error};
 
     extern "C" {
         /// Returns a [`Dart_Handle`] to the newly created empty `List` with
         /// `IceServer`s.
-        pub fn init() -> Dart_Handle;
+        pub fn init() -> Result<Dart_Handle, Error>;
 
         /// Adds an `IceServer` to the provided `List`.
         pub fn add(
@@ -27,7 +27,7 @@ mod ice_servers {
             url: ptr::NonNull<c_char>,
             username: DartValueArg<String>,
             credentials: DartValueArg<String>,
-        );
+        ) -> Result<(), Error>;
     }
 }
 
@@ -45,12 +45,13 @@ impl RtcIceServers {
     }
 }
 
+#[allow(clippy::fallible_impl_from)] // intentional
 impl<I> From<I> for RtcIceServers
 where
     I: IntoIterator<Item = IceServer>,
 {
     fn from(servers: I) -> Self {
-        let ice_servers = unsafe { ice_servers::init() };
+        let ice_servers = unsafe { ice_servers::init() }.unwrap();
         let ice_servers = unsafe { DartHandle::new(ice_servers) };
         for srv in servers {
             for url in srv.urls {
@@ -60,8 +61,9 @@ where
                         string_into_c_str(url),
                         srv.username.clone().into(),
                         srv.credential.clone().into(),
-                    );
+                    )
                 }
+                .unwrap();
             }
         }
         Self(ice_servers)

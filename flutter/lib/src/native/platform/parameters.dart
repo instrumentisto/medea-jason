@@ -7,19 +7,18 @@ import 'parameters.g.dart' as bridge;
 /// Registers [RtpParameters] related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(dl,
-      encodings: Pointer.fromFunction(_encodings),
-      setEncoding: Pointer.fromFunction(_setEncodings));
+      encodings: _encodings, setEncoding: _setEncodings);
 }
 
 /// Returns [SendEncodingParameters] from the provided [RtpParameters].
-Object _encodings(Object parameters) {
+List<SendEncodingParameters> Function() _encodings(Object parameters) {
   parameters as RtpParameters;
   return () => parameters.encodings;
 }
 
 /// Sets the provided [SendEncodingParameters] into the provided
 /// [RtpParameters].
-Object _setEncodings(Object parameters, Object encoding) {
+void Function() _setEncodings(Object parameters, Object encoding) {
   parameters as RtpParameters;
   encoding as SendEncodingParameters;
   return () => parameters.encodings.add(encoding);

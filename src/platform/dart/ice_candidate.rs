@@ -14,7 +14,7 @@ mod ice_candidate {
 
     use dart_sys::Dart_Handle;
 
-    use crate::api::DartValueArg;
+    use crate::{api::DartValueArg, platform::Error};
 
     extern "C" {
         /// Creates a new [`IceCandidate`] with the provided parameters.
@@ -22,16 +22,22 @@ mod ice_candidate {
             candidate: DartValueArg<String>,
             sdp_mid: DartValueArg<Option<String>>,
             sdp_m_line_index: DartValueArg<Option<u16>>,
-        ) -> Dart_Handle;
+        ) -> Result<Dart_Handle, Error>;
 
         /// Returns candidate of the provided [`IceCandidate`].
-        pub fn candidate(ice_candidate: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn candidate(
+            ice_candidate: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
 
         /// Returns SDP line index of the provided [`IceCandidate`].
-        pub fn sdp_m_line_index(ice_candidate: Dart_Handle) -> u64;
+        pub fn sdp_m_line_index(
+            ice_candidate: Dart_Handle,
+        ) -> Result<u64, Error>;
 
         /// Returns SDP MID of the provided [`IceCandidate`].
-        pub fn sdp_mid(ice_candidate: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn sdp_mid(
+            ice_candidate: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
     }
 }
 
@@ -41,26 +47,30 @@ mod ice_candidate_error {
 
     use dart_sys::Dart_Handle;
 
+    use crate::platform::Error;
+
     extern "C" {
         /// Returns the local IP address used to communicate with a
         /// [STUN]/[TURN] server.
         ///
         /// [STUN]: https://webrtcglossary.com/stun
         /// [TURN]: https://webrtcglossary.com/turn
-        pub fn address(error: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn address(
+            error: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
 
         /// Returns the port used to communicate with a [STUN]/[TURN] server.
         ///
         /// [STUN]: https://webrtcglossary.com/stun
         /// [TURN]: https://webrtcglossary.com/turn
-        pub fn port(error: Dart_Handle) -> u32;
+        pub fn port(error: Dart_Handle) -> Result<u32, Error>;
 
         /// Returns the URL identifying the [STUN]/[TURN] server for which the
         /// failure occurred.
         ///
         /// [STUN]: https://webrtcglossary.com/stun
         /// [TURN]: https://webrtcglossary.com/turn
-        pub fn url(error: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn url(error: Dart_Handle) -> Result<ptr::NonNull<c_char>, Error>;
 
         /// Returns the Numeric [STUN] error code returned by the [STUN]/[TURN]
         /// server.
@@ -72,7 +82,7 @@ mod ice_candidate_error {
         ///
         /// [STUN]: https://webrtcglossary.com/stun
         /// [TURN]: https://webrtcglossary.com/turn
-        pub fn error_code(error: Dart_Handle) -> i32;
+        pub fn error_code(error: Dart_Handle) -> Result<i32, Error>;
 
         /// [STUN] reason text returned by the [STUN]/[TURN] server.
         ///
@@ -81,7 +91,9 @@ mod ice_candidate_error {
         ///
         /// [STUN]: https://webrtcglossary.com/stun
         /// [TURN]: https://webrtcglossary.com/turn
-        pub fn error_text(error: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn error_text(
+            error: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
     }
 }
 
@@ -100,7 +112,8 @@ impl IceCandidateError {
     /// [TURN]: https://webrtcglossary.com/turn
     #[must_use]
     pub fn address(&self) -> String {
-        let address = unsafe { ice_candidate_error::address(self.0.get()) };
+        let address =
+            unsafe { ice_candidate_error::address(self.0.get()) }.unwrap();
         unsafe { dart_string_into_rust(address) }
     }
 
@@ -110,7 +123,7 @@ impl IceCandidateError {
     /// [TURN]: https://webrtcglossary.com/turn
     #[must_use]
     pub fn port(&self) -> u32 {
-        unsafe { ice_candidate_error::port(self.0.get()) }
+        unsafe { ice_candidate_error::port(self.0.get()) }.unwrap()
     }
 
     /// Returns the URL identifying the [STUN]/[TURN] server for which the
@@ -120,7 +133,7 @@ impl IceCandidateError {
     /// [TURN]: https://webrtcglossary.com/turn
     #[must_use]
     pub fn url(&self) -> String {
-        let url = unsafe { ice_candidate_error::url(self.0.get()) };
+        let url = unsafe { ice_candidate_error::url(self.0.get()) }.unwrap();
         unsafe { dart_string_into_rust(url) }
     }
 
@@ -136,7 +149,7 @@ impl IceCandidateError {
     /// [TURN]: https://webrtcglossary.com/turn
     #[must_use]
     pub fn error_code(&self) -> i32 {
-        unsafe { ice_candidate_error::error_code(self.0.get()) }
+        unsafe { ice_candidate_error::error_code(self.0.get()) }.unwrap()
     }
 
     /// [STUN] reason text returned by the [STUN]/[TURN] server.
@@ -149,7 +162,7 @@ impl IceCandidateError {
     #[must_use]
     pub fn error_text(&self) -> String {
         let error_text =
-            unsafe { ice_candidate_error::error_text(self.0.get()) };
+            unsafe { ice_candidate_error::error_text(self.0.get()) }.unwrap();
         unsafe { dart_string_into_rust(error_text) }
     }
 }
@@ -175,7 +188,8 @@ impl IceCandidate {
                 sdp_mid.clone().into(),
                 sdp_m_line_index.map(i64::from).into(),
             )
-        };
+        }
+        .unwrap();
         Self(unsafe { DartHandle::new(handle) })
     }
 
@@ -188,7 +202,8 @@ impl IceCandidate {
     /// Returns candidate of this [`IceCandidate`].
     #[must_use]
     pub fn candidate(&self) -> String {
-        let candidate = unsafe { ice_candidate::candidate(self.0.get()) };
+        let candidate =
+            unsafe { ice_candidate::candidate(self.0.get()) }.unwrap();
         unsafe { dart_string_into_rust(candidate) }
     }
 
@@ -198,6 +213,7 @@ impl IceCandidate {
     pub fn sdp_m_line_index(&self) -> Option<u16> {
         Some(unsafe {
             ice_candidate::sdp_m_line_index(self.0.get())
+                .unwrap()
                 .try_into()
                 .unwrap()
         })
@@ -205,8 +221,9 @@ impl IceCandidate {
 
     /// Returns SDP MID of this [`IceCandidate`].
     #[must_use]
+    #[allow(clippy::unwrap_in_result)] // intentional
     pub fn sdp_mid(&self) -> Option<String> {
-        let mid = unsafe { ice_candidate::sdp_mid(self.0.get()) };
+        let mid = unsafe { ice_candidate::sdp_mid(self.0.get()) }.unwrap();
         Some(unsafe { dart_string_into_rust(mid) })
     }
 }

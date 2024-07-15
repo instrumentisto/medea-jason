@@ -23,19 +23,24 @@ mod codec_capability {
 
     use dart_sys::Dart_Handle;
 
+    use crate::platform::Error;
+
     extern "C" {
         /// Returns [RTCRtpSender]'s available [RTCRtpCodecCapability][1]s.
         ///
         /// [RTCRtpSender]: https://w3.org/TR/webrtc#dom-rtcrtpsender
         /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
-        pub fn get_sender_codec_capabilities(kind: i64) -> Dart_Handle;
+        pub fn get_sender_codec_capabilities(
+            kind: i64,
+        ) -> Result<Dart_Handle, Error>;
 
         /// Returns [mimeType][2] of the provided [RTCRtpCodecCapability][1].
         ///
         /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
         /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
-        pub fn mime_type(codec_capability: Dart_Handle)
-            -> ptr::NonNull<c_char>;
+        pub fn mime_type(
+            codec_capability: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
     }
 }
 
@@ -65,7 +70,8 @@ impl CodecCapability {
     ) -> Result<Vec<Self>, Error> {
         let fut = unsafe {
             codec_capability::get_sender_codec_capabilities(kind as i64)
-        };
+        }
+        .unwrap();
 
         #[allow(clippy::map_err_ignore)]
         let res: DartHandle = unsafe { FutureFromDart::execute(fut) }
@@ -86,8 +92,10 @@ impl CodecCapability {
     /// implementation.
     ///
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
+    #[allow(clippy::unwrap_in_result)] // intentional
     pub fn mime_type(&self) -> Result<String, Error> {
-        let mime_type = unsafe { codec_capability::mime_type(self.0.get()) };
+        let mime_type =
+            unsafe { codec_capability::mime_type(self.0.get()) }.unwrap();
         Ok(unsafe { dart_string_into_rust(mime_type) })
     }
 

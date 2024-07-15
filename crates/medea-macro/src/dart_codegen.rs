@@ -115,6 +115,67 @@ impl DartType {
         }
     }
 
+    /// Converts this [`DartType`] into the string representation that can be
+    /// used in Dart code.
+    pub(crate) const fn to_dart_type(self) -> &'static str {
+        match self {
+            Self::Void => "void",
+            Self::Bool => "bool",
+            Self::Int8
+            | Self::Uint8
+            | Self::Int32
+            | Self::Uint32
+            | Self::Int64
+            | Self::Uint64 => "int",
+            Self::Handle => "Object",
+            Self::Pointer => "Pointer",
+            Self::HandlePointer => "Pointer<Handle>",
+            Self::StringPointer => "Pointer<Utf8>",
+            Self::ForeignValue => "ForeignValue",
+        }
+    }
+
+    /// Returns a string representing the default value of this [`DartType`],
+    /// intended to be used in return statements if the function has completed
+    /// with an error.
+    pub(crate) const fn default_value(self) -> &'static str {
+        match self {
+            Self::Void => "",
+            Self::Bool => "false",
+            Self::Int8
+            | Self::Uint8
+            | Self::Int32
+            | Self::Uint32
+            | Self::Int64
+            | Self::Uint64
+            | Self::Handle
+            | Self::HandlePointer
+            | Self::ForeignValue => "0",
+            Self::StringPointer | Self::Pointer => "Pointer.fromAddress(0)",
+        }
+    }
+
+    /// Returns a string representing the value that should be passed as the
+    /// `exceptionalReturn` argument of the [Pointer.fromFunction][1] method.
+    ///
+    /// [1]: https://api.dart.dev/stable/dart-ffi/Pointer/fromFunction.html
+    pub(crate) const fn exceptional_return(self) -> &'static str {
+        match self {
+            Self::Bool => "false",
+            Self::Int8
+            | Self::Uint8
+            | Self::Int32
+            | Self::Uint32
+            | Self::Int64
+            | Self::Uint64
+            | Self::HandlePointer
+            | Self::ForeignValue => "0",
+            Self::StringPointer | Self::Pointer | Self::Handle | Self::Void => {
+                ""
+            }
+        }
+    }
+
     /// Parses [`ptr::NonNull`] [`DartType`] from the provided
     /// [`PathArguments`].
     ///
@@ -122,39 +183,39 @@ impl DartType {
     pub(crate) fn from_non_null_generic(
         args: &syn::PathArguments,
     ) -> syn::Result<Self> {
-        if let syn::PathArguments::AngleBracketed(bracketed) = args {
-            match bracketed.args.last().ok_or_else(|| {
-                syn::Error::new(bracketed.span(), "Empty generics list")
-            })? {
-                syn::GenericArgument::Type(syn::Type::Path(p)) => {
-                    let segment = p.path.segments.last().ok_or_else(|| {
-                        syn::Error::new(p.span(), "Empty generic path")
-                    })?;
-                    Ok(if segment.ident.to_string().as_str() == "c_char" {
-                        Self::StringPointer
-                    } else {
-                        Self::Pointer
-                    })
-                }
-                syn::GenericArgument::Lifetime(_)
-                | syn::GenericArgument::Type(_)
-                | syn::GenericArgument::Const(_)
-                | syn::GenericArgument::AssocType(_)
-                | syn::GenericArgument::AssocConst(_)
-                | syn::GenericArgument::Constraint(_) => Err(syn::Error::new(
-                    bracketed.span(),
-                    "Unsupported generic argument",
-                )),
-                _ => Err(syn::Error::new(
-                    bracketed.span(),
-                    "Unsupported unknown generic argument",
-                )),
-            }
-        } else {
-            Err(syn::Error::new(
+        let syn::PathArguments::AngleBracketed(bracketed) = args else {
+            return Err(syn::Error::new(
                 args.span(),
-                "Unsupported `NonNull` path arguments",
-            ))
+                "unsupported `NonNull` path arguments",
+            ));
+        };
+
+        match bracketed.args.last().ok_or_else(|| {
+            syn::Error::new(bracketed.span(), "empty generics list")
+        })? {
+            syn::GenericArgument::Type(syn::Type::Path(p)) => {
+                let segment = p.path.segments.last().ok_or_else(|| {
+                    syn::Error::new(p.span(), "empty generic path")
+                })?;
+                Ok(if segment.ident.to_string().as_str() == "c_char" {
+                    Self::StringPointer
+                } else {
+                    Self::Pointer
+                })
+            }
+            syn::GenericArgument::Lifetime(_)
+            | syn::GenericArgument::Type(_)
+            | syn::GenericArgument::Const(_)
+            | syn::GenericArgument::AssocType(_)
+            | syn::GenericArgument::AssocConst(_)
+            | syn::GenericArgument::Constraint(_) => Err(syn::Error::new(
+                bracketed.span(),
+                "unsupported generic argument",
+            )),
+            _ => Err(syn::Error::new(
+                bracketed.span(),
+                "unsupported unknown generic argument",
+            )),
         }
     }
 }
@@ -163,7 +224,7 @@ impl TryFrom<syn::Type> for DartType {
     type Error = syn::Error;
 
     fn try_from(value: syn::Type) -> syn::Result<Self> {
-        Ok(match value {
+        Ok(match &value {
             syn::Type::Path(p) => {
                 let ty =
                     p.path.segments.last().ok_or_else(|| {
@@ -189,6 +250,16 @@ impl TryFrom<syn::Type> for DartType {
                     }
                 }
             }
+            syn::Type::Tuple(t) => {
+                if t.elems.is_empty() {
+                    Self::Void
+                } else {
+                    return Err(syn::Error::new(
+                        value.span(),
+                        "unsupported type",
+                    ));
+                }
+            }
             syn::Type::Array(_)
             | syn::Type::BareFn(_)
             | syn::Type::Group(_)
@@ -201,13 +272,10 @@ impl TryFrom<syn::Type> for DartType {
             | syn::Type::Reference(_)
             | syn::Type::Slice(_)
             | syn::Type::TraitObject(_)
-            | syn::Type::Tuple(_)
             | syn::Type::Verbatim(_) => {
-                return Err(syn::Error::new(value.span(), "Unsupported type"));
+                return Err(syn::Error::new(value.span(), "unsupported type"));
             }
-            _ => {
-                return Err(syn::Error::new(value.span(), "Unknown type"));
-            }
+            _ => return Err(syn::Error::new(value.span(), "unknown type")),
         })
     }
 }
@@ -223,6 +291,9 @@ struct FnRegistration {
 
     /// Name of the registering function.
     name: String,
+
+    /// Name of the error setter extern function.
+    error_setter_fn_name: String,
 }
 
 impl TryFrom<FnRegistrationBuilder> for FnRegistration {
@@ -244,15 +315,11 @@ impl TryFrom<FnRegistrationBuilder> for FnRegistration {
             })
             .collect::<syn::Result<_>>()?;
 
-        let output = match from.output {
-            syn::ReturnType::Default => DartType::Void,
-            syn::ReturnType::Type(_, ty) => DartType::try_from(*ty)?,
-        };
-
         Ok(Self {
             inputs,
-            output,
+            output: DartType::try_from(from.output)?,
             name: from.name.to_string(),
+            error_setter_fn_name: from.error_setter_ident.to_string(),
         })
     }
 }
@@ -264,10 +331,13 @@ pub(crate) struct FnRegistrationBuilder {
     pub(crate) inputs: Vec<syn::FnArg>,
 
     /// Output of the registering function.
-    pub(crate) output: syn::ReturnType,
+    pub(crate) output: syn::Type,
 
     /// Name of the registering function.
     pub(crate) name: syn::Ident,
+
+    /// [`syn::Ident`] of the extern function that saves an error in its slot.
+    pub(crate) error_setter_ident: syn::Ident,
 }
 
 /// Generator of the Dart code registering functions.
@@ -305,12 +375,43 @@ impl DartCodegen {
             out,
             "import 'package:medea_jason/src/native/ffi/foreign_value.dart';"
         )?;
+
+        writeln!(out, "typedef _ErrorSetterFnC = Void Function(Handle);")?;
+        writeln!(out, "typedef _ErrorSetterFnDart = void Function(Object);\n")?;
+
+        self.generate_fns_storage(&mut out)?;
+        writeln!(out)?;
+
+        self.generate_set_errors_storage(&mut out)?;
+        writeln!(out)?;
+
         writeln!(out, "void registerFunction(DynamicLibrary dl, {{")?;
         self.generate_args(&mut out)?;
         writeln!(out, "}} ) {{")?;
+
+        // Save the provided Dart functions, e.g.:
+        //
+        // _iceConnectionState = iceConnectionState;
+        // _onConnectionStateChange = onConnectionStateChange;
+        // _connectionState = connectionState;
+        for f in &self.registrators {
+            writeln!(out, "_{name} = {name};", name = f.name.to_camel_case())?;
+        }
+        writeln!(out)?;
+
+        self.gen_set_error_lookup(&mut out)?;
+        writeln!(out)?;
+
+        self.generate_pointers_to_proxy_fns(&mut out)?;
+        writeln!(out)?;
+
         self.generate_lookup(&mut out)?;
+        writeln!(out)?;
+
         self.generate_functions_registration(&mut out)?;
         writeln!(out, ");}}")?;
+
+        self.generate_proxy_fns(&mut out)?;
 
         Ok(out)
     }
@@ -320,16 +421,15 @@ impl DartCodegen {
         for f in &self.registrators {
             let mut inputs = String::new();
             for i in &f.inputs {
-                write!(inputs, "{}, ", i.to_ffi_type())?;
+                write!(inputs, "{}, ", i.to_dart_type())?;
             }
             if !inputs.is_empty() {
                 inputs.truncate(inputs.len() - 2);
             }
             writeln!(
                 out,
-                "required Pointer<NativeFunction<{ret_ty} \
-                 Function({inputs})>> {name},",
-                ret_ty = f.output.to_ffi_type(),
+                "required {ret_ty}  Function({inputs}) {name},",
+                ret_ty = f.output.to_dart_type(),
                 name = f.name.to_camel_case()
             )?;
         }
@@ -362,7 +462,179 @@ impl DartCodegen {
     ) -> fmt::Result {
         for f in &self.registrators {
             let name = f.name.to_camel_case();
-            writeln!(out, "{name},")?;
+            writeln!(out, "{name}_native,")?;
+        }
+
+        Ok(())
+    }
+
+    /// Generates variables storing Dart functions that will be called by Rust
+    /// side.
+    ///
+    /// # Example of generated code
+    ///
+    /// ```ignore
+    /// int Function(Object)? _iceConnectionState;
+    /// void Function(Object, Object)? _onConnectionStateChange;
+    /// Pointer Function(Object)? _connectionState;
+    /// ```
+    fn generate_fns_storage<T: Write>(&self, out: &mut T) -> fmt::Result {
+        for f in &self.registrators {
+            let mut inputs = String::new();
+
+            for i in &f.inputs {
+                write!(inputs, "{}, ", i.to_dart_type())?;
+            }
+            if !inputs.is_empty() {
+                inputs.truncate(inputs.len() - 2);
+            }
+
+            writeln!(
+                out,
+                "{ret_ty} Function({inputs})? _{name};",
+                ret_ty = f.output.to_dart_type(),
+                name = f.name.to_camel_case()
+            )?;
+        }
+
+        Ok(())
+    }
+
+    /// Generates variables storing Dart bindings to Rust functions that save
+    /// execution errors.
+    ///
+    /// # Example of generated code
+    ///
+    /// ```ignore
+    /// _ErrorSetterFnDart? _peer_connection__rollback__set_error;
+    /// _ErrorSetterFnDart? _peer_connection__get_stats__set_error;
+    /// _ErrorSetterFnDart? _peer_connection__on_track__set_error;
+    /// ```
+    fn generate_set_errors_storage<T: Write>(
+        &self,
+        out: &mut T,
+    ) -> fmt::Result {
+        for f in &self.registrators {
+            writeln!(
+                out,
+                "_ErrorSetterFnDart? _{name};",
+                name = f.error_setter_fn_name
+            )?;
+        }
+
+        Ok(())
+    }
+
+    /// Generates code that convert Dart function to a C function pointers.
+    ///
+    /// # Example of generated code
+    ///
+    /// ```ignore
+    /// Pointer<NativeFunction<Int32 Function(Handle)>>
+    ///     iceConnectionState_native =
+    ///         Pointer.fromFunction(_iceConnectionStateProxy, 0);
+    ///
+    /// Pointer<NativeFunction<Void Function(Handle, Handle)>>
+    ///       onConnectionStateChange_native = Pointer.fromFunction(
+    ///     _onConnectionStateChangeProxy,
+    ///   );
+    /// ```
+    fn generate_pointers_to_proxy_fns<T: Write>(
+        &self,
+        out: &mut T,
+    ) -> fmt::Result {
+        for f in &self.registrators {
+            let mut inputs = String::new();
+            for i in &f.inputs {
+                write!(inputs, "{}, ", i.to_ffi_type())?;
+            }
+            if !inputs.is_empty() {
+                inputs.truncate(inputs.len() - 2);
+            }
+            writeln!(
+                out,
+                "Pointer<NativeFunction<{ret_ty} Function({inputs})>> \
+                 {name}_native = Pointer.fromFunction(_{name}Proxy,{exc_ret});",
+                ret_ty = f.output.to_ffi_type(),
+                name = f.name.to_camel_case(),
+                exc_ret = f.output.exceptional_return(),
+            )?;
+        }
+
+        Ok(())
+    }
+
+    /// Generates code that performs lookup of Rust-side error setter functions.
+    ///
+    /// # Example of generated code
+    ///
+    /// ```ignore
+    ///   _peer_connection__ice_connection_state__set_error =
+    ///       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+    ///           'peer_connection__ice_connection_state__set_error');
+    ///   _peer_connection__on_connection_state_change__set_error =
+    ///       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+    ///           'peer_connection__on_connection_state_change__set_error');
+    /// ```
+    fn gen_set_error_lookup<T: Write>(&self, out: &mut T) -> fmt::Result {
+        for f in &self.registrators {
+            writeln!(
+                out,
+                "_{name} = dl.lookupFunction<\
+                    _ErrorSetterFnC,\
+                    _ErrorSetterFnDart>('{name}');",
+                name = f.error_setter_fn_name
+            )?;
+        }
+
+        Ok(())
+    }
+
+    /// Generates proxy functions that wrap calls in a try-catch blocks that
+    /// pass any exceptions to Rust.
+    ///
+    /// # Example of generated code
+    ///
+    /// ```ignore
+    /// int _iceConnectionStateProxy(Object arg0) {
+    ///   try {
+    ///     return _iceConnectionState!(arg0);
+    ///   } catch (e) {
+    ///     _peer_connection__ice_connection_state__set_error!(e);
+    ///     return 0;
+    ///   }
+    /// }
+    /// ```
+    fn generate_proxy_fns<T: Write>(&self, out: &mut T) -> fmt::Result {
+        for f in &self.registrators {
+            let mut inputs = String::new();
+            let mut arg_names = String::new();
+
+            for (i, t) in f.inputs.iter().enumerate() {
+                write!(inputs, "{arg_t} arg{i}, ", arg_t = t.to_dart_type())?;
+                write!(arg_names, "arg{i}, ")?;
+            }
+            if !inputs.is_empty() {
+                inputs.truncate(inputs.len() - 2);
+                arg_names.truncate(arg_names.len() - 2);
+            }
+
+            writeln!(
+                out,
+                "{ret_ty} _{name}Proxy({inputs}) {{\
+                     try {{
+                        return _{name}!({arg_names}); \
+                     }} catch (e) {{ \
+                        _{error_setter}!(e); \
+                        return {return_value};
+                     }} \
+                }}",
+                ret_ty = f.output.to_dart_type(),
+                name = f.name.to_camel_case(),
+                error_setter = f.error_setter_fn_name,
+                inputs = inputs,
+                return_value = f.output.default_value(),
+            )?;
         }
 
         Ok(())
