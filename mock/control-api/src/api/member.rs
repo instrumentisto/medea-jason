@@ -34,6 +34,14 @@ pub struct Member {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub on_leave: Option<String>,
 
+    /// URL to which `OnStart` Control API callback will be sent.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub on_start: Option<String>,
+
+    /// URL to which `OnStop` Control API callback will be sent.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub on_stop: Option<String>,
+
     /// Timeout of receiving heartbeat messages from this [`Member`] via Client
     /// API. Once reached, the [`Member`] is considered being idle.
     #[serde(default, with = "humantime_serde")]
@@ -69,6 +77,8 @@ impl Member {
             credentials: self.credentials.map(Into::into),
             on_join: self.on_join.unwrap_or_default(),
             on_leave: self.on_leave.unwrap_or_default(),
+            on_start: self.on_start.unwrap_or_default(),
+            on_stop: self.on_stop.unwrap_or_default(),
             idle_timeout: self.idle_timeout.map(|d| d.try_into().unwrap()),
             reconnect_timeout: self
                 .reconnect_timeout
@@ -100,6 +110,8 @@ impl From<proto::Member> for Member {
             credentials: proto.credentials.map(Into::into),
             on_join: Some(proto.on_join).filter(|s| !s.is_empty()),
             on_leave: Some(proto.on_leave).filter(|s| !s.is_empty()),
+            on_start: Some(proto.on_start).filter(|s| !s.is_empty()),
+            on_stop: Some(proto.on_stop).filter(|s| !s.is_empty()),
             idle_timeout: proto.idle_timeout.map(|dur| dur.try_into().unwrap()),
             reconnect_timeout: proto
                 .reconnect_timeout

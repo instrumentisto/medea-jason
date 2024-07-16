@@ -58,6 +58,18 @@ pub struct Spec {
     /// [Client API]: https://tinyurl.com/266y74tf
     pub on_leave: Option<Url>,
 
+    /// [`Url`] of the callback to fire when this [`Member`] started traffic
+    /// with a media server via [Client API].
+    ///
+    /// [Client API]: https://tinyurl.com/266y74tf
+    pub on_start: Option<Url>,
+
+    /// [`Url`] of the callback to fire when this [`Member`] stopped traffic
+    /// with a media server via [Client API].
+    ///
+    /// [Client API]: https://tinyurl.com/266y74tf
+    pub on_stop: Option<Url>,
+
     /// Timeout of receiving heartbeat messages from this [`Member`] via
     /// [Client API].
     ///

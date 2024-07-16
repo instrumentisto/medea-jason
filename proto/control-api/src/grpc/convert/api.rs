@@ -412,6 +412,14 @@ impl TryFrom<proto::Member> for Member {
                     .then(|| member.on_leave.parse())
                     .transpose()
                     .map_err(CallbackUrlParseError::from)?,
+                on_start: (!member.on_start.is_empty())
+                    .then(|| member.on_start.parse())
+                    .transpose()
+                    .map_err(CallbackUrlParseError::from)?,
+                on_stop: (!member.on_stop.is_empty())
+                    .then(|| member.on_stop.parse())
+                    .transpose()
+                    .map_err(CallbackUrlParseError::from)?,
                 idle_timeout,
                 reconnect_timeout,
                 ping_interval,
@@ -435,6 +443,16 @@ impl From<Member> for proto::Member {
             on_leave: member
                 .spec
                 .on_leave
+                .as_ref()
+                .map_or_else(String::default, ToString::to_string),
+            on_start: member
+                .spec
+                .on_start
+                .as_ref()
+                .map_or_else(String::default, ToString::to_string),
+            on_stop: member
+                .spec
+                .on_stop
                 .as_ref()
                 .map_or_else(String::default, ToString::to_string),
             idle_timeout: member
