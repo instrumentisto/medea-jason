@@ -1,6 +1,7 @@
 // ignore_for_file: implementation_imports
 
-import 'package:js/js.dart';
+import 'dart:js_interop';
+
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import 'package:medea_flutter_webrtc/src/platform/web/media_stream_track.dart';
 
@@ -43,17 +44,17 @@ class WebRemoteMediaTrack implements RemoteMediaTrack {
 
   @override
   void onMuted(void Function() f) {
-    fallibleFunction(() => obj.on_muted(allowInterop(f)));
+    fallibleFunction(() => obj.on_muted(f.toJS));
   }
 
   @override
   void onUnmuted(void Function() f) {
-    fallibleFunction(() => obj.on_unmuted(allowInterop(f)));
+    fallibleFunction(() => obj.on_unmuted(f.toJS));
   }
 
   @override
   void onStopped(void Function() f) {
-    fallibleFunction(() => obj.on_stopped(allowInterop(f)));
+    fallibleFunction(() => obj.on_stopped(f.toJS));
   }
 
   @moveSemantics
@@ -64,7 +65,10 @@ class WebRemoteMediaTrack implements RemoteMediaTrack {
 
   @override
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
-    fallibleFunction(() => obj.on_media_direction_changed(
-        allowInterop((i) => f(TrackMediaDirection.values[i]))));
+    fallibleFunction(
+      () => obj.on_media_direction_changed(
+        ((i) => f(TrackMediaDirection.values[i])).toJS,
+      ),
+    );
   }
 }

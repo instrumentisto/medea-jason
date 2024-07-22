@@ -1,7 +1,3 @@
-// ignore_for_file: avoid_web_libraries_in_flutter
-
-import 'dart:js_util';
-
 import '../interface/exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
@@ -10,9 +6,9 @@ import 'jason_wasm.dart' as wasm;
 /// Returns `null` in case if the provided exception is not from Jason.
 String? _getName(dynamic e) {
   try {
-    var exceptionConstructor = getProperty(e, 'constructor');
-    return getProperty(exceptionConstructor, 'name');
+    return e.name;
   } catch (e) {
+    print('_getName failed: $e');
     return null;
   }
 }

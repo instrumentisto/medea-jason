@@ -3,10 +3,9 @@
 @JS()
 library medea_jason;
 
-import 'dart:html' as html;
+import 'dart:js_interop';
 
-import 'package:js/js.dart';
-import 'package:js/js_util.dart' show promiseToFuture;
+import 'package:web/web.dart' as web;
 
 @JS()
 class FacingMode {
@@ -54,39 +53,39 @@ class AudioTrackConstraints {
 @JS()
 class ConnectionHandle {
   external void free();
-  external void on_close(Function cb);
+  external void on_close(JSFunction cb);
   external String get_remote_member_id();
-  external void on_remote_track_added(Function cb);
-  external void on_quality_score_update(Function cb);
+  external void on_remote_track_added(JSFunction cb);
+  external void on_quality_score_update(JSFunction cb);
 }
 
 @JS('ConnectionHandle')
 abstract class _ConnectionHandle {
-  external Promise<dynamic> disable_remote_audio();
-  external Promise<dynamic> disable_remote_video(num? source_kind);
-  external Promise<dynamic> enable_remote_audio();
-  external Promise<dynamic> enable_remote_video(num? source_kind);
+  external JSPromise<JSAny?> disable_remote_audio();
+  external JSPromise<JSAny?> disable_remote_video(num? source_kind);
+  external JSPromise<JSAny?> enable_remote_audio();
+  external JSPromise<JSAny?> enable_remote_video(num? source_kind);
 }
 
 extension ConnectionHandleExtensions on ConnectionHandle {
   Future<dynamic> disable_remote_audio() {
     final tt = this as _ConnectionHandle;
-    return promiseToFuture(tt.disable_remote_audio());
+    return tt.disable_remote_audio().toDart;
   }
 
   Future<dynamic> disable_remote_video(num? source_kind) {
     final tt = this as _ConnectionHandle;
-    return promiseToFuture(tt.disable_remote_video(source_kind));
+    return tt.disable_remote_video(source_kind).toDart;
   }
 
   Future<dynamic> enable_remote_audio() {
     final tt = this as _ConnectionHandle;
-    return promiseToFuture(tt.enable_remote_audio());
+    return tt.enable_remote_audio().toDart;
   }
 
   Future<dynamic> enable_remote_video(num? source_kind) {
     final tt = this as _ConnectionHandle;
-    return promiseToFuture(tt.enable_remote_video(source_kind));
+    return tt.enable_remote_video(source_kind).toDart;
   }
 }
 
@@ -171,45 +170,46 @@ class LocalMediaInitException {
 @JS()
 class LocalMediaTrack {
   external void free();
-  external html.MediaStreamTrack get_track();
+  external web.MediaStreamTrack get_track();
   external num kind();
   external num media_source_kind();
-  external void on_enabled(Function cb);
+  external void on_enabled(JSFunction cb);
 }
 
 @JS('LocalMediaTrack')
 abstract class _LocalMediaTrack {
-  external Promise<dynamic> state();
+  external JSPromise<JSAny?> state();
 }
 
 extension LocalMediaTrackExtensions on LocalMediaTrack {
   Future<dynamic> state() {
     final tt = this as _LocalMediaTrack;
-    return promiseToFuture(tt.state());
+    return tt.state().toDart;
   }
 }
 
 @JS()
 class MediaManagerHandle {
-  external void on_device_change(Function cb);
+  external void on_device_change(JSFunction cb);
   external void free();
 }
 
 @JS('MediaManagerHandle')
 abstract class _MediaManagerHandle {
-  external Promise<List<dynamic>> enumerate_devices();
-  external Promise<List<dynamic>> init_local_tracks(MediaStreamSettings caps);
+  external JSPromise<JSArray<JSAny>> enumerate_devices();
+  external JSPromise<JSArray<JSAny>> init_local_tracks(
+      MediaStreamSettings caps);
 }
 
 extension MediaManagerHandleExtensions on MediaManagerHandle {
-  Future<List<dynamic>> enumerate_devices() {
+  Future<List<dynamic>> enumerate_devices() async {
     final tt = this as _MediaManagerHandle;
-    return promiseToFuture(tt.enumerate_devices());
+    return (await tt.enumerate_devices().toDart).toDart;
   }
 
-  Future<List<dynamic>> init_local_tracks(MediaStreamSettings caps) {
+  Future<List<dynamic>> init_local_tracks(MediaStreamSettings caps) async {
     final tt = this as _MediaManagerHandle;
-    return promiseToFuture(tt.init_local_tracks(caps));
+    return (await tt.init_local_tracks(caps).toDart).toDart;
   }
 }
 
@@ -245,37 +245,51 @@ class ReconnectHandle {
 
 @JS('ReconnectHandle')
 abstract class _ReconnectHandle {
-  external Promise<dynamic> reconnect_with_delay(num delay_ms);
-  external Promise<dynamic> reconnect_with_backoff(num starting_delay_ms,
-      num multiplier, num max_delay, num? max_elapsed_time_ms);
+  external JSPromise<JSAny?> reconnect_with_delay(num delay_ms);
+  external JSPromise<JSAny?> reconnect_with_backoff(
+    num starting_delay_ms,
+    num multiplier,
+    num max_delay,
+    num? max_elapsed_time_ms,
+  );
 }
 
 extension ReconnectHandleExtensions on ReconnectHandle {
   Future<dynamic> reconnect_with_delay(num delay_ms) {
     final tt = this as _ReconnectHandle;
-    return promiseToFuture(tt.reconnect_with_delay(delay_ms));
+    return tt.reconnect_with_delay(delay_ms).toDart;
   }
 
-  Future<dynamic> reconnect_with_backoff(num starting_delay_ms, num multiplier,
-      num max_delay, num? max_elapsed_time_ms) {
+  Future<dynamic> reconnect_with_backoff(
+    num starting_delay_ms,
+    num multiplier,
+    num max_delay,
+    num? max_elapsed_time_ms,
+  ) {
     final tt = this as _ReconnectHandle;
-    return promiseToFuture(tt.reconnect_with_backoff(
-        starting_delay_ms, multiplier, max_delay, max_elapsed_time_ms));
+    return tt
+        .reconnect_with_backoff(
+          starting_delay_ms,
+          multiplier,
+          max_delay,
+          max_elapsed_time_ms,
+        )
+        .toDart;
   }
 }
 
 @JS()
 class RemoteMediaTrack {
   external void free();
-  external html.MediaStreamTrack get_track();
+  external web.MediaStreamTrack get_track();
   external bool enabled();
   external bool muted();
-  external void on_enabled(Function cb);
-  external void on_disabled(Function cb);
-  external void on_muted(Function cb);
-  external void on_unmuted(Function cb);
-  external void on_stopped(Function cb);
-  external void on_media_direction_changed(Function cb);
+  external void on_enabled(JSFunction cb);
+  external void on_disabled(JSFunction cb);
+  external void on_muted(JSFunction cb);
+  external void on_unmuted(JSFunction cb);
+  external void on_stopped(JSFunction cb);
+  external void on_media_direction_changed(JSFunction cb);
   external num kind();
   external num media_source_kind();
   external num media_direction();
@@ -292,103 +306,110 @@ class RoomCloseReason {
 @JS()
 class RoomHandle {
   external void free();
-  external void on_new_connection(Function cb);
-  external void on_close(Function cb);
-  external void on_local_track(Function cb);
-  external void on_failed_local_media(Function cb);
-  external void on_connection_loss(Function cb);
+  external void on_new_connection(JSFunction cb);
+  external void on_close(JSFunction cb);
+  external void on_local_track(JSFunction cb);
+  external void on_failed_local_media(JSFunction cb);
+  external void on_connection_loss(JSFunction cb);
 }
 
 @JS('RoomHandle')
 abstract class _RoomHandle {
-  external Promise<dynamic> join(String token);
-  external Promise<dynamic> set_local_media_settings(
-      MediaStreamSettings settings, bool stop_first, bool rollback_on_fail);
-  external Promise<dynamic> mute_audio();
-  external Promise<dynamic> unmute_audio();
-  external Promise<dynamic> mute_video(num? source_kind);
-  external Promise<dynamic> unmute_video(num? source_kind);
-  external Promise<dynamic> disable_audio();
-  external Promise<dynamic> enable_audio();
-  external Promise<dynamic> disable_video(num? source_kind);
-  external Promise<dynamic> enable_video(num? source_kind);
-  external Promise<dynamic> disable_remote_audio();
-  external Promise<dynamic> disable_remote_video(num? source_kind);
-  external Promise<dynamic> enable_remote_audio();
-  external Promise<dynamic> enable_remote_video(num? source_kind);
+  external JSPromise<JSAny?> join(String token);
+  external JSPromise<JSAny?> set_local_media_settings(
+    MediaStreamSettings settings,
+    bool stop_first,
+    bool rollback_on_fail,
+  );
+  external JSPromise<JSAny?> mute_audio();
+  external JSPromise<JSAny?> unmute_audio();
+  external JSPromise<JSAny?> mute_video(num? source_kind);
+  external JSPromise<JSAny?> unmute_video(num? source_kind);
+  external JSPromise<JSAny?> disable_audio();
+  external JSPromise<JSAny?> enable_audio();
+  external JSPromise<JSAny?> disable_video(num? source_kind);
+  external JSPromise<JSAny?> enable_video(num? source_kind);
+  external JSPromise<JSAny?> disable_remote_audio();
+  external JSPromise<JSAny?> disable_remote_video(num? source_kind);
+  external JSPromise<JSAny?> enable_remote_audio();
+  external JSPromise<JSAny?> enable_remote_video(num? source_kind);
 }
 
 extension RoomHandleExtensions on RoomHandle {
   Future<dynamic> join(String token) {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.join(token));
+    return tt.join(token).toDart;
   }
 
   Future<dynamic> set_local_media_settings(
-      MediaStreamSettings settings, bool stop_first, bool rollback_on_fail) {
+    MediaStreamSettings settings,
+    bool stop_first,
+    bool rollback_on_fail,
+  ) {
     final tt = this as _RoomHandle;
-    return promiseToFuture(
-        tt.set_local_media_settings(settings, stop_first, rollback_on_fail));
+    return tt
+        .set_local_media_settings(settings, stop_first, rollback_on_fail)
+        .toDart;
   }
 
   Future<dynamic> mute_audio() {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.mute_audio());
+    return tt.mute_audio().toDart;
   }
 
   Future<dynamic> unmute_audio() {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.unmute_audio());
+    return tt.unmute_audio().toDart;
   }
 
   Future<dynamic> mute_video(num? source_kind) {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.mute_video(source_kind));
+    return tt.mute_video(source_kind).toDart;
   }
 
   Future<dynamic> unmute_video(num? source_kind) {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.unmute_video(source_kind));
+    return tt.unmute_video(source_kind).toDart;
   }
 
   Future<dynamic> disable_audio() {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.disable_audio());
+    return tt.disable_audio().toDart;
   }
 
   Future<dynamic> enable_audio() {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.enable_audio());
+    return tt.enable_audio().toDart;
   }
 
   Future<dynamic> disable_video(num? source_kind) {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.disable_video(source_kind));
+    return tt.disable_video(source_kind).toDart;
   }
 
   Future<dynamic> enable_video(num? source_kind) {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.enable_video(source_kind));
+    return tt.enable_video(source_kind).toDart;
   }
 
   Future<dynamic> disable_remote_audio() {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.disable_remote_audio());
+    return tt.disable_remote_audio().toDart;
   }
 
   Future<dynamic> disable_remote_video(num? source_kind) {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.disable_remote_video(source_kind));
+    return tt.disable_remote_video(source_kind).toDart;
   }
 
   Future<dynamic> enable_remote_audio() {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.enable_remote_audio());
+    return tt.enable_remote_audio().toDart;
   }
 
   Future<dynamic> enable_remote_video(num? source_kind) {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.enable_remote_video(source_kind));
+    return tt.enable_remote_video(source_kind).toDart;
   }
 }
 
@@ -406,12 +427,4 @@ class StateError {
   external void free();
   external String message();
   external String trace();
-}
-
-@JS()
-abstract class Promise<T> {
-  external factory Promise(
-      void Function(void Function(T result) resolve, Function reject) executor);
-  external Promise then(void Function(T result) onFulfilled,
-      [Function onRejected]);
 }

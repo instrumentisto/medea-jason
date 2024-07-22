@@ -3,7 +3,7 @@
 import 'package:medea_flutter_webrtc/src/platform/web/video_renderer.dart'
     as video_renderer;
 
-import 'package:js/js.dart';
+import 'dart:js_interop';
 
 import '../interface/media_device_details.dart';
 import '../interface/media_display_details.dart';
@@ -54,7 +54,7 @@ class WebMediaManagerHandle implements MediaManagerHandle {
 
   @override
   void onDeviceChange(Function cb) {
-    obj.on_device_change(allowInterop(cb));
+    obj.on_device_change(cb.toJS);
   }
 
   @override

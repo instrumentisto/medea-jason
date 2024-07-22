@@ -1,4 +1,4 @@
-import 'package:js/js.dart';
+import 'dart:js_interop';
 
 import '../interface/connection_handle.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
@@ -94,37 +94,41 @@ class WebRoomHandle implements RoomHandle {
 
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
-    fallibleFunction(() => obj.on_new_connection(allowInterop((handle) {
-          f(WebConnectionHandle(handle));
-        })));
+    fallibleFunction(
+      () => obj.on_new_connection(
+        ((handle) => f(WebConnectionHandle(handle))).toJS,
+      ),
+    );
   }
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
-    fallibleFunction(() => obj.on_close(allowInterop((reason) {
-          f(WebRoomCloseReason(reason));
-        })));
+    fallibleFunction(
+      () => obj.on_close(((reason) => f(WebRoomCloseReason(reason))).toJS),
+    );
   }
 
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
-    fallibleFunction(() => obj.on_local_track(allowInterop((track) {
-          f(WebLocalMediaTrack(track));
-        })));
+    fallibleFunction(
+      () => obj.on_local_track(((track) => f(WebLocalMediaTrack(track))).toJS),
+    );
   }
 
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
-    fallibleFunction(() => obj.on_connection_loss(allowInterop((handle) {
-          f(WebReconnectHandle(handle));
-        })));
+    fallibleFunction(
+      () => obj.on_connection_loss(
+        ((handle) => f(WebReconnectHandle(handle))).toJS,
+      ),
+    );
   }
 
   @override
   void onFailedLocalMedia(void Function(Object) f) {
-    fallibleFunction(() => obj.on_failed_local_media(allowInterop((e) {
-          f(convertException(e));
-        })));
+    fallibleFunction(
+      () => obj.on_failed_local_media(((e) => f(convertException(e))).toJS),
+    );
   }
 
   @moveSemantics

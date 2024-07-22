@@ -1,8 +1,6 @@
 // ignore_for_file: avoid_web_libraries_in_flutter
 
-import 'dart:js';
-
-import 'package:js/js.dart';
+import 'dart:js_interop';
 
 import '../interface/connection_handle.dart';
 import '../interface/media_track.dart';
@@ -23,19 +21,21 @@ class WebConnectionHandle implements ConnectionHandle {
 
   @override
   void onClose(void Function() f) {
-    fallibleFunction(() => obj.on_close(allowInterop(f)));
+    fallibleFunction(() => obj.on_close(f.toJS));
   }
 
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
-    fallibleFunction(() => obj.on_remote_track_added(allowInterop((track) {
-          f(WebRemoteMediaTrack(track));
-        })));
+    fallibleFunction(
+      () => obj.on_remote_track_added(
+        ((track) => f(WebRemoteMediaTrack(track))).toJS,
+      ),
+    );
   }
 
   @override
   void onQualityScoreUpdate(void Function(int) f) {
-    fallibleFunction(() => obj.on_quality_score_update(allowInterop(f)));
+    fallibleFunction(() => obj.on_quality_score_update(f.toJS));
   }
 
   @override
