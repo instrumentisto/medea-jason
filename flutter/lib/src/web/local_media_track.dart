@@ -46,8 +46,8 @@ class WebLocalMediaTrack implements LocalMediaTrack {
 
   @override
   Future<MediaStreamTrackState> state() async {
-    var index = await fallibleFuture(obj.state());
-    return MediaStreamTrackState.values[index];
+    final index = await fallibleFuture(obj.state().toDart) as JSNumber;
+    return MediaStreamTrackState.values[index.toDartInt];
   }
 
   @override

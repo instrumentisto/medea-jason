@@ -7,42 +7,42 @@ import 'dart:js_interop';
 
 import 'package:web/web.dart' as web;
 
-@JS()
-class FacingMode {
+@JS('Date')
+extension type FacingMode._(JSObject _) implements JSObject {
   external static num get User;
   external static num get Environment;
   external static num get Left;
   external static num get Right;
 }
 
-@JS()
-class MediaSourceKind {
+@JS('MediaSourceKind')
+extension type MediaSourceKind._(JSObject _) implements JSObject {
   external static num get Device;
   external static num get Display;
 }
 
-@JS()
-class MediaKind {
+@JS('MediaKind')
+extension type MediaKind._(JSObject _) implements JSObject {
   external static num get Audio;
   external static num get Video;
 }
 
-@JS()
-class LocalMediaInitExceptionKind {
+@JS('LocalMediaInitExceptionKind')
+extension type LocalMediaInitExceptionKind._(JSObject _) implements JSObject {
   external static num get GetUserMediaFailed;
   external static num get GetDisplayMediaFailed;
   external static num get LocalTrackIsEnded;
 }
 
-@JS()
-class RpcClientExceptionKind {
+@JS('RpcClientExceptionKind')
+extension type RpcClientExceptionKind._(JSObject _) implements JSObject {
   external static num get ConnectionLost;
   external static num get AuthorizationFailed;
   external static num get SessionFinished;
 }
 
-@JS()
-class AudioTrackConstraints {
+@JS('AudioTrackConstraints')
+extension type AudioTrackConstraints._(JSObject _) implements JSObject {
   external void free();
   external factory AudioTrackConstraints();
   external void device_id(String device_id);
@@ -50,47 +50,21 @@ class AudioTrackConstraints {
   external void ideal_auto_gain_control(bool auto_gain_control);
 }
 
-@JS()
-class ConnectionHandle {
+@JS('ConnectionHandle')
+extension type ConnectionHandle._(JSObject _) implements JSObject {
   external void free();
   external void on_close(JSFunction cb);
   external String get_remote_member_id();
   external void on_remote_track_added(JSFunction cb);
   external void on_quality_score_update(JSFunction cb);
-}
-
-@JS('ConnectionHandle')
-abstract class _ConnectionHandle {
   external JSPromise<JSAny?> disable_remote_audio();
   external JSPromise<JSAny?> disable_remote_video(num? source_kind);
   external JSPromise<JSAny?> enable_remote_audio();
   external JSPromise<JSAny?> enable_remote_video(num? source_kind);
 }
 
-extension ConnectionHandleExtensions on ConnectionHandle {
-  Future<dynamic> disable_remote_audio() {
-    final tt = this as _ConnectionHandle;
-    return tt.disable_remote_audio().toDart;
-  }
-
-  Future<dynamic> disable_remote_video(num? source_kind) {
-    final tt = this as _ConnectionHandle;
-    return tt.disable_remote_video(source_kind).toDart;
-  }
-
-  Future<dynamic> enable_remote_audio() {
-    final tt = this as _ConnectionHandle;
-    return tt.enable_remote_audio().toDart;
-  }
-
-  Future<dynamic> enable_remote_video(num? source_kind) {
-    final tt = this as _ConnectionHandle;
-    return tt.enable_remote_video(source_kind).toDart;
-  }
-}
-
 @JS()
-class DeviceVideoTrackConstraints {
+extension type DeviceVideoTrackConstraints._(JSObject _) implements JSObject {
   external void free();
   external factory DeviceVideoTrackConstraints();
   external void device_id(String device_id);
@@ -107,7 +81,7 @@ class DeviceVideoTrackConstraints {
 }
 
 @JS()
-class DisplayVideoTrackConstraints {
+extension type DisplayVideoTrackConstraints._(JSObject _) implements JSObject {
   external void free();
   external factory DisplayVideoTrackConstraints();
   external void exact_height(num height);
@@ -119,20 +93,20 @@ class DisplayVideoTrackConstraints {
 }
 
 @JS()
-class EnumerateDevicesException {
+extension type EnumerateDevicesException._(JSObject _) implements JSObject {
   external void free();
-  external Error cause();
+  external String cause();
   external String trace();
 }
 
 @JS()
-class FormatException {
+extension type FormatException._(JSObject _) implements JSObject {
   external void free();
   external String message();
 }
 
 @JS()
-class MediaDeviceDetails {
+extension type MediaDeviceDetails._(JSObject _) implements JSObject {
   external void free();
   external String device_id();
   external num kind();
@@ -141,17 +115,17 @@ class MediaDeviceDetails {
 }
 
 @JS()
-class InternalException {
+extension type InternalException._(JSObject _) implements JSObject {
   external void free();
   external String message();
-  external dynamic cause();
+  external String cause();
   external String trace();
 }
 
-@JS()
-class Jason {
+@JS('Jason')
+extension type Jason._(JSObject _) implements JSObject {
+  external Jason();
   external void free();
-  external factory Jason();
   external RoomHandle init_room();
   external MediaManagerHandle media_manager();
   external void close_room(RoomHandle room_to_delete);
@@ -159,70 +133,44 @@ class Jason {
 }
 
 @JS()
-class LocalMediaInitException {
+extension type LocalMediaInitException._(JSObject _) implements JSObject {
   external void free();
   external num kind();
   external String message();
-  external dynamic cause();
+  external String cause();
   external String trace();
 }
 
 @JS()
-class LocalMediaTrack {
+extension type LocalMediaTrack._(JSObject _) implements JSObject {
   external void free();
   external web.MediaStreamTrack get_track();
   external num kind();
   external num media_source_kind();
   external void on_enabled(JSFunction cb);
-}
-
-@JS('LocalMediaTrack')
-abstract class _LocalMediaTrack {
   external JSPromise<JSAny?> state();
 }
 
-extension LocalMediaTrackExtensions on LocalMediaTrack {
-  Future<dynamic> state() {
-    final tt = this as _LocalMediaTrack;
-    return tt.state().toDart;
-  }
-}
-
 @JS()
-class MediaManagerHandle {
+extension type MediaManagerHandle._(JSObject _) implements JSObject {
   external void on_device_change(JSFunction cb);
   external void free();
-}
-
-@JS('MediaManagerHandle')
-abstract class _MediaManagerHandle {
   external JSPromise<JSArray<JSAny>> enumerate_devices();
   external JSPromise<JSArray<JSAny>> init_local_tracks(
-      MediaStreamSettings caps);
-}
-
-extension MediaManagerHandleExtensions on MediaManagerHandle {
-  Future<List<dynamic>> enumerate_devices() async {
-    final tt = this as _MediaManagerHandle;
-    return (await tt.enumerate_devices().toDart).toDart;
-  }
-
-  Future<List<dynamic>> init_local_tracks(MediaStreamSettings caps) async {
-    final tt = this as _MediaManagerHandle;
-    return (await tt.init_local_tracks(caps).toDart).toDart;
-  }
+    MediaStreamSettings caps,
+  );
 }
 
 @JS()
-class MediaSettingsUpdateException {
+extension type MediaSettingsUpdateException._(JSObject _) implements JSObject {
   external void free();
   external String message();
-  external dynamic cause();
+  external String cause();
   external bool rolled_back();
 }
 
 @JS()
-class MediaStateTransitionException {
+extension type MediaStateTransitionException._(JSObject _) implements JSObject {
   external void free();
   external String message();
   external String trace();
@@ -230,7 +178,7 @@ class MediaStateTransitionException {
 }
 
 @JS()
-class MediaStreamSettings {
+extension type MediaStreamSettings._(JSObject _) implements JSObject {
   external void free();
   external factory MediaStreamSettings();
   external void audio(AudioTrackConstraints constraints);
@@ -238,13 +186,9 @@ class MediaStreamSettings {
   external void display_video(DisplayVideoTrackConstraints constraints);
 }
 
-@JS()
-class ReconnectHandle {
-  external void free();
-}
-
 @JS('ReconnectHandle')
-abstract class _ReconnectHandle {
+extension type ReconnectHandle._(JSObject _) implements JSObject {
+  external void free();
   external JSPromise<JSAny?> reconnect_with_delay(num delay_ms);
   external JSPromise<JSAny?> reconnect_with_backoff(
     num starting_delay_ms,
@@ -254,32 +198,8 @@ abstract class _ReconnectHandle {
   );
 }
 
-extension ReconnectHandleExtensions on ReconnectHandle {
-  Future<dynamic> reconnect_with_delay(num delay_ms) {
-    final tt = this as _ReconnectHandle;
-    return tt.reconnect_with_delay(delay_ms).toDart;
-  }
-
-  Future<dynamic> reconnect_with_backoff(
-    num starting_delay_ms,
-    num multiplier,
-    num max_delay,
-    num? max_elapsed_time_ms,
-  ) {
-    final tt = this as _ReconnectHandle;
-    return tt
-        .reconnect_with_backoff(
-          starting_delay_ms,
-          multiplier,
-          max_delay,
-          max_elapsed_time_ms,
-        )
-        .toDart;
-  }
-}
-
 @JS()
-class RemoteMediaTrack {
+extension type RemoteMediaTrack._(JSObject _) implements JSObject {
   external void free();
   external web.MediaStreamTrack get_track();
   external bool enabled();
@@ -296,7 +216,7 @@ class RemoteMediaTrack {
 }
 
 @JS()
-class RoomCloseReason {
+extension type RoomCloseReason._(JSObject _) implements JSObject {
   external void free();
   external String reason();
   external bool is_closed_by_server();
@@ -304,17 +224,13 @@ class RoomCloseReason {
 }
 
 @JS()
-class RoomHandle {
+extension type RoomHandle._(JSObject _) implements JSObject {
   external void free();
   external void on_new_connection(JSFunction cb);
   external void on_close(JSFunction cb);
   external void on_local_track(JSFunction cb);
   external void on_failed_local_media(JSFunction cb);
   external void on_connection_loss(JSFunction cb);
-}
-
-@JS('RoomHandle')
-abstract class _RoomHandle {
   external JSPromise<JSAny?> join(String token);
   external JSPromise<JSAny?> set_local_media_settings(
     MediaStreamSettings settings,
@@ -335,95 +251,17 @@ abstract class _RoomHandle {
   external JSPromise<JSAny?> enable_remote_video(num? source_kind);
 }
 
-extension RoomHandleExtensions on RoomHandle {
-  Future<dynamic> join(String token) {
-    final tt = this as _RoomHandle;
-    return tt.join(token).toDart;
-  }
-
-  Future<dynamic> set_local_media_settings(
-    MediaStreamSettings settings,
-    bool stop_first,
-    bool rollback_on_fail,
-  ) {
-    final tt = this as _RoomHandle;
-    return tt
-        .set_local_media_settings(settings, stop_first, rollback_on_fail)
-        .toDart;
-  }
-
-  Future<dynamic> mute_audio() {
-    final tt = this as _RoomHandle;
-    return tt.mute_audio().toDart;
-  }
-
-  Future<dynamic> unmute_audio() {
-    final tt = this as _RoomHandle;
-    return tt.unmute_audio().toDart;
-  }
-
-  Future<dynamic> mute_video(num? source_kind) {
-    final tt = this as _RoomHandle;
-    return tt.mute_video(source_kind).toDart;
-  }
-
-  Future<dynamic> unmute_video(num? source_kind) {
-    final tt = this as _RoomHandle;
-    return tt.unmute_video(source_kind).toDart;
-  }
-
-  Future<dynamic> disable_audio() {
-    final tt = this as _RoomHandle;
-    return tt.disable_audio().toDart;
-  }
-
-  Future<dynamic> enable_audio() {
-    final tt = this as _RoomHandle;
-    return tt.enable_audio().toDart;
-  }
-
-  Future<dynamic> disable_video(num? source_kind) {
-    final tt = this as _RoomHandle;
-    return tt.disable_video(source_kind).toDart;
-  }
-
-  Future<dynamic> enable_video(num? source_kind) {
-    final tt = this as _RoomHandle;
-    return tt.enable_video(source_kind).toDart;
-  }
-
-  Future<dynamic> disable_remote_audio() {
-    final tt = this as _RoomHandle;
-    return tt.disable_remote_audio().toDart;
-  }
-
-  Future<dynamic> disable_remote_video(num? source_kind) {
-    final tt = this as _RoomHandle;
-    return tt.disable_remote_video(source_kind).toDart;
-  }
-
-  Future<dynamic> enable_remote_audio() {
-    final tt = this as _RoomHandle;
-    return tt.enable_remote_audio().toDart;
-  }
-
-  Future<dynamic> enable_remote_video(num? source_kind) {
-    final tt = this as _RoomHandle;
-    return tt.enable_remote_video(source_kind).toDart;
-  }
-}
-
 @JS()
-class RpcClientException {
+extension type RpcClientException._(JSObject _) implements JSObject {
   external void free();
   external num kind();
   external String message();
-  external dynamic cause();
+  external String cause();
   external String trace();
 }
 
 @JS()
-class StateError {
+extension type StateError._(JSObject _) implements JSObject {
   external void free();
   external String message();
   external String trace();

@@ -65,10 +65,9 @@ class WebRemoteMediaTrack implements RemoteMediaTrack {
 
   @override
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
-    fallibleFunction(
-      () => obj.on_media_direction_changed(
-        ((i) => f(TrackMediaDirection.values[i])).toJS,
-      ),
-    );
+    void fn(JSAny? i) =>
+        f(TrackMediaDirection.values[(i as JSNumber).toDartInt]);
+
+    fallibleFunction(() => obj.on_media_direction_changed(fn.toJS));
   }
 }

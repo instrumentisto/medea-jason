@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import '../interface/reconnect_handle.dart';
 import '../util/move_semantic.dart';
 import 'exceptions.dart';
@@ -10,15 +12,26 @@ class WebReconnectHandle implements ReconnectHandle {
 
   @override
   Future<void> reconnectWithDelay(int delayMs) async {
-    await fallibleFuture(obj.reconnect_with_delay(delayMs));
+    await fallibleFuture(obj.reconnect_with_delay(delayMs).toDart);
   }
 
   @override
   Future<void> reconnectWithBackoff(
-      int startingDelayMs, double multiplier, int maxDelay,
-      [int? maxElapsedTimeMs]) async {
-    await fallibleFuture(obj.reconnect_with_backoff(
-        startingDelayMs, multiplier, maxDelay, maxElapsedTimeMs));
+    int startingDelayMs,
+    double multiplier,
+    int maxDelay, [
+    int? maxElapsedTimeMs,
+  ]) async {
+    await fallibleFuture(
+      obj
+          .reconnect_with_backoff(
+            startingDelayMs,
+            multiplier,
+            maxDelay,
+            maxElapsedTimeMs,
+          )
+          .toDart,
+    );
   }
 
   @moveSemantics

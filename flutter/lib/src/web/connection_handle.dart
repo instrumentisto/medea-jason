@@ -26,11 +26,9 @@ class WebConnectionHandle implements ConnectionHandle {
 
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
-    fallibleFunction(
-      () => obj.on_remote_track_added(
-        ((track) => f(WebRemoteMediaTrack(track))).toJS,
-      ),
-    );
+    void fn(JSAny? track) =>
+        f(WebRemoteMediaTrack(track as wasm.RemoteMediaTrack));
+    fallibleFunction(() => obj.on_remote_track_added(fn.toJS));
   }
 
   @override
@@ -40,22 +38,22 @@ class WebConnectionHandle implements ConnectionHandle {
 
   @override
   Future<void> enableRemoteAudio() async {
-    await fallibleFuture(obj.enable_remote_audio());
+    await fallibleFuture(obj.enable_remote_audio().toDart);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
-    await fallibleFuture(obj.disable_remote_audio());
+    await fallibleFuture(obj.disable_remote_audio().toDart);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
-    await fallibleFuture(obj.enable_remote_video(kind?.index));
+    await fallibleFuture(obj.enable_remote_video(kind?.index).toDart);
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
-    await fallibleFuture(obj.disable_remote_video(kind?.index));
+    await fallibleFuture(obj.disable_remote_video(kind?.index).toDart);
   }
 
   @moveSemantics

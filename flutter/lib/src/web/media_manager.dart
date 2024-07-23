@@ -25,15 +25,21 @@ class WebMediaManagerHandle implements MediaManagerHandle {
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
       base_settings.MediaStreamSettings caps) async {
-    var tracks = await fallibleFuture(
-        obj.init_local_tracks((caps as MediaStreamSettings).obj));
-    return tracks.map((t) => WebLocalMediaTrack(t)).toList();
+    final tracks = await fallibleFuture(
+      obj.init_local_tracks((caps as MediaStreamSettings).obj).toDart,
+    );
+
+    return tracks.toDart
+        .map((t) => WebLocalMediaTrack(t as wasm.LocalMediaTrack))
+        .toList();
   }
 
   @override
   Future<List<MediaDeviceDetails>> enumerateDevices() async {
-    var tracks = await fallibleFuture(obj.enumerate_devices());
-    return tracks.map((t) => WebMediaDeviceDetails(t)).toList();
+    final tracks = await fallibleFuture(obj.enumerate_devices().toDart);
+    return tracks.toDart
+        .map((t) => WebMediaDeviceDetails(t as wasm.MediaDeviceDetails))
+        .toList();
   }
 
   @override
@@ -53,7 +59,7 @@ class WebMediaManagerHandle implements MediaManagerHandle {
   }
 
   @override
-  void onDeviceChange(Function cb) {
+  void onDeviceChange(void Function() cb) {
     obj.on_device_change(cb.toJS);
   }
 
