@@ -14,21 +14,25 @@ bool _audioSend = true;
 bool _audioRecv = true;
 
 class CallRoute extends StatefulWidget {
-  final String _roomId;
-  final String _memberId;
-  final bool _isPublish;
-  final bool _publishAudio;
-  final bool _publishVideo;
-  final bool _fakeMedia;
+  const CallRoute(
+    this.roomId,
+    this.memberId,
+    this.isPublish,
+    this.publishVideo,
+    this.publishAudio,
+    this.fakeMedia, {
+    super.key,
+  });
 
-  const CallRoute(this._roomId, this._memberId, this._isPublish,
-      this._publishVideo, this._publishAudio, this._fakeMedia,
-      {super.key});
+  final String roomId;
+  final String memberId;
+  final bool isPublish;
+  final bool publishAudio;
+  final bool publishVideo;
+  final bool fakeMedia;
 
   @override
-  // ignore: no_logic_in_create_state
-  State<CallRoute> createState() => _CallState(
-      _roomId, _memberId, _isPublish, _publishVideo, _publishAudio, _fakeMedia);
+  State<CallRoute> createState() => _CallState();
 }
 
 class ConnectWidgets {
@@ -75,20 +79,17 @@ class _CallState extends State<CallRoute> {
   late String _roomId;
   late String _memberId;
 
-  _CallState(String roomId, String memberId, bool isPublish, bool publishVideo,
-      bool publishAudio, bool fakeMedia) {
-    _roomId = roomId;
-    _memberId = memberId;
-    _isPublish = isPublish;
-    _publishVideo = publishVideo;
-    _publishAudio = publishAudio;
-    _fakeMedia = fakeMedia;
-  }
-
   @override
   void initState() {
+    _roomId = widget.roomId;
+    _memberId = widget.memberId;
+    _isPublish = widget.isPublish;
+    _publishVideo = widget.publishVideo;
+    _publishAudio = widget.publishAudio;
+    _fakeMedia = widget.fakeMedia;
+
     _call.onNewRemoteStream((track, remoteId, conn) async {
-      var trackId = track.getTrack().id();
+      final trackId = track.getTrack().id();
       if (track.mediaDirection() == jason.TrackMediaDirection.sendRecv) {
         var renderer = createVideoRenderer();
         await renderer.initialize();
@@ -103,37 +104,40 @@ class _CallState extends State<CallRoute> {
           connectionWidgets.name = Text(remoteId);
           connectionWidgets.toggleButtons = [
             TextButton(
-                onPressed: () {
-                  if (!connectionWidgets!.recvVideoDevice) {
-                    conn.enableRemoteVideo(jason.MediaSourceKind.device);
-                  } else {
-                    conn.disableRemoteVideo(jason.MediaSourceKind.device);
-                  }
-                  connectionWidgets.recvVideoDevice =
-                      !connectionWidgets.recvVideoDevice;
-                },
-                child: const Text('Toggle divece video recv')),
+              onPressed: () {
+                if (!connectionWidgets!.recvVideoDevice) {
+                  conn.enableRemoteVideo(jason.MediaSourceKind.device);
+                } else {
+                  conn.disableRemoteVideo(jason.MediaSourceKind.device);
+                }
+                connectionWidgets.recvVideoDevice =
+                    !connectionWidgets.recvVideoDevice;
+              },
+              child: const Text('Toggle device video recv'),
+            ),
             TextButton(
-                onPressed: () {
-                  if (!connectionWidgets!.recvVideoDisplay) {
-                    conn.enableRemoteVideo(jason.MediaSourceKind.display);
-                  } else {
-                    conn.disableRemoteVideo(jason.MediaSourceKind.display);
-                  }
-                  connectionWidgets.recvVideoDisplay =
-                      !connectionWidgets.recvVideoDisplay;
-                },
-                child: const Text('Toggle display video recv')),
+              onPressed: () {
+                if (!connectionWidgets!.recvVideoDisplay) {
+                  conn.enableRemoteVideo(jason.MediaSourceKind.display);
+                } else {
+                  conn.disableRemoteVideo(jason.MediaSourceKind.display);
+                }
+                connectionWidgets.recvVideoDisplay =
+                    !connectionWidgets.recvVideoDisplay;
+              },
+              child: const Text('Toggle display video recv'),
+            ),
             TextButton(
-                onPressed: () {
-                  if (!connectionWidgets!.recvAudio) {
-                    conn.enableRemoteAudio();
-                  } else {
-                    conn.disableRemoteAudio();
-                  }
-                  connectionWidgets.recvAudio = !connectionWidgets.recvAudio;
-                },
-                child: const Text('Toggle audio recv'))
+              onPressed: () {
+                if (!connectionWidgets!.recvAudio) {
+                  conn.enableRemoteAudio();
+                } else {
+                  conn.disableRemoteAudio();
+                }
+                connectionWidgets.recvAudio = !connectionWidgets.recvAudio;
+              },
+              child: const Text('Toggle audio recv'),
+            )
           ];
         } else {
           connectionWidgets.videoTracks[trackId] = VideoView(renderer);
@@ -235,157 +239,179 @@ class _CallState extends State<CallRoute> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     });
 
-    _call.start(_roomId, _memberId, _isPublish, _publishVideo, _publishAudio,
-        _fakeMedia);
+    _call.start(
+      _roomId,
+      _memberId,
+      _isPublish,
+      _publishVideo,
+      _publishAudio,
+      _fakeMedia,
+    );
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Medea call demo'), actions: <Widget>[
-          TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
+      appBar: AppBar(title: const Text('Medea call demo'), actions: <Widget>[
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue,
+          ),
+          child: const Text('MediaSetting'),
+          onPressed: () async {
+            await mediaSettingDialog(context, _call);
+          },
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue,
+          ),
+          child: const Text('Create'),
+          onPressed: () async {
+            await controlApiCreateDialog(context, _call);
+          },
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue,
+          ),
+          child: const Text('Get'),
+          onPressed: () async {
+            await controlApiGetDialog(context, _call);
+          },
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue,
+          ),
+          child: const Text('Delete'),
+          onPressed: () async {
+            await controlApiDeleteDialog(context, _call);
+          },
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue,
+          ),
+          child: const Text('Callbacks'),
+          onPressed: () async {
+            await showCallbacks(context, _call);
+          },
+        ),
+      ]),
+      body: Center(
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            children: [
+              LinearProgressIndicator(
+                value: currentAudioLevel,
+                minHeight: 10.0,
               ),
-              child: const Text('MediaSetting'),
-              onPressed: () async {
-                await mediaSettingDialog(context, _call);
-              }),
-          TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
-              ),
-              child: const Text('Create'),
-              onPressed: () async {
-                await controlApiCreateDialog(context, _call);
-              }),
-          TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
-              ),
-              child: const Text('Get'),
-              onPressed: () async {
-                await controlApiGetDialog(context, _call);
-              }),
-          TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
-              ),
-              child: const Text('Delete'),
-              onPressed: () async {
-                await controlApiDeleteDialog(context, _call);
-              }),
-          TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
-              ),
-              child: const Text('Callbacks'),
-              onPressed: () async {
-                await showCallbacks(context, _call);
-              }),
-        ]),
-        body: Center(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: Column(
-              children: [
-                LinearProgressIndicator(
-                  value: currentAudioLevel,
-                  minHeight: 10.0,
+              Expanded(
+                child: Row(
+                  children: _widgets.values
+                      .map(
+                        (videoMap) => Expanded(
+                          child: Column(children: videoMap.all().toList()),
+                        ),
+                      )
+                      .toList(),
                 ),
-                Expanded(
-                  child: Row(
-                    children: _widgets.values
-                        .map((videoMap) => Expanded(
-                              child: Column(
-                                children: videoMap.all().toList(),
-                              ),
-                            ))
-                        .toList(),
-                  ),
-                )
-              ],
-            ),
+              )
+            ],
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: Padding(
-            padding: const EdgeInsets.only(bottom: 50.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                    padding: const EdgeInsets.only(right: 30.0),
-                    child: FloatingActionButton(
-                      onPressed: () async {
-                        setState(() {
-                          _audioEnabled = !_audioEnabled;
-                        });
-                        await _call.toggleAudio(_audioEnabled);
-                      },
-                      heroTag: null,
-                      child: Icon(_audioEnabled ? Icons.mic_off : Icons.mic),
-                    )),
-                Padding(
-                    padding: const EdgeInsets.only(right: 30.0),
-                    child: FloatingActionButton(
-                      onPressed: () async {
-                        setState(() {
-                          _videoEnabled = !_videoEnabled;
-                        });
-                        await _call.toggleVideo(_videoEnabled);
-                      },
-                      heroTag: null,
-                      child: Icon(
-                          _videoEnabled ? Icons.videocam_off : Icons.videocam),
-                    )),
-                FloatingActionButton(
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 50.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+                padding: const EdgeInsets.only(right: 30.0),
+                child: FloatingActionButton(
                   onPressed: () async {
-                    await _call.dispose();
-                    Navigator.pop(context);
+                    setState(() {
+                      _audioEnabled = !_audioEnabled;
+                    });
+
+                    await _call.toggleAudio(_audioEnabled);
                   },
                   heroTag: null,
-                  backgroundColor: Colors.red,
-                  child: const Icon(Icons.call_end),
-                ),
-              ],
-            )));
+                  child: Icon(_audioEnabled ? Icons.mic_off : Icons.mic),
+                )),
+            Padding(
+                padding: const EdgeInsets.only(right: 30.0),
+                child: FloatingActionButton(
+                  onPressed: () async {
+                    setState(() {
+                      _videoEnabled = !_videoEnabled;
+                    });
+
+                    await _call.toggleVideo(_videoEnabled);
+                  },
+                  heroTag: null,
+                  child: Icon(
+                    _videoEnabled ? Icons.videocam_off : Icons.videocam,
+                  ),
+                )),
+            FloatingActionButton(
+              onPressed: () async {
+                await _call.dispose();
+                Navigator.pop(context);
+              },
+              heroTag: null,
+              backgroundColor: Colors.red,
+              child: const Icon(Icons.call_end),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
-Future showCallbacks(BuildContext context, Call call) async {
-  var cbs = await call.controlApi.getCallbacks();
+Future<void> showCallbacks(BuildContext context, Call call) async {
+  final cbs = await call.controlApi.getCallbacks();
+
   await showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-            content: SizedBox(
-                width: double.maxFinite,
-                child: ListView(
-                  shrinkWrap: true,
-                  children: cbs
-                      .map((cb) => Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Expanded(
-                                  child: Text(cb.event.toJson().toString())),
-                              Expanded(child: Text(cb.at)),
-                              Expanded(child: Text(cb.fid)),
-                            ],
-                          ))
-                      .toList(),
-                )));
-      });
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView(
+            shrinkWrap: true,
+            children: cbs
+                .map(
+                  (cb) => Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(child: Text(cb.event.toJson().toString())),
+                      Expanded(child: Text(cb.at)),
+                      Expanded(child: Text(cb.fid)),
+                    ],
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      );
+    },
+  );
 }
 
-Future controlApiGetDialog(BuildContext context, Call call) async {
+Future<void> controlApiGetDialog(BuildContext context, Call call) async {
   var roomId = '';
   var memberId = '';
   var endpointId = '';
@@ -446,12 +472,13 @@ Future controlApiGetDialog(BuildContext context, Call call) async {
                 ),
                 const SizedBox(height: 10),
                 TextButton(
-                    onPressed: () async {
-                      await call.controlApi.get(roomId, memberId, endpointId);
+                  onPressed: () async {
+                    await call.controlApi.get(roomId, memberId, endpointId);
 
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Get'))
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Get'),
+                )
               ],
             );
           },
@@ -461,7 +488,7 @@ Future controlApiGetDialog(BuildContext context, Call call) async {
   );
 }
 
-Future controlApiDeleteDialog(BuildContext context, Call call) async {
+Future<void> controlApiDeleteDialog(BuildContext context, Call call) async {
   var roomId = '';
   var memberId = '';
   var endpointId = '';
@@ -478,9 +505,7 @@ Future controlApiDeleteDialog(BuildContext context, Call call) async {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Flexible(
-                      child: Text('local://'),
-                    ),
+                    const Flexible(child: Text('local://')),
                     const SizedBox(width: 10),
                     Expanded(
                       child: TextFormField(
@@ -522,12 +547,12 @@ Future controlApiDeleteDialog(BuildContext context, Call call) async {
                 ),
                 const SizedBox(height: 10),
                 TextButton(
-                    onPressed: () async {
-                      await call.controlApi
-                          .delete(roomId, memberId, endpointId);
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Get'))
+                  onPressed: () async {
+                    await call.controlApi.delete(roomId, memberId, endpointId);
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Get'),
+                )
               ],
             );
           },
@@ -537,14 +562,14 @@ Future controlApiDeleteDialog(BuildContext context, Call call) async {
   );
 }
 
-Future mediaSettingDialog(BuildContext context, Call call) async {
-  var displayList = await call.enumerateDisplay();
+Future<void> mediaSettingDialog(BuildContext context, Call call) async {
+  final displayList = await call.enumerateDisplay();
 
-  var deviceList = await call.enumerateDevice();
-  var videoDevices = deviceList
+  final deviceList = await call.enumerateDevice();
+  final videoDevices = deviceList
       .where((element) => element.kind() == jason.MediaDeviceKind.videoInput)
       .toList();
-  var audioDevices = deviceList
+  final audioDevices = deviceList
       .where((element) => element.kind() == jason.MediaDeviceKind.audioInput)
       .toList();
 
@@ -558,11 +583,12 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SwitchListTile(
-                    title: const Text('Screen share'),
-                    value: call.screenShare,
-                    onChanged: (v) => setStateSb(() {
-                          call.screenShare = v;
-                        })),
+                  title: const Text('Screen share'),
+                  value: call.screenShare,
+                  onChanged: (v) => setStateSb(() {
+                    call.screenShare = v;
+                  }),
+                ),
                 DropdownButton<String>(
                   value: call.videoDisplayId,
                   icon: const Icon(Icons.arrow_downward),
@@ -595,8 +621,9 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   onChanged: (text) {
                     try {
                       call.selectedDisplayFrameRate = int.parse(text);
-                      // ignore: empty_catches
-                    } catch (e) {}
+                    } catch (e) {
+                      // No-op.
+                    }
                   },
                   decoration: const InputDecoration(
                     labelText: 'Display FPS',
@@ -610,8 +637,9 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   onChanged: (text) {
                     try {
                       call.selectedDisplayWidth = int.parse(text);
-                      // ignore: empty_catches
-                    } catch (e) {}
+                    } catch (e) {
+                      // No-op.
+                    }
                   },
                   decoration: const InputDecoration(
                     labelText: 'Display width',
@@ -625,8 +653,9 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   onChanged: (text) {
                     try {
                       call.selectedDisplayHeight = int.parse(text);
-                      // ignore: empty_catches
-                    } catch (e) {}
+                    } catch (e) {
+                      // No-op.
+                    }
                   },
                   decoration: const InputDecoration(
                     labelText: 'Display height',
@@ -684,12 +713,11 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   onChanged: (text) {
                     try {
                       call.selectedDeviceWidth = int.parse(text);
-                      // ignore: empty_catches
-                    } catch (e) {}
+                    } catch (e) {
+                      // No-op.
+                    }
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Device width',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Device width'),
                 ),
                 TextFormField(
                   initialValue: call.selectedDeviceHeight == null
@@ -699,92 +727,100 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   onChanged: (text) {
                     try {
                       call.selectedDeviceHeight = int.parse(text);
-                      // ignore: empty_catches
-                    } catch (e) {}
+                    } catch (e) {
+                      // No-op.
+                    }
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Device height',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Device height'),
                 ),
                 Row(
                   children: [
                     TextButton(
-                        onPressed: () async {
-                          await call.setSendAudio(!_audioSend);
-                          setStateSb(() {
-                            _audioSend = !_audioSend;
-                          });
-                        },
-                        child: Text(
-                            '${_audioSend ? 'Disable' : 'Enable'} Audio Send')),
+                      onPressed: () async {
+                        await call.setSendAudio(!_audioSend);
+                        setStateSb(() {
+                          _audioSend = !_audioSend;
+                        });
+                      },
+                      child: Text(
+                        '${_audioSend ? 'Disable' : 'Enable'} Audio Send',
+                      ),
+                    ),
                     TextButton(
-                        onPressed: () async {
-                          await call.setSendVideo(!_videoSend);
-                          setStateSb(() {
-                            _videoSend = !_videoSend;
-                          });
-                        },
-                        child: Text(
-                            '${_videoSend ? 'Disable' : 'Enable'} Video Send')),
+                      onPressed: () async {
+                        await call.setSendVideo(!_videoSend);
+                        setStateSb(() {
+                          _videoSend = !_videoSend;
+                        });
+                      },
+                      child: Text(
+                        '${_videoSend ? 'Disable' : 'Enable'} Video Send',
+                      ),
+                    ),
                   ],
                 ),
                 Row(
                   children: [
                     TextButton(
-                        onPressed: () async {
-                          await call.setRecvAudio(!_audioRecv);
-                          setStateSb(() {
-                            _audioRecv = !_audioRecv;
-                          });
-                        },
-                        child: Text(
-                            '${_audioRecv ? 'Disable' : 'Enable'} Audio Recv')),
+                      onPressed: () async {
+                        await call.setRecvAudio(!_audioRecv);
+                        setStateSb(() {
+                          _audioRecv = !_audioRecv;
+                        });
+                      },
+                      child: Text(
+                        '${_audioRecv ? 'Disable' : 'Enable'} Audio Recv',
+                      ),
+                    ),
                     TextButton(
-                        onPressed: () async {
-                          await call.setRecvVideo(!_videoRecv);
-                          setStateSb(() {
-                            _videoRecv = !_videoRecv;
-                          });
-                        },
-                        child: Text(
-                            '${_videoRecv ? 'Disable' : 'Enable'} Video Recv')),
+                      onPressed: () async {
+                        await call.setRecvVideo(!_videoRecv);
+                        setStateSb(() {
+                          _videoRecv = !_videoRecv;
+                        });
+                      },
+                      child: Text(
+                        '${_videoRecv ? 'Disable' : 'Enable'} Video Recv',
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(
                   height: 10,
                 ),
                 TextButton(
-                    onPressed: () async {
-                      var videoTrack = jason.DeviceVideoTrackConstraints();
-                      videoTrack.deviceId(call.videoDeviceId!);
-                      if (call.selectedDeviceHeight != null) {
-                        videoTrack.exactHeight(call.selectedDeviceHeight!);
-                      }
-                      if (call.selectedDeviceWidth != null) {
-                        videoTrack.exactWidth(call.selectedDeviceWidth!);
-                      }
+                  onPressed: () async {
+                    var videoTrack = jason.DeviceVideoTrackConstraints();
+                    videoTrack.deviceId(call.videoDeviceId!);
+                    if (call.selectedDeviceHeight != null) {
+                      videoTrack.exactHeight(call.selectedDeviceHeight!);
+                    }
+                    if (call.selectedDeviceWidth != null) {
+                      videoTrack.exactWidth(call.selectedDeviceWidth!);
+                    }
 
-                      var displayTrack = jason.DisplayVideoTrackConstraints();
-                      if (call.videoDisplayId != null) {
-                        displayTrack.deviceId(call.videoDisplayId!);
-                      }
-                      if (call.selectedDisplayHeight != null) {
-                        displayTrack.exactHeight(call.selectedDisplayHeight!);
-                      }
-                      if (call.selectedDisplayWidth != null) {
-                        displayTrack.exactWidth(call.selectedDisplayWidth!);
-                      }
-                      if (call.selectedDisplayFrameRate != null) {
-                        displayTrack
-                            .exactFrameRate(call.selectedDisplayFrameRate!);
-                      }
+                    var displayTrack = jason.DisplayVideoTrackConstraints();
+                    if (call.videoDisplayId != null) {
+                      displayTrack.deviceId(call.videoDisplayId!);
+                    }
+                    if (call.selectedDisplayHeight != null) {
+                      displayTrack.exactHeight(call.selectedDisplayHeight!);
+                    }
+                    if (call.selectedDisplayWidth != null) {
+                      displayTrack.exactWidth(call.selectedDisplayWidth!);
+                    }
+                    if (call.selectedDisplayFrameRate != null) {
+                      displayTrack
+                          .exactFrameRate(call.selectedDisplayFrameRate!);
+                    }
 
-                      var audioTrack = jason.AudioTrackConstraints();
-                      audioTrack.deviceId(call.audioDeviceId!);
+                    var audioTrack = jason.AudioTrackConstraints();
+                    audioTrack.deviceId(call.audioDeviceId!);
 
-                      await call.setMedia(videoTrack, audioTrack, displayTrack);
-                    },
-                    child: const Text('Set media setting')),
+                    await call.setMedia(videoTrack, audioTrack, displayTrack);
+                  },
+                  child: const Text('Set media setting'),
+                ),
               ],
             );
           },
@@ -794,15 +830,17 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
   );
 }
 
-Future controlApiCreateDialog(BuildContext context, Call call) {
+Future<void> controlApiCreateDialog(BuildContext context, Call call) {
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
         content: StatefulBuilder(
           builder: (BuildContext context, StateSetter setStateSb) {
-            return Column(mainAxisSize: MainAxisSize.min, children: [
-              TextButton(
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton(
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blue,
@@ -810,9 +848,10 @@ Future controlApiCreateDialog(BuildContext context, Call call) {
                   child: const Text('Room'),
                   onPressed: () async {
                     await controlApiCreateRoomDialog(context, call);
-                  }),
-              const SizedBox(height: 10),
-              TextButton(
+                  },
+                ),
+                const SizedBox(height: 10),
+                TextButton(
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blue,
@@ -820,9 +859,10 @@ Future controlApiCreateDialog(BuildContext context, Call call) {
                   child: const Text('Member'),
                   onPressed: () async {
                     await controlApiCreateMemberDialog(context, call);
-                  }),
-              const SizedBox(height: 10),
-              TextButton(
+                  },
+                ),
+                const SizedBox(height: 10),
+                TextButton(
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blue,
@@ -830,8 +870,10 @@ Future controlApiCreateDialog(BuildContext context, Call call) {
                   child: const Text('Endpoint'),
                   onPressed: () async {
                     await controlApiCreateEndpointDialog(context, call);
-                  }),
-            ]);
+                  },
+                ),
+              ],
+            );
           },
         ),
       );
@@ -839,7 +881,7 @@ Future controlApiCreateDialog(BuildContext context, Call call) {
   );
 }
 
-Future controlApiCreateRoomDialog(BuildContext context, Call call) {
+Future<void> controlApiCreateRoomDialog(BuildContext context, Call call) {
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
@@ -847,36 +889,36 @@ Future controlApiCreateRoomDialog(BuildContext context, Call call) {
       return AlertDialog(
         content: StatefulBuilder(
           builder: (BuildContext context, StateSetter setStateSb) {
-            return Column(mainAxisSize: MainAxisSize.min, children: [
-              Flexible(
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
                   child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Flexible(
-                    child: Text('local://'),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextFormField(
-                      initialValue: null,
-                      onChanged: (newRoomId) async {
-                        roomId = newRoomId;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Room ID',
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Flexible(child: Text('local://')),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: null,
+                          onChanged: (newRoomId) => roomId = newRoomId,
+                          decoration:
+                              const InputDecoration(hintText: 'Room ID'),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              )),
-              const SizedBox(height: 10),
-              TextButton(
+                ),
+                const SizedBox(height: 10),
+                TextButton(
                   onPressed: () async {
                     await call.controlApi.createRoom(roomId);
                     Navigator.pop(context);
                   },
-                  child: const Text('Create'))
-            ]);
+                  child: const Text('Create'),
+                )
+              ],
+            );
           },
         ),
       );
@@ -884,7 +926,7 @@ Future controlApiCreateRoomDialog(BuildContext context, Call call) {
   );
 }
 
-Future controlApiCreateMemberDialog(BuildContext context, Call call) {
+Future<void> controlApiCreateMemberDialog(BuildContext context, Call call) {
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
@@ -898,118 +940,108 @@ Future controlApiCreateMemberDialog(BuildContext context, Call call) {
       return AlertDialog(
         content: StatefulBuilder(
           builder: (BuildContext context, StateSetter setStateSb) {
-            return Column(mainAxisSize: MainAxisSize.min, children: [
-              Flexible(
-                  child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Flexible(
-                    child: Text('local://'),
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: TextFormField(
-                      initialValue: null,
-                      onChanged: (newRoomId) async {
-                        roomId = newRoomId;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Room ID',
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Flexible(child: Text('local://')),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: TextFormField(
+                        initialValue: null,
+                        onChanged: (newRoomId) {
+                          roomId = newRoomId;
+                        },
+                        decoration: const InputDecoration(hintText: 'Room ID'),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: TextFormField(
-                      initialValue: null,
-                      onChanged: (newMemberId) async {
-                        memberId = newMemberId;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Member ID',
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: TextFormField(
+                        initialValue: null,
+                        onChanged: (newMemberId) {
+                          memberId = newMemberId;
+                        },
+                        decoration:
+                            const InputDecoration(hintText: 'Member ID'),
                       ),
                     ),
-                  ),
-                ],
-              )),
-              const SizedBox(height: 10),
-              const Flexible(
-                child: Text('Credentials'),
-              ),
-              Flexible(
-                child: TextFormField(
-                  initialValue: null,
-                  onChanged: (newCredentials) async {
-                    credentials = newCredentials;
-                  },
-                  decoration: const InputDecoration(
-                    hintText: 'Credentials',
+                  ],
+                )),
+                const SizedBox(height: 10),
+                const Flexible(
+                  child: Text('Credentials'),
+                ),
+                Flexible(
+                  child: TextFormField(
+                    initialValue: null,
+                    onChanged: (newCredentials) async {
+                      credentials = newCredentials;
+                    },
+                    decoration: const InputDecoration(hintText: 'Credentials'),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Flexible(
-                child: Text('Timeout'),
-              ),
-              Flexible(
-                  child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(width: 10),
-                  const Flexible(
-                    child: Text('IDLE'),
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: TextFormField(
-                      initialValue: null,
-                      onChanged: (newIdle) async {
-                        idle = newIdle;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: '10s',
+                const SizedBox(height: 10),
+                const Flexible(child: Text('Timeout')),
+                Flexible(
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(width: 10),
+                    const Flexible(child: Text('IDLE')),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: TextFormField(
+                        initialValue: null,
+                        onChanged: (newIdle) async {
+                          idle = newIdle;
+                        },
+                        decoration: const InputDecoration(hintText: '10s'),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Flexible(
-                    child: Text('Reconnect'),
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: TextFormField(
-                      initialValue: null,
-                      onChanged: (newReconnect) async {
-                        reconnectTimeout = newReconnect;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: '10s',
+                    const SizedBox(width: 10),
+                    const Flexible(
+                      child: Text('Reconnect'),
+                    ),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: TextFormField(
+                        initialValue: null,
+                        onChanged: (newReconnect) async {
+                          reconnectTimeout = newReconnect;
+                        },
+                        decoration: const InputDecoration(
+                          hintText: '10s',
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Flexible(
-                    child: Text('Ping'),
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: TextFormField(
-                      initialValue: null,
-                      onChanged: (newPing) async {
-                        ping = newPing;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: '3s',
+                    const SizedBox(width: 10),
+                    const Flexible(child: Text('Ping')),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: TextFormField(
+                        initialValue: null,
+                        onChanged: (newPing) async {
+                          ping = newPing;
+                        },
+                        decoration: const InputDecoration(hintText: '3s'),
                       ),
                     ),
-                  ),
-                ],
-              )),
-              const SizedBox(height: 10),
-              TextButton(
+                  ],
+                )),
+                const SizedBox(height: 10),
+                TextButton(
                   onPressed: () async {
-                    var member = Member(memberId, {}, Plain(credentials),
-                        'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099');
+                    final member = Member(
+                      memberId,
+                      {},
+                      Plain(credentials),
+                      'grpc://127.0.0.1:9099',
+                      'grpc://127.0.0.1:9099',
+                    );
 
                     member.idle_timeout = idle;
                     member.reconnect_timeout = reconnectTimeout;
@@ -1018,8 +1050,10 @@ Future controlApiCreateMemberDialog(BuildContext context, Call call) {
                     await call.controlApi.createMember(roomId, member);
                     Navigator.pop(context);
                   },
-                  child: const Text('Create'))
-            ]);
+                  child: const Text('Create'),
+                )
+              ],
+            );
           },
         ),
       );
@@ -1027,7 +1061,7 @@ Future controlApiCreateMemberDialog(BuildContext context, Call call) {
   );
 }
 
-Future controlApiCreateEndpointDialog(BuildContext context, Call call) {
+Future<void> controlApiCreateEndpointDialog(BuildContext context, Call call) {
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
@@ -1041,131 +1075,125 @@ Future controlApiCreateEndpointDialog(BuildContext context, Call call) {
       return AlertDialog(
         content: StatefulBuilder(
           builder: (BuildContext context, StateSetter setStateSb) {
-            return Column(mainAxisSize: MainAxisSize.min, children: [
-              const SizedBox(height: 10),
-              const Text('Endpoint URI'),
-              Flexible(
-                  child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Flexible(
-                    child: Text('local://'),
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: TextFormField(
-                      initialValue: null,
-                      onChanged: (newRoomId) async {
-                        roomId = newRoomId;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Room ID',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: TextFormField(
-                      initialValue: null,
-                      onChanged: (newMemberId) async {
-                        memberId = newMemberId;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Member ID',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: TextFormField(
-                      initialValue: null,
-                      onChanged: (newEndpointId) async {
-                        endpointId = newEndpointId;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Endpoint ID',
-                      ),
-                    ),
-                  ),
-                ],
-              )),
-              const SizedBox(height: 10),
-              const Flexible(
-                child: Text('Endpoint type'),
-              ),
-              Flexible(
-                child: DropdownButton<String>(
-                  value: endpointType,
-                  icon: const Icon(Icons.arrow_downward),
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.deepPurple),
-                  underline: Container(
-                    height: 2,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                  onChanged: (String? value) {
-                    endpointType = value!;
-                  },
-                  items: ['PlayEndpoint', 'PublishEndpoint']
-                      .map<DropdownMenuItem<String>>((value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Flexible(
-                child: Text('Source URI'),
-              ),
-              Flexible(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 10),
+                const Text('Endpoint URI'),
+                Flexible(
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Flexible(child: Text('local://')),
                     const SizedBox(width: 10),
-                    const Flexible(
-                      child: Text('local://'),
+                    Flexible(
+                      child: TextFormField(
+                        initialValue: null,
+                        onChanged: (newRoomId) async {
+                          roomId = newRoomId;
+                        },
+                        decoration: const InputDecoration(hintText: 'Room ID'),
+                      ),
                     ),
                     const SizedBox(width: 10),
                     Flexible(
                       child: TextFormField(
                         initialValue: null,
-                        onChanged: (newUrl) async {
-                          url = newUrl;
+                        onChanged: (newMemberId) async {
+                          memberId = newMemberId;
+                        },
+                        decoration:
+                            const InputDecoration(hintText: 'Member ID'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: TextFormField(
+                        initialValue: null,
+                        onChanged: (newEndpointId) async {
+                          endpointId = newEndpointId;
                         },
                         decoration: const InputDecoration(
-                          hintText: 'roomId/memberId/sourceId',
+                          hintText: 'Endpoint ID',
                         ),
                       ),
                     ),
-                  ])),
-              const SizedBox(height: 10),
-              Flexible(
-                child: SwitchListTile(
+                  ],
+                )),
+                const SizedBox(height: 10),
+                const Flexible(child: Text('Endpoint type')),
+                Flexible(
+                  child: DropdownButton<String>(
+                    value: endpointType,
+                    icon: const Icon(Icons.arrow_downward),
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (String? value) {
+                      endpointType = value!;
+                    },
+                    items: ['PlayEndpoint', 'PublishEndpoint']
+                        .map<DropdownMenuItem<String>>((value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Flexible(child: Text('Source URI')),
+                Flexible(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(width: 10),
+                      const Flexible(child: Text('local://')),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: TextFormField(
+                          initialValue: null,
+                          onChanged: (newUrl) async {
+                            url = newUrl;
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'roomId/memberId/sourceId',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Flexible(
+                  child: SwitchListTile(
                     title: const Text('Force relay'),
                     value: forceRelay,
-                    onChanged: (v) => setStateSb(() {
-                          forceRelay = v;
-                        })),
-              ),
-              const SizedBox(height: 10),
-              TextButton(
+                    onChanged: (v) => setStateSb(() => forceRelay = v),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextButton(
                   onPressed: () async {
                     if (endpointType == 'PlayEndpoint') {
-                      var endpoint = WebRtcPlayEndpoint(endpointId, url);
+                      final endpoint = WebRtcPlayEndpoint(endpointId, url);
                       await call.controlApi
                           .createPlayEndpoint(roomId, memberId, endpoint);
                     } else {
-                      var endpoint =
+                      final endpoint =
                           WebRtcPublishEndpoint(endpointId, P2pMode.Always);
                       await call.controlApi
                           .createPublishEndpoint(roomId, memberId, endpoint);
                     }
                     Navigator.pop(context);
                   },
-                  child: const Text('Create'))
-            ]);
+                  child: const Text('Create'),
+                )
+              ],
+            );
           },
         ),
       );

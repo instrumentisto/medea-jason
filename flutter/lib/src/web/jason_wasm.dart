@@ -95,7 +95,7 @@ extension type DisplayVideoTrackConstraints._(JSObject _) implements JSObject {
 @JS()
 extension type EnumerateDevicesException._(JSObject _) implements JSObject {
   external void free();
-  external String cause();
+  external JSObject cause();
   external String trace();
 }
 
@@ -122,10 +122,10 @@ extension type InternalException._(JSObject _) implements JSObject {
   external String trace();
 }
 
-@JS('Jason')
+@JS()
 extension type Jason._(JSObject _) implements JSObject {
-  external Jason();
   external void free();
+  external factory Jason();
   external RoomHandle init_room();
   external MediaManagerHandle media_manager();
   external void close_room(RoomHandle room_to_delete);
@@ -137,7 +137,7 @@ extension type LocalMediaInitException._(JSObject _) implements JSObject {
   external void free();
   external num kind();
   external String message();
-  external String cause();
+  external JSObject cause();
   external String trace();
 }
 
@@ -165,7 +165,7 @@ extension type MediaManagerHandle._(JSObject _) implements JSObject {
 extension type MediaSettingsUpdateException._(JSObject _) implements JSObject {
   external void free();
   external String message();
-  external String cause();
+  external JSObject cause();
   external bool rolled_back();
 }
 
@@ -256,7 +256,7 @@ extension type RpcClientException._(JSObject _) implements JSObject {
   external void free();
   external num kind();
   external String message();
-  external String cause();
+  external JSObject cause();
   external String trace();
 }
 

@@ -1,3 +1,6 @@
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
+
 import '../interface/exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
@@ -5,12 +8,21 @@ import 'jason_wasm.dart' as wasm;
 ///
 /// Returns `null` in case if the provided exception is not from Jason.
 String? _getName(dynamic e) {
-  try {
-    return e.name;
-  } catch (e) {
-    print('_getName failed: $e');
+  if (e is! JSObject) {
     return null;
   }
+
+  final constructor = e.getProperty('constructor'.toJS);
+  if (constructor is JSObject) {
+    if (constructor.hasProperty('name'.toJS).toDart) {
+      final name = constructor.getProperty('name'.toJS);
+      if (name is JSString) {
+        return name.toDart;
+      }
+    }
+  }
+
+  return null;
 }
 
 /// Converts the provided [wasm] exception into the Dart exception.
