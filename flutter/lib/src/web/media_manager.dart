@@ -1,5 +1,7 @@
 // ignore_for_file: implementation_imports
 
+import 'package:medea_flutter_webrtc/src/platform/web/audio_renderer.dart'
+    as audio_renderer;
 import 'package:medea_flutter_webrtc/src/platform/web/video_renderer.dart'
     as video_renderer;
 
@@ -56,6 +58,7 @@ class WebMediaManagerHandle implements MediaManagerHandle {
   @override
   Future<void> setOutputAudioId(String deviceId) async {
     video_renderer.setOutputAudioSinkId(deviceId);
+    audio_renderer.setOutputAudioSinkId(deviceId);
   }
 
   @override
