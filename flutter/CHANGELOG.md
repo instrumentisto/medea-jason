@@ -13,12 +13,14 @@ All user visible changes to this project will be documented in this file. This p
 
 - More information in `toString()` on custom exceptions ([#140]).
 
-### Fixed
+### Changed
 
-- Inability to compile web platform for [WebAssembly] ([#178]).
+- Migrated from [`dart:html`] to [`package:web`] package ([#178]).
 
 [#140]: /../../pull/140
 [#178]: /../../pull/178
+[`dart:html`]: https://dart.dev/libraries/dart-html
+[`package:web`]: https://pub.dev/packages/web
 
 
 
@@ -86,4 +88,3 @@ All user visible changes to this project will be documented in this file. This p
 [`medea-jason`]: https://docs.rs/medea-jason
 [Semantic Versioning 2.0.0]: https://semver.org
 [SFU]: https://webrtcglossary.com/sfu
-[WebAssembly]: https://webassembly.org
