@@ -3,7 +3,6 @@
 
 use std::{
     fmt::{self, Debug},
-    mem,
     os::raw::c_void,
     ptr,
 };
@@ -206,7 +205,7 @@ impl Callback {
                 _ = dart_api::new_finalizable_handle(
                     handle,
                     f.as_ptr().cast::<c_void>(),
-                    mem::size_of::<Self>() as libc::intptr_t,
+                    size_of::<Self>() as libc::intptr_t,
                     Some(callback_finalizer),
                 );
             }
