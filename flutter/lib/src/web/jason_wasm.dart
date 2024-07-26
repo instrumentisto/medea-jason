@@ -7,7 +7,7 @@ import 'dart:js_interop';
 
 import 'package:web/web.dart' as web;
 
-@JS('Date')
+@JS()
 extension type FacingMode._(JSObject _) implements JSObject {
   external static num get User;
   external static num get Environment;
@@ -15,33 +15,33 @@ extension type FacingMode._(JSObject _) implements JSObject {
   external static num get Right;
 }
 
-@JS('MediaSourceKind')
+@JS()
 extension type MediaSourceKind._(JSObject _) implements JSObject {
   external static num get Device;
   external static num get Display;
 }
 
-@JS('MediaKind')
+@JS()
 extension type MediaKind._(JSObject _) implements JSObject {
   external static num get Audio;
   external static num get Video;
 }
 
-@JS('LocalMediaInitExceptionKind')
+@JS()
 extension type LocalMediaInitExceptionKind._(JSObject _) implements JSObject {
   external static num get GetUserMediaFailed;
   external static num get GetDisplayMediaFailed;
   external static num get LocalTrackIsEnded;
 }
 
-@JS('RpcClientExceptionKind')
+@JS()
 extension type RpcClientExceptionKind._(JSObject _) implements JSObject {
   external static num get ConnectionLost;
   external static num get AuthorizationFailed;
   external static num get SessionFinished;
 }
 
-@JS('AudioTrackConstraints')
+@JS()
 extension type AudioTrackConstraints._(JSObject _) implements JSObject {
   external void free();
   external factory AudioTrackConstraints();
@@ -50,7 +50,7 @@ extension type AudioTrackConstraints._(JSObject _) implements JSObject {
   external void ideal_auto_gain_control(bool auto_gain_control);
 }
 
-@JS('ConnectionHandle')
+@JS()
 extension type ConnectionHandle._(JSObject _) implements JSObject {
   external void free();
   external void on_close(JSFunction cb);
