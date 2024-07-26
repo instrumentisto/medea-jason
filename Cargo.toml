@@ -1,6 +1,6 @@
 [package]
 name = "medea-jason"
-version = "0.5.0-dev"
+version = "0.5.0"
 edition = "2021"
 rust-version = "1.65"
 description = "Client library for Medea media server."
