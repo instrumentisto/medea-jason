@@ -144,10 +144,7 @@ impl SendEncodingParameters {
     /// Sets [scaleResolutionDownBy][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/ypzzc75t
-    pub fn set_scale_resolution_down_by(
-        &self,
-        scale_resolution_down_by: i64,
-    ) {
+    pub fn set_scale_resolution_down_by(&self, scale_resolution_down_by: i64) {
         let handle = self.0.get();
         unsafe {
             send_encoding_parameters::set_scale_resolution_down_by(

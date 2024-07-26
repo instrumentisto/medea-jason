@@ -172,7 +172,7 @@ pub async fn get_callbacks(
         .map_err(|e| {
             InternalError(format!("GrpcCallbackServer mailbox error. {e}"))
         })
-        .map(|callbacks| HttpResponse::Ok().json(&callbacks.unwrap()))
+        .map(|callbacks| HttpResponse::Ok().json(callbacks.unwrap()))
 }
 
 /// Implementation of `Delete` requests to [Control API] mock.
