@@ -21,10 +21,10 @@ packages:
     dependency: transitive
     description:
       name: archive
-      sha256: ecf4273855368121b1caed0d10d4513c7241dfc813f7d3c8933b36622ae9b265
+      sha256: cb6a278ef2dbb298455e1a713bda08524a175630ec643a242c399c932a0a1f7d
       url: "https://pub.dev"
     source: hosted
-    version: "3.5.1"
+    version: "3.6.1"
   args:
     dependency: transitive
     description:
@@ -149,10 +149,10 @@ packages:
     dependency: "direct main"
     description:
       name: faker_dart
-      sha256: aaf3756cb19947340af10602be86a607dd6d2acf007ea351cdea36a5533c77f7
+      sha256: "73c082ed0d71e0824b9a59ba61640479d536588030b2c55033593d8bd820b204"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.1"
+    version: "0.2.2"
   ffi:
     dependency: transitive
     description:
@@ -212,10 +212,10 @@ packages:
     dependency: "direct main"
     description:
       name: freezed_annotation
-      sha256: c3fd9336eb55a38cc1bbd79ab17573113a8deccd0ecbbf926cca3c62803b5c2d
+      sha256: c2e2d632dd9b8a2b7751117abcfc2b4888ecfe181bd9fca7170d9ef02e595fe2
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.1"
+    version: "2.4.4"
   fuchsia_remote_debug_protocol:
     dependency: transitive
     description: flutter
@@ -342,10 +342,10 @@ packages:
     dependency: "direct main"
     description:
       name: medea_flutter_webrtc
-      sha256: "6a472fda429341aaa777613332927f2fae8282736fc3a6d4dea4fb87a5ad9b11"
+      sha256: d5dfec8896f6684bcf4b3fa250f7bb8934d958b1878f6a03d760629f950e6a75
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.0-dev+rev.c8bcd8b26c90ce3a348d696a46b89890422b3413"
+    version: "0.10.0-dev+rev.dc5a0ad3550d7e3bc29163d273262bcd64ebbfbc"
   medea_jason:
     dependency: "direct main"
     description:
@@ -429,18 +429,18 @@ packages:
     dependency: transitive
     description:
       name: pubspec_parse
-      sha256: c63b2876e58e194e4b0828fcb080ad0e06d051cb607a6be51a9e084f47cb9367
+      sha256: c799b721d79eb6ee6fa56f00c04b472dcd44a30d258fac2174a6ec57302678f8
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.3"
+    version: "1.3.0"
   puppeteer:
     dependency: transitive
     description:
       name: puppeteer
-      sha256: "37293a2379ec5d022b7af6e5967304e74c69ebf7b72925b965a3c1ff9ccd9a4c"
+      sha256: de3f921154e5d336b14cdc05b674ac3db5701a5338f3cb0042868a5146f16e67
       url: "https://pub.dev"
     source: hosted
-    version: "3.10.0"
+    version: "3.12.0"
   retry:
     dependency: "direct main"
     description:
@@ -602,18 +602,18 @@ packages:
     dependency: transitive
     description:
       name: web
-      sha256: "97da13628db363c635202ad97068d47c5b8aa555808e7a9411963c533b449b27"
+      sha256: d43c1d6b787bf0afad444700ae7f4db8827f701bc61c255ac8d328c6f4d52062
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.1"
+    version: "1.0.0"
   web_socket_channel:
     dependency: transitive
     description:
       name: web_socket_channel
-      sha256: "58c6666b342a38816b2e7e50ed0f1e261959630becd4c879c4f26bfa14aa5a42"
+      sha256: d88238e5eac9a42bb43ca4e721edba3c08c6354d4a53063afaa568516217621b
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.5"
+    version: "2.4.0"
   webdriver:
     dependency: transitive
     description:
@@ -631,5 +631,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.3.0 <4.0.0"
+  dart: ">=3.4.0 <4.0.0"
   flutter: ">=3.18.0-18.0.pre.54"
