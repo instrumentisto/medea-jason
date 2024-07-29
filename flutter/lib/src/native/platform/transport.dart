@@ -122,8 +122,12 @@ Future<WebSocket> Function() _connect(
 
 /// Sends the provided [message] to the provided [WebSocket].
 void _send(Object ws, Pointer<Utf8> message) {
-  ws as WebSocket;
-  ws.add(message.nativeStringToDartString());
+  try {
+    ws as WebSocket;
+    ws.add(message.nativeStringToDartString());
+  } catch (e) {
+    print('Transport::send exception: $e');
+  }
 }
 
 /// Closes the provided [WebSocket] connection with the provided
