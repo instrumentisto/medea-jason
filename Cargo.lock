@@ -2087,7 +2087,6 @@ dependencies = [
  "fantoccini",
  "futures",
  "medea-control-api-mock",
- "once_cell",
  "reqwest",
  "serde",
  "serde_json",
