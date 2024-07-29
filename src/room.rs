@@ -1591,12 +1591,12 @@ impl EventHandler for InnerRoom {
         connection_mode: ConnectionMode,
         tracks: Vec<Track>,
         ice_servers: Vec<IceServer>,
-        is_force_relayed: bool,
+        force_relay: bool,
     ) -> Self::Output {
         let peer_state = peer::State::new(
             peer_id,
             ice_servers,
-            is_force_relayed,
+            force_relay,
             Some(negotiation_role),
             connection_mode,
         );
@@ -1629,14 +1629,14 @@ impl EventHandler for InnerRoom {
     async fn on_local_description_applied(
         &self,
         peer_id: PeerId,
-        local_sdp: String,
+        sdp_offer: String,
     ) -> Self::Output {
         let peer_state = self
             .peers
             .state()
             .get(peer_id)
             .ok_or_else(|| tracerr::new!(UnknownPeerIdError(peer_id)))?;
-        peer_state.apply_local_sdp(local_sdp);
+        peer_state.apply_local_sdp(sdp_offer);
 
         Ok(())
     }
@@ -1824,10 +1824,10 @@ impl PeerEventHandler for InnerRoom {
     /// Invokes `on_local_track` [`Room`]'s callback.
     async fn on_new_local_track(
         &self,
-        track: Rc<local::Track>,
+        local_track: Rc<local::Track>,
     ) -> Self::Output {
         self.on_local_track
-            .call1(local::LocalMediaTrack::new(track));
+            .call1(local::LocalMediaTrack::new(local_track));
         Ok(())
     }
 
@@ -1925,11 +1925,8 @@ impl PeerEventHandler for InnerRoom {
 
     /// Handles [`PeerEvent::MediaUpdateCommand`] event by sending the provided
     /// [`Command`] to Media Server.
-    async fn on_media_update_command(
-        &self,
-        intention: Command,
-    ) -> Self::Output {
-        self.rpc.send_command(intention);
+    async fn on_media_update_command(&self, command: Command) -> Self::Output {
+        self.rpc.send_command(command);
         Ok(())
     }
 }

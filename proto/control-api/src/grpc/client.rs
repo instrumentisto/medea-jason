@@ -37,9 +37,9 @@ where
 {
     async fn on_event(
         &self,
-        req: tonic::Request<callback_proto::Request>,
+        request: tonic::Request<callback_proto::Request>,
     ) -> Result<tonic::Response<callback_proto::Response>, tonic::Status> {
-        let req = CallbackRequest::try_from(req.into_inner())
+        let req = CallbackRequest::try_from(request.into_inner())
             .map_err(T::Error::from)?;
         self.on_event(req)
             .await
@@ -61,16 +61,18 @@ where
 
     async fn create(
         &self,
-        req: ControlRequest,
+        request: ControlRequest,
     ) -> Result<member::Sids, Self::Error> {
         // It's OK to `.clone()` `tonic::client`:
         // https://docs.rs/tonic/latest/tonic/client/index.html#concurrent-usage
         let mut this = self.clone();
 
-        let resp =
-            Self::create(&mut this, control_proto::CreateRequest::from(req))
-                .await?
-                .into_inner();
+        let resp = Self::create(
+            &mut this,
+            control_proto::CreateRequest::from(request),
+        )
+        .await?
+        .into_inner();
         if let Some(e) = resp.error {
             return Err(e.into());
         }
@@ -85,14 +87,14 @@ where
 
     async fn apply(
         &self,
-        req: ControlRequest,
+        request: ControlRequest,
     ) -> Result<member::Sids, Self::Error> {
         // It's OK to `.clone()` `tonic::client`:
         // https://docs.rs/tonic/latest/tonic/client/index.html#concurrent-usage
         let mut this = self.clone();
 
         let resp =
-            Self::apply(&mut this, control_proto::ApplyRequest::from(req))
+            Self::apply(&mut this, control_proto::ApplyRequest::from(request))
                 .await?
                 .into_inner();
         if let Some(e) = resp.error {

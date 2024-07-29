@@ -255,8 +255,8 @@ impl RpcTransport for WebSocketRpcTransport {
         Box::pin(rx)
     }
 
-    fn set_close_reason(&self, close_reason: ClientDisconnect) {
-        self.0.borrow_mut().close_reason = close_reason;
+    fn set_close_reason(&self, reason: ClientDisconnect) {
+        self.0.borrow_mut().close_reason = reason;
     }
 
     fn send(&self, msg: &ClientMsg) -> TransportResult<()> {

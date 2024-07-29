@@ -31,7 +31,7 @@ pub trait SynchronizableState {
     /// representation.
     fn from_proto(
         input: Self::Input,
-        send_cons: &LocalTracksConstraints,
+        send_constraints: &LocalTracksConstraints,
     ) -> Self;
 
     /// Updates this state with a provided [`medea_client_api_proto::state`].

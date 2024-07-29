@@ -11,7 +11,7 @@ publish = false
 async-recursion = "1.0"
 cucumber = { version = "0.21", features = ["libtest"] }
 derive_more = "0.99"
-fantoccini = { version = "0.19", features = ["rustls-tls"], default-features = false }
+fantoccini = { version = "0.21", features = ["rustls-tls"], default-features = false }
 futures = "0.3"
 medea-control-api-mock = { path = "../mock/control-api" }
 once_cell = "1.12"

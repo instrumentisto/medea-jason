@@ -476,57 +476,63 @@ impl SynchronizableState for State {
     type Input = proto::state::Peer;
 
     fn from_proto(
-        from: Self::Input,
-        send_cons: &LocalTracksConstraints,
+        input: Self::Input,
+        send_constraints: &LocalTracksConstraints,
     ) -> Self {
         let state = Self::new(
-            from.id,
-            from.ice_servers,
-            from.force_relay,
-            from.negotiation_role,
-            from.connection_mode,
+            input.id,
+            input.ice_servers,
+            input.force_relay,
+            input.negotiation_role,
+            input.connection_mode,
         );
 
         #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
-        for (id, sender) in from.senders {
+        for (id, sender) in input.senders {
             if !sender.receivers.is_empty() {
                 state.senders.insert(
                     id,
-                    Rc::new(sender::State::from_proto(sender, send_cons)),
+                    Rc::new(sender::State::from_proto(
+                        sender,
+                        send_constraints,
+                    )),
                 );
             }
         }
         #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
-        for (id, receiver) in from.receivers {
+        for (id, receiver) in input.receivers {
             state.receivers.insert(
                 id,
-                Rc::new(receiver::State::from_proto(receiver, send_cons)),
+                Rc::new(receiver::State::from_proto(
+                    receiver,
+                    send_constraints,
+                )),
             );
         }
         #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
-        for ice_candidate in from.ice_candidates {
+        for ice_candidate in input.ice_candidates {
             state.ice_candidates.add(ice_candidate);
         }
 
         state
     }
 
-    fn apply(&self, state: Self::Input, send_cons: &LocalTracksConstraints) {
-        if state.negotiation_role.is_some() {
-            self.negotiation_role.set(state.negotiation_role);
+    fn apply(&self, input: Self::Input, send_cons: &LocalTracksConstraints) {
+        if input.negotiation_role.is_some() {
+            self.negotiation_role.set(input.negotiation_role);
         }
-        if state.restart_ice {
+        if input.restart_ice {
             self.restart_ice.set(true);
         }
-        if let Some(sdp_offer) = state.local_sdp {
+        if let Some(sdp_offer) = input.local_sdp {
             self.local_sdp.approved_set(sdp_offer);
         } else {
             self.negotiation_state.set(NegotiationState::WaitLocalSdp);
         }
-        self.remote_sdp.set(state.remote_sdp);
-        self.ice_candidates.apply(state.ice_candidates, send_cons);
-        self.senders.apply(state.senders, send_cons);
-        self.receivers.apply(state.receivers, send_cons);
+        self.remote_sdp.set(input.remote_sdp);
+        self.ice_candidates.apply(input.ice_candidates, send_cons);
+        self.senders.apply(input.senders, send_cons);
+        self.receivers.apply(input.receivers, send_cons);
 
         self.sync_state.set(SyncState::Synced);
     }

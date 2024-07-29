@@ -173,10 +173,10 @@ impl Handler<Notification> for WsSession {
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
     fn handle(
         &mut self,
-        msg: Result<ws::Message, ws::ProtocolError>,
+        item: Result<ws::Message, ws::ProtocolError>,
         ctx: &mut Self::Context,
     ) {
-        match msg {
+        match item {
             Ok(msg) => match msg {
                 ws::Message::Ping(ping) => {
                     ctx.pong(&ping);

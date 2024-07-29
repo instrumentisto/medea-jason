@@ -36,11 +36,11 @@ where
 {
     async fn create(
         &self,
-        req: tonic::Request<control_proto::CreateRequest>,
+        request: tonic::Request<control_proto::CreateRequest>,
     ) -> Result<tonic::Response<control_proto::CreateResponse>, tonic::Status>
     {
         let fut = async {
-            self.create(ControlRequest::try_from(req.into_inner())?)
+            self.create(ControlRequest::try_from(request.into_inner())?)
                 .await
         };
 
@@ -61,9 +61,9 @@ where
 
     async fn delete(
         &self,
-        req: tonic::Request<control_proto::IdRequest>,
+        request: tonic::Request<control_proto::IdRequest>,
     ) -> Result<tonic::Response<control_proto::Response>, tonic::Status> {
-        let ids = req
+        let ids = request
             .into_inner()
             .fid
             .into_iter()
@@ -85,10 +85,10 @@ where
 
     async fn get(
         &self,
-        req: tonic::Request<control_proto::IdRequest>,
+        request: tonic::Request<control_proto::IdRequest>,
     ) -> Result<tonic::Response<control_proto::GetResponse>, tonic::Status>
     {
-        let ids = req
+        let ids = request
             .into_inner()
             .fid
             .into_iter()
@@ -120,11 +120,11 @@ where
 
     async fn apply(
         &self,
-        req: tonic::Request<control_proto::ApplyRequest>,
+        request: tonic::Request<control_proto::ApplyRequest>,
     ) -> Result<tonic::Response<control_proto::CreateResponse>, tonic::Status>
     {
         let result = async {
-            let req = ControlRequest::try_from(req.into_inner())?;
+            let req = ControlRequest::try_from(request.into_inner())?;
             self.apply(req).await
         };
 
@@ -178,12 +178,15 @@ where
 {
     type Error = CallbackApiClientError;
 
-    async fn on_event(&self, req: CallbackRequest) -> Result<(), Self::Error> {
+    async fn on_event(
+        &self,
+        request: CallbackRequest,
+    ) -> Result<(), Self::Error> {
         // It's OK to `.clone()` `tonic::client`:
         // https://docs.rs/tonic/latest/tonic/client/index.html#concurrent-usage
         let mut this = self.clone();
 
-        Self::on_event(&mut this, callback_proto::Request::from(req))
+        Self::on_event(&mut this, callback_proto::Request::from(request))
             .await
             .map(drop)
             .map_err(Into::into)

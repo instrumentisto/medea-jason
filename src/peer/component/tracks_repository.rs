@@ -145,12 +145,14 @@ where
 
     fn from_proto(
         input: Self::Input,
-        send_cons: &LocalTracksConstraints,
+        send_constraints: &LocalTracksConstraints,
     ) -> Self {
         Self(RefCell::new(
             input
                 .into_iter()
-                .map(|(id, t)| (id, Rc::new(S::from_proto(t, send_cons))))
+                .map(|(id, t)| {
+                    (id, Rc::new(S::from_proto(t, send_constraints)))
+                })
                 .collect(),
         ))
     }

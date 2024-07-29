@@ -41,7 +41,10 @@ pub trait Api {
     ///   doesn't exist.
     /// - If an [`Element`] with such ID already exists.
     /// - If the media server failed to perform this request.
-    async fn create(&self, req: Request) -> Result<member::Sids, Self::Error>;
+    async fn create(
+        &self,
+        request: Request,
+    ) -> Result<member::Sids, Self::Error>;
 
     /// Applies changes to an existing [`Element`] on the media server, or
     /// creates a new one in case there is no [`Element`] with such ID.
@@ -58,7 +61,10 @@ pub trait Api {
     /// - If the [`Element`]'s parent [`Element`] (identified by a [`Fid`])
     ///   doesn't exist.
     /// - If the media server failed to perform this request.
-    async fn apply(&self, req: Request) -> Result<member::Sids, Self::Error>;
+    async fn apply(
+        &self,
+        request: Request,
+    ) -> Result<member::Sids, Self::Error>;
 
     /// Removes [`Element`]s from the media server.
     ///
