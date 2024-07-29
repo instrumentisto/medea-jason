@@ -294,7 +294,7 @@ impl Transceiver {
         let params = self.get_send_parameters().await;
 
         let encs = params.encodings().await?;
-        for enc in encs {
+        for mut enc in encs {
             let rid = enc.rid();
 
             let Some(encoding) = encodings.iter().find(|e| e.rid == rid) else {
