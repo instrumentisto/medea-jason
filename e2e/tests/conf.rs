@@ -1,8 +1,6 @@
 //! All configurable properties of E2E tests runner.
 
-use std::env;
-
-use once_cell::sync::Lazy;
+use std::{env, sync::LazyLock};
 
 /// Generates static config variable which will be lazily obtained from the
 /// environment variables falling back to a default one.
@@ -12,7 +10,7 @@ macro_rules! env_var {
         $name:ident || $default:expr
     ) => {
         $(#[$meta])*
-        pub static $name: Lazy<String> = Lazy::new(|| {
+        pub static $name: LazyLock<String> = LazyLock::new(|| {
             env::var(stringify!($name))
                 .unwrap_or_else(|_| $default.to_string())
         });
@@ -64,6 +62,6 @@ env_var!(
 /// Indicator whether tests should run in a headless browser's mode.
 ///
 /// Default: `true`
-pub static HEADLESS: Lazy<bool> = Lazy::new(|| {
+pub static HEADLESS: LazyLock<bool> = LazyLock::new(|| {
     env::var("HEADLESS").map_or(true, |v| v.to_ascii_lowercase() == "true")
 });

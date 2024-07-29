@@ -218,7 +218,7 @@ impl Inner {
     /// [WebDriver]: https://w3.org/TR/webdriver
     async fn new(webdriver_address: &str, caps: Capabilities) -> Result<Self> {
         Ok(Self(
-            ClientBuilder::rustls()
+            ClientBuilder::rustls()?
                 .capabilities(caps)
                 .connect(webdriver_address)
                 .await?,

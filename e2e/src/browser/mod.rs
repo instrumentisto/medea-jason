@@ -6,9 +6,12 @@ pub mod client;
 mod js;
 pub mod mock;
 
-use std::sync::{
-    atomic::{AtomicUsize, Ordering},
-    Arc,
+use std::{
+    io,
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
+    },
 };
 
 use derive_more::{Display, Error, From};
@@ -23,9 +26,20 @@ pub use self::js::Statement;
 /// All errors which can happen while working with a browser.
 #[derive(Debug, Display, Error, From)]
 pub enum Error {
+    /// Failed to deserialize a result of the executed JS code.
+    ///
+    /// Should never happen.
+    Deserialize(serde_json::Error),
+
     /// JS exception was thrown while executing a JS code.
     #[from(ignore)]
     Js(#[error(not(source))] Json),
+
+    /// Failed to initialize TLS for establishing a [WebDriver] session.
+    ///
+    /// [WebDriver]: https://w3.org/TR/webdriver
+    #[display(fmt = "Failed to initialize TLS: {_0}")]
+    TlsInit(io::Error),
 
     /// Error occurred while executing some browser action by a [WebDriver].
     ///
@@ -36,11 +50,6 @@ pub enum Error {
     ///
     /// [WebDriver]: https://w3.org/TR/webdriver
     WebDriverSession(fantoccini::error::NewSessionError),
-
-    /// Failed to deserialize a result of the executed JS code.
-    ///
-    /// Should never happen.
-    Deserialize(serde_json::Error),
 }
 
 /// Shortcut for a [`Result`] with an [`Error`](enum@Error) inside.

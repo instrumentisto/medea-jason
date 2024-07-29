@@ -136,11 +136,14 @@ where
         }
     }
 
-    async fn healthz(&self, request: Ping) -> Result<Pong, Self::Error> {
+    async fn healthz(&self, ping: Ping) -> Result<Pong, Self::Error> {
         let (sender, receiver) = oneshot::channel();
         self.sender
             .clone()
-            .unbounded_send(ControlApiRequest::Healthz { request, sender })
+            .unbounded_send(ControlApiRequest::Healthz {
+                request: ping,
+                sender,
+            })
             .map_err(mpsc::TrySendError::into_send_error)?;
         match receiver.await {
             Ok(Ok(ok)) => Ok(ok),

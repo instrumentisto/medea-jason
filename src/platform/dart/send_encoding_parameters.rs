@@ -124,7 +124,8 @@ impl SendEncodingParameters {
     /// Sets [activeness][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-active
-    pub fn set_active(&self, active: bool) {
+    #[allow(clippy::needless_pass_by_ref_mut)] // semantically correct
+    pub fn set_active(&mut self, active: bool) {
         let handle = self.0.get();
         unsafe { send_encoding_parameters::set_active(handle, active) }
             .unwrap();
@@ -133,7 +134,8 @@ impl SendEncodingParameters {
     /// Sets [maxBitrate][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
-    pub fn set_max_bitrate(&self, max_bitrate: i64) {
+    #[allow(clippy::needless_pass_by_ref_mut)] // semantically correct
+    pub fn set_max_bitrate(&mut self, max_bitrate: i64) {
         let handle = self.0.get();
         unsafe {
             send_encoding_parameters::set_max_bitrate(handle, max_bitrate)
@@ -144,7 +146,11 @@ impl SendEncodingParameters {
     /// Sets [scaleResolutionDownBy][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/ypzzc75t
-    pub fn set_scale_resolution_down_by(&self, scale_resolution_down_by: i64) {
+    #[allow(clippy::needless_pass_by_ref_mut)] // semantically correct
+    pub fn set_scale_resolution_down_by(
+        &mut self,
+        scale_resolution_down_by: i64,
+    ) {
         let handle = self.0.get();
         unsafe {
             send_encoding_parameters::set_scale_resolution_down_by(
@@ -158,7 +164,7 @@ impl SendEncodingParameters {
     /// Sets [scalabilityMode][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/3zuaee45
-    #[allow(clippy::needless_pass_by_ref_mut)] // for platform code uniformity
+    #[allow(clippy::needless_pass_by_ref_mut)] // semantically correct
     pub fn set_scalability_mode(&mut self, scalability_mode: ScalabilityMode) {
         let handle = self.0.get();
         unsafe {
@@ -180,7 +186,7 @@ impl From<EncodingParameters> for SendEncodingParameters {
             scale_resolution_down_by,
         } = from;
 
-        let enc = Self::new(rid, active);
+        let mut enc = Self::new(rid, active);
 
         if let Some(b) = max_bitrate {
             enc.set_max_bitrate(b.into());

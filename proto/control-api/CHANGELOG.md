@@ -15,8 +15,10 @@ All user visible changes to this project will be documented in this file. This p
 
 - Dependencies:
     - [`medea-client-api-proto`] to `0.6` ([#151]).
+    - [`tonic`] to `0.12` ([todo]).
 
 [#151]: /../../pull/151
+[todo]: /../../commit/todo-full
 
 
 
