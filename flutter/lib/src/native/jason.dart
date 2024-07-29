@@ -94,9 +94,6 @@ frb.MedeaJason _initApi() {
   var api = frb.MedeaJasonImpl(dl);
   api.onPanic(cb: (msg) async {
     msg as String;
-    print("-------------------------------");
-    print(msg);
-    print("-------------------------------");
     await RustHandlesStorage().freeAll();
     if (_onPanicCallback != null) {
       _onPanicCallback!(msg);
