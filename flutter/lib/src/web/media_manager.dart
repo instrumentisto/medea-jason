@@ -1,9 +1,11 @@
 // ignore_for_file: implementation_imports
 
+import 'package:medea_flutter_webrtc/src/platform/web/audio_renderer.dart'
+    as audio_renderer;
 import 'package:medea_flutter_webrtc/src/platform/web/video_renderer.dart'
     as video_renderer;
 
-import 'package:js/js.dart';
+import 'dart:js_interop';
 
 import '../interface/media_device_details.dart';
 import '../interface/media_display_details.dart';
@@ -25,15 +27,21 @@ class WebMediaManagerHandle implements MediaManagerHandle {
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
       base_settings.MediaStreamSettings caps) async {
-    var tracks = await fallibleFuture(
-        obj.init_local_tracks((caps as MediaStreamSettings).obj));
-    return tracks.map((t) => WebLocalMediaTrack(t)).toList();
+    final tracks = await fallibleFuture(
+      obj.init_local_tracks((caps as MediaStreamSettings).obj).toDart,
+    );
+
+    return tracks.toDart
+        .map((t) => WebLocalMediaTrack(t as wasm.LocalMediaTrack))
+        .toList();
   }
 
   @override
   Future<List<MediaDeviceDetails>> enumerateDevices() async {
-    var tracks = await fallibleFuture(obj.enumerate_devices());
-    return tracks.map((t) => WebMediaDeviceDetails(t)).toList();
+    final tracks = await fallibleFuture(obj.enumerate_devices().toDart);
+    return tracks.toDart
+        .map((t) => WebMediaDeviceDetails(t as wasm.MediaDeviceDetails))
+        .toList();
   }
 
   @override
@@ -50,11 +58,12 @@ class WebMediaManagerHandle implements MediaManagerHandle {
   @override
   Future<void> setOutputAudioId(String deviceId) async {
     video_renderer.setOutputAudioSinkId(deviceId);
+    audio_renderer.setOutputAudioSinkId(deviceId);
   }
 
   @override
-  void onDeviceChange(Function cb) {
-    obj.on_device_change(allowInterop(cb));
+  void onDeviceChange(void Function() cb) {
+    obj.on_device_change(cb.toJS);
   }
 
   @override

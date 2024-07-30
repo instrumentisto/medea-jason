@@ -13,7 +13,14 @@ All user visible changes to this project will be documented in this file. This p
 
 - More information in `toString()` on custom exceptions ([#140]).
 
+### Changed
+
+- Migrated from [`dart:html`] to [`package:web`] package ([#178]).
+
 [#140]: /../../pull/140
+[#178]: /../../pull/178
+[`dart:html`]: https://dart.dev/libraries/dart-html
+[`package:web`]: https://pub.dev/packages/web
 
 
 

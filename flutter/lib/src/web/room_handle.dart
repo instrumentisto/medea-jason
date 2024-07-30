@@ -1,4 +1,4 @@
-import 'package:js/js.dart';
+import 'dart:js_interop';
 
 import '../interface/connection_handle.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
@@ -22,109 +22,118 @@ class WebRoomHandle implements RoomHandle {
 
   @override
   Future<void> join(String token) async {
-    await fallibleFuture(obj.join(token));
+    await fallibleFuture(obj.join(token).toDart);
   }
 
   @override
   Future<void> setLocalMediaSettings(base_settings.MediaStreamSettings settings,
       bool stopFirst, bool rollbackOnFail) async {
-    await fallibleFuture(obj.set_local_media_settings(
-        (settings as MediaStreamSettings).obj, stopFirst, rollbackOnFail));
+    await fallibleFuture(
+      obj
+          .set_local_media_settings(
+            (settings as MediaStreamSettings).obj,
+            stopFirst,
+            rollbackOnFail,
+          )
+          .toDart,
+    );
   }
 
   @override
   Future<void> muteAudio() async {
-    await fallibleFuture(obj.mute_audio());
+    await fallibleFuture(obj.mute_audio().toDart);
   }
 
   @override
   Future<void> unmuteAudio() async {
-    await fallibleFuture(obj.unmute_audio());
+    await fallibleFuture(obj.unmute_audio().toDart);
   }
 
   @override
   Future<void> enableAudio() async {
-    await fallibleFuture(obj.enable_audio());
+    await fallibleFuture(obj.enable_audio().toDart);
   }
 
   @override
   Future<void> disableAudio() async {
-    await fallibleFuture(obj.disable_audio());
+    await fallibleFuture(obj.disable_audio().toDart);
   }
 
   @override
   Future<void> muteVideo([MediaSourceKind? kind]) async {
-    await fallibleFuture(obj.mute_video(kind?.index));
+    await fallibleFuture(obj.mute_video(kind?.index).toDart);
   }
 
   @override
   Future<void> unmuteVideo([MediaSourceKind? kind]) async {
-    await fallibleFuture(obj.unmute_video(kind?.index));
+    await fallibleFuture(obj.unmute_video(kind?.index).toDart);
   }
 
   @override
   Future<void> enableVideo([MediaSourceKind? kind]) async {
-    await fallibleFuture(obj.enable_video(kind?.index));
+    await fallibleFuture(obj.enable_video(kind?.index).toDart);
   }
 
   @override
   Future<void> disableVideo([MediaSourceKind? kind]) async {
-    await fallibleFuture(obj.disable_video(kind?.index));
+    await fallibleFuture(obj.disable_video(kind?.index).toDart);
   }
 
   @override
   Future<void> enableRemoteAudio() async {
-    await fallibleFuture(obj.enable_remote_audio());
+    await fallibleFuture(obj.enable_remote_audio().toDart);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
-    await fallibleFuture(obj.disable_remote_audio());
+    await fallibleFuture(obj.disable_remote_audio().toDart);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
-    await fallibleFuture(obj.enable_remote_video(kind?.index));
+    await fallibleFuture(obj.enable_remote_video(kind?.index).toDart);
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
-    await fallibleFuture(obj.disable_remote_video(kind?.index));
+    await fallibleFuture(obj.disable_remote_video(kind?.index).toDart);
   }
 
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
-    fallibleFunction(() => obj.on_new_connection(allowInterop((handle) {
-          f(WebConnectionHandle(handle));
-        })));
+    void fn(JSAny? handle) =>
+        f(WebConnectionHandle(handle as wasm.ConnectionHandle));
+
+    fallibleFunction(() => obj.on_new_connection(fn.toJS));
   }
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
-    fallibleFunction(() => obj.on_close(allowInterop((reason) {
-          f(WebRoomCloseReason(reason));
-        })));
+    void fn(JSAny? reason) =>
+        f(WebRoomCloseReason(reason as wasm.RoomCloseReason));
+    fallibleFunction(() => obj.on_close(fn.toJS));
   }
 
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
-    fallibleFunction(() => obj.on_local_track(allowInterop((track) {
-          f(WebLocalMediaTrack(track));
-        })));
+    void fn(JSAny? track) =>
+        f(WebLocalMediaTrack(track as wasm.LocalMediaTrack));
+    fallibleFunction(
+      () => obj.on_local_track(fn.toJS),
+    );
   }
 
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
-    fallibleFunction(() => obj.on_connection_loss(allowInterop((handle) {
-          f(WebReconnectHandle(handle));
-        })));
+    void fn(JSAny? handle) =>
+        f(WebReconnectHandle(handle as wasm.ReconnectHandle));
+    fallibleFunction(() => obj.on_connection_loss(fn.toJS));
   }
 
   @override
   void onFailedLocalMedia(void Function(Object) f) {
-    fallibleFunction(() => obj.on_failed_local_media(allowInterop((e) {
-          f(convertException(e));
-        })));
+    void fn(JSAny? e) => f(convertException(e));
+    fallibleFunction(() => obj.on_failed_local_media(fn.toJS));
   }
 
   @moveSemantics
