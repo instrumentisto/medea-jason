@@ -2,7 +2,7 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
-    - 'lib/src/native/ffi/frb/**'
+#    - 'lib/src/native/ffi/frb/**'
     - '**.g.dart'
 
 linter:

@@ -1,5 +1,5 @@
 import '../interface/room_close_reason.dart';
-import 'ffi/frb//api/dart/api.dart' as frb;
+import 'ffi/frb/room.dart' as frb;
 
 class NativeRoomCloseReason implements RoomCloseReason {
   /// Rust `flutter_rust_bridge` api representation.

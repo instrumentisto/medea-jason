@@ -296,7 +296,7 @@ void main() {
     } catch (e) {
       var res = await completer.future;
       expect(res as String, contains('panicked at'));
-      expect(jason.opaque.isStale(), true);
+      expect(jason.opaque.isDisposed, true);
       return;
     }
     throw Exception('Exception not fired on panic');

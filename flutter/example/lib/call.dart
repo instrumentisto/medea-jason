@@ -20,9 +20,9 @@ class Call {
   /// Provides access to Control API of the media server.
   late ControlApi controlApi = ControlApi(client);
 
-  final Jason _jason = await Jason.init();
-  late final MediaManagerHandle _mediaManager = _jason.mediaManager();
-  late final RoomHandle _room = _jason.initRoom();
+  late Jason _jason;
+  late final MediaManagerHandle _mediaManager;
+  late final RoomHandle _room;
 
   /// Callback for creating/changing a render from a local video device track.
   late Function(webrtc.MediaStreamTrack) _onLocalDeviceTrack;
@@ -69,6 +69,10 @@ class Call {
   /// Starts a call in the specified room.
   Future<void> start(String roomId, String memberId, bool isPublish,
       bool publishVideo, bool publishAudio, bool fakeMedia) async {
+    _jason = await Jason.init();
+    _mediaManager = _jason.mediaManager();
+    _room = _jason.initRoom();
+
     if (fakeMedia) {
       await webrtc.enableFakeMedia();
     }

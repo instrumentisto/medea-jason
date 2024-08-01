@@ -138,6 +138,7 @@ impl From<DartError> for DartOpaque {
     fn from(val: DartError) -> Self {
         // let boxed = unsafe { Box::from_raw(val.0.as_ptr()) };
         // unsafe { Self::new_non_droppable(*boxed) }
+        // DartOpaque::new()
         todo!()
     }
 }

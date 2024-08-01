@@ -4,7 +4,6 @@ import 'dart:io';
 import '../../medea_jason.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
 import '../util/move_semantic.dart';
-import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/frb//api/dart/api.dart' as frb;
 import 'local_media_track.dart';
@@ -13,12 +12,12 @@ import 'media_display_details.dart';
 
 class NativeMediaManagerHandle implements MediaManagerHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  final RustOpaque<frb.MediaManagerHandle> opaque;
+  final frb.MediaManagerHandle opaque;
 
   /// Creates a new [MediaManagerHandle] backed by the Rust struct behind the
   /// provided [frb.MediaManagerHandle].
   NativeMediaManagerHandle(frb.MediaManagerHandle mediaManager)
-      : opaque = RustOpaque(mediaManager) {
+      : opaque = mediaManager {
     RustHandlesStorage().insertHandle(this);
   }
 
@@ -27,11 +26,11 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
       base_settings.MediaStreamSettings caps) async {
     Pointer tracks;
     tracks = await (frb.mediaManagerHandleInitLocalTracks(
-        manager: opaque.innerOpaque,
+        manager: opaque,
         caps: (caps as MediaStreamSettings).setting) as Future) as Pointer;
 
     return frb
-        .vecLocalTracksFromPtr(ptr: tracks.address)
+        .vecLocalTracksFromPtr(ptr: BigInt.from(tracks.address))
         .map((track) => NativeLocalMediaTrack(track))
         .toList();
   }
@@ -39,10 +38,10 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   @override
   Future<List<MediaDeviceDetails>> enumerateDevices() async {
     Pointer devices;
-    devices = await (frb.mediaManagerHandleEnumerateDevices(
-        manager: opaque.innerOpaque) as Future);
+    devices = await (frb.mediaManagerHandleEnumerateDevices(manager: opaque)
+        as Future);
     return frb
-        .vecMediaDeviceDetailsFromPtr(ptr: devices.address)
+        .vecMediaDeviceDetailsFromPtr(ptr: BigInt.from(devices.address))
         .map((info) => NativeMediaDeviceDetails(info))
         .toList();
   }
@@ -55,11 +54,11 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
     }
 
     Pointer devices;
-    devices = await (frb.mediaManagerHandleEnumerateDisplays(
-        manager: opaque.innerOpaque) as Future) as Pointer;
+    devices = await (frb.mediaManagerHandleEnumerateDisplays(manager: opaque)
+        as Future) as Pointer;
 
     return frb
-        .vecMediaDisplayDetailsFromPtr(ptr: devices.address)
+        .vecMediaDisplayDetailsFromPtr(ptr: BigInt.from(devices.address))
         .map((info) => NativeMediaDisplayDetails(info))
         .toList();
   }
@@ -67,36 +66,36 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   @override
   Future<void> setOutputAudioId(String deviceId) async {
     await (frb.mediaManagerHandleSetOutputAudioId(
-        manager: opaque.innerOpaque, deviceId: deviceId) as Future);
+        manager: opaque, deviceId: deviceId) as Future);
   }
 
   @override
   Future<void> setMicrophoneVolume(int level) async {
     await (frb.mediaManagerHandleSetMicrophoneVolume(
-        manager: opaque.innerOpaque, level: level) as Future);
+        manager: opaque, level: level) as Future);
   }
 
   @override
   Future<int> microphoneVolume() async {
-    return await (frb.mediaManagerHandleMicrophoneVolume(
-        manager: opaque.innerOpaque) as Future) as int;
+    return await (frb.mediaManagerHandleMicrophoneVolume(manager: opaque)
+        as Future) as int;
   }
 
   @override
   Future<bool> microphoneVolumeIsAvailable() async {
     return await (frb.mediaManagerHandleMicrophoneVolumeIsAvailable(
-        manager: opaque.innerOpaque) as Future) as bool;
+        manager: opaque) as Future) as bool;
   }
 
   @override
   void onDeviceChange(void Function() cb) {
-    frb.mediaManagerHandleOnDeviceChange(manager: opaque.innerOpaque, cb: cb);
+    frb.mediaManagerHandleOnDeviceChange(manager: opaque, cb: cb);
   }
 
   @moveSemantics
   @override
   void free() {
-    if (!opaque.isStale()) {
+    if (!opaque.isDisposed) {
       RustHandlesStorage().removeHandle(this);
 
       opaque.dispose();

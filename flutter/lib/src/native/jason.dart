@@ -3,17 +3,20 @@ library jason;
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+
 import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
-import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/callback.dart' as callback;
 import 'ffi/completer.dart' as completer;
 import 'ffi/exception.dart' as exceptions;
 import 'ffi/executor.dart';
 import 'ffi/frb/api/dart/api.dart' as frb;
+import 'ffi/frb/frb_generated.dart';
 import 'ffi/function.dart' as function;
 import 'ffi/future.dart' as future;
 import 'ffi/list.dart' as list;
@@ -91,17 +94,28 @@ DynamicLibrary _dlLoad() {
 
 class Jason implements base.Jason {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late RustOpaque<frb.Jason> opaque;
+  late frb.Jason opaque;
 
   /// Constructs a new [Jason] backed by the Rust struct behind the provided
   /// [frb.Jason].
   static Future<Jason> init() async {
+    const stem = 'medea_jason';
+
+    var lib = await loadExternalLibrary(const ExternalLibraryLoaderConfig(
+        stem: stem, ioDirectory: '', webPrefix: ''));
+
+    await RustLib.init(externalLibrary: lib);
+
     var jason = Jason._();
-    jason.opaque = RustOpaque(frb.jasonNew());
+    jason.opaque = frb.jasonNew();
 
     RustHandlesStorage().insertHandle(jason);
 
-    // (RustLib.instance.api) as BaseApiImpl;
+    print('-------------------------------------------------------------');
+    var port =
+        ((RustLib.instance.api) as BaseApiImpl).portManager.dartHandlerPort;
+    print(port);
+    print('-------------------------------------------------------------');
     // RustLib.instance.portManager;
 
     return jason;
@@ -111,28 +125,27 @@ class Jason implements base.Jason {
 
   @override
   MediaManagerHandle mediaManager() {
-    return NativeMediaManagerHandle(
-        frb.jasonMediaManager(jason: opaque.innerOpaque));
+    return NativeMediaManagerHandle(frb.jasonMediaManager(jason: opaque));
   }
 
   @override
   RoomHandle initRoom() {
-    return NativeRoomHandle(frb.jasonInitRoom(jason: opaque.innerOpaque));
+    return NativeRoomHandle(frb.jasonInitRoom(jason: opaque));
   }
 
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
     frb.jasonCloseRoom(
-        jason: opaque.innerOpaque,
-        roomToDelete: (room as NativeRoomHandle).opaque.moveOpaque);
+        jason: opaque, roomToDelete: (room as NativeRoomHandle).opaque);
+    opaque.dispose();
   }
 
   @override
   @moveSemantics
   void free() {
-    if (!opaque.isStale()) {
+    if (!opaque.isDisposed) {
       RustHandlesStorage().removeHandle(this);
-      frb.jasonDispose(jason: opaque.moveOpaque);
+      frb.jasonDispose(jason: opaque);
     }
   }
 }

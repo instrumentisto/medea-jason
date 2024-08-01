@@ -1279,6 +1279,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aebee2d1d5b8b3cfbbb11919b44791b4e0f037328195efd3832c7f7e0c6c6c8b"
 dependencies = [
  "allo-isolate",
+ "anyhow",
  "build-target",
  "bytemuck",
  "byteorder",
