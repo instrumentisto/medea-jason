@@ -4,8 +4,7 @@ import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/jason_api.g.dart' as frb;
-import 'jason.dart';
+import 'ffi/frb//api/dart/api.dart' as frb;
 
 class NativeConnectionHandle implements ConnectionHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
@@ -20,28 +19,28 @@ class NativeConnectionHandle implements ConnectionHandle {
 
   @override
   String getRemoteMemberId() {
-    return api.connectionHandleGetRemoteMemberId(
+    return frb.connectionHandleGetRemoteMemberId(
         connection: opaque.innerOpaque);
   }
 
   @override
   void onClose(void Function() f) {
-    api.connectionHandleOnClose(connection: opaque.innerOpaque, f: f);
+    frb.connectionHandleOnClose(connection: opaque.innerOpaque, f: f);
   }
 
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
-    api.connectionHandleOnRemoteTrackAdded(
+    frb.connectionHandleOnRemoteTrackAdded(
         connection: opaque.innerOpaque,
         f: (t) {
           f(NativeRemoteMediaTrack(
-              api.remoteMediaTrackFromPtr(ptr: t.address)));
+              frb.remoteMediaTrackFromPtr(ptr: t.address)));
         });
   }
 
   @override
   void onQualityScoreUpdate(void Function(int) f) {
-    api.connectionHandleOnQualityScoreUpdate(
+    frb.connectionHandleOnQualityScoreUpdate(
         connection: opaque.innerOpaque, f: f);
   }
 
@@ -57,25 +56,25 @@ class NativeConnectionHandle implements ConnectionHandle {
 
   @override
   Future<void> enableRemoteAudio() async {
-    await (api.connectionHandleEnableRemoteAudio(connection: opaque.innerOpaque)
+    await (frb.connectionHandleEnableRemoteAudio(connection: opaque.innerOpaque)
         as Future);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
-    await (api.connectionHandleDisableRemoteAudio(
+    await (frb.connectionHandleDisableRemoteAudio(
         connection: opaque.innerOpaque) as Future);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
-    await (api.connectionHandleEnableRemoteVideo(
+    await (frb.connectionHandleEnableRemoteVideo(
         connection: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
-    await (api.connectionHandleDisableRemoteVideo(
+    await (frb.connectionHandleDisableRemoteVideo(
         connection: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 }

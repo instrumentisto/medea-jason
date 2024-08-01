@@ -4,7 +4,7 @@ import '../interface/media_stream_settings.dart' as base;
 import 'audio_track_constraints.dart';
 import 'device_video_track_constraints.dart';
 import 'display_video_track_constraints.dart';
-import 'ffi/jason_api.g.dart' as frb;
+import 'ffi/frb//api/dart/api.dart' as frb;
 
 import '../interface/display_video_track_constraints.dart'
     as base_display_video;

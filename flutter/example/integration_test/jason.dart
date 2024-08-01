@@ -20,7 +20,7 @@ void main() {
   });
 
   testWidgets('MediaManager', (WidgetTester tester) async {
-    var jason = Jason();
+    var jason = await Jason.init();
     var mediaManager = jason.mediaManager();
 
     var devices = await mediaManager.enumerateDevices();
@@ -97,7 +97,7 @@ void main() {
   });
 
   testWidgets('RoomHandle', (WidgetTester tester) async {
-    var jason = Jason();
+    var jason = await Jason.init();
     var room = jason.initRoom();
     room.onFailedLocalMedia((_) {});
     room.onConnectionLoss((_) {});
@@ -288,7 +288,7 @@ void main() {
       (WidgetTester widgetTester) async {
     final firePanic =
         dl.lookupFunction<Void Function(), void Function()>('fire_panic');
-    final jason = Jason();
+    final jason = await Jason.init();
     var completer = Completer();
     onPanic((msg) => completer.complete(msg));
     try {
@@ -305,7 +305,7 @@ void main() {
   testWidgets('Enumerate displays', (WidgetTester widgetTester) async {
     var shouldWork = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
 
-    var jason = Jason();
+    var jason = await Jason.init();
     var media = jason.mediaManager();
 
     if (!shouldWork) {

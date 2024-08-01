@@ -20,7 +20,7 @@ class Call {
   /// Provides access to Control API of the media server.
   late ControlApi controlApi = ControlApi(client);
 
-  final Jason _jason = Jason();
+  final Jason _jason = await Jason.init();
   late final MediaManagerHandle _mediaManager = _jason.mediaManager();
   late final RoomHandle _room = _jason.initRoom();
 

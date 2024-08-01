@@ -13,9 +13,9 @@ import 'ffi/callback.dart' as callback;
 import 'ffi/completer.dart' as completer;
 import 'ffi/exception.dart' as exceptions;
 import 'ffi/executor.dart';
+import 'ffi/frb/api/dart/api.dart' as frb;
 import 'ffi/function.dart' as function;
 import 'ffi/future.dart' as future;
-import 'ffi/jason_api.g.dart' as frb;
 import 'ffi/list.dart' as list;
 import 'ffi/map.dart' as map;
 import 'ffi/native_string.dart' as native_string;
@@ -24,7 +24,6 @@ import 'platform/functions_registerer.dart' as platform_utils_registerer;
 import 'room_handle.dart';
 
 /// Bindings to the Rust side API.
-frb.MedeaJason api = _initApi();
 DynamicLibrary dl = _dlLoad();
 
 /// [Executor] that drives Rust futures.
@@ -90,42 +89,40 @@ DynamicLibrary _dlLoad() {
   return dl;
 }
 
-frb.MedeaJason _initApi() {
-  var api = frb.MedeaJasonImpl(dl);
-  api.onPanic(cb: (msg) async {
-    msg as String;
-    await RustHandlesStorage().freeAll();
-    if (_onPanicCallback != null) {
-      _onPanicCallback!(msg);
-    }
-  });
-  return api;
-}
-
 class Jason implements base.Jason {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  final RustOpaque<frb.Jason> opaque = RustOpaque(api.jasonNew());
+  late RustOpaque<frb.Jason> opaque;
 
   /// Constructs a new [Jason] backed by the Rust struct behind the provided
   /// [frb.Jason].
-  Jason() {
-    RustHandlesStorage().insertHandle(this);
+  static Future<Jason> init() async {
+    var jason = Jason._();
+    jason.opaque = RustOpaque(frb.jasonNew());
+
+    RustHandlesStorage().insertHandle(jason);
+
+    // (RustLib.instance.api) as BaseApiImpl;
+    // RustLib.instance.portManager;
+
+    return jason;
   }
+
+  Jason._();
 
   @override
   MediaManagerHandle mediaManager() {
     return NativeMediaManagerHandle(
-        api.jasonMediaManager(jason: opaque.innerOpaque));
+        frb.jasonMediaManager(jason: opaque.innerOpaque));
   }
 
   @override
   RoomHandle initRoom() {
-    return NativeRoomHandle(api.jasonInitRoom(jason: opaque.innerOpaque));
+    return NativeRoomHandle(frb.jasonInitRoom(jason: opaque.innerOpaque));
   }
 
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
-    api.jasonCloseRoom(
+    frb.jasonCloseRoom(
         jason: opaque.innerOpaque,
         roomToDelete: (room as NativeRoomHandle).opaque.moveOpaque);
   }
@@ -135,7 +132,7 @@ class Jason implements base.Jason {
   void free() {
     if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
-      api.jasonDispose(jason: opaque.moveOpaque);
+      frb.jasonDispose(jason: opaque.moveOpaque);
     }
   }
 }

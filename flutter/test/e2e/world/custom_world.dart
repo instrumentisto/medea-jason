@@ -120,7 +120,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       }
     }
 
-    var jason = Jason();
+    var jason = await Jason.init();
     var room = jason.initRoom();
     await room.disableVideo(MediaSourceKind.display);
 

@@ -30,6 +30,7 @@ pub mod utils;
     let_underscore_drop,
     unused_qualifications
 )]
+#[rustfmt::skip]
 mod api_bridge_generated;
 
 use std::{

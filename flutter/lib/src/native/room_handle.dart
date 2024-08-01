@@ -8,8 +8,7 @@ import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'connection_handle.dart';
-import 'ffi/jason_api.g.dart' as frb;
-import 'jason.dart';
+import 'ffi/frb/api/dart/api.dart' as frb;
 import 'local_media_track.dart';
 import 'media_stream_settings.dart';
 import 'reconnect_handle.dart';
@@ -28,14 +27,14 @@ class NativeRoomHandle implements RoomHandle {
 
   @override
   Future<void> join(String token) async {
-    await (api.roomHandleJoin(roomHandle: opaque.innerOpaque, token: token)
+    await (frb.roomHandleJoin(roomHandle: opaque.innerOpaque, token: token)
         as Future);
   }
 
   @override
   Future<void> setLocalMediaSettings(base_settings.MediaStreamSettings settings,
       bool stopFirst, bool rollbackOnFail) async {
-    await (api.roomHandleSetLocalMediaSettings(
+    await (frb.roomHandleSetLocalMediaSettings(
         roomHandle: opaque.innerOpaque,
         settings: (settings as MediaStreamSettings).setting,
         stopFirst: stopFirst,
@@ -44,113 +43,113 @@ class NativeRoomHandle implements RoomHandle {
 
   @override
   Future<void> muteAudio() async {
-    await (api.roomHandleMuteAudio(roomHandle: opaque.innerOpaque) as Future);
+    await (frb.roomHandleMuteAudio(roomHandle: opaque.innerOpaque) as Future);
   }
 
   @override
   Future<void> unmuteAudio() async {
-    await (api.roomHandleUnmuteAudio(roomHandle: opaque.innerOpaque) as Future);
+    await (frb.roomHandleUnmuteAudio(roomHandle: opaque.innerOpaque) as Future);
   }
 
   @override
   Future<void> enableAudio() async {
-    await (api.roomHandleEnableAudio(roomHandle: opaque.innerOpaque) as Future);
+    await (frb.roomHandleEnableAudio(roomHandle: opaque.innerOpaque) as Future);
   }
 
   @override
   Future<void> disableAudio() async {
-    await (api.roomHandleDisableAudio(roomHandle: opaque.innerOpaque)
+    await (frb.roomHandleDisableAudio(roomHandle: opaque.innerOpaque)
         as Future);
   }
 
   @override
   Future<void> muteVideo([MediaSourceKind? kind]) async {
-    await (api.roomHandleMuteVideo(
+    await (frb.roomHandleMuteVideo(
         roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> unmuteVideo([MediaSourceKind? kind]) async {
-    await (api.roomHandleUnmuteVideo(
+    await (frb.roomHandleUnmuteVideo(
         roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> enableVideo([MediaSourceKind? kind]) async {
-    await (api.roomHandleEnableVideo(
+    await (frb.roomHandleEnableVideo(
         roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> disableVideo([MediaSourceKind? kind]) async {
-    await (api.roomHandleDisableVideo(
+    await (frb.roomHandleDisableVideo(
         roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> enableRemoteAudio() async {
-    await (api.roomHandleEnableRemoteAudio(roomHandle: opaque.innerOpaque)
+    await (frb.roomHandleEnableRemoteAudio(roomHandle: opaque.innerOpaque)
         as Future);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
-    await (api.roomHandleDisableRemoteAudio(roomHandle: opaque.innerOpaque)
+    await (frb.roomHandleDisableRemoteAudio(roomHandle: opaque.innerOpaque)
         as Future);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
-    await (api.roomHandleEnableRemoteVideo(
+    await (frb.roomHandleEnableRemoteVideo(
         roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
-    await (api.roomHandleDisableRemoteVideo(
+    await (frb.roomHandleDisableRemoteVideo(
         roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
-    api.roomHandleOnNewConnection(
+    frb.roomHandleOnNewConnection(
         roomHandle: opaque.innerOpaque,
         cb: (t) {
           f(NativeConnectionHandle(
-              api.connectionHandleFromPtr(ptr: t.address)));
+              frb.connectionHandleFromPtr(ptr: t.address)));
         });
   }
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
-    api.roomHandleOnClose(
+    frb.roomHandleOnClose(
         roomHandle: opaque.innerOpaque,
         cb: (t) {
-          f(NativeRoomCloseReason(api.roomCloseReasonFromPtr(ptr: t.address)));
+          f(NativeRoomCloseReason(frb.roomCloseReasonFromPtr(ptr: t.address)));
         });
   }
 
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
-    api.roomHandleOnLocalTrack(
+    frb.roomHandleOnLocalTrack(
         roomHandle: opaque.innerOpaque,
         cb: (t) {
-          f(NativeLocalMediaTrack(api.localMediaTrackFromPtr(ptr: t.address)));
+          f(NativeLocalMediaTrack(frb.localMediaTrackFromPtr(ptr: t.address)));
         });
   }
 
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
-    api.roomHandleOnConnectionLoss(
+    frb.roomHandleOnConnectionLoss(
         roomHandle: opaque.innerOpaque,
         cb: (t) {
-          f(NativeReconnectHandle(api.reconnectHandleFromPtr(ptr: t.address)));
+          f(NativeReconnectHandle(frb.reconnectHandleFromPtr(ptr: t.address)));
         });
   }
 
   @override
   void onFailedLocalMedia(void Function(Object) f) {
-    api.roomHandleOnFailedLocalMedia(
+    frb.roomHandleOnFailedLocalMedia(
         roomHandle: opaque.innerOpaque,
         cb: (err) {
           f(err);

@@ -5,8 +5,7 @@ import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/jason_api.g.dart' as frb;
-import 'jason.dart';
+import 'ffi/frb//api/dart/api.dart' as frb;
 
 class NativeLocalMediaTrack implements LocalMediaTrack {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
@@ -21,17 +20,17 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
 
   @override
   MediaKind kind() {
-    return api.localMediaTrackKind(track: opaque.innerOpaque);
+    return frb.localMediaTrackKind(track: opaque.innerOpaque);
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return api.localMediaTrackMediaSourceKind(track: opaque.innerOpaque);
+    return frb.localMediaTrackMediaSourceKind(track: opaque.innerOpaque);
   }
 
   @override
   webrtc.MediaStreamTrack getTrack() {
-    return api.localMediaTrackGetTrack(track: opaque.innerOpaque)
+    return frb.localMediaTrackGetTrack(track: opaque.innerOpaque)
         as webrtc.MediaStreamTrack;
   }
 
@@ -40,29 +39,29 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
   Future<void> free() async {
     if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
-      await (api.localMediaTrackFree(track: opaque.moveOpaque) as Future);
+      await (frb.localMediaTrackFree(track: opaque.moveOpaque) as Future);
     }
   }
 
   @override
   void onEnded(OnEndedCallback f) {
-    api.localMediaTrackOnEnded(track: opaque.innerOpaque, f: f);
+    frb.localMediaTrackOnEnded(track: opaque.innerOpaque, f: f);
   }
 
   @override
   Future<MediaStreamTrackState> state() async {
     var index =
-        await (api.localMediaTrackState(track: opaque.innerOpaque) as Future);
+        await (frb.localMediaTrackState(track: opaque.innerOpaque) as Future);
     return MediaStreamTrackState.values[index];
   }
 
   @override
   bool isOnAudioLevelAvailable() {
-    return api.isOnAudioLevelAvailable(track: opaque.innerOpaque);
+    return frb.isOnAudioLevelAvailable(track: opaque.innerOpaque);
   }
 
   @override
   void onAudioLevelChanged(OnAudioLevelChangedCallback f) {
-    api.onAudioLevelChanged(track: opaque.innerOpaque, f: f);
+    frb.onAudioLevelChanged(track: opaque.innerOpaque, f: f);
   }
 }
