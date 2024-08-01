@@ -1,14 +1,12 @@
 PODS:
   - Flutter (1.0.0)
-  - instrumentisto-libwebrtc-bin (118.0.5993.88)
+  - instrumentisto-libwebrtc-bin (127.0.6533.72)
   - integration_test (0.0.1):
     - Flutter
-  - libyuv-iOS (1.0.2)
-  - medea_flutter_webrtc (0.9.0):
+  - medea_flutter_webrtc (0.10.0):
     - Flutter
-    - instrumentisto-libwebrtc-bin (= 118.0.5993.88)
-    - libyuv-iOS
-  - medea_jason (0.4.0):
+    - instrumentisto-libwebrtc-bin (= 127.0.6533.72)
+  - medea_jason (0.5.0):
     - Flutter
 
 DEPENDENCIES:
@@ -20,7 +18,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - instrumentisto-libwebrtc-bin
-    - libyuv-iOS
 
 EXTERNAL SOURCES:
   Flutter:
@@ -33,13 +30,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/medea_jason/ios"
 
 SPEC CHECKSUMS:
-  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  instrumentisto-libwebrtc-bin: 295e1721ff9a8ccfc030c0de5f095c7d6b3e53ce
-  integration_test: 13825b8a9334a850581300559b8839134b124670
-  libyuv-iOS: 5a154ccc84ec754029886ecb607512731fe30640
-  medea_flutter_webrtc: 4be3b47ae44588d2e1197e87e0611d3f85d14e60
-  medea_jason: 05d8174fd71ee885e68e40a50816d609d971f7b5
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  instrumentisto-libwebrtc-bin: 56ed98f1c6354a4d6f80199922978ec74db208a7
+  integration_test: ce0a3ffa1de96d1a89ca0ac26fca7ea18a749ef4
+  medea_flutter_webrtc: 661d80d1940c3335fa40ae91175bdab30a37cd4d
+  medea_jason: 8ae6cad8f42474e0437eb1ed230be00eacfff464
 
 PODFILE CHECKSUM: 645e03ec353e4a50b5c4f39a89c4acce2cfd4faf
 
-COCOAPODS: 1.14.2
+COCOAPODS: 1.14.3

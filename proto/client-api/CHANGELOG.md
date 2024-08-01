@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.6.0] · 2024-??-?? (unreleased)
+## [0.6.0] · 2024-08-01
 [0.6.0]: /../../tree/medea-client-api-proto-0.6.0/proto/client-api
 
 ## BC Breaks
