@@ -17,7 +17,7 @@ pub trait Api {
     type Error;
 
     /// Fires when a certain callback [`Event`] happens on a media server.
-    async fn on_event(&self, req: Request) -> Result<(), Self::Error>;
+    async fn on_event(&self, request: Request) -> Result<(), Self::Error>;
 }
 
 /// Request with a fired callback [`Event`] and its meta information.

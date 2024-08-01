@@ -59,10 +59,10 @@ struct Sleeper;
 impl backoff::future::Sleeper for Sleeper {
     type Sleep = BoxFuture<'static, ()>;
 
-    fn sleep(&self, delay: Duration) -> Self::Sleep {
+    fn sleep(&self, dur: Duration) -> Self::Sleep {
         let (tx, rx) = oneshot::channel();
         platform::spawn(async move {
-            platform::delay_for(delay).await;
+            platform::delay_for(dur).await;
             _ = tx.send(());
         });
         Box::pin(rx.map(drop))

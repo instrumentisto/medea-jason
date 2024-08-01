@@ -224,7 +224,9 @@ impl RpcTransport for WebSocketRpcTransport {
         match state {
             TransportState::Open => unsafe {
                 let msg = serde_json::to_string(msg).unwrap();
-                transport::send(handle.get(), string_into_c_str(msg)).unwrap();
+                transport::send(handle.get(), string_into_c_str(msg))
+                    .map_err(TransportError::SendMessage)
+                    .map_err(tracerr::wrap!())?;
                 Ok(())
             },
             TransportState::Connecting

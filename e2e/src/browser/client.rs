@@ -125,7 +125,7 @@ impl WebDriverClient {
         let (tx, rx) = mpsc::channel();
         let client = Arc::clone(&self.inner);
         drop(tokio::spawn(async move {
-            let mut client = client.lock().await;
+            let client = client.lock().await;
             client.close_window(window).await;
             tx.send(()).unwrap();
         }));
@@ -218,7 +218,7 @@ impl Inner {
     /// [WebDriver]: https://w3.org/TR/webdriver
     async fn new(webdriver_address: &str, caps: Capabilities) -> Result<Self> {
         Ok(Self(
-            ClientBuilder::rustls()
+            ClientBuilder::rustls()?
                 .capabilities(caps)
                 .connect(webdriver_address)
                 .await?,
@@ -231,7 +231,7 @@ impl Inner {
     ///
     /// - If JS exception was thrown while executing a JS code.
     /// - If failed to deserialize a result of the executed JS code.
-    async fn execute(&mut self, statement: Statement) -> Result<Json> {
+    async fn execute(&self, statement: Statement) -> Result<Json> {
         let (inner_js, args) = statement.prepare();
 
         // language=JavaScript
@@ -274,10 +274,7 @@ impl Inner {
     ///
     /// - If failed to create a new browser window.
     /// - If `index.html` wasn't found at `file_server_host`.
-    async fn new_window(
-        &mut self,
-        file_server_host: &str,
-    ) -> Result<WindowHandle> {
+    async fn new_window(&self, file_server_host: &str) -> Result<WindowHandle> {
         let window = self.0.new_window(true).await?.handle;
         self.0.switch_to_window(window.clone()).await?;
         self.0
@@ -308,7 +305,7 @@ impl Inner {
     /// Switches to the provided browser window and executes the provided
     /// [`Statement`].
     async fn switch_to_window_and_execute(
-        &mut self,
+        &self,
         window: WindowHandle,
         exec: Statement,
     ) -> Result<Json> {
@@ -317,7 +314,7 @@ impl Inner {
     }
 
     /// Closes the provided browser window.
-    async fn close_window(&mut self, window: WindowHandle) {
+    async fn close_window(&self, window: WindowHandle) {
         if self.0.switch_to_window(window).await.is_ok() {
             drop(self.0.close_window().await);
         }

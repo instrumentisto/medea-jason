@@ -154,11 +154,11 @@ impl FromStr for LocalSrcUri {
 
 #[cfg(feature = "serde")]
 impl<'de> Deserialize<'de> for LocalSrcUri {
-    fn deserialize<D>(de: D) -> Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
-        String::deserialize(de)?
+        String::deserialize(deserializer)?
             .parse::<Self>()
             .map_err(D::Error::custom)
     }
@@ -166,11 +166,11 @@ impl<'de> Deserialize<'de> for LocalSrcUri {
 
 #[cfg(feature = "serde")]
 impl Serialize for LocalSrcUri {
-    fn serialize<S>(&self, se: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        se.serialize_str(&self.to_string())
+        serializer.serialize_str(&self.to_string())
     }
 }
 

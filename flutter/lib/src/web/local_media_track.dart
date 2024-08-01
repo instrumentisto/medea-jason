@@ -1,5 +1,7 @@
 // ignore_for_file: implementation_imports
 
+import 'dart:js_interop';
+
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import 'package:medea_flutter_webrtc/src/platform/web/media_stream_track.dart';
 
@@ -22,7 +24,8 @@ class WebLocalMediaTrack implements LocalMediaTrack {
   @override
   MediaSourceKind mediaSourceKind() {
     return fallibleFunction(
-        () => MediaSourceKind.values[obj.media_source_kind().toInt()]);
+      () => MediaSourceKind.values[obj.media_source_kind().toInt()],
+    );
   }
 
   @override
@@ -32,9 +35,7 @@ class WebLocalMediaTrack implements LocalMediaTrack {
 
   @override
   void onEnded(OnEndedCallback f) {
-    obj.get_track().onEnded.listen((event) {
-      f();
-    });
+    obj.get_track().onended = f.toJS;
   }
 
   @moveSemantics
@@ -45,8 +46,8 @@ class WebLocalMediaTrack implements LocalMediaTrack {
 
   @override
   Future<MediaStreamTrackState> state() async {
-    var index = await fallibleFuture(obj.state());
-    return MediaStreamTrackState.values[index];
+    final index = await fallibleFuture(obj.state().toDart) as JSNumber;
+    return MediaStreamTrackState.values[index.toDartInt];
   }
 
   @override
