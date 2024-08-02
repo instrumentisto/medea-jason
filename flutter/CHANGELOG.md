@@ -6,8 +6,8 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.4.1] · 2023-??-??
-[0.4.1]: /../../tree/medea-jason-0.4.1/flutter
+## [0.5.0] · 2023-08-02
+[0.5.0]: /../../tree/medea-jason-0.5.0/flutter
 
 ### Added
 
