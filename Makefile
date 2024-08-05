@@ -959,7 +959,7 @@ docker.down.control:
 #	make docker.down.demo
 
 docker.down.demo:
-	docker-compose -f demo/docker-compose.yml down --rmi=local -v
+	docker compose -f demo/docker-compose.yml down --rmi=local -v
 
 
 # Stop E2E tests environment in Docker Compose and remove all related
@@ -970,7 +970,7 @@ docker.down.demo:
 
 docker.down.e2e: down.control
 	@make docker.down.medea
-	docker-compose -f e2e/docker-compose.yml down --rmi=local -v
+	docker compose -f e2e/docker-compose.yml down --rmi=local -v
 
 
 # Stop Medea media server in Docker Compose environment
@@ -980,7 +980,7 @@ docker.down.e2e: down.control
 # 	make docker.down.medea
 
 docker.down.medea:
-	docker-compose -f docker-compose.medea.yml down --rmi=local -v
+	docker compose -f docker-compose.medea.yml down --rmi=local -v
 
 
 # Stop dockerized WebDriver and remove all related containers.
@@ -1116,7 +1116,7 @@ docker.up.control:
 #	make docker.up.demo
 
 docker.up.demo: docker.down.demo
-	docker-compose -f demo/docker-compose.yml up
+	docker compose -f demo/docker-compose.yml up
 
 
 # Run E2E tests environment in Docker Compose.
@@ -1156,13 +1156,13 @@ ifeq ($(rebuild),yes)
 endif
 	@mkdir -p pkg/
 	env $(docker-up-e2e-env) \
-	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
+	docker compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
 		up $(if $(call eq,$(dockerized),yes),\
 		   $(if $(call eq,$(background),yes),-d,--abort-on-container-exit),-d)
 ifeq ($(background),yes)
 ifeq ($(log),yes)
 	env $(docker-up-e2e-env) \
-	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
+	docker compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
 		logs -f &
 endif
 endif
@@ -1184,11 +1184,11 @@ docker-up-medea-tag = $(if $(call eq,$(tag),),edge,$(tag))
 docker.up.medea: docker.down.medea
 	COMPOSE_MEDEA_IMAGE_NAME=$(docker-up-medea-image) \
 	COMPOSE_MEDEA_IMAGE_VER=$(docker-up-medea-tag) \
-	docker-compose -f docker-compose.medea.yml up \
+	docker compose -f docker-compose.medea.yml up \
 		$(if $(call eq,$(background),yes),-d,--abort-on-container-exit)
 ifeq ($(background),yes)
 ifeq ($(log),yes)
-	docker-compose -f docker-compose.medea.yml logs -f &
+	docker compose -f docker-compose.medea.yml logs -f &
 endif
 endif
 
