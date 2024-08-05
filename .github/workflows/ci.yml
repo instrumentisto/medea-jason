@@ -763,6 +763,12 @@ jobs:
           test "${{ steps.release.outputs.group2 }}" \
             == $(make cargo.version crate=${{ steps.release.outputs.group1 }})
 
+      - uses: arduino/setup-protoc@v3
+        with:
+          version: ${{ env.PROTOC_VER }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ startsWith(github.ref, 'refs/tags/medea-control-api-proto-') }}
+
       - run: make release.cargo crate=${{ steps.release.outputs.group1 }}
                                 publish=yes
         env:
