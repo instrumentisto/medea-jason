@@ -10,12 +10,19 @@ import 'dart:ffi' as ffi;
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_io.dart';
 
 import 'api/dart/api.dart';
+import 'api/dart/api/connection_handle.dart';
+import 'api/dart/api/jason.dart';
+import 'api/dart/api/local_media_track.dart';
+import 'api/dart/api/media_manager.dart';
+import 'api/dart/api/reconnect_handle.dart';
+import 'api/dart/api/remote_media_track.dart';
+import 'api/dart/api/room.dart';
+import 'api/dart/api/room_close_reason.dart';
 import 'frb_generated.dart';
 import 'media.dart';
 import 'media/constraints.dart';
 import 'media/track.dart';
 import 'media/track/remote.dart';
-import 'room.dart';
 
 abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustLibApiImplPlatform({
@@ -26,54 +33,161 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   });
 
   CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_ConnectionHandlePtr =>
-          wire._rust_arc_decrement_strong_count_RustOpaque_ConnectionHandlePtr;
-
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_JasonPtr =>
-      wire._rust_arc_decrement_strong_count_RustOpaque_JasonPtr;
+      get rust_arc_decrement_strong_count_ConnectionHandlePtr => wire
+          ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandlePtr;
 
   CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_LocalMediaTrackPtr =>
-          wire._rust_arc_decrement_strong_count_RustOpaque_LocalMediaTrackPtr;
+      get rust_arc_decrement_strong_count_JasonHandlePtr => wire
+          ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandlePtr;
+
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_LocalMediaTrackPtr => wire
+          ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrackPtr;
 
   CrossPlatformFinalizerArg
       get rust_arc_decrement_strong_count_MediaManagerHandlePtr => wire
-          ._rust_arc_decrement_strong_count_RustOpaque_MediaManagerHandlePtr;
+          ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandlePtr;
 
   CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_ReconnectHandlePtr =>
-          wire._rust_arc_decrement_strong_count_RustOpaque_ReconnectHandlePtr;
+      get rust_arc_decrement_strong_count_ReconnectHandlePtr => wire
+          ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandlePtr;
 
   CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_RemoteMediaTrackPtr =>
-          wire._rust_arc_decrement_strong_count_RustOpaque_RemoteMediaTrackPtr;
+      get rust_arc_decrement_strong_count_RemoteMediaTrackPtr => wire
+          ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrackPtr;
+
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_RoomCloseReasonPtr => wire
+          ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReasonPtr;
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_RoomHandlePtr =>
-      wire._rust_arc_decrement_strong_count_RustOpaque_RoomHandlePtr;
+      wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandlePtr;
+
+  @protected
+  ConnectionHandle
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+          dynamic raw);
+
+  @protected
+  JasonHandle
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+          dynamic raw);
+
+  @protected
+  LocalMediaTrack
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          dynamic raw);
+
+  @protected
+  MediaManagerHandle
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+          dynamic raw);
+
+  @protected
+  ReconnectHandle
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
+          dynamic raw);
+
+  @protected
+  RemoteMediaTrack
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+          dynamic raw);
+
+  @protected
+  RoomCloseReason
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+          dynamic raw);
+
+  @protected
+  RoomHandle
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+          dynamic raw);
+
+  @protected
+  ConnectionHandle
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+          dynamic raw);
+
+  @protected
+  JasonHandle
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+          dynamic raw);
+
+  @protected
+  LocalMediaTrack
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          dynamic raw);
+
+  @protected
+  MediaManagerHandle
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+          dynamic raw);
+
+  @protected
+  ReconnectHandle
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
+          dynamic raw);
+
+  @protected
+  RemoteMediaTrack
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+          dynamic raw);
+
+  @protected
+  RoomCloseReason
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+          dynamic raw);
+
+  @protected
+  RoomHandle
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+          dynamic raw);
+
+  @protected
+  int dco_decode_CastedPrimitive_usize(dynamic raw);
 
   @protected
   Object dco_decode_DartOpaque(dynamic raw);
 
   @protected
-  ConnectionHandle dco_decode_RustOpaque_ConnectionHandle(dynamic raw);
+  ConnectionHandle
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+          dynamic raw);
 
   @protected
-  Jason dco_decode_RustOpaque_Jason(dynamic raw);
+  JasonHandle
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+          dynamic raw);
 
   @protected
-  LocalMediaTrack dco_decode_RustOpaque_LocalMediaTrack(dynamic raw);
+  LocalMediaTrack
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          dynamic raw);
 
   @protected
-  MediaManagerHandle dco_decode_RustOpaque_MediaManagerHandle(dynamic raw);
+  MediaManagerHandle
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+          dynamic raw);
 
   @protected
-  ReconnectHandle dco_decode_RustOpaque_ReconnectHandle(dynamic raw);
+  ReconnectHandle
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
+          dynamic raw);
 
   @protected
-  RemoteMediaTrack dco_decode_RustOpaque_RemoteMediaTrack(dynamic raw);
+  RemoteMediaTrack
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+          dynamic raw);
 
   @protected
-  RoomHandle dco_decode_RustOpaque_RoomHandle(dynamic raw);
+  RoomCloseReason
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+          dynamic raw);
+
+  @protected
+  RoomHandle
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+          dynamic raw);
 
   @protected
   String dco_decode_String(dynamic raw);
@@ -154,7 +268,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
-  List<LocalMediaTrack> dco_decode_list_RustOpaque_LocalMediaTrack(dynamic raw);
+  List<LocalMediaTrack>
+      dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          dynamic raw);
 
   @protected
   List<ApiMediaDeviceDetails> dco_decode_list_api_media_device_details(
@@ -213,9 +329,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
 
   @protected
-  RoomCloseReason dco_decode_room_close_reason(dynamic raw);
-
-  @protected
   int dco_decode_u_32(dynamic raw);
 
   @protected
@@ -228,33 +341,130 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt dco_decode_usize(dynamic raw);
 
   @protected
+  ConnectionHandle
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+          SseDeserializer deserializer);
+
+  @protected
+  JasonHandle
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+          SseDeserializer deserializer);
+
+  @protected
+  LocalMediaTrack
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          SseDeserializer deserializer);
+
+  @protected
+  MediaManagerHandle
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+          SseDeserializer deserializer);
+
+  @protected
+  ReconnectHandle
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
+          SseDeserializer deserializer);
+
+  @protected
+  RemoteMediaTrack
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+          SseDeserializer deserializer);
+
+  @protected
+  RoomCloseReason
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+          SseDeserializer deserializer);
+
+  @protected
+  RoomHandle
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+          SseDeserializer deserializer);
+
+  @protected
+  ConnectionHandle
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+          SseDeserializer deserializer);
+
+  @protected
+  JasonHandle
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+          SseDeserializer deserializer);
+
+  @protected
+  LocalMediaTrack
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          SseDeserializer deserializer);
+
+  @protected
+  MediaManagerHandle
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+          SseDeserializer deserializer);
+
+  @protected
+  ReconnectHandle
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
+          SseDeserializer deserializer);
+
+  @protected
+  RemoteMediaTrack
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+          SseDeserializer deserializer);
+
+  @protected
+  RoomCloseReason
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+          SseDeserializer deserializer);
+
+  @protected
+  RoomHandle
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+          SseDeserializer deserializer);
+
+  @protected
+  int sse_decode_CastedPrimitive_usize(SseDeserializer deserializer);
+
+  @protected
   Object sse_decode_DartOpaque(SseDeserializer deserializer);
 
   @protected
-  ConnectionHandle sse_decode_RustOpaque_ConnectionHandle(
-      SseDeserializer deserializer);
+  ConnectionHandle
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+          SseDeserializer deserializer);
 
   @protected
-  Jason sse_decode_RustOpaque_Jason(SseDeserializer deserializer);
+  JasonHandle
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+          SseDeserializer deserializer);
 
   @protected
-  LocalMediaTrack sse_decode_RustOpaque_LocalMediaTrack(
-      SseDeserializer deserializer);
+  LocalMediaTrack
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          SseDeserializer deserializer);
 
   @protected
-  MediaManagerHandle sse_decode_RustOpaque_MediaManagerHandle(
-      SseDeserializer deserializer);
+  MediaManagerHandle
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+          SseDeserializer deserializer);
 
   @protected
-  ReconnectHandle sse_decode_RustOpaque_ReconnectHandle(
-      SseDeserializer deserializer);
+  ReconnectHandle
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
+          SseDeserializer deserializer);
 
   @protected
-  RemoteMediaTrack sse_decode_RustOpaque_RemoteMediaTrack(
-      SseDeserializer deserializer);
+  RemoteMediaTrack
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+          SseDeserializer deserializer);
 
   @protected
-  RoomHandle sse_decode_RustOpaque_RoomHandle(SseDeserializer deserializer);
+  RoomCloseReason
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+          SseDeserializer deserializer);
+
+  @protected
+  RoomHandle
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+          SseDeserializer deserializer);
 
   @protected
   String sse_decode_String(SseDeserializer deserializer);
@@ -347,8 +557,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
-  List<LocalMediaTrack> sse_decode_list_RustOpaque_LocalMediaTrack(
-      SseDeserializer deserializer);
+  List<LocalMediaTrack>
+      sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          SseDeserializer deserializer);
 
   @protected
   List<ApiMediaDeviceDetails> sse_decode_list_api_media_device_details(
@@ -410,9 +621,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
 
   @protected
-  RoomCloseReason sse_decode_room_close_reason(SseDeserializer deserializer);
-
-  @protected
   int sse_decode_u_32(SseDeserializer deserializer);
 
   @protected
@@ -425,34 +633,130 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt sse_decode_usize(SseDeserializer deserializer);
 
   @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+          ConnectionHandle self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+          JasonHandle self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          LocalMediaTrack self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+          MediaManagerHandle self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
+          ReconnectHandle self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+          RemoteMediaTrack self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+          RoomCloseReason self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+          RoomHandle self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+          ConnectionHandle self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+          JasonHandle self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          LocalMediaTrack self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+          MediaManagerHandle self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
+          ReconnectHandle self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+          RemoteMediaTrack self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+          RoomCloseReason self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+          RoomHandle self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_CastedPrimitive_usize(int self, SseSerializer serializer);
+
+  @protected
   void sse_encode_DartOpaque(Object self, SseSerializer serializer);
 
   @protected
-  void sse_encode_RustOpaque_ConnectionHandle(
-      ConnectionHandle self, SseSerializer serializer);
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+          ConnectionHandle self, SseSerializer serializer);
 
   @protected
-  void sse_encode_RustOpaque_Jason(Jason self, SseSerializer serializer);
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+          JasonHandle self, SseSerializer serializer);
 
   @protected
-  void sse_encode_RustOpaque_LocalMediaTrack(
-      LocalMediaTrack self, SseSerializer serializer);
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          LocalMediaTrack self, SseSerializer serializer);
 
   @protected
-  void sse_encode_RustOpaque_MediaManagerHandle(
-      MediaManagerHandle self, SseSerializer serializer);
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+          MediaManagerHandle self, SseSerializer serializer);
 
   @protected
-  void sse_encode_RustOpaque_ReconnectHandle(
-      ReconnectHandle self, SseSerializer serializer);
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
+          ReconnectHandle self, SseSerializer serializer);
 
   @protected
-  void sse_encode_RustOpaque_RemoteMediaTrack(
-      RemoteMediaTrack self, SseSerializer serializer);
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+          RemoteMediaTrack self, SseSerializer serializer);
 
   @protected
-  void sse_encode_RustOpaque_RoomHandle(
-      RoomHandle self, SseSerializer serializer);
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+          RoomCloseReason self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+          RoomHandle self, SseSerializer serializer);
 
   @protected
   void sse_encode_String(String self, SseSerializer serializer);
@@ -543,8 +847,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
-  void sse_encode_list_RustOpaque_LocalMediaTrack(
-      List<LocalMediaTrack> self, SseSerializer serializer);
+  void
+      sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          List<LocalMediaTrack> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_api_media_device_details(
@@ -608,10 +913,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
 
   @protected
-  void sse_encode_room_close_reason(
-      RoomCloseReason self, SseSerializer serializer);
-
-  @protected
   void sse_encode_u_32(int self, SseSerializer serializer);
 
   @protected
@@ -638,213 +939,259 @@ class RustLibWire implements BaseWire {
   RustLibWire(ffi.DynamicLibrary dynamicLibrary)
       : _lookup = dynamicLibrary.lookup;
 
-  void rust_arc_increment_strong_count_RustOpaque_ConnectionHandle(
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_increment_strong_count_RustOpaque_ConnectionHandle(
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
       ptr,
     );
   }
 
-  late final _rust_arc_increment_strong_count_RustOpaque_ConnectionHandlePtr =
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_ConnectionHandle');
-  late final _rust_arc_increment_strong_count_RustOpaque_ConnectionHandle =
-      _rust_arc_increment_strong_count_RustOpaque_ConnectionHandlePtr
+          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-  void rust_arc_decrement_strong_count_RustOpaque_ConnectionHandle(
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_ConnectionHandle(
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
       ptr,
     );
   }
 
-  late final _rust_arc_decrement_strong_count_RustOpaque_ConnectionHandlePtr =
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_ConnectionHandle');
-  late final _rust_arc_decrement_strong_count_RustOpaque_ConnectionHandle =
-      _rust_arc_decrement_strong_count_RustOpaque_ConnectionHandlePtr
+          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-  void rust_arc_increment_strong_count_RustOpaque_Jason(
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_increment_strong_count_RustOpaque_Jason(
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
       ptr,
     );
   }
 
-  late final _rust_arc_increment_strong_count_RustOpaque_JasonPtr = _lookup<
-          ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-      'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_Jason');
-  late final _rust_arc_increment_strong_count_RustOpaque_Jason =
-      _rust_arc_increment_strong_count_RustOpaque_JasonPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  void rust_arc_decrement_strong_count_RustOpaque_Jason(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_Jason(
-      ptr,
-    );
-  }
-
-  late final _rust_arc_decrement_strong_count_RustOpaque_JasonPtr = _lookup<
-          ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-      'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_Jason');
-  late final _rust_arc_decrement_strong_count_RustOpaque_Jason =
-      _rust_arc_decrement_strong_count_RustOpaque_JasonPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  void rust_arc_increment_strong_count_RustOpaque_LocalMediaTrack(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_increment_strong_count_RustOpaque_LocalMediaTrack(
-      ptr,
-    );
-  }
-
-  late final _rust_arc_increment_strong_count_RustOpaque_LocalMediaTrackPtr =
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_LocalMediaTrack');
-  late final _rust_arc_increment_strong_count_RustOpaque_LocalMediaTrack =
-      _rust_arc_increment_strong_count_RustOpaque_LocalMediaTrackPtr
+          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-  void rust_arc_decrement_strong_count_RustOpaque_LocalMediaTrack(
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_LocalMediaTrack(
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
       ptr,
     );
   }
 
-  late final _rust_arc_decrement_strong_count_RustOpaque_LocalMediaTrackPtr =
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_LocalMediaTrack');
-  late final _rust_arc_decrement_strong_count_RustOpaque_LocalMediaTrack =
-      _rust_arc_decrement_strong_count_RustOpaque_LocalMediaTrackPtr
+          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-  void rust_arc_increment_strong_count_RustOpaque_MediaManagerHandle(
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_increment_strong_count_RustOpaque_MediaManagerHandle(
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
       ptr,
     );
   }
 
-  late final _rust_arc_increment_strong_count_RustOpaque_MediaManagerHandlePtr =
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrackPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_MediaManagerHandle');
-  late final _rust_arc_increment_strong_count_RustOpaque_MediaManagerHandle =
-      _rust_arc_increment_strong_count_RustOpaque_MediaManagerHandlePtr
+          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrackPtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-  void rust_arc_decrement_strong_count_RustOpaque_MediaManagerHandle(
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_MediaManagerHandle(
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
       ptr,
     );
   }
 
-  late final _rust_arc_decrement_strong_count_RustOpaque_MediaManagerHandlePtr =
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrackPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_MediaManagerHandle');
-  late final _rust_arc_decrement_strong_count_RustOpaque_MediaManagerHandle =
-      _rust_arc_decrement_strong_count_RustOpaque_MediaManagerHandlePtr
+          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrackPtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-  void rust_arc_increment_strong_count_RustOpaque_ReconnectHandle(
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_increment_strong_count_RustOpaque_ReconnectHandle(
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
       ptr,
     );
   }
 
-  late final _rust_arc_increment_strong_count_RustOpaque_ReconnectHandlePtr =
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_ReconnectHandle');
-  late final _rust_arc_increment_strong_count_RustOpaque_ReconnectHandle =
-      _rust_arc_increment_strong_count_RustOpaque_ReconnectHandlePtr
+          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-  void rust_arc_decrement_strong_count_RustOpaque_ReconnectHandle(
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_ReconnectHandle(
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
       ptr,
     );
   }
 
-  late final _rust_arc_decrement_strong_count_RustOpaque_ReconnectHandlePtr =
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_ReconnectHandle');
-  late final _rust_arc_decrement_strong_count_RustOpaque_ReconnectHandle =
-      _rust_arc_decrement_strong_count_RustOpaque_ReconnectHandlePtr
+          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-  void rust_arc_increment_strong_count_RustOpaque_RemoteMediaTrack(
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_increment_strong_count_RustOpaque_RemoteMediaTrack(
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
       ptr,
     );
   }
 
-  late final _rust_arc_increment_strong_count_RustOpaque_RemoteMediaTrackPtr =
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_RemoteMediaTrack');
-  late final _rust_arc_increment_strong_count_RustOpaque_RemoteMediaTrack =
-      _rust_arc_increment_strong_count_RustOpaque_RemoteMediaTrackPtr
+          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-  void rust_arc_decrement_strong_count_RustOpaque_RemoteMediaTrack(
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_RemoteMediaTrack(
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
       ptr,
     );
   }
 
-  late final _rust_arc_decrement_strong_count_RustOpaque_RemoteMediaTrackPtr =
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_RemoteMediaTrack');
-  late final _rust_arc_decrement_strong_count_RustOpaque_RemoteMediaTrack =
-      _rust_arc_decrement_strong_count_RustOpaque_RemoteMediaTrackPtr
+          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-  void rust_arc_increment_strong_count_RustOpaque_RoomHandle(
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_increment_strong_count_RustOpaque_RoomHandle(
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
       ptr,
     );
   }
 
-  late final _rust_arc_increment_strong_count_RustOpaque_RoomHandlePtr = _lookup<
-          ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-      'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_RoomHandle');
-  late final _rust_arc_increment_strong_count_RustOpaque_RoomHandle =
-      _rust_arc_increment_strong_count_RustOpaque_RoomHandlePtr
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrackPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrackPtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-  void rust_arc_decrement_strong_count_RustOpaque_RoomHandle(
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
     ffi.Pointer<ffi.Void> ptr,
   ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_RoomHandle(
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
       ptr,
     );
   }
 
-  late final _rust_arc_decrement_strong_count_RustOpaque_RoomHandlePtr = _lookup<
-          ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-      'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_RoomHandle');
-  late final _rust_arc_decrement_strong_count_RustOpaque_RoomHandle =
-      _rust_arc_decrement_strong_count_RustOpaque_RoomHandlePtr
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrackPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrackPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReasonPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReasonPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReasonPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReasonPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandlePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandlePtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandlePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 }

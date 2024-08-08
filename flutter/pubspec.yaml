@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   ffi: ^2.0.1
   flutter_rust_bridge: 2.1.0  # should be the same as in `Cargo.lock`
-  freezed_annotation: ^2.2.0
+  freezed_annotation: ^2.4.1
   http: ^0.13.5
   json_annotation: ^4.7.0
   medea_flutter_webrtc:
@@ -30,7 +30,7 @@ dev_dependencies:
   flutter_lints: ^3.0.1
   flutter_test:
     sdk: flutter
-  freezed: 2.5.3
+  freezed: ^2.5.3
   gherkin: ^3.1.0
   import_sorter: ^4.6.0
   json_serializable: ^6.7.1

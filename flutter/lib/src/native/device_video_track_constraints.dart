@@ -1,5 +1,5 @@
 import '../interface/device_video_track_constraints.dart' as base;
-import 'ffi/frb//api/dart/api.dart' as frb;
+import 'ffi/frb/frb.dart' as frb;
 import 'ffi/frb/media/constraints.dart';
 
 class DeviceVideoTrackConstraints implements base.DeviceVideoTrackConstraints {

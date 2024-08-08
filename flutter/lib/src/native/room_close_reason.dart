@@ -1,5 +1,5 @@
 import '../interface/room_close_reason.dart';
-import 'ffi/frb/room.dart' as frb;
+import 'ffi/frb/frb.dart' as frb;
 
 class NativeRoomCloseReason implements RoomCloseReason {
   /// Rust `flutter_rust_bridge` api representation.
@@ -11,17 +11,17 @@ class NativeRoomCloseReason implements RoomCloseReason {
 
   @override
   String reason() {
-    return _closeReason.reason;
+    return _closeReason.reason();
   }
 
   @override
   bool isClosedByServer() {
-    return _closeReason.isClosedByServer;
+    return _closeReason.isClosedByServer();
   }
 
   @override
   bool isErr() {
-    return _closeReason.isErr;
+    return _closeReason.isErr();
   }
 
   @override

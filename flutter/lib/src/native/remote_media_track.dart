@@ -3,7 +3,7 @@ import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/frb//api/dart/api.dart' as frb;
+import 'ffi/frb/frb.dart' as frb;
 
 class NativeRemoteMediaTrack implements RemoteMediaTrack {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
@@ -18,49 +18,47 @@ class NativeRemoteMediaTrack implements RemoteMediaTrack {
 
   @override
   bool muted() {
-    return frb.remoteMediaTrackMuted(track: opaque);
+    return opaque.muted();
   }
 
   @override
   MediaKind kind() {
-    return frb.remoteMediaTrackKind(track: opaque);
+    return opaque.kind();
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return frb.remoteMediaTrackMediaSourceKind(track: opaque);
+    return opaque.mediaSourceKind();
   }
 
   @override
   TrackMediaDirection mediaDirection() {
-    return frb.remoteMediaTrackMediaDirection(track: opaque);
+    return opaque.mediaDirection();
   }
 
   @override
   webrtc.MediaStreamTrack getTrack() {
-    return frb.remoteMediaTrackGetTrack(track: opaque)
-        as webrtc.MediaStreamTrack;
+    return opaque.getTrack() as webrtc.MediaStreamTrack;
   }
 
   @override
   void onMuted(void Function() f) {
-    return frb.remoteMediaTrackOnMuted(track: opaque, f: f);
+    return opaque.onMuted(f: f);
   }
 
   @override
   void onUnmuted(void Function() f) {
-    return frb.remoteMediaTrackOnUnmuted(track: opaque, f: f);
+    return opaque.onUnmuted(f: f);
   }
 
   @override
   void onStopped(void Function() f) {
-    return frb.remoteMediaTrackOnStopped(track: opaque, f: f);
+    return opaque.onStopped(f: f);
   }
 
   @override
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
-    frb.remoteMediaTrackOnMediaDirectionChanged(
-        track: opaque, f: (i) => f(TrackMediaDirection.values[i]));
+    opaque.onMediaDirectionChanged(f: (i) => f(TrackMediaDirection.values[i]));
   }
 
   @moveSemantics

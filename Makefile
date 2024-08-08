@@ -436,11 +436,13 @@ endif
 	flutter_rust_bridge_codegen generate \
 		--rust-input=crate::api::dart::api \
 		--rust-root=. \
-		--rust-output src/api/dart/api_bridge_generated.rs \
+		--rust-output src/api/dart/api/api_bridge_generated.rs \
 		--no-add-mod-to-lib \
 		--dart-output=flutter/lib/src/native/ffi/frb \
 		--no-web \
 		--local
+	cd flutter && \
+	dart pub run build_runner build --delete-conflicting-outputs
 
 
 # Lint Rust sources with Clippy.

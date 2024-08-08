@@ -3,7 +3,6 @@ library jason;
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import '../interface/jason.dart' as base;
@@ -15,7 +14,7 @@ import 'ffi/callback.dart' as callback;
 import 'ffi/completer.dart' as completer;
 import 'ffi/exception.dart' as exceptions;
 import 'ffi/executor.dart';
-import 'ffi/frb/api/dart/api.dart' as frb;
+import 'ffi/frb/frb.dart' as frb;
 import 'ffi/frb/frb_generated.dart';
 import 'ffi/function.dart' as function;
 import 'ffi/future.dart' as future;
@@ -94,7 +93,7 @@ DynamicLibrary _dlLoad() {
 
 class Jason implements base.Jason {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late frb.Jason opaque;
+  late frb.JasonHandle opaque;
 
   /// Constructs a new [Jason] backed by the Rust struct behind the provided
   /// [frb.Jason].
@@ -107,7 +106,7 @@ class Jason implements base.Jason {
     await RustLib.init(externalLibrary: lib);
 
     var jason = Jason._();
-    jason.opaque = frb.jasonNew();
+    jason.opaque = frb.JasonHandle();
 
     RustHandlesStorage().insertHandle(jason);
 
@@ -125,19 +124,20 @@ class Jason implements base.Jason {
 
   @override
   MediaManagerHandle mediaManager() {
-    return NativeMediaManagerHandle(frb.jasonMediaManager(jason: opaque));
+    return NativeMediaManagerHandle(opaque.jasonMediaManager());
   }
 
   @override
   RoomHandle initRoom() {
-    return NativeRoomHandle(frb.jasonInitRoom(jason: opaque));
+    return NativeRoomHandle(opaque.jasonInitRoom());
   }
 
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
-    frb.jasonCloseRoom(
-        jason: opaque, roomToDelete: (room as NativeRoomHandle).opaque);
-    opaque.dispose();
+    room as NativeRoomHandle;
+
+    opaque.jasonCloseRoom(roomToDelete: room.opaque);
+    room.opaque.dispose();
   }
 
   @override
@@ -145,7 +145,8 @@ class Jason implements base.Jason {
   void free() {
     if (!opaque.isDisposed) {
       RustHandlesStorage().removeHandle(this);
-      frb.jasonDispose(jason: opaque);
+      opaque.jasonDispose();
+      opaque.dispose();
     }
   }
 }

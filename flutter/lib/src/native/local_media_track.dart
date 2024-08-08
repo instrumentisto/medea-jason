@@ -4,7 +4,7 @@ import '../interface/enums.dart';
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/frb//api/dart/api.dart' as frb;
+import 'ffi/frb/frb.dart' as frb;
 
 class NativeLocalMediaTrack implements LocalMediaTrack {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
@@ -19,18 +19,17 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
 
   @override
   MediaKind kind() {
-    return frb.localMediaTrackKind(track: opaque);
+    return opaque.kind();
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return frb.localMediaTrackMediaSourceKind(track: opaque);
+    return opaque.mediaSourceKind();
   }
 
   @override
   webrtc.MediaStreamTrack getTrack() {
-    return frb.localMediaTrackGetTrack(track: opaque)
-        as webrtc.MediaStreamTrack;
+    return opaque.getTrack() as webrtc.MediaStreamTrack;
   }
 
   @moveSemantics
@@ -38,28 +37,28 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
   Future<void> free() async {
     if (!opaque.isDisposed) {
       RustHandlesStorage().removeHandle(this);
-      await (frb.localMediaTrackFree(track: opaque) as Future);
+      await (opaque.free() as Future);
     }
   }
 
   @override
   void onEnded(OnEndedCallback f) {
-    frb.localMediaTrackOnEnded(track: opaque, f: f);
+    opaque.onEnded(f: f);
   }
 
   @override
   Future<MediaStreamTrackState> state() async {
-    var index = await (frb.localMediaTrackState(track: opaque) as Future);
+    var index = await (opaque.state() as Future);
     return MediaStreamTrackState.values[index];
   }
 
   @override
   bool isOnAudioLevelAvailable() {
-    return frb.isOnAudioLevelAvailable(track: opaque);
+    return opaque.isOnAudioLevelAvailable();
   }
 
   @override
   void onAudioLevelChanged(OnAudioLevelChangedCallback f) {
-    frb.onAudioLevelChanged(track: opaque, f: f);
+    opaque.onAudioLevelChanged(f: f);
   }
 }

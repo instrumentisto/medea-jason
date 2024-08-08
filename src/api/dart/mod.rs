@@ -15,24 +15,6 @@
 pub mod api;
 pub mod utils;
 
-#[allow(
-    clippy::absolute_paths,
-    clippy::as_conversions,
-    clippy::default_trait_access,
-    clippy::let_underscore_untyped,
-    clippy::missing_docs_in_private_items,
-    clippy::multiple_unsafe_ops_per_block,
-    clippy::ptr_as_ptr,
-    clippy::undocumented_unsafe_blocks,
-    clippy::empty_structs_with_brackets,
-    clippy::use_self,
-    clippy::wildcard_imports,
-    let_underscore_drop,
-    unused_qualifications
-)]
-#[rustfmt::skip]
-mod api_bridge_generated;
-
 use std::{
     ffi::{c_void, CString},
     marker::PhantomData,
@@ -56,8 +38,8 @@ pub use crate::media::MediaDirection;
 
 pub use self::{
     api::{
-        ConnectionHandle, Jason, LocalMediaTrack, MediaManagerHandle,
-        ReconnectHandle, RemoteMediaTrack, RoomCloseReason, RoomHandle,
+        ConnectionHandle, LocalMediaTrack, MediaManagerHandle, ReconnectHandle,
+        RemoteMediaTrack, RoomCloseReason, RoomHandle,
     },
     utils::DartError as Error,
 };

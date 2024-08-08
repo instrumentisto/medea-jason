@@ -1,5 +1,5 @@
 import '../interface/media_device_details.dart';
-import 'ffi/frb//api/dart/api.dart' as frb;
+import 'ffi/frb/frb.dart' as frb;
 
 class NativeMediaDeviceDetails implements MediaDeviceDetails {
   /// Rust `flutter_rust_bridge` API representation.

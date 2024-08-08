@@ -5,8 +5,6 @@ mod err;
 use dart_sys::Dart_Handle;
 use flutter_rust_bridge::DartOpaque;
 
-use crate::platform::utils::dart_api;
-
 pub use self::err::{new_panic_error, DartError};
 
 /// Creates a new [`DartOpaque`] value out of the provided [`Dart_Handle`].

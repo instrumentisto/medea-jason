@@ -9,7 +9,7 @@
 
 use std::marker::PhantomData;
 
-use dart_sys::{Dart_Handle, Dart_PersistentHandle};
+use dart_sys::Dart_PersistentHandle;
 use flutter_rust_bridge::DartOpaque;
 use medea_macro::dart_bridge;
 
