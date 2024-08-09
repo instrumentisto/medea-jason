@@ -1,14 +1,11 @@
-use std::{
-    panic::{RefUnwindSafe, UnwindSafe},
-    ptr,
-};
+use std::panic::{RefUnwindSafe, UnwindSafe};
 
 use derive_more::From;
 use flutter_rust_bridge::{frb, DartOpaque};
 use tracerr::Traced;
 
 use crate::{
-    api::{Error as DartError, ForeignClass},
+    api::{dart::api::ForeignClass, Error as DartError},
     connection as core,
     media::MediaSourceKind,
     platform::{self, utils::dart_future::IntoDartFuture},
@@ -19,15 +16,6 @@ use crate::{
 pub struct ConnectionHandle(core::ConnectionHandle);
 
 impl ConnectionHandle {
-    /// Returns the [`ConnectionHandle`] from the [`ForeignClass`] address.
-    #[frb(sync, type_64bit_int)]
-    #[must_use]
-    pub fn from_raw(ptr: usize) -> ConnectionHandle {
-        unsafe {
-            ConnectionHandle::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
-        }
-    }
-
     /// Sets a callback to be invoked once the provided `connection` is closed.
     ///
     /// # Errors

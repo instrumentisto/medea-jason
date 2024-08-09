@@ -13,6 +13,8 @@ import '../../media/constraints.dart';
 part 'api.freezed.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`
+// These functions are ignored (category: IgnoreBecauseExplicitAttribute): `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`
+// These functions are ignored (category: IgnoreBecauseNotAllowedOwner): `from_ptr`, `into_ptr`
 
 /// Returns the [`Vec<ApiMediaDeviceDetails>`] from the [`ForeignClass`]
 /// address.
@@ -33,6 +35,8 @@ void logDartException({required String message, required String stackTrace}) =>
 /// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
 void onPanic({required Object cb}) =>
     RustLib.instance.api.crateApiDartApiOnPanic(cb: cb);
+
+abstract class ForeignClass {}
 
 /// Constraints applicable to audio tracks.
 class ApiAudioConstraints {

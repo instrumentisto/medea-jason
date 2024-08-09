@@ -1,13 +1,8 @@
-use std::{
-    panic::{RefUnwindSafe, UnwindSafe},
-    ptr,
-};
-
 use derive_more::From;
 use flutter_rust_bridge::{frb, DartOpaque};
 
 use crate::{
-    api::{utils::new_dart_opaque, Error, ForeignClass},
+    api::{api::DART_HANDLER_PORT, dart::api::ForeignClass, Error},
     media::{track::local as core, MediaKind, MediaSourceKind},
     platform::{self, utils::dart_future::IntoDartFuture},
 };
@@ -17,15 +12,6 @@ use crate::{
 pub struct LocalMediaTrack(core::LocalMediaTrack);
 
 impl LocalMediaTrack {
-    /// Returns the [`LocalMediaTrack`] from the [`ForeignClass`] address.
-    #[frb(sync, type_64bit_int)]
-    #[must_use]
-    pub fn from_raw(ptr: usize) -> LocalMediaTrack {
-        unsafe {
-            LocalMediaTrack::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
-        }
-    }
-
     /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of the
     /// provided [`LocalMediaTrack`].
     ///
@@ -33,7 +19,9 @@ impl LocalMediaTrack {
     #[frb(sync)]
     #[must_use]
     pub fn get_track(&self) -> DartOpaque {
-        unsafe { new_dart_opaque(self.0.get_track().handle()) }
+        DartOpaque::new(self.0.get_track().handle() as _, unsafe {
+            DART_HANDLER_PORT.unwrap()
+        })
     }
 
     /// Returns a [`MediaKind::Audio`] if the provided [`LocalMediaTrack`]
@@ -116,11 +104,7 @@ impl LocalMediaTrack {
 #[frb(sync, type_64bit_int)]
 #[must_use]
 pub fn vec_local_tracks_from_raw(ptr: usize) -> Vec<LocalMediaTrack> {
-    unsafe {
-        Vec::<LocalMediaTrack>::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
-            .into_iter()
-            .collect()
-    }
+    unsafe { Vec::<LocalMediaTrack>::from_ptr(ptr).into_iter().collect() }
 }
 
 impl ForeignClass for LocalMediaTrack {}

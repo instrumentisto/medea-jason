@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
 import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
@@ -26,7 +27,8 @@ import 'platform/functions_registerer.dart' as platform_utils_registerer;
 import 'room_handle.dart';
 
 /// Bindings to the Rust side API.
-DynamicLibrary dl = _dlLoad();
+final ExternalLibrary el = _dlLoad();
+final DynamicLibrary dl = el.ffiDynamicLibrary;
 
 /// [Executor] that drives Rust futures.
 ///
@@ -45,7 +47,7 @@ void onPanic(void Function(String)? cb) {
   _onPanicCallback = cb;
 }
 
-DynamicLibrary _dlLoad() {
+ExternalLibrary _dlLoad() {
   if (!(Platform.isAndroid ||
       Platform.isLinux ||
       Platform.isWindows ||
@@ -62,11 +64,13 @@ DynamicLibrary _dlLoad() {
 
   const base = 'medea_jason';
   final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
-  late final dl = Platform.isIOS
-      ? DynamicLibrary.process()
-      : Platform.isMacOS
-          ? DynamicLibrary.executable()
-          : DynamicLibrary.open(path);
+  late final el = ExternalLibrary.open(path);
+  late final dl = el.ffiDynamicLibrary;
+  // late final dl = Platform.isIOS
+  //     ? DynamicLibrary.process()
+  //     : Platform.isMacOS
+  //         ? DynamicLibrary.executable()
+  //         : DynamicLibrary.open(path);
 
   var initResult = dl.lookupFunction<IntPtr Function(Pointer<Void>),
           int Function(Pointer<Void>)>('init_jason_dart_api_dl')(
@@ -88,7 +92,7 @@ DynamicLibrary _dlLoad() {
 
   executor = Executor(dl);
 
-  return dl;
+  return el;
 }
 
 class Jason implements base.Jason {
@@ -98,24 +102,26 @@ class Jason implements base.Jason {
   /// Constructs a new [Jason] backed by the Rust struct behind the provided
   /// [frb.Jason].
   static Future<Jason> init() async {
-    const stem = 'medea_jason';
+    await initFfiBridge();
+    // var lib = ExternalLibrary.open('medea_jason');
+    // var lib = await loadExternalLibrary(const ExternalLibraryLoaderConfig(
+    //     stem: 'medea_jason', ioDirectory: '', webPrefix: ''));
+    if (!RustLib.instance.initialized) {
+      await RustLib.init(externalLibrary: el);
+    }
 
-    var lib = await loadExternalLibrary(const ExternalLibraryLoaderConfig(
-        stem: stem, ioDirectory: '', webPrefix: ''));
-
-    await RustLib.init(externalLibrary: lib);
-
+    frb.onPanic(cb: (msg) async {
+      msg as String;
+      await RustHandlesStorage().freeAll();
+      if (_onPanicCallback != null) {
+        _onPanicCallback!(msg);
+      }
+    });
     var jason = Jason._();
-    jason.opaque = frb.JasonHandle();
-
-    RustHandlesStorage().insertHandle(jason);
-
-    print('-------------------------------------------------------------');
     var port =
         ((RustLib.instance.api) as BaseApiImpl).portManager.dartHandlerPort;
-    print(port);
-    print('-------------------------------------------------------------');
-    // RustLib.instance.portManager;
+    jason.opaque = frb.JasonHandle(dartHandlerPort: port);
+    RustHandlesStorage().insertHandle(jason);
 
     return jason;
   }

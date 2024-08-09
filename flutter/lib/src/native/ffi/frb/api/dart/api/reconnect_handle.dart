@@ -6,17 +6,21 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import '../../../frb_generated.dart';
-import '../../dart.dart';
+import '../api.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
 
-/// Returns the [`ReconnectHandle`] from the [`ForeignClass`] address.
-ReconnectHandle reconnectHandleFromPtr({required BigInt ptr}) =>
-    RustLib.instance.api
-        .crateApiDartApiReconnectHandleReconnectHandleFromPtr(ptr: ptr);
-
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ReconnectHandle>>
 abstract class ReconnectHandle implements RustOpaqueInterface, ForeignClass {
+  /// Constructs a [`ForeignClass`] from the given raw pointer via
+  /// [`Box::from_raw()`].
+  ///
+  /// # Safety
+  ///
+  /// Same as for [`Box::from_raw()`].
+  static ReconnectHandle fromPtr({required int ptr}) => RustLib.instance.api
+      .crateApiDartApiReconnectHandleReconnectHandleFromPtr(ptr: ptr);
+
   /// Tries to reconnect a [`Room`] in a loop with a growing backoff delay.
   ///
   /// The first attempt will be performed immediately, and the second attempt

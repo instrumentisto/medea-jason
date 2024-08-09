@@ -3,7 +3,7 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 use derive_more::From;
 use flutter_rust_bridge::frb;
 
-use crate::api::{self};
+use crate::api::{self, api::DART_HANDLER_PORT};
 
 #[derive(Debug, From)]
 #[frb(opaque)]
@@ -11,7 +11,11 @@ pub struct JasonHandle(crate::jason::Jason);
 
 impl JasonHandle {
     #[frb(sync)]
-    pub fn new() -> JasonHandle {
+    pub fn new(dart_handler_port: i64) -> JasonHandle {
+        unsafe {
+            DART_HANDLER_PORT.replace(dart_handler_port);
+        }
+
         Self(crate::jason::Jason::new(None))
     }
 

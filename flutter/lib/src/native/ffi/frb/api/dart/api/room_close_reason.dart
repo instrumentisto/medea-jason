@@ -6,15 +6,20 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import '../../../frb_generated.dart';
-import '../../dart.dart';
+import '../api.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomCloseReason>>
 abstract class RoomCloseReason implements RustOpaqueInterface, ForeignClass {
-  /// Returns the [`RoomCloseReason`] from the [`ForeignClass`] address.
-  static RoomCloseReason fromRaw({required int ptr}) => RustLib.instance.api
-      .crateApiDartApiRoomCloseReasonRoomCloseReasonFromRaw(ptr: ptr);
+  /// Constructs a [`ForeignClass`] from the given raw pointer via
+  /// [`Box::from_raw()`].
+  ///
+  /// # Safety
+  ///
+  /// Same as for [`Box::from_raw()`].
+  static RoomCloseReason fromPtr({required int ptr}) => RustLib.instance.api
+      .crateApiDartApiRoomCloseReasonRoomCloseReasonFromPtr(ptr: ptr);
 
   /// Indicates whether the [`Room`] was closed by server.
   ///

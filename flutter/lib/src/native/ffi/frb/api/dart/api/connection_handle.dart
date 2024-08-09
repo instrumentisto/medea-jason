@@ -7,7 +7,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import '../../../frb_generated.dart';
 import '../../../media/track.dart';
-import '../../dart.dart';
+import '../api.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
 
@@ -29,9 +29,14 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
   /// Affects only video with the specific [`MediaSourceKind`], if specified.
   Object enableRemoteVideo({MediaSourceKind? sourceKind});
 
-  /// Returns the [`ConnectionHandle`] from the [`ForeignClass`] address.
-  static ConnectionHandle fromRaw({required int ptr}) => RustLib.instance.api
-      .crateApiDartApiConnectionHandleConnectionHandleFromRaw(ptr: ptr);
+  /// Constructs a [`ForeignClass`] from the given raw pointer via
+  /// [`Box::from_raw()`].
+  ///
+  /// # Safety
+  ///
+  /// Same as for [`Box::from_raw()`].
+  static ConnectionHandle fromPtr({required int ptr}) => RustLib.instance.api
+      .crateApiDartApiConnectionHandleConnectionHandleFromPtr(ptr: ptr);
 
   /// Returns remote `Member` ID of the provided `connection`.
   ///

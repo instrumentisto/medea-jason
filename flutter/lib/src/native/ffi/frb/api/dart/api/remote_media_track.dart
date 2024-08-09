@@ -9,15 +9,20 @@ import '../../../frb_generated.dart';
 import '../../../media.dart';
 import '../../../media/track.dart';
 import '../../../media/track/remote.dart';
-import '../../dart.dart';
+import '../api.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RemoteMediaTrack>>
 abstract class RemoteMediaTrack implements RustOpaqueInterface, ForeignClass {
-  /// Returns the [`RemoteMediaTrack`] from the [`ForeignClass`] address.
-  static RemoteMediaTrack fromRaw({required int ptr}) => RustLib.instance.api
-      .crateApiDartApiRemoteMediaTrackRemoteMediaTrackFromRaw(ptr: ptr);
+  /// Constructs a [`ForeignClass`] from the given raw pointer via
+  /// [`Box::from_raw()`].
+  ///
+  /// # Safety
+  ///
+  /// Same as for [`Box::from_raw()`].
+  static RemoteMediaTrack fromPtr({required int ptr}) => RustLib.instance.api
+      .crateApiDartApiRemoteMediaTrackRemoteMediaTrackFromPtr(ptr: ptr);
 
   /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
   /// [`RemoteMediaTrack`].

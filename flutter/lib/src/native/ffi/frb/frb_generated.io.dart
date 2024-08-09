@@ -193,6 +193,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
+  ForeignClass dco_decode_TraitDef_ForeignClass(dynamic raw);
+
+  @protected
   ApiAudioConstraints dco_decode_api_audio_constraints(dynamic raw);
 
   @protected

@@ -46,7 +46,6 @@ use std::ptr;
 use flutter_rust_bridge::{frb, DartOpaque};
 
 use crate::{
-    api::ForeignClass,
     media::{
         self,
         constraints::{ConstrainBoolean, ConstrainU32},
@@ -63,6 +62,33 @@ pub use self::{
     reconnect_handle::ReconnectHandle, remote_media_track::RemoteMediaTrack,
     room::RoomHandle, room_close_reason::RoomCloseReason,
 };
+
+pub static mut DART_HANDLER_PORT: Option<i64> = None;
+
+/// Rust structure having wrapper class in Dart.
+///
+/// Intended to be passed through FFI boundaries as thin pointers.
+pub trait ForeignClass: Sized {
+    /// Consumes itself returning a wrapped raw pointer obtained via
+    /// [`Box::into_raw()`].
+    #[frb(ignore)]
+    #[must_use]
+    fn into_ptr(self) -> ptr::NonNull<Self> {
+        ptr::NonNull::from(Box::leak(Box::new(self)))
+    }
+
+    /// Constructs a [`ForeignClass`] from the given raw pointer via
+    /// [`Box::from_raw()`].
+    ///
+    /// # Safety
+    ///
+    /// Same as for [`Box::from_raw()`].
+    #[frb(sync, type_64bit_int)]
+    #[must_use]
+    fn from_ptr(ptr: usize) -> Self {
+        unsafe { *Box::from_raw(ptr as *mut _) }
+    }
+}
 
 /// Representation of a [MediaDeviceInfo][0] ONLY for input devices.
 ///
@@ -323,11 +349,7 @@ impl<T> ForeignClass for Vec<T> {}
 pub fn vec_media_device_details_from_raw(
     ptr: usize,
 ) -> Vec<ApiMediaDeviceDetails> {
-    unsafe {
-        Vec::<ApiMediaDeviceDetails>::from_ptr(
-            ptr::NonNull::new(ptr as _).unwrap(),
-        )
-    }
+    unsafe { Vec::<ApiMediaDeviceDetails>::from_ptr(ptr) }
 }
 
 /// Returns the [`Vec<RustOpaque<ApiMediaDisplayDetails>>`] from the
@@ -337,14 +359,8 @@ pub fn vec_media_device_details_from_raw(
 pub fn vec_media_display_details_from_raw(
     ptr: usize,
 ) -> Vec<ApiMediaDisplayDetails> {
-    unsafe {
-        Vec::<ApiMediaDisplayDetails>::from_ptr(
-            ptr::NonNull::new(ptr as _).unwrap(),
-        )
-    }
+    unsafe { Vec::<ApiMediaDisplayDetails>::from_ptr(ptr) }
 }
-
-impl ForeignClass for RoomCloseReason {}
 
 /// Logs Dart exception.
 #[frb(sync)]

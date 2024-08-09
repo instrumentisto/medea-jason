@@ -8,7 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import '../../../frb_generated.dart';
 import '../../../media.dart';
 import '../../../media/track.dart';
-import '../../dart.dart';
+import '../api.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
 
@@ -23,9 +23,14 @@ abstract class LocalMediaTrack implements RustOpaqueInterface, ForeignClass {
   /// Frees the data behind the provided opaque local track.
   Object free();
 
-  /// Returns the [`LocalMediaTrack`] from the [`ForeignClass`] address.
-  static LocalMediaTrack fromRaw({required int ptr}) => RustLib.instance.api
-      .crateApiDartApiLocalMediaTrackLocalMediaTrackFromRaw(ptr: ptr);
+  /// Constructs a [`ForeignClass`] from the given raw pointer via
+  /// [`Box::from_raw()`].
+  ///
+  /// # Safety
+  ///
+  /// Same as for [`Box::from_raw()`].
+  static LocalMediaTrack fromPtr({required int ptr}) => RustLib.instance.api
+      .crateApiDartApiLocalMediaTrackLocalMediaTrackFromPtr(ptr: ptr);
 
   /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of the
   /// provided [`LocalMediaTrack`].

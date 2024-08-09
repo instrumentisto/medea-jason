@@ -27,6 +27,7 @@ abstract class JasonHandle implements RustOpaqueInterface {
   /// Returns a [`MediaManagerHandle`].
   MediaManagerHandle jasonMediaManager();
 
-  factory JasonHandle() =>
-      RustLib.instance.api.crateApiDartApiJasonJasonHandleNew();
+  factory JasonHandle({required PlatformInt64 dartHandlerPort}) =>
+      RustLib.instance.api
+          .crateApiDartApiJasonJasonHandleNew(dartHandlerPort: dartHandlerPort);
 }

@@ -1,13 +1,10 @@
-use std::{
-    panic::{RefUnwindSafe, UnwindSafe},
-    ptr,
-};
+use std::panic::{RefUnwindSafe, UnwindSafe};
 
 use derive_more::From;
 use flutter_rust_bridge::{frb, DartOpaque};
 
 use crate::{
-    api::{utils::new_dart_opaque, ForeignClass, MediaDirection},
+    api::{api::DART_HANDLER_PORT, dart::api::ForeignClass, MediaDirection},
     media::{track::remote as core, MediaKind, MediaSourceKind},
     platform,
 };
@@ -17,15 +14,6 @@ use crate::{
 pub struct RemoteMediaTrack(core::Track);
 
 impl RemoteMediaTrack {
-    /// Returns the [`RemoteMediaTrack`] from the [`ForeignClass`] address.
-    #[frb(sync, type_64bit_int)]
-    #[must_use]
-    pub fn from_raw(ptr: usize) -> RemoteMediaTrack {
-        unsafe {
-            RemoteMediaTrack::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
-        }
-    }
-
     /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
     /// [`RemoteMediaTrack`].
     ///
@@ -33,7 +21,9 @@ impl RemoteMediaTrack {
     #[frb(sync)]
     #[must_use]
     pub fn get_track(&self) -> DartOpaque {
-        unsafe { new_dart_opaque(self.0.get_track().handle()) }
+        DartOpaque::new(self.0.get_track().handle() as _, unsafe {
+            DART_HANDLER_PORT.unwrap()
+        })
     }
 
     /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.

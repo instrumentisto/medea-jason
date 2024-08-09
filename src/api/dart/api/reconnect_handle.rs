@@ -1,13 +1,10 @@
-use std::{
-    panic::{RefUnwindSafe, UnwindSafe},
-    ptr,
-};
+use std::panic::{RefUnwindSafe, UnwindSafe};
 
 use derive_more::From;
 use flutter_rust_bridge::{frb, DartOpaque};
 
 use crate::{
-    api::{Error, Error as DartError, ForeignClass},
+    api::{dart::api::ForeignClass, Error, Error as DartError},
     platform::utils::dart_future::IntoDartFuture,
     rpc as core,
 };
@@ -91,10 +88,3 @@ impl RefUnwindSafe for ReconnectHandle {}
 impl UnwindSafe for ReconnectHandle {}
 unsafe impl Send for ReconnectHandle {}
 unsafe impl Sync for ReconnectHandle {}
-
-/// Returns the [`ReconnectHandle`] from the [`ForeignClass`] address.
-#[frb(sync)]
-#[must_use]
-pub fn reconnect_handle_from_ptr(ptr: usize) -> ReconnectHandle {
-    unsafe { ReconnectHandle::from_ptr(ptr::NonNull::new(ptr as _).unwrap()) }
-}

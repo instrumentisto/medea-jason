@@ -11,7 +11,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{
-        propagate_panic, utils::new_dart_opaque, DartValue, DartValueArg,
+        api::DART_HANDLER_PORT, propagate_panic, DartValue, DartValueArg,
         Error as DartError,
     },
     platform::{
@@ -167,7 +167,7 @@ impl<O> DartFuture<O> {
     /// transferred to Dart side via `flutter_rust_bridge` bindings.
     #[must_use]
     pub fn into_dart_opaque(self) -> DartOpaque {
-        unsafe { new_dart_opaque(self.0) }
+        DartOpaque::new(self.0 as _, unsafe { DART_HANDLER_PORT.unwrap() })
     }
 }
 

@@ -66,13 +66,23 @@ class Call {
   /// Indicator of screen sharing.
   bool screenShare = false;
 
+  /// Private constructor use [Call.create()].
+  Call._create();
+
+  /// Creates a new [Call].
+  static Future<Call> create() async {
+    var self = Call._create();
+
+    self._jason = await Jason.init();
+    self._mediaManager = self._jason.mediaManager();
+    self._room = self._jason.initRoom();
+
+    return self;
+  }
+
   /// Starts a call in the specified room.
   Future<void> start(String roomId, String memberId, bool isPublish,
       bool publishVideo, bool publishAudio, bool fakeMedia) async {
-    _jason = await Jason.init();
-    _mediaManager = _jason.mediaManager();
-    _room = _jason.initRoom();
-
     if (fakeMedia) {
       await webrtc.enableFakeMedia();
     }

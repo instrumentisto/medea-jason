@@ -100,28 +100,28 @@ class NativeRoomHandle implements RoomHandle {
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
     opaque.onNewConnection(cb: (t) {
-      f(NativeConnectionHandle(frb.ConnectionHandle.fromRaw(ptr: t.address)));
+      f(NativeConnectionHandle(frb.ConnectionHandle.fromPtr(ptr: t.address)));
     });
   }
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
     opaque.onClose(cb: (t) {
-      f(NativeRoomCloseReason(frb.RoomCloseReason.fromRaw(ptr: t.address)));
+      f(NativeRoomCloseReason(frb.RoomCloseReason.fromPtr(ptr: t.address)));
     });
   }
 
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
     opaque.onLocalTrack(cb: (t) {
-      f(NativeLocalMediaTrack(frb.LocalMediaTrack.fromRaw(ptr: t.address)));
+      f(NativeLocalMediaTrack(frb.LocalMediaTrack.fromPtr(ptr: t.address)));
     });
   }
 
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
     opaque.onConnectionLoss(cb: (t) {
-      f(NativeReconnectHandle(frb.reconnectHandleFromPtr(ptr: t.address)));
+      f(NativeReconnectHandle(frb.ReconnectHandle.fromPtr(ptr: t.address)));
     });
   }
 

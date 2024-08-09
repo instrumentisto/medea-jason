@@ -2,12 +2,10 @@
 //!
 //! [`Room`]: room::Room
 
-use std::ptr;
-
 use derive_more::From;
 use flutter_rust_bridge::frb;
 
-use crate::{api::ForeignClass, room as core};
+use crate::{api::dart::api::ForeignClass, room as core};
 
 /// Reason of why a [`Room`] is closed.
 #[derive(Debug, From)]
@@ -15,15 +13,6 @@ use crate::{api::ForeignClass, room as core};
 pub struct RoomCloseReason(core::RoomCloseReason);
 
 impl RoomCloseReason {
-    /// Returns the [`RoomCloseReason`] from the [`ForeignClass`] address.
-    #[frb(sync, type_64bit_int)]
-    #[must_use]
-    pub fn from_raw(ptr: usize) -> RoomCloseReason {
-        unsafe {
-            RoomCloseReason::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
-        }
-    }
-
     /// Returns the [`Room`]'s close reason.
     ///
     /// [`Room`]: room::Room
@@ -51,3 +40,5 @@ impl RoomCloseReason {
         self.0.is_err()
     }
 }
+
+impl ForeignClass for RoomCloseReason {}
