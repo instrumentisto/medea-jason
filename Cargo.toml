@@ -73,8 +73,9 @@ wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
 wee_alloc = { version = "0.4", optional = true }
-[target.'cfg(target_family = "wasm")'.dependencies.web-sys]
-    version = "0.3.68"
+#[target.'cfg(target_family = "wasm")'.dependencies.web-sys]
+[dependencies.web-sys]
+    version = "0.3.69"
     features = [
         "console",
         "ConstrainBooleanParameters",
@@ -99,7 +100,7 @@ wee_alloc = { version = "0.4", optional = true }
         "RtcPeerConnection", "RtcPeerConnectionIceEvent",
         "RtcPeerConnectionIceErrorEvent",
         "RtcRtpCapabilities",
-        "RtcRtpCodecParameters",
+        "RtcRtpCodecParameters", "RtcRtpCodecCapability",
         "RtcRtpEncodingParameters",
         "RtcRtpParameters",
         "RtcRtpReceiver", "RtcRtpSender",
