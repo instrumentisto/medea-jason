@@ -18,6 +18,7 @@ dependencies:
   medea_flutter_webrtc: ^0.10.0
   retry: ^3.1.0
   tuple: ^2.0.1
+  uuid: ^3.0.7
   web: ">=0.5.1 <2.0.0"
 
 dev_dependencies:
