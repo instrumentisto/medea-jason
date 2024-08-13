@@ -274,9 +274,8 @@ pub async fn probe_video_codecs(
     for svc in svc_settings {
         if let Some(mut codec_cap) = codecs.remove(svc.codec.mime_type()) {
             target_codecs.append(&mut codec_cap);
-            if target_scalability_mode.is_none() {
-                target_scalability_mode = Some(svc.scalability_mode);
-            }
+            target_scalability_mode = Some(svc.scalability_mode);
+            break;
         }
     }
     if !target_codecs.is_empty() {

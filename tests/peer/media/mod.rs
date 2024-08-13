@@ -460,7 +460,8 @@ mod codec_probing {
 
     fn target_codecs_mime_types(codecs: &[CodecCapability]) -> Vec<String> {
         let mut mime_types: Vec<_> =
-            codecs.iter().map(|c| c.mime_type()).collect();
+            codecs.iter().map(|c| c.mime_type().unwrap()).collect();
+        mime_types.sort();
         mime_types.dedup();
         mime_types
     }
@@ -474,15 +475,14 @@ mod codec_probing {
         .await;
 
         assert_eq!(svc, Some(ScalabilityMode::L1T1));
-        let codecs = target_codecs_mime_types(&target_codecs);
-        assert_eq!(codecs[0], "video/VP8");
-        assert!(codecs.contains(&String::from("video/red")));
-        assert!(codecs.contains(&String::from("video/rtx")));
-        assert!(codecs.contains(&String::from("video/ulpfec")));
+        assert_eq!(
+            target_codecs_mime_types(&target_codecs),
+            vec!["video/VP8", "video/red", "video/rtx", "video/ulpfec"]
+        );
     }
 
     #[wasm_bindgen_test]
-    async fn correct_order_is_preserved() {
+    async fn probes_first_codec_when_many() {
         {
             let (target_codecs, svc) = probe_video_codecs(&vec![
                 SvcSettings {
@@ -497,12 +497,10 @@ mod codec_probing {
             .await;
 
             assert_eq!(svc, Some(ScalabilityMode::L1T2));
-            let codecs = target_codecs_mime_types(&target_codecs);
-            assert_eq!(codecs[0], "video/VP9");
-            assert_eq!(codecs[1], "video/VP8");
-            assert!(codecs.contains(&String::from("video/red")));
-            assert!(codecs.contains(&String::from("video/rtx")));
-            assert!(codecs.contains(&String::from("video/ulpfec")));
+            assert_eq!(
+                target_codecs_mime_types(&target_codecs),
+                vec!["video/VP9", "video/red", "video/rtx", "video/ulpfec"]
+            );
         }
 
         {
@@ -519,12 +517,10 @@ mod codec_probing {
             .await;
 
             assert_eq!(svc, Some(ScalabilityMode::L1T1));
-            let codecs = target_codecs_mime_types(&target_codecs);
-            assert_eq!(codecs[0], "video/VP8");
-            assert_eq!(codecs[1], "video/VP9");
-            assert!(codecs.contains(&String::from("video/red")));
-            assert!(codecs.contains(&String::from("video/rtx")));
-            assert!(codecs.contains(&String::from("video/ulpfec")));
+            assert_eq!(
+                target_codecs_mime_types(&target_codecs),
+                vec!["video/VP8", "video/red", "video/rtx", "video/ulpfec"]
+            );
         }
     }
 
