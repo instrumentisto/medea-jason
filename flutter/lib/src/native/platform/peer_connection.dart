@@ -5,7 +5,6 @@ import 'package:ffi/ffi.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
 import 'package:medea_jason/src/native/ffi/native_string.dart';
-import '../ffi/foreign_value.dart';
 import 'peer_connection.g.dart' as bridge;
 import 'rtc_stats.dart';
 

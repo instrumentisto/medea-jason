@@ -16,8 +16,8 @@ dependencies:
   http: ">=0.13.6 <2.0.0"
   json_annotation: ^4.9.0
   medea_flutter_webrtc: ^0.10.0
-  retry: ^3.1.0
-  tuple: ^2.0.1
+  retry: ^3.1.2
+  tuple: ^2.0.2
   uuid: ^3.0.7
   web: ">=0.5.1 <2.0.0"
 
