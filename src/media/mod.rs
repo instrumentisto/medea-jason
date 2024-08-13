@@ -34,11 +34,11 @@ pub use self::{
 #[repr(u8)]
 pub enum MediaKind {
     /// Audio track.
-    #[display(fmt = "audio")]
+    #[display("audio")]
     Audio = 0,
 
     /// Video track.
-    #[display(fmt = "video")]
+    #[display("video")]
     Video = 1,
 }
 

@@ -4,8 +4,8 @@ version: 1.0.0
 publish_to: none
 
 environment:
-  flutter: ">=3.10.0"
-  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.24.0"
+  sdk: ">=3.5.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -20,9 +20,9 @@ dependencies:
     path: ../
 
   cupertino_icons: ^1.0.2
-  faker_dart: ^0.2.1
-  freezed_annotation: ^2.2.0
-  http: ^0.13.6
+  faker_dart: ^0.2.2
+  freezed_annotation: ^2.4.4
+  http: ">=0.13.6 <2.0.0"
   medea_flutter_webrtc: ^0.10.0
   retry: ^3.1.2
 
@@ -30,7 +30,7 @@ dev_dependencies:
   flutter_driver:
     sdk: flutter
   flutter_gherkin: 3.0.0-rc.17
-  flutter_lints: ^2.0.1
+  flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
   gherkin: ^3.1.0

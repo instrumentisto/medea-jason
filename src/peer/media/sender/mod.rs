@@ -31,12 +31,14 @@ pub use self::component::{Component, State};
 #[cause(error = platform::Error)]
 pub enum CreateError {
     /// [`Sender`] cannot be disabled because it's marked as `required`.
-    #[display(fmt = "MediaExchangeState of Sender cannot transit to \
-                     disabled state, because this Sender is required.")]
+    #[display(
+        "MediaExchangeState of Sender cannot transit to \
+                     disabled state, because this Sender is required."
+    )]
     CannotDisableRequiredSender,
 
     /// Could not find a [`platform::Transceiver`] by `mid`.
-    #[display(fmt = "Unable to find Transceiver with mid: {}", _0)]
+    #[display("Unable to find Transceiver with mid: {}", _0)]
     TransceiverNotFound(String),
 }
 
@@ -45,7 +47,7 @@ pub enum CreateError {
 /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-replacetrack
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = platform::Error)]
-#[display(fmt = "MediaManagerHandle is in detached state")]
+#[display("MediaManagerHandle is in detached state")]
 pub struct InsertTrackError(platform::Error);
 
 /// Representation of a [`local::Track`] that is being sent to some remote peer.

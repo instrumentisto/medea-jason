@@ -617,10 +617,10 @@ impl Drop for RtcPeerConnection {
 #[derive(Display)]
 pub enum RtcSdpType {
     /// Description is an initial proposal in an offer/answer exchange.
-    #[display(fmt = "offer")]
+    #[display("offer")]
     Offer,
 
     /// Description is a definitive choice in an offer/answer exchange.
-    #[display(fmt = "answer")]
+    #[display("answer")]
     Answer,
 }

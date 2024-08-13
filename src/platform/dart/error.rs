@@ -7,7 +7,7 @@ use super::utils::handle::DartHandle;
 
 /// Wrapper for Dart exception thrown when calling Dart code.
 #[derive(Clone, Debug, Display, Eq, PartialEq)]
-#[display(fmt = "DartPlatformError")]
+#[display("DartPlatformError")]
 pub struct Error(DartHandle);
 
 impl Error {

@@ -19,7 +19,7 @@ pub enum ReconnectError {
     Session(#[cause] SessionError),
 
     /// [`ReconnectHandle`]'s [`Weak`] pointer is detached.
-    #[display(fmt = "ReconnectHandle is in detached state")]
+    #[display("ReconnectHandle is in detached state")]
     Detached,
 }
 

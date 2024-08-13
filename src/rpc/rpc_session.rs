@@ -36,35 +36,33 @@ use crate::{
 pub enum SessionError {
     /// [`WebSocketRpcSession`] goes into [`SessionState::Finished`] and can't
     /// be used.
-    #[display(fmt = "RPC Session finished with {:?} close reason", _0)]
+    #[display("RPC Session finished with {:?} close reason", _0)]
     SessionFinished(CloseReason),
 
     /// [`WebSocketRpcSession`] doesn't have any credentials to authorize with.
-    #[display(
-        fmt = "RPC Session doesn't have any credentials to authorize with"
-    )]
+    #[display("RPC Session doesn't have any credentials to authorize with")]
     NoCredentials,
 
     /// [`WebSocketRpcSession`] authorization on the server was failed.
-    #[display(fmt = "Failed to authorize RPC session")]
+    #[display("Failed to authorize RPC session")]
     AuthorizationFailed,
 
     /// [`WebSocketRpcClient`] returned [`RpcClientError`].
-    #[display(fmt = "RpcClientError: {}", _0)]
+    #[display("RpcClientError: {}", _0)]
     RpcClient(#[cause] RpcClientError),
 
     /// [`WebSocketRpcSession`] was unexpectedly dropped.
-    #[display(fmt = "RPC Session was unexpectedly dropped")]
+    #[display("RPC Session was unexpectedly dropped")]
     SessionUnexpectedlyDropped,
 
     /// [`WebSocketRpcClient`] lost connection with a server.
-    #[display(fmt = "Connection with a server was lost: {}", _0)]
+    #[display("Connection with a server was lost: {}", _0)]
     ConnectionLost(ConnectionLostReason),
 
     /// [`WebSocketRpcSession::connect`] called while connecting to the server.
     ///
     /// So old connection process was canceled.
-    #[display(fmt = "New connection info was provided")]
+    #[display("New connection info was provided")]
     NewConnectionInfo,
 }
 

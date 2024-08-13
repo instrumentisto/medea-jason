@@ -36,12 +36,12 @@ dart-codegen = ["medea-macro/dart-codegen"]
 mockable = ["mockall"]
 
 [dependencies]
-async-recursion = "1.0"
+async-recursion = "1.1"
 async-trait = "0.1"
 backoff = { version = "0.4", features = ["futures"] }
-bitflags = "2.0"
+bitflags = "2.6"
 derivative = "2.2"
-derive_more = "0.99"
+derive_more = { version = "1.0", features = ["display", "from", "into", "as_ref", "deref", "mul"] }
 futures = "0.3"
 log = "0.4"
 medea-client-api-proto = { version = "0.6", path = "proto/client-api" }
@@ -52,7 +52,7 @@ sealed = "0.5"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tracerr = "0.3"
-url = "2.3"
+url = "2.5"
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.14"
@@ -61,7 +61,7 @@ android_logger = "0.14"
 simple_logger = "5.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-dart-sys = "4.0"
+dart-sys = "4.1"
 flutter_rust_bridge = { version = "=1.82.4", default-features = false }
 libc = "0.2"
 
@@ -74,7 +74,7 @@ wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
 wee_alloc = { version = "0.4", optional = true }
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
-    version = "0.3.68"
+    version = "0.3.70"
     features = [
         "console",
         "ConstrainBooleanParameters",

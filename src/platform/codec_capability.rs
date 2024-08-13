@@ -11,7 +11,7 @@ pub enum CodecCapabilityError {
     /// Failed to retrieve an [RTCRtpCodecCapability][1].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
-    #[display(fmt = "Failed to retrieve codec capabilities")]
+    #[display("Failed to retrieve codec capabilities")]
     FailedToGetCapabilities,
 
     /// Failed to retrieve an [RTCRtpCodecCapability][1]'s [MIME media
@@ -19,6 +19,6 @@ pub enum CodecCapabilityError {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
-    #[display(fmt = "Failed to get codec's mimeType")]
+    #[display("Failed to get codec's mimeType")]
     FailedToGetMimeType,
 }

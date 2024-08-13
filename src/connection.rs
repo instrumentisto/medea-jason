@@ -36,7 +36,7 @@ use crate::{
 #[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
     /// [`ConnectionHandle`]'s [`Weak`] pointer is detached.
-    #[display(fmt = "ConnectionHandle is in detached state")]
+    #[display("ConnectionHandle is in detached state")]
     Detached,
 
     /// [`MediaState`] of a [`Sender`] transits to an opposite of the requested
@@ -44,7 +44,7 @@ pub enum ChangeMediaStateError {
     ///
     /// [`Sender`]: crate::peer::media::Sender
     #[display(
-        fmt = "MediaState transits to opposite ({}) of the \
+        "MediaState transits to opposite ({}) of the \
                requested MediaExchangeState",
         _0
     )]
@@ -280,7 +280,7 @@ impl Connections {
 /// Error of [`ConnectionHandle`]'s [`Weak`] pointer being detached.
 #[derive(Caused, Clone, Copy, Debug, Display)]
 #[cause(error = platform::Error)]
-#[display(fmt = "`ConnectionHandle` is in detached state")]
+#[display("`ConnectionHandle` is in detached state")]
 pub struct HandleDetachedError;
 
 /// External handler to a [`Connection`] with a remote `Member`.

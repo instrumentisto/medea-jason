@@ -15,24 +15,24 @@ pub enum RtcStatsError {
     /// [RTCStats.id][1] is undefined.
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcstats-id
-    #[display(fmt = "RTCStats.id is undefined")]
+    #[display("RTCStats.id is undefined")]
     UndefinedId,
 
     /// [RTCStats.stats] are undefined.
     ///
     /// [1]: https://w3.org/TR/webrtc-stats/#dfn-stats-object
-    #[display(fmt = "RTCStats.stats are undefined")]
+    #[display("RTCStats.stats are undefined")]
     UndefinedStats,
 
     /// Some platform error occurred.
-    #[display(fmt = "Unexpected platform error: {}", _0)]
+    #[display("Unexpected platform error: {}", _0)]
     Platform(platform::Error),
 
     /// `RTCStats.entries` are undefined.
-    #[display(fmt = "RTCStats.entries are undefined")]
+    #[display("RTCStats.entries are undefined")]
     UndefinedEntries,
 
     /// [`platform::RtcStats`] deserialization error.
-    #[display(fmt = "Failed to deserialize into RtcStats: {}", _0)]
+    #[display("Failed to deserialize into RtcStats: {}", _0)]
     ParseError(Rc<serde_json::Error>),
 }

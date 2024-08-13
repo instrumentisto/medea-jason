@@ -117,20 +117,20 @@ impl RoomCloseReason {
 #[cause(error = platform::Error)]
 pub enum RoomJoinError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
-    #[display(fmt = "RoomHandle is in detached state")]
+    #[display("RoomHandle is in detached state")]
     Detached,
 
     /// Returned if the mandatory callback wasn't set.
-    #[display(fmt = "`{}` callback isn't set.", _0)]
+    #[display("`{}` callback isn't set.", _0)]
     #[from(ignore)]
     CallbackNotSet(&'static str),
 
     /// [`ConnectionInfo`] parsing failed.
-    #[display(fmt = "Failed to parse ConnectionInfo: {}", _0)]
+    #[display("Failed to parse ConnectionInfo: {}", _0)]
     ConnectionInfoParse(ConnectionInfoParseError),
 
     /// [`RpcSession`] returned [`SessionError`].
-    #[display(fmt = "WebSocketSession error occurred: {}", _0)]
+    #[display("WebSocketSession error occurred: {}", _0)]
     SessionError(#[cause] SessionError),
 }
 
@@ -147,7 +147,7 @@ pub struct HandleDetachedError;
 #[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
-    #[display(fmt = "RoomHandle is in detached state")]
+    #[display("RoomHandle is in detached state")]
     Detached,
 
     /// Validating [`TracksRequest`] doesn't pass.
@@ -174,7 +174,7 @@ pub enum ChangeMediaStateError {
     ///
     /// [`Sender`]: peer::media::Sender
     #[display(
-        fmt = "MediaState of Sender transits to opposite ({}) of the \
+        "MediaState of Sender transits to opposite ({}) of the \
                requested MediaExchangeState",
         _0
     )]
@@ -1027,12 +1027,12 @@ pub enum ConstraintsUpdateError {
     /// New [`MediaStreamSettings`] set failed and state was recovered
     /// accordingly to the provided recover policy
     /// (`rollback_on_fail`/`stop_first` arguments).
-    #[display(fmt = "RecoveredException")]
+    #[display("RecoveredException")]
     Recovered(Traced<ChangeMediaStateError>),
 
     /// New [`MediaStreamSettings`] set failed and state recovering also
     /// failed.
-    #[display(fmt = "RecoverFailedException")]
+    #[display("RecoverFailedException")]
     RecoverFailed {
         /// [`ChangeMediaStateError`] due to which recovery has happened.
         recover_reason: Traced<ChangeMediaStateError>,
@@ -1042,7 +1042,7 @@ pub enum ConstraintsUpdateError {
     },
 
     /// Some other error occurred.
-    #[display(fmt = "ErroredException")]
+    #[display("ErroredException")]
     Errored(Traced<ChangeMediaStateError>),
 }
 
@@ -1569,7 +1569,7 @@ impl InnerRoom {
 /// Error of a [`RpcEvent`] containing a [`PeerId`] that a [`Room`] is not aware
 /// of.
 #[derive(Clone, Copy, Debug, Display)]
-#[display(fmt = "Peer with id {} doesnt exist", _0)]
+#[display("Peer with id {} doesnt exist", _0)]
 struct UnknownPeerIdError(PeerId);
 
 /// RPC events handling.
@@ -1749,7 +1749,7 @@ impl EventHandler for InnerRoom {
 /// Error of a [`PeerEvent::NewRemoteTrack`] containing an unknown remote
 /// [`MemberId`].
 #[derive(Clone, Debug, Display)]
-#[display(fmt = "Remote stream from unknown member")]
+#[display("Remote stream from unknown member")]
 struct UnknownRemoteMemberError(MemberId);
 
 /// [`PeerEvent`]s handling.

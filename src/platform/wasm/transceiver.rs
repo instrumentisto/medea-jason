@@ -28,8 +28,8 @@ impl TransceiverInit {
     /// Creates a new [`TransceiverInit`].
     #[must_use]
     pub fn new(direction: TransceiverDirection) -> Self {
-        let mut init = RtcRtpTransceiverInit::new();
-        _ = init.direction(direction.into());
+        let init = RtcRtpTransceiverInit::new();
+        init.set_direction(direction.into());
         Self(init)
     }
 
@@ -41,15 +41,12 @@ impl TransceiverInit {
 
     /// Adds the provided [`SendEncodingParameters`] to this
     /// [`TransceiverInit`].
-    pub fn sending_encodings(
-        &mut self,
-        encodings: Vec<SendEncodingParameters>,
-    ) {
+    pub fn sending_encodings(&self, encodings: Vec<SendEncodingParameters>) {
         let send_encoding = ::js_sys::Array::new();
         for enc in encodings {
             _ = send_encoding.push(enc.handle());
         }
-        _ = self.0.send_encodings(&send_encoding);
+        self.0.set_send_encodings(&send_encoding);
     }
 }
 
@@ -158,7 +155,7 @@ impl Transceiver {
         })
         .unwrap();
 
-        for mut enc in encs.iter().map(RtcRtpEncodingParameters::from) {
+        for enc in encs.iter().map(RtcRtpEncodingParameters::from) {
             #[allow(clippy::unwrap_used)] // intentional
             let rid =
                 get_property_by_name(&enc, "rid", |v| v.as_string()).unwrap();
@@ -167,15 +164,16 @@ impl Transceiver {
                 continue;
             };
 
-            _ = enc.active(encoding.active);
+            enc.set_active(encoding.active);
             if let Some(max_bitrate) = encoding.max_bitrate {
-                _ = enc.max_bitrate(max_bitrate);
+                enc.set_max_bitrate(max_bitrate);
             }
             if let Some(scale_resolution_down_by) =
                 encoding.scale_resolution_down_by
             {
-                _ = enc
-                    .scale_resolution_down_by(scale_resolution_down_by.into());
+                enc.set_scale_resolution_down_by(
+                    scale_resolution_down_by.into(),
+                );
             }
         }
 

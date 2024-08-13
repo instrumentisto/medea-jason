@@ -639,7 +639,7 @@ impl TryFrom<DartValueArg<Self>> for Option<bool> {
 
 /// Error of converting a [`DartValue`] to the concrete type.
 #[derive(Debug, Display)]
-#[display(fmt = "expected `{}`, but got: `{:?}`", expectation, value)]
+#[display("expected `{}`, but got: `{:?}`", expectation, value)]
 pub struct DartValueCastError {
     /// Expected type description. Like a [`String`] or an `Option<i64>`.
     expectation: &'static str,

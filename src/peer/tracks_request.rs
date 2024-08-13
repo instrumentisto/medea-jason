@@ -24,47 +24,41 @@ use crate::{
 #[cause(error = platform::Error)]
 pub enum TracksRequestError {
     /// [`TracksRequest`] contains multiple [`AudioTrackConstraints`].
-    #[display(fmt = "only one audio track is allowed in SimpleTracksRequest")]
+    #[display("only one audio track is allowed in SimpleTracksRequest")]
     TooManyAudioTracks,
 
     /// [`TracksRequest`] contains multiple [`DeviceVideoTrackConstraints`].
-    #[display(
-        fmt = "only one device video track is allowed in SimpleTracksRequest"
-    )]
+    #[display("only one device video track is allowed in SimpleTracksRequest")]
     TooManyDeviceVideoTracks,
 
     /// [`TracksRequest`] contains multiple [`DisplayVideoTrackConstraints`].
     #[display(
-        fmt = "only one display video track is allowed in SimpleTracksRequest"
+        "only one display video track is allowed in SimpleTracksRequest"
     )]
     TooManyDisplayVideoTracks,
 
     /// [`TracksRequest`] contains no track constraints at all.
-    #[display(fmt = "SimpleTracksRequest should have at least one track")]
+    #[display("SimpleTracksRequest should have at least one track")]
     NoTracks,
 
     /// Provided multiple audio [`local::Track`]s.
-    #[display(fmt = "provided multiple audio MediaStreamTracks")]
+    #[display("provided multiple audio MediaStreamTracks")]
     ExpectedAudioTracks,
 
     /// Provided multiple device video [`local::Track`]s.
-    #[display(fmt = "provided multiple device video MediaStreamTracks")]
+    #[display("provided multiple device video MediaStreamTracks")]
     ExpectedDeviceVideoTracks,
 
     /// Provided multiple display video [`local::Track`]s.
-    #[display(fmt = "provided multiple display video MediaStreamTracks")]
+    #[display("provided multiple display video MediaStreamTracks")]
     ExpectedDisplayVideoTracks,
 
     /// Audio track fails to satisfy specified constraints.
-    #[display(
-        fmt = "provided audio track does not satisfy specified constraints"
-    )]
+    #[display("provided audio track does not satisfy specified constraints")]
     InvalidAudioTrack,
 
     /// Video track fails to satisfy specified constraints.
-    #[display(
-        fmt = "provided video track does not satisfy specified constraints"
-    )]
+    #[display("provided video track does not satisfy specified constraints")]
     InvalidVideoTrack,
 }
 
