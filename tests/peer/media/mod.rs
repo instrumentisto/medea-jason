@@ -460,7 +460,7 @@ mod codec_probing {
 
     fn target_codecs_mime_types(codecs: &[CodecCapability]) -> Vec<String> {
         let mut mime_types: Vec<_> =
-            codecs.iter().map(|c| c.mime_type().unwrap()).collect();
+            codecs.iter().map(|c| c.mime_type()).collect();
         mime_types.sort();
         mime_types.dedup();
         mime_types
