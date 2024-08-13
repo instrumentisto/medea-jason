@@ -9,7 +9,7 @@ typedef _ErrorSetterFnDart = void Function(Object);
 
 int Function(Object)? _iceConnectionState;
 void Function(Object, Object)? _onConnectionStateChange;
-Pointer Function(Object)? _connectionState;
+int Function(Object)? _connectionState;
 void Function(Object)? _restartIce;
 Object Function(Object)? _rollback;
 Object Function(Object)? _getStats;
@@ -51,7 +51,7 @@ void registerFunction(
   DynamicLibrary dl, {
   required int Function(Object) iceConnectionState,
   required void Function(Object, Object) onConnectionStateChange,
-  required Pointer Function(Object) connectionState,
+  required int Function(Object) connectionState,
   required void Function(Object) restartIce,
   required Object Function(Object) rollback,
   required Object Function(Object) getStats,
@@ -155,10 +155,8 @@ void registerFunction(
       onConnectionStateChange_native = Pointer.fromFunction(
     _onConnectionStateChangeProxy,
   );
-  Pointer<NativeFunction<Pointer Function(Handle)>> connectionState_native =
-      Pointer.fromFunction(
-    _connectionStateProxy,
-  );
+  Pointer<NativeFunction<Int32 Function(Handle)>> connectionState_native =
+      Pointer.fromFunction(_connectionStateProxy, 0);
   Pointer<NativeFunction<Void Function(Handle)>> restartIce_native =
       Pointer.fromFunction(
     _restartIceProxy,
@@ -305,12 +303,12 @@ void _onConnectionStateChangeProxy(Object arg0, Object arg1) {
   }
 }
 
-Pointer _connectionStateProxy(Object arg0) {
+int _connectionStateProxy(Object arg0) {
   try {
     return _connectionState!(arg0);
   } catch (e) {
     _peer_connection__connection_state__set_error!(e);
-    return Pointer.fromAddress(0);
+    return 0;
   }
 }
 

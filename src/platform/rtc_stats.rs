@@ -28,10 +28,6 @@ pub enum RtcStatsError {
     #[display("Unexpected platform error: {}", _0)]
     Platform(platform::Error),
 
-    /// `RTCStats.entries` are undefined.
-    #[display("RTCStats.entries are undefined")]
-    UndefinedEntries,
-
     /// [`platform::RtcStats`] deserialization error.
     #[display("Failed to deserialize into RtcStats: {}", _0)]
     ParseError(Rc<serde_json::Error>),

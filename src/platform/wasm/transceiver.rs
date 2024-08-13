@@ -3,8 +3,9 @@
 use std::{future::Future, rc::Rc};
 
 use derive_more::From;
-use js_sys::Array;
+use js_sys::Reflect;
 use medea_client_api_proto::EncodingParameters;
+use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{
     RtcRtpEncodingParameters, RtcRtpTransceiver, RtcRtpTransceiverInit,
@@ -17,8 +18,6 @@ use crate::{
         wasm::codec_capability::CodecCapability, Error, TransceiverDirection,
     },
 };
-
-use super::get_property_by_name;
 
 /// Wrapper around an [`RtcRtpTransceiverInit`].
 #[derive(Debug)]
@@ -149,18 +148,16 @@ impl Transceiver {
         encodings: Vec<EncodingParameters>,
     ) -> Result<(), Error> {
         let params = self.0.sender().get_parameters();
-        #[allow(clippy::unwrap_used)] // intentional
-        let encs = get_property_by_name(&params, "encodings", |v| {
-            v.is_array().then_some(Array::from(&v))
-        })
-        .unwrap();
+        let Some(encs) = params.get_encodings() else {
+            return Ok(());
+        };
 
         for enc in encs.iter().map(RtcRtpEncodingParameters::from) {
-            #[allow(clippy::unwrap_used)] // intentional
-            let rid =
-                get_property_by_name(&enc, "rid", |v| v.as_string()).unwrap();
+            let rid = enc.get_rid();
 
-            let Some(encoding) = encodings.iter().find(|e| e.rid == rid) else {
+            let Some(encoding) =
+                encodings.iter().find(|e| Some(&e.rid) == rid.as_ref())
+            else {
                 continue;
             };
 
@@ -190,14 +187,18 @@ impl Transceiver {
     /// Sets the preferred [`CodecCapability`]s for this [`Transceiver`].
     pub fn set_codec_preferences(&self, codecs: Vec<CodecCapability>) {
         let is_api_available =
-            get_property_by_name(&self.0, "setCodecPreferences", |val| {
-                if val.is_undefined() {
-                    None
-                } else {
-                    Some(val)
-                }
-            })
-            .is_some();
+            Reflect::get(&self.0, &JsValue::from_str("setCodecPreferences"))
+                .map_or_else(
+                    |_| None,
+                    |val| {
+                        if val.is_undefined() {
+                            None
+                        } else {
+                            Some(val)
+                        }
+                    },
+                )
+                .is_some();
 
         // Unsupported on Firefox < 128.
         if is_api_available {

@@ -19,18 +19,16 @@ use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
     RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
     RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceErrorEvent,
-    RtcPeerConnectionIceEvent, RtcRtpTransceiver, RtcSdpType,
-    RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
+    RtcPeerConnectionIceEvent, RtcPeerConnectionState, RtcRtpTransceiver,
+    RtcSdpType, RtcSessionDescription, RtcSessionDescriptionInit,
+    RtcStatsReport, RtcTrackEvent,
 };
 
 use crate::{
     media::MediaKind,
     platform::{
         self,
-        wasm::{
-            get_property_by_name, transceiver::TransceiverInit,
-            utils::EventListener,
-        },
+        wasm::{transceiver::TransceiverInit, utils::EventListener},
         IceCandidate, IceCandidateError, MediaStreamTrack,
         RtcPeerConnectionError, RtcStats, SdpType, Transceiver,
     },
@@ -170,14 +168,16 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://tinyurl.com/w6hmt5f
     pub async fn get_stats(&self) -> RtcPeerConnectionResult<RtcStats> {
-        let js_stats =
-            JsFuture::from(self.peer.get_stats()).await.map_err(|e| {
+        let report = JsFuture::from(self.peer.get_stats())
+            .await
+            .map(RtcStatsReport::from)
+            .map_err(|e| {
                 tracerr::new!(RtcPeerConnectionError::GetStatsException(
                     platform::Error::from(e)
                 ))
             })?;
 
-        RtcStats::try_from(&js_stats).map_err(tracerr::map_from_and_wrap!())
+        RtcStats::try_from(report).map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Sets handler for a [`RtcTrackEvent`] (see [RTCTrackEvent][1] and
@@ -312,11 +312,9 @@ impl RtcPeerConnection {
     }
 
     /// Returns [`PeerConnectionState`] of this [`RtcPeerConnection`].
-    ///
-    /// Returns [`None`] if failed to parse a [`PeerConnectionState`].
     #[must_use]
-    pub fn connection_state(&self) -> Option<PeerConnectionState> {
-        get_peer_connection_state(&self.peer)?.ok()
+    pub fn connection_state(&self) -> PeerConnectionState {
+        parse_peer_connection_state(self.peer.connection_state())
     }
 
     /// Sets handler for an [`iceconnectionstatechange`][1] event.
@@ -384,23 +382,9 @@ impl RtcPeerConnection {
                             // browser does not support the functionality of
                             // `RTCPeerConnection.connectionState`, then this
                             // callback won't fire.
-                            match get_peer_connection_state(&peer) {
-                                Some(Ok(state)) => {
-                                    f(state);
-                                }
-                                Some(Err(state)) => {
-                                    log::error!(
-                                        "Unknown RTCPeerConnection connection \
-                                         state: {state}",
-                                    );
-                                }
-                                None => {
-                                    log::error!(
-                                        "Could not receive RTCPeerConnection \
-                                         connection state",
-                                    );
-                                }
-                            }
+                            f(parse_peer_connection_state(
+                                peer.as_ref().connection_state(),
+                            ));
                         },
                     )
                     .unwrap(),
@@ -695,26 +679,24 @@ impl Drop for RtcPeerConnection {
     }
 }
 
-/// Returns [RTCPeerConnection.connectionState][1] property of provided
-/// [`SysRtcPeerConnection`] using reflection.
-///
-/// [1]: https://w3.org/TR/webrtc#dom-peerconnection-connection-state
-fn get_peer_connection_state(
-    peer: &SysRtcPeerConnection,
-) -> Option<Result<PeerConnectionState, String>> {
-    let state =
-        get_property_by_name(peer, "connectionState", |v| v.as_string())?;
-    Some(Ok(match state.as_str() {
-        "new" => PeerConnectionState::New,
-        "connecting" => PeerConnectionState::Connecting,
-        "connected" => PeerConnectionState::Connected,
-        "disconnected" => PeerConnectionState::Disconnected,
-        "failed" => PeerConnectionState::Failed,
-        "closed" => PeerConnectionState::Closed,
+/// Parses a [`PeerConnectionState`] out of the given
+/// [`RtcPeerConnectionState`].
+fn parse_peer_connection_state(
+    state: RtcPeerConnectionState,
+) -> PeerConnectionState {
+    use RtcPeerConnectionState as S;
+
+    match state {
+        S::New => PeerConnectionState::New,
+        S::Connecting => PeerConnectionState::Connecting,
+        S::Connected => PeerConnectionState::Connected,
+        S::Disconnected => PeerConnectionState::Disconnected,
+        S::Failed => PeerConnectionState::Failed,
+        S::Closed => PeerConnectionState::Closed,
         _ => {
-            return Some(Err(state));
+            unreachable!("Unknown peer connection state {state:?}");
         }
-    }))
+    }
 }
 
 /// Parses a [`IceConnectionState`] out of the given [`RtcIceConnectionState`].

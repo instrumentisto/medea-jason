@@ -97,7 +97,7 @@ wee_alloc = { version = "0.4", optional = true }
         "RtcIceTransportPolicy",
         "RtcOfferOptions",
         "RtcPeerConnection", "RtcPeerConnectionIceEvent",
-        "RtcPeerConnectionIceErrorEvent",
+        "RtcPeerConnectionIceErrorEvent", "RtcPeerConnectionState",
         "RtcRtpCapabilities",
         "RtcRtpCodecParameters",
         "RtcRtpEncodingParameters",
@@ -107,7 +107,7 @@ wee_alloc = { version = "0.4", optional = true }
         "RtcRtpTransceiverInit",
         "RtcSdpType",
         "RtcSessionDescription", "RtcSessionDescriptionInit",
-        "RtcStats",
+        "RtcStats", "RtcStatsReport",
         "RtcTrackEvent",
         "WebSocket", "Window",
     ]
