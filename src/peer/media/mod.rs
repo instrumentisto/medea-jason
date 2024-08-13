@@ -426,7 +426,7 @@ impl InnerMediaConnections {
                         target_scalability_mode,
                     );
                     if !encoding_params.is_empty() {
-                        init.sending_encodings(encoding_params);
+                        init.set_send_encodings(encoding_params);
                     }
 
                     let transceiver = peer.add_transceiver(kind, init).await;

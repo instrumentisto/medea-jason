@@ -41,7 +41,7 @@ impl TransceiverInit {
 
     /// Adds the provided [`SendEncodingParameters`] to this
     /// [`TransceiverInit`].
-    pub fn sending_encodings(&self, encodings: Vec<SendEncodingParameters>) {
+    pub fn set_send_encodings(&self, encodings: Vec<SendEncodingParameters>) {
         let send_encoding = ::js_sys::Array::new();
         for enc in encodings {
             _ = send_encoding.push(enc.handle());
