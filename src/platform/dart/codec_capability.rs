@@ -86,12 +86,8 @@ impl CodecCapability {
 
     /// Returns [MIME media type][2] of this [`CodecCapability`].
     ///
-    /// # Errors
-    ///
-    /// Never errors, but [`Result`] is needed for consistency with WASM
-    /// implementation.
-    ///
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
+    #[must_use]
     pub fn mime_type(&self) -> String {
         let mime_type =
             unsafe { codec_capability::mime_type(self.0.get()) }.unwrap();
