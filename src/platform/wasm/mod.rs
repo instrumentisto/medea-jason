@@ -17,7 +17,8 @@ pub mod utils;
 use std::time::Duration;
 
 use futures::Future;
-use js_sys::Promise;
+use js_sys::{Promise, Reflect};
+use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::Window;
 
@@ -38,11 +39,11 @@ pub use self::{
 /// Unimplemented on WASM targets.
 pub type MediaDisplayInfo = ();
 
-// #[cfg(feature = "wee_alloc")]
-// /// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// /// allocator.
-// #[global_allocator]
-// static ALLOC: wee_alloc::WeeAlloc<'_> = wee_alloc::WeeAlloc::INIT;
+#[cfg(feature = "wee_alloc")]
+/// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
+/// allocator.
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc<'_> = wee_alloc::WeeAlloc::INIT;
 
 /// When the `console_error_panic_hook` feature is enabled, we can call the
 /// `set_panic_hook` function at least once during initialization, and then
@@ -88,6 +89,22 @@ pub async fn delay_for(delay: Duration) {
     .await
     .map(drop)
     .unwrap();
+}
+
+/// Returns property of JS object by name if its defined.
+/// Converts the value with a given predicate.
+pub fn get_property_by_name<T, F, U>(
+    value: &T,
+    name: &str,
+    into: F,
+) -> Option<U>
+where
+    T: AsRef<JsValue>,
+    F: Fn(JsValue) -> Option<U>,
+{
+    Reflect::get(value.as_ref(), &JsValue::from_str(name))
+        .ok()
+        .map_or_else(|| None, into)
 }
 
 /// Returns [`Window`] object.

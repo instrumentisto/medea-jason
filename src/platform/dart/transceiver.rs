@@ -359,7 +359,10 @@ impl TransceiverInit {
 
     /// Adds the provided [`SendEncodingParameters`] to this
     /// [`TransceiverInit`].
-    pub fn set_send_encodings(&self, encodings: Vec<SendEncodingParameters>) {
+    pub fn sending_encodings(
+        &mut self,
+        encodings: Vec<SendEncodingParameters>,
+    ) {
         for encoding in encodings {
             unsafe {
                 transceiver::add_sending_encodings(

@@ -29,7 +29,6 @@ impl CodecCapability {
     pub async fn get_sender_codec_capabilities(
         kind: MediaKind,
     ) -> Result<Vec<Self>, Error> {
-        // TODO: This Reflect usage is refactored out in #180.
         let codecs = RtcRtpSender::get_capabilities(&kind.to_string())
             .and_then(|capabs| {
                 Reflect::get(&capabs, &JsString::from("codecs")).ok()

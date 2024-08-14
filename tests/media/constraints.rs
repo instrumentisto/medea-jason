@@ -1,10 +1,13 @@
 #![cfg(target_arch = "wasm32")]
 
 use medea_client_api_proto::{MediaSourceKind, VideoSettings};
-use medea_jason::media::{
-    AudioTrackConstraints, DeviceVideoTrackConstraints,
-    DisplayVideoTrackConstraints, MediaKind, MediaManager, MediaStreamSettings,
-    MultiSourceTracksConstraints, VideoSource,
+use medea_jason::{
+    media::{
+        AudioTrackConstraints, DeviceVideoTrackConstraints,
+        DisplayVideoTrackConstraints, MediaKind, MediaManager,
+        MediaStreamSettings, MultiSourceTracksConstraints, VideoSource,
+    },
+    platform::get_property_by_name,
 };
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
@@ -220,10 +223,18 @@ async fn multi_source_media_stream_constraints_build2() {
 
     match constraints {
         Some(MultiSourceTracksConstraints::Device(constraints)) => {
-            let has_video =
-                js_val_to_option(constraints.as_ref().get_video()).is_some();
-            let has_audio =
-                js_val_to_option(constraints.as_ref().get_audio()).is_some();
+            let has_video = get_property_by_name(
+                constraints.as_ref(),
+                "video",
+                js_val_to_option,
+            )
+            .is_some();
+            let has_audio = get_property_by_name(
+                constraints.as_ref(),
+                "audio",
+                js_val_to_option,
+            )
+            .is_some();
 
             assert!(!has_video);
             assert!(has_audio);
@@ -244,10 +255,18 @@ async fn multi_source_media_stream_constraints_build3() {
 
     match constraints {
         Some(MultiSourceTracksConstraints::Device(constraints)) => {
-            let has_video =
-                js_val_to_option(constraints.as_ref().get_video()).is_some();
-            let has_audio =
-                js_val_to_option(constraints.as_ref().get_audio()).is_some();
+            let has_video = get_property_by_name(
+                constraints.as_ref(),
+                "video",
+                js_val_to_option,
+            )
+            .is_some();
+            let has_audio = get_property_by_name(
+                constraints.as_ref(),
+                "audio",
+                js_val_to_option,
+            )
+            .is_some();
 
             assert!(has_video);
             assert!(has_audio);
@@ -271,14 +290,30 @@ async fn multi_source_media_stream_constraints_build4() {
             device,
             display,
         )) => {
-            let device_has_video =
-                js_val_to_option(device.as_ref().get_video()).is_some();
-            let device_has_audio =
-                js_val_to_option(device.as_ref().get_audio()).is_some();
-            let display_has_video =
-                js_val_to_option(display.as_ref().get_video()).is_some();
-            let display_has_audio =
-                js_val_to_option(display.as_ref().get_audio()).is_some();
+            let device_has_video = get_property_by_name(
+                device.as_ref(),
+                "video",
+                js_val_to_option,
+            )
+            .is_some();
+            let device_has_audio = get_property_by_name(
+                &device.as_ref(),
+                "audio",
+                js_val_to_option,
+            )
+            .is_some();
+            let display_has_video = get_property_by_name(
+                display.as_ref(),
+                "video",
+                js_val_to_option,
+            )
+            .is_some();
+            let display_has_audio = get_property_by_name(
+                display.as_ref(),
+                "audio",
+                js_val_to_option,
+            )
+            .is_some();
 
             assert!(!device_has_video);
             assert!(device_has_audio);
@@ -300,10 +335,18 @@ async fn multi_source_media_stream_constraints_build5() {
 
     match constraints {
         Some(MultiSourceTracksConstraints::Device(constraints)) => {
-            let has_video =
-                js_val_to_option(constraints.as_ref().get_video()).is_some();
-            let has_audio =
-                js_val_to_option(constraints.as_ref().get_audio()).is_some();
+            let has_video = get_property_by_name(
+                constraints.as_ref(),
+                "video",
+                js_val_to_option,
+            )
+            .is_some();
+            let has_audio = get_property_by_name(
+                constraints.as_ref(),
+                "audio",
+                js_val_to_option,
+            )
+            .is_some();
 
             assert!(has_video);
             assert!(!has_audio);
@@ -323,10 +366,18 @@ async fn multi_source_media_stream_constraints_build6() {
 
     match constraints {
         Some(MultiSourceTracksConstraints::Display(constraints)) => {
-            let has_video =
-                js_val_to_option(constraints.as_ref().get_video()).is_some();
-            let has_audio =
-                js_val_to_option(constraints.as_ref().get_audio()).is_some();
+            let has_video = get_property_by_name(
+                constraints.as_ref(),
+                "video",
+                js_val_to_option,
+            )
+            .is_some();
+            let has_audio = get_property_by_name(
+                constraints.as_ref(),
+                "audio",
+                js_val_to_option,
+            )
+            .is_some();
 
             assert!(has_video);
             assert!(!has_audio);
@@ -359,10 +410,18 @@ async fn multi_source_media_stream_constraints_build7() {
 
     match constraints {
         Some(MultiSourceTracksConstraints::Device(constraints)) => {
-            let has_video =
-                js_val_to_option(constraints.as_ref().get_video()).is_some();
-            let has_audio =
-                js_val_to_option(constraints.as_ref().get_audio()).is_some();
+            let has_video = get_property_by_name(
+                constraints.as_ref(),
+                "video",
+                js_val_to_option,
+            )
+            .is_some();
+            let has_audio = get_property_by_name(
+                constraints.as_ref(),
+                "audio",
+                js_val_to_option,
+            )
+            .is_some();
 
             assert!(has_video);
             assert!(has_audio);
@@ -382,10 +441,18 @@ async fn multi_source_media_stream_constraints_build8() {
 
     match constraints {
         Some(MultiSourceTracksConstraints::Device(constraints)) => {
-            let has_video =
-                js_val_to_option(constraints.as_ref().get_video()).is_some();
-            let has_audio =
-                js_val_to_option(constraints.as_ref().get_audio()).is_some();
+            let has_video = get_property_by_name(
+                constraints.as_ref(),
+                "video",
+                js_val_to_option,
+            )
+            .is_some();
+            let has_audio = get_property_by_name(
+                constraints.as_ref(),
+                "audio",
+                js_val_to_option,
+            )
+            .is_some();
 
             assert!(has_video);
             assert!(!has_audio);
