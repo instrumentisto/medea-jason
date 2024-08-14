@@ -599,6 +599,9 @@ async function updateLocalVideo(stream) {
 }
 
 window.onload = async function() {
+  if (usernameInput == null) {
+    return;
+  }
   rust = await import('../../pkg');
   let jason = new rust.Jason();
   console.log(baseUrl);
