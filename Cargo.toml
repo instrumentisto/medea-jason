@@ -44,7 +44,7 @@ derivative = "2.2"
 derive_more = { version = "1.0", features = ["display", "from", "into", "as_ref", "deref", "mul"] }
 futures = "0.3"
 log = "0.4"
-medea-client-api-proto = { version = "0.6", path = "proto/client-api" }
+medea-client-api-proto = { version = "0.6.1-dev", path = "proto/client-api" }
 medea-macro = { version = "0.3", path = "crates/medea-macro" }
 medea-reactive = { version = "0.1", path = "crates/medea-reactive" }
 mockall = { version = "0.13", optional = true }
