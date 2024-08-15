@@ -6,7 +6,7 @@ pub mod member;
 
 use std::{collections::HashMap, env, fmt, time::Duration};
 
-use derive_more::{Display, Error, From};
+use derive_more::{Display, Error as DeriveError, From};
 use medea_control_api_mock::{
     callback::{CallbackEvent, CallbackItem},
     proto,
@@ -38,7 +38,7 @@ macro_rules! control_api_path {
 }
 
 /// All errors which can happen while working with [`World`].
-#[derive(Debug, Display, Error, From)]
+#[derive(Debug, Display, DeriveError, From)]
 pub enum Error {
     Control(control::Error),
     Object(object::Error),

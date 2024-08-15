@@ -2,7 +2,7 @@
 
 use std::{cell::RefCell, collections::HashMap, env, fmt, time::Duration};
 
-use derive_more::{Display, Error, From};
+use derive_more::{Display, Error as DeriveError, From};
 use medea_e2e::{
     browser::{mock, Statement, Window},
     object::{
@@ -14,7 +14,7 @@ use medea_e2e::{
 use crate::conf;
 
 /// All errors which can happen while working with a [`Member`].
-#[derive(Debug, Display, Error, From)]
+#[derive(Debug, Display, DeriveError, From)]
 pub enum Error {
     /// [`Room`] or a [`ConnectionStore`] object errored.
     Object(object::Error),
