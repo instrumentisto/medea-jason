@@ -6,6 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.12.1] · Unreleased
+[0.12.1]: /../../tree/medea-control-api-proto-0.12.1/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.12.0...medea-control-api-proto-0.12.1)
+
+### Upgraded
+
+- Dependencies:
+    - [`derive-more`] to `1.0` ([#181]).
+
+[#181]: /../../pull/181
+
+
+
+
 ## [0.12.0] · 2024-08-05
 [0.12.0]: /../../tree/medea-control-api-proto-0.12.0/proto/control-api
 

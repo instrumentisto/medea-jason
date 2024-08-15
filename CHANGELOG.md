@@ -6,6 +6,22 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.5.1] · Unreleased
+[0.5.1]: /../../tree/medea-jason-0.5.1
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.5.0...medea-jason-0.5.1)
+
+### Upgraded
+
+- Dependencies:
+    - [`derive-more`] to `1.0` ([#181]);
+    - Flutter to `3.24` ([#182])
+
+[#181]: /../../pull/181
+
+
+
+
 ## [0.5.0] · 2024-08-05
 [0.5.0]: /../../tree/medea-jason-0.5.0
 
