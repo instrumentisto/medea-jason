@@ -17,7 +17,7 @@ actix-cors = "0.7"
 actix-web = "4.0"
 actix-web-actors = "4.1"
 clap = { version = "4.0", features = ["derive", "wrap_help"] }
-derive_more = "0.99"
+derive_more = "1.0"
 dotenv = "0.15"
 humantime-serde = "1.0"
 medea-control-api-proto = { version = "0.12", path = "../../proto/control-api", features = ["grpc", "client"] }

@@ -181,14 +181,14 @@ pub enum RootElement {
 #[derive(Clone, Debug, Display, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum Fid {
     /// FID of a [`Room`].
-    #[display(fmt = "{}", id)]
+    #[display("{}", id)]
     Room {
         /// Unique ID of the [`Room`].
         id: room::Id,
     },
 
     /// FID of a [`Member`].
-    #[display(fmt = "{}/{}", room_id, id)]
+    #[display("{}/{}", room_id, id)]
     Member {
         /// ID of the [`Member`] in the [`Room`].
         id: member::Id,
@@ -198,7 +198,7 @@ pub enum Fid {
     },
 
     /// FID of an [`Endpoint`].
-    #[display(fmt = "{}/{}/{}", room_id, member_id, id)]
+    #[display("{}/{}/{}", room_id, member_id, id)]
     Endpoint {
         /// ID of the [`Endpoint`] of the [`Member`].
         id: endpoint::Id,
@@ -259,15 +259,15 @@ impl FromStr for Fid {
 #[derive(Debug, Display, Error)]
 pub enum ParseFidError {
     /// [`Fid`] is empty.
-    #[display(fmt = "FID is empty")]
+    #[display("FID is empty")]
     Empty,
 
     /// [`Fid`] has too many paths.
-    #[display(fmt = "FID has too many paths: {}", _0)]
+    #[display("FID has too many paths: {}", _0)]
     TooManyPaths(#[error(not(source))] Box<str>),
 
     /// [`Fid`] has missing paths.
-    #[display(fmt = "FID has missing paths: {}", _0)]
+    #[display("FID has missing paths: {}", _0)]
     MissingPath(#[error(not(source))] Box<str>),
 }
 

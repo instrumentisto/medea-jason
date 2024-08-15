@@ -10,7 +10,7 @@ pub mod tracks_store;
 
 use std::{marker::PhantomData, sync::mpsc};
 
-use derive_more::{Display, Error, From};
+use derive_more::{Display, Error as DeriveError, From};
 use serde_json::Value as Json;
 use tokio::task;
 use uuid::Uuid;
@@ -23,7 +23,7 @@ pub use self::{
 };
 
 /// All errors which can happen while working with [`Object`]s.
-#[derive(Debug, Display, Error, From)]
+#[derive(Debug, Display, DeriveError, From)]
 pub enum Error {
     /// Error while interacting with a browser.
     Browser(browser::Error),
@@ -36,11 +36,11 @@ pub enum Error {
 #[derive(Clone, Copy, Debug, Display, Eq, Hash, PartialEq)]
 pub enum AwaitCompletion {
     /// Wait for the spawned promise to complete completion.
-    #[display(fmt = "await")]
+    #[display("await")]
     Do,
 
     /// Don't wait for the spawned promise completion.
-    #[display(fmt = "")]
+    #[display("")]
     Dont,
 }
 

@@ -1,6 +1,6 @@
 //! [`Member`] definitions.
 
-use std::{collections::HashMap, fmt, str::FromStr, time::Duration};
+use std::{collections::HashMap, fmt, time::Duration};
 
 use derive_more::{AsRef, Display, Error, From, FromStr, Into};
 use ref_cast::RefCast;
@@ -105,8 +105,8 @@ pub struct Spec {
 )]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-#[from(types("&str", String))]
-#[into(owned(types(String)))]
+#[from(&str, String)]
+#[into(owned(String))]
 #[repr(transparent)]
 pub struct Id(Box<str>);
 
@@ -143,7 +143,7 @@ pub struct Sid {
     pub creds: Option<PlainCredentials>,
 }
 
-impl fmt::Display for Sid {
+impl Display for Sid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}/{}/{}", self.public_url, self.room_id, self.member_id)?;
         if let Some(plain) = &self.creds {
@@ -194,13 +194,13 @@ pub enum ParseSidError {
     /// `ws://localhost:8080/ws//qwerty`, for example.
     ///
     /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
-    #[display(fmt = "Missing paths in URI: {}", _0)]
+    #[display("Missing paths in URI: {}", _0)]
     MissingPaths(#[error(not(source))] Box<str>),
 
     /// Error of parsing the provided [URI].
     ///
     /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
-    #[display(fmt = "Cannot parse provided URI `{}`: {}", _0, _1)]
+    #[display("Cannot parse provided URI `{}`: {}", _0, _1)]
     InvalidUrl(Box<str>, #[error(source)] url::ParseError),
 }
 
@@ -293,6 +293,6 @@ impl Credentials {
 )]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-#[from(types("&str", String))]
-#[into(owned(types(String)))]
+#[from(&str, String)]
+#[into(owned(String))]
 pub struct PlainCredentials(Box<str>); // TODO: Use `secrecy` crate.
