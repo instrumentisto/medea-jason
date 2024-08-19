@@ -5,7 +5,6 @@ import 'package:ffi/ffi.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
 import 'package:medea_jason/src/native/ffi/native_string.dart';
-import '../ffi/foreign_value.dart';
 import 'peer_connection.g.dart' as bridge;
 import 'rtc_stats.dart';
 
@@ -188,9 +187,9 @@ Future<void> Function() _addIceCandidate(Object conn, Object candidate) {
 
 /// Returns the current [PeerConnection.connectionState] of the provided
 /// [PeerConnection].
-Pointer _connectionState(Object conn) {
+int _connectionState(Object conn) {
   conn as PeerConnection;
-  return ForeignValue.fromInt(conn.connectionState().index).intoRustOwned();
+  return conn.connectionState().index;
 }
 
 /// Returns the current [PeerConnection.iceConnectionState] of the provided

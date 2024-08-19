@@ -4,33 +4,27 @@
 
 use std::{
     cell::{Cell, RefCell},
-    fmt,
     mem::ManuallyDrop,
     rc::Rc,
     task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
 };
 
+use derive_more::Debug;
 use futures::future::LocalBoxFuture;
 
 use crate::platform::dart::executor::task_wake;
 
 /// Inner [`Task`]'s data.
+#[derive(Debug)]
 struct Inner {
     /// An actual [`Future`] that this [`Task`] is driving.
     ///
     /// [`Future`]: std::future::Future
+    #[debug(skip)]
     future: LocalBoxFuture<'static, ()>,
 
     /// Handle for waking up this [`Task`].
     waker: Waker,
-}
-
-impl fmt::Debug for Inner {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Inner")
-            .field("waker", &self.waker)
-            .finish_non_exhaustive()
-    }
 }
 
 /// Wrapper for a [`Future`] that can be polled by an external single threaded

@@ -2,9 +2,10 @@
 //!
 //! [0]: https://api.dart.dev/stable/dart-async/Future-class.html
 
-use std::{fmt, future::Future, marker::PhantomData, ptr};
+use std::{future::Future, marker::PhantomData, ptr};
 
 use dart_sys::Dart_Handle;
+use derive_more::Debug;
 use flutter_rust_bridge::DartOpaque;
 use futures::channel::oneshot;
 use medea_macro::dart_bridge;
@@ -82,15 +83,10 @@ pub unsafe extern "C" fn FutureFromDart__resolve_err(
 /// Compatibility layer for polling [Dart `Future`s][0] in Rust.
 ///
 /// [0]: https://api.dart.dev/stable/dart-async/Future-class.html
-pub struct FutureFromDart(Box<dyn FnOnce(Result<DartValue, Error>)>);
-
-impl fmt::Debug for FutureFromDart {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("FutureFromDart")
-            .field(&format!("{:p}", self.0))
-            .finish()
-    }
-}
+#[derive(Debug)]
+pub struct FutureFromDart(
+    #[debug("{_0:p}")] Box<dyn FnOnce(Result<DartValue, Error>)>,
+);
 
 impl FutureFromDart {
     /// Converts a fallible [Dart `Future`s][0] into the Rust [`Future`].
@@ -113,7 +109,7 @@ impl FutureFromDart {
     ) -> impl Future<Output = Result<T, Error>>
     where
         DartValueArg<T>: TryInto<T>,
-        <DartValueArg<T> as TryInto<T>>::Error: fmt::Debug,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
         T: 'static,
     {
         let dart_fut = unsafe { DartHandle::new(dart_fut) };

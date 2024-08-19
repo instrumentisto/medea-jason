@@ -2,9 +2,9 @@
 //!
 //! [WebSocket]: https://developer.mozilla.org/ru/docs/WebSockets
 
-use std::{cell::RefCell, fmt, rc::Rc, time::Duration};
+use std::{cell::RefCell, rc::Rc, time::Duration};
 
-use derive_more::Display;
+use derive_more::{Debug, Display};
 use futures::{
     channel::{mpsc, oneshot},
     future::LocalBoxFuture,
@@ -90,8 +90,10 @@ pub enum ClientState {
 }
 
 /// Inner state of [`WebSocketRpcClient`].
+#[derive(Debug)]
 struct Inner {
     /// Transport connection with remote media server.
+    #[debug(skip)]
     sock: Option<Rc<dyn platform::RpcTransport>>,
 
     /// Connection loss detector via ping/pong mechanism.
@@ -117,6 +119,7 @@ struct Inner {
     /// Closure which will create new [`platform::RpcTransport`]s for this
     /// [`WebSocketRpcClient`] on each
     /// [`WebSocketRpcClient:: establish_connection`] call.
+    #[debug("{rpc_transport_factory:p}")]
     rpc_transport_factory: RpcTransportFactory,
 
     /// URL that [`platform::RpcTransport`] will connect to.
@@ -127,20 +130,6 @@ struct Inner {
 
     /// Current [`ClientState`] of this [`WebSocketRpcClient`].
     state: ObservableCell<ClientState>,
-}
-
-impl fmt::Debug for Inner {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Inner")
-            .field("heartbeat", &self.heartbeat)
-            .field("subs", &self.subs)
-            .field("on_close_subscribers", &self.on_close_subscribers)
-            .field("close_reason", &self.close_reason)
-            .field("on_connection_loss_subs", &self.on_connection_loss_subs)
-            .field("url", &self.url)
-            .field("state", &self.state)
-            .finish_non_exhaustive()
-    }
 }
 
 /// Factory closure producing a [`platform::RpcTransport`].
@@ -167,7 +156,7 @@ impl Inner {
 
 /// Events which can be thrown by [`WebSocketRpcClient`].
 #[dispatchable(self: &Self)]
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum RpcEvent {
     /// Notification of the subscribers that [`WebSocketRpcClient`] is joined
     /// [`Room`] on Media Server.

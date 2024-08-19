@@ -92,30 +92,30 @@ pub trait RpcTransport {
 #[cause(error = platform::Error)]
 pub enum TransportError {
     /// Error encountered when trying to establish connection.
-    #[display(fmt = "Failed to create WebSocket: {}", _0)]
+    #[display("Failed to create WebSocket: {_0}")]
     CreateSocket(platform::Error),
 
     /// Connection was closed before becoming active.
-    #[display(fmt = "Failed to init WebSocket")]
+    #[display("Failed to init WebSocket")]
     InitSocket,
 
     /// Occurs when [`ClientMsg`] cannot be serialized.
-    #[display(fmt = "Failed to parse client message: {}", _0)]
+    #[display("Failed to parse client message: {_0}")]
     SerializeClientMessage(JsonParseError),
 
     /// Occurs when [`ServerMsg`] cannot be parsed.
-    #[display(fmt = "Failed to parse server message: {}", _0)]
+    #[display("Failed to parse server message: {_0}")]
     ParseServerMessage(JsonParseError),
 
     /// Occurs if the parsed message is not string.
-    #[display(fmt = "Message is not a string")]
+    #[display("Message is not a string")]
     MessageNotString,
 
-    /// Occurs when a message cannot be send to server.
-    #[display(fmt = "Failed to send message: {}", _0)]
+    /// Occurs when a message cannot be sent to server.
+    #[display("Failed to send message: {_0}")]
     SendMessage(platform::Error),
 
     /// Occurs when message is sent to a closed socket.
-    #[display(fmt = "Underlying socket is closed")]
+    #[display("Underlying socket is closed")]
     ClosedSocket,
 }

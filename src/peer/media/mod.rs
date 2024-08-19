@@ -213,8 +213,10 @@ pub enum TrackDirection {
 #[derive(Clone, Copy, Debug, Display)]
 pub enum ProhibitedStateError {
     /// [`Sender`] cannot be disabled because it's required.
-    #[display(fmt = "MediaExchangeState of Sender can't transit to \
-                     disabled state, because this Sender is required.")]
+    #[display(
+        "`MediaExchangeState` of `Sender` can't transit to \
+         disabled state, because this `Sender` is required"
+    )]
     CannotDisableRequiredSender,
 }
 
@@ -223,11 +225,11 @@ pub enum ProhibitedStateError {
 #[cause(error = platform::Error)]
 pub enum InsertLocalTracksError {
     /// [`local::Track`] doesn't satisfy [`Sender`]'s constraints.
-    #[display(fmt = "Provided Track doesn't satisfy senders constraints")]
+    #[display("Provided `Track` doesn't satisfy senders constraints")]
     InvalidMediaTrack,
 
     /// There are not enough [`local::Track`]s being inserted into [`Sender`]s.
-    #[display(fmt = "Provided stream does not have all necessary Tracks")]
+    #[display("Provided stream does not have all necessary `Track`s")]
     NotEnoughTracks,
 
     /// Insertion of a [`local::Track`] into a [`Sender`] fails.
@@ -238,11 +240,11 @@ pub enum InsertLocalTracksError {
 #[derive(Clone, Copy, Debug, Display)]
 pub enum GetMidsError {
     /// Cannot get the `mid` from a [`Sender`].
-    #[display(fmt = "Peer has senders without mid")]
+    #[display("Peer has senders without mid")]
     SendersWithoutMid,
 
     /// Cannot get the `mid` from a [`Receiver`].
-    #[display(fmt = "Peer has receivers without mid")]
+    #[display("Peer has receivers without mid")]
     ReceiversWithoutMid,
 }
 

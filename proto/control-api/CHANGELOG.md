@@ -6,6 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.12.1] · unreleased
+[0.12.1]: /../../tree/medea-control-api-proto-0.12.1/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.12.0...medea-control-api-proto-0.12.1)
+
+### Upgraded
+
+- Dependencies:
+    - [`derive-more`] to `1.0` ([#181]).
+
+[#181]: /../../pull/181
+
+
+
+
 ## [0.12.0] · 2024-08-05
 [0.12.0]: /../../tree/medea-control-api-proto-0.12.0/proto/control-api
 
@@ -241,8 +256,8 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+[`derive_more`]: https://docs.rs/derive_more
 [`medea-client-api-proto`]: https://docs.rs/medea-client-api-proto
 [`prost`]: https://docs.rs/prost
 [`tonic`]: https://docs.rs/tonic
-
 [Semantic Versioning 2.0.0]: https://semver.org

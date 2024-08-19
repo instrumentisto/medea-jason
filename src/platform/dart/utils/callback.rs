@@ -1,13 +1,10 @@
 //! Functionality for converting Rust closures into callbacks that can be passed
 //! to Dart and called by Dart.
 
-use std::{
-    fmt::{self, Debug},
-    os::raw::c_void,
-    ptr,
-};
+use std::{os::raw::c_void, ptr};
 
 use dart_sys::Dart_Handle;
+use derive_more::Debug;
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -90,23 +87,12 @@ pub unsafe extern "C" fn Callback__call(
 }
 
 /// Possible kinds of an underlying [`Callback`] function to be called.
+#[derive(Debug)]
 enum Kind {
-    FnOnce(Box<dyn FnOnce(DartValue)>),
-    FnMut(Box<dyn FnMut(DartValue)>),
-    Fn(Box<dyn Fn(DartValue)>),
-    TwoArgFnMut(Box<dyn FnMut(DartValue, DartValue)>),
-}
-
-impl Debug for Kind {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Kind::")?;
-        match self {
-            Self::FnOnce(p) => write!(f, "FnOnce({p:p})"),
-            Self::FnMut(p) => write!(f, "FnMut({p:p})"),
-            Self::Fn(p) => write!(f, "Fn({p:p})"),
-            Self::TwoArgFnMut(p) => write!(f, "TwoArgFnMut({p:p})"),
-        }
-    }
+    FnOnce(#[debug("{_0:p}")] Box<dyn FnOnce(DartValue)>),
+    FnMut(#[debug("{_0:p}")] Box<dyn FnMut(DartValue)>),
+    Fn(#[debug("{_0:p}")] Box<dyn Fn(DartValue)>),
+    TwoArgFnMut(#[debug("{_0:p}")] Box<dyn FnMut(DartValue, DartValue)>),
 }
 
 // TODO: Fix in #13:

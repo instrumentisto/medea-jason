@@ -1,8 +1,8 @@
 //! Reconnection for [`RpcSession`].
 
-use std::{fmt, rc::Weak, time::Duration};
+use std::{rc::Weak, time::Duration};
 
-use derive_more::{Display, From};
+use derive_more::{Debug, Display, From};
 use tracerr::Traced;
 
 use crate::{
@@ -19,21 +19,15 @@ pub enum ReconnectError {
     Session(#[cause] SessionError),
 
     /// [`ReconnectHandle`]'s [`Weak`] pointer is detached.
-    #[display(fmt = "ReconnectHandle is in detached state")]
+    #[display("ReconnectHandle is in detached state")]
     Detached,
 }
 
 /// External handle used to reconnect to a media server when connection is lost.
 ///
 /// This handle will be passed to a `Room.on_connection_loss` callback.
-#[derive(Clone)]
-pub struct ReconnectHandle(Weak<dyn RpcSession>);
-
-impl fmt::Debug for ReconnectHandle {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("ReconnectHandle").finish()
-    }
-}
+#[derive(Clone, Debug)]
+pub struct ReconnectHandle(#[debug(skip)] Weak<dyn RpcSession>);
 
 impl ReconnectHandle {
     /// Instantiates new [`ReconnectHandle`] from the given [`RpcSession`]

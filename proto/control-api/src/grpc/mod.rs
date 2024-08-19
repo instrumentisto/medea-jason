@@ -83,8 +83,8 @@ pub use self::{
 /// [`CallbackApi`]: crate::CallbackApi
 /// [gRPC]: https://grpc.io
 #[derive(Clone, Debug, Display, Eq, Hash, Into, PartialEq)]
-#[display(fmt = "grpc://{}", _0)]
-#[into(owned(types(String)))]
+#[display("grpc://{_0}")]
+#[into(String)]
 pub struct CallbackUrl(Url);
 
 impl CallbackUrl {
@@ -116,14 +116,14 @@ impl FromStr for CallbackUrl {
 #[derive(Clone, Copy, Debug, Display, Error, From)]
 pub enum CallbackUrlParseError {
     /// Error of parsing the provided [`Url`].
-    #[display(fmt = "Invalid URL: {}", _0)]
+    #[display("Invalid URL: {_0}")]
     UrlParseErr(url::ParseError),
 
     /// [`Url`] is missing host.
-    #[display(fmt = "Missing host")]
+    #[display("Missing host")]
     MissingHost,
 
     /// [`Url`] contains unsupported scheme.
-    #[display(fmt = "Only `grpc://` scheme is allowed")]
+    #[display("Only `grpc://` scheme is allowed")]
     WrongScheme,
 }

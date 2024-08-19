@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.5.1] · unreleased
+[0.5.1]: /../../tree/medea-jason-0.5.1/flutter
+
+See also [`medea-jason` crate 0.5.1 changes](/../../tree/medea-jason-0.5.1/CHANGELOG.md).
+
+### Upgraded
+
+- Flutter to `3.24` ([#181]).
+
+[#181]: /../../pull/182
+
+
+
+
 ## [0.5.0] · 2024-08-05
 [0.5.0]: /../../tree/medea-jason-0.5.0/flutter
 
