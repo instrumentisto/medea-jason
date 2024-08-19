@@ -38,11 +38,13 @@ pub use self::{
 /// Unimplemented on WASM targets.
 pub type MediaDisplayInfo = ();
 
-// #[cfg(feature = "wee_alloc")]
-// /// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// /// allocator.
 // #[global_allocator]
-// static ALLOC: wee_alloc::WeeAlloc<'_> = wee_alloc::WeeAlloc::INIT;
+// static ALLOC: talc::TalckWasm = unsafe { talc::TalckWasm::new_global() };
+
+#[global_allocator]
+static GLOBAL_ALLOCATOR: wasm_tracing_allocator::WasmTracingAllocator<
+    std::alloc::System,
+> = wasm_tracing_allocator::WasmTracingAllocator(std::alloc::System);
 
 /// When the `console_error_panic_hook` feature is enabled, we can call the
 /// `set_panic_hook` function at least once during initialization, and then
@@ -51,7 +53,23 @@ pub type MediaDisplayInfo = ();
 /// For more details see:
 /// <https://github.com/rustwasm/console_error_panic_hook#readme>
 #[cfg(feature = "console_error_panic_hook")]
-pub use console_error_panic_hook::set_once as set_panic_hook;
+pub fn set_panic_hook() {
+    use std::sync::Once;
+    static SET_HOOK: Once = Once::new();
+    SET_HOOK.call_once(|| {
+        std::panic::set_hook(Box::new(|bt| {
+            let a = bt.to_string();
+            log::error!("----------------------------------");
+            log::error!("{a}");
+            log::error!("{:?}", unsafe { talc::ASD.clone().unwrap() });
+            log::error!("----------------------------------");
+            // if let Some(f) = unsafe { PANIC_FN.as_ref() } {
+            //     f.call1(format!("{bt}"));
+            // }
+        }));
+    });
+}
+pub use console_error_panic_hook::set_once as asd;
 
 /// Initialize [`wasm_logger`] as default application logger.
 ///
