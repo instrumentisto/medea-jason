@@ -56,7 +56,9 @@ mixin _$ApiConstrainFacingMode {
   }) =>
       throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ApiConstrainFacingMode
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ApiConstrainFacingModeCopyWith<ApiConstrainFacingMode> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -81,6 +83,8 @@ class _$ApiConstrainFacingModeCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ApiConstrainFacingMode
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -117,6 +121,8 @@ class __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>
       $Res Function(_$ApiConstrainFacingMode_ExactImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ApiConstrainFacingMode
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -155,7 +161,9 @@ class _$ApiConstrainFacingMode_ExactImpl extends ApiConstrainFacingMode_Exact {
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ApiConstrainFacingMode
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ApiConstrainFacingMode_ExactImplCopyWith<
@@ -233,8 +241,11 @@ abstract class ApiConstrainFacingMode_Exact extends ApiConstrainFacingMode {
 
   @override
   FacingMode get field0;
+
+  /// Create a copy of ApiConstrainFacingMode
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ApiConstrainFacingMode_ExactImplCopyWith<
           _$ApiConstrainFacingMode_ExactImpl>
       get copyWith => throw _privateConstructorUsedError;
@@ -262,6 +273,8 @@ class __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>
       $Res Function(_$ApiConstrainFacingMode_IdealImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ApiConstrainFacingMode
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -300,7 +313,9 @@ class _$ApiConstrainFacingMode_IdealImpl extends ApiConstrainFacingMode_Ideal {
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ApiConstrainFacingMode
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ApiConstrainFacingMode_IdealImplCopyWith<
@@ -378,8 +393,11 @@ abstract class ApiConstrainFacingMode_Ideal extends ApiConstrainFacingMode {
 
   @override
   FacingMode get field0;
+
+  /// Create a copy of ApiConstrainFacingMode
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ApiConstrainFacingMode_IdealImplCopyWith<
           _$ApiConstrainFacingMode_IdealImpl>
       get copyWith => throw _privateConstructorUsedError;

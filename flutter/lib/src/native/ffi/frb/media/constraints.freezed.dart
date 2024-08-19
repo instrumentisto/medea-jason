@@ -56,7 +56,9 @@ mixin _$ConstrainBoolean {
   }) =>
       throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ConstrainBooleanCopyWith<ConstrainBoolean> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -80,6 +82,8 @@ class _$ConstrainBooleanCopyWithImpl<$Res, $Val extends ConstrainBoolean>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -115,6 +119,8 @@ class __$$ConstrainBoolean_ExactImplCopyWithImpl<$Res>
       $Res Function(_$ConstrainBoolean_ExactImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -153,7 +159,9 @@ class _$ConstrainBoolean_ExactImpl extends ConstrainBoolean_Exact {
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainBoolean_ExactImplCopyWith<_$ConstrainBoolean_ExactImpl>
@@ -230,8 +238,11 @@ abstract class ConstrainBoolean_Exact extends ConstrainBoolean {
 
   @override
   bool get field0;
+
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainBoolean_ExactImplCopyWith<_$ConstrainBoolean_ExactImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -257,6 +268,8 @@ class __$$ConstrainBoolean_IdealImplCopyWithImpl<$Res>
       $Res Function(_$ConstrainBoolean_IdealImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -295,7 +308,9 @@ class _$ConstrainBoolean_IdealImpl extends ConstrainBoolean_Ideal {
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainBoolean_IdealImplCopyWith<_$ConstrainBoolean_IdealImpl>
@@ -372,8 +387,11 @@ abstract class ConstrainBoolean_Ideal extends ConstrainBoolean {
 
   @override
   bool get field0;
+
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainBoolean_IdealImplCopyWith<_$ConstrainBoolean_IdealImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -426,7 +444,9 @@ mixin _$ConstrainU32 {
   }) =>
       throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ConstrainU32CopyWith<ConstrainU32> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -450,6 +470,8 @@ class _$ConstrainU32CopyWithImpl<$Res, $Val extends ConstrainU32>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -483,6 +505,8 @@ class __$$ConstrainU32_ExactImplCopyWithImpl<$Res>
       $Res Function(_$ConstrainU32_ExactImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -521,7 +545,9 @@ class _$ConstrainU32_ExactImpl extends ConstrainU32_Exact {
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainU32_ExactImplCopyWith<_$ConstrainU32_ExactImpl> get copyWith =>
@@ -603,8 +629,11 @@ abstract class ConstrainU32_Exact extends ConstrainU32 {
 
   @override
   int get field0;
+
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainU32_ExactImplCopyWith<_$ConstrainU32_ExactImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -628,6 +657,8 @@ class __$$ConstrainU32_IdealImplCopyWithImpl<$Res>
       $Res Function(_$ConstrainU32_IdealImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -666,7 +697,9 @@ class _$ConstrainU32_IdealImpl extends ConstrainU32_Ideal {
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainU32_IdealImplCopyWith<_$ConstrainU32_IdealImpl> get copyWith =>
@@ -748,8 +781,11 @@ abstract class ConstrainU32_Ideal extends ConstrainU32 {
 
   @override
   int get field0;
+
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainU32_IdealImplCopyWith<_$ConstrainU32_IdealImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -773,6 +809,8 @@ class __$$ConstrainU32_RangeImplCopyWithImpl<$Res>
       $Res Function(_$ConstrainU32_RangeImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -819,7 +857,9 @@ class _$ConstrainU32_RangeImpl extends ConstrainU32_Range {
   @override
   int get hashCode => Object.hash(runtimeType, field0, field1);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainU32_RangeImplCopyWith<_$ConstrainU32_RangeImpl> get copyWith =>
@@ -903,8 +943,11 @@ abstract class ConstrainU32_Range extends ConstrainU32 {
   @override
   int get field0;
   int get field1;
+
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainU32_RangeImplCopyWith<_$ConstrainU32_RangeImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

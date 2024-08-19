@@ -15,7 +15,8 @@ dependencies:
   freezed_annotation: ^2.4.4
   http: ">=0.13.6 <2.0.0"
   json_annotation: ^4.9.0
-  medea_flutter_webrtc: ^0.10.0
+  medea_flutter_webrtc:
+    path: /media/alexlapa/drive2/CLionProjects3/flutter-webrtc
   retry: ^3.1.2
   tuple: ^2.0.2
   uuid: ^3.0.7
@@ -23,7 +24,7 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.4.12
-  ffigen: 9.0.0
+  ffigen: ^11.0.0
   flutter_gherkin: 3.0.0-rc.17
   flutter_lints: ^4.0.0
   flutter_test:
