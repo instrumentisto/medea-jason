@@ -162,7 +162,7 @@ async fn error_get_local_stream_on_new_peer() {
         cb_assert_eq!(
             &err.message(),
             "Failed to get local tracks: MediaDevices.getUserMedia() failed: \
-             Error: error_get_local_stream_on_new_peer"
+             Error: error_get_local_stream_on_new_peer",
         );
         assert_eq!(&cause.message(), "error_get_local_stream_on_new_peer");
         assert!(&err.trace().contains("at src"));
@@ -216,7 +216,7 @@ async fn error_join_room_without_on_failed_stream_callback() {
 
     assert_eq!(
         err.message(),
-        "`Room.on_failed_local_media()` callback isn't set.",
+        "`Room.on_failed_local_media()` callback isn't set",
     );
     assert!(!err.trace().is_empty());
 }
@@ -247,7 +247,7 @@ async fn error_join_room_without_on_connection_loss_callback() {
 
     assert_eq!(
         err.message(),
-        "`Room.on_connection_loss()` callback isn't set.",
+        "`Room.on_connection_loss()` callback isn't set",
     );
     assert!(!err.trace().is_empty());
 }
@@ -2508,8 +2508,8 @@ mod set_local_media_settings {
                 jsval_cast(err, "MediaStateTransitionException")?;
             cb_assert_eq!(
                 err.message(),
-                "MediaExchangeState of Sender cannot transit to \
-                 disabled state, because this Sender is required."
+                "`MediaExchangeState` of `Sender` cannot transit to disabled \
+                 state, because this `Sender` is required",
             );
         });
         room_handle.on_failed_local_media(cb.into()).unwrap();
@@ -2556,7 +2556,7 @@ mod set_local_media_settings {
                 jsval_cast(err, "MediaStateTransitionException")?;
             cb_assert_eq!(
                 &err.message(),
-                "provided multiple device video MediaStreamTracks"
+                "provided multiple device video MediaStreamTracks",
             );
         });
         let (audio_track, video_track) = get_test_required_tracks();
