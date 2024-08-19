@@ -26,7 +26,7 @@ use super::track::local;
 #[cause(error = platform::Error)]
 pub enum EnumerateDevicesError {
     /// Occurs if the `enumerateDevices` request fails.
-    #[display("MediaDevices.enumerateDevices() failed: {}", _0)]
+    #[display("MediaDevices.enumerateDevices() failed: {_0}")]
     Failed(platform::Error),
 
     /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
@@ -40,7 +40,7 @@ pub enum EnumerateDevicesError {
 #[cause(error = platform::Error)]
 pub enum EnumerateDisplaysError {
     /// Occurs if the `enumerateDisplays` request fails.
-    #[display("MediaDevices.enumerateDisplays() failed: {}", _0)]
+    #[display("MediaDevices.enumerateDisplays() failed: {_0}")]
     Failed(platform::Error),
 
     /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
@@ -59,13 +59,13 @@ pub enum InitLocalTracksError {
     /// Occurs if the [getUserMedia][1] request fails.
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-    #[display("Failed to get local tracks: {}", _0)]
+    #[display("Failed to get local tracks: {_0}")]
     GetUserMediaFailed(#[cause] GetUserMediaError),
 
     /// Occurs if the [getDisplayMedia()][1] request fails.
     ///
     /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-    #[display("Failed to get local tracks: {}", _0)]
+    #[display("Failed to get local tracks: {_0}")]
     GetDisplayMediaFailed(#[cause] GetDisplayMediaError),
 }
 
@@ -82,7 +82,7 @@ pub struct InvalidOutputAudioDeviceIdError;
 #[cause(error = platform::Error)]
 pub enum MicVolumeError {
     /// Error accessing microphone volume settings.
-    #[display("Error accessing microphone volume settings: {}", _0)]
+    #[display("Error accessing microphone volume settings: {_0}")]
     MicVolumeError(platform::Error),
 
     /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
@@ -102,7 +102,7 @@ pub struct HandleDetachedError;
 /// [2]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [3]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
 #[derive(Clone, Debug, Display)]
-#[display("{} track is ended", _0)]
+#[display("{_0} track is ended")]
 struct LocalTrackIsEndedError(MediaKind);
 
 /// Errors occurring when [getUserMedia()][1] request fails.
@@ -114,7 +114,7 @@ pub enum GetUserMediaError {
     /// [getUserMedia()][1] request failed.
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-    #[display("MediaDevices.getUserMedia() failed: {}", _0)]
+    #[display("MediaDevices.getUserMedia() failed: {_0}")]
     PlatformRequestFailed(platform::GetUserMediaError),
 
     /// [`local::Track`] was [`ended`][1] right after [getUserMedia()][2] or
@@ -123,7 +123,7 @@ pub enum GetUserMediaError {
     /// [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
     /// [2]: https://tinyurl.com/rnxcavf
     /// [3]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-    #[display("New {} local track was ended", _0)]
+    #[display("New {_0} local track was ended")]
     LocalTrackIsEnded(MediaKind),
 }
 
@@ -143,7 +143,7 @@ pub enum GetDisplayMediaError {
     /// [getDisplayMedia()][1] request failed.
     ///
     /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-    #[display("`MediaDevices.getDisplayMedia()` failed: {}", _0)]
+    #[display("`MediaDevices.getDisplayMedia()` failed: {_0}")]
     PlatformRequestFailed(platform::Error),
 
     /// [`local::Track`] was [`ended`][1] right after [getUserMedia()][2] or
@@ -152,7 +152,7 @@ pub enum GetDisplayMediaError {
     /// [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
     /// [2]: https://tinyurl.com/rnxcavf
     /// [3]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-    #[display("New {} local track was ended", _0)]
+    #[display("New {_0} local track was ended")]
     LocalTrackIsEnded(MediaKind),
 }
 

@@ -36,7 +36,7 @@ use crate::{
 pub enum SessionError {
     /// [`WebSocketRpcSession`] goes into [`SessionState::Finished`] and can't
     /// be used.
-    #[display("RPC Session finished with {:?} close reason", _0)]
+    #[display("RPC Session finished with {_0:?} close reason")]
     SessionFinished(CloseReason),
 
     /// [`WebSocketRpcSession`] doesn't have any credentials to authorize with.
@@ -48,7 +48,7 @@ pub enum SessionError {
     AuthorizationFailed,
 
     /// [`WebSocketRpcClient`] returned [`RpcClientError`].
-    #[display("RpcClientError: {}", _0)]
+    #[display("RpcClientError: {_0}")]
     RpcClient(#[cause] RpcClientError),
 
     /// [`WebSocketRpcSession`] was unexpectedly dropped.
@@ -56,7 +56,7 @@ pub enum SessionError {
     SessionUnexpectedlyDropped,
 
     /// [`WebSocketRpcClient`] lost connection with a server.
-    #[display("Connection with a server was lost: {}", _0)]
+    #[display("Connection with a server was lost: {_0}")]
     ConnectionLost(ConnectionLostReason),
 
     /// [`WebSocketRpcSession::connect`] called while connecting to the server.

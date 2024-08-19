@@ -144,10 +144,7 @@
     unused_results,
     variant_size_differences
 )]
-#![allow(clippy::same_name_method)]
-// uncontrolled names in the generated code
-// TODO: Remove on next `derive_more` major version.
-#![allow(clippy::uninlined_format_args, clippy::use_debug)]
+#![allow(clippy::same_name_method)] // uncontrolled names in the generated code
 
 pub mod callback;
 pub mod control;

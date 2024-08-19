@@ -37,7 +37,7 @@ use super::Sender;
 /// [`LocalTrackState::Failed`] content.
 ///
 /// [`local::Track`]: crate::media::track::local::Track
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 enum LocalTrackState {
     /// Indicates that [`Sender`] is new, or [`local::Track`] is set.
     ///

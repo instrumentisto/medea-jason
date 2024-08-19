@@ -679,7 +679,7 @@ impl Drop for RtcPeerConnection {
     }
 }
 
-/// Parses a [`PeerConnectionState`] out of the given
+/// Parses a [`PeerConnectionState`] out of the provided
 /// [`RtcPeerConnectionState`].
 fn parse_peer_connection_state(
     state: RtcPeerConnectionState,
@@ -694,7 +694,7 @@ fn parse_peer_connection_state(
         S::Failed => PeerConnectionState::Failed,
         S::Closed => PeerConnectionState::Closed,
         _ => {
-            unreachable!("Unknown peer connection state {state:?}");
+            unreachable!("unknown `RtcPeerConnectionState::{state:?}`");
         }
     }
 }
@@ -714,7 +714,7 @@ fn parse_ice_connection_state(
         S::Disconnected => IceConnectionState::Disconnected,
         S::Closed => IceConnectionState::Closed,
         _ => {
-            unreachable!("Unknown ICE connection state {state:?}");
+            unreachable!("unknown `IceConnectionState::{state:?}`");
         }
     }
 }

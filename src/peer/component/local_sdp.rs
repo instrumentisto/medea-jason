@@ -101,8 +101,7 @@ impl LocalSdp {
                 .prev_sdp
                 .borrow()
                 .as_ref()
-                .map(|prev| prev == &sdp)
-                .unwrap_or_default();
+                .is_some_and(|prev| prev == &sdp);
             if is_restart_needed {
                 self.0.restart_needed.set(true);
             }
@@ -130,8 +129,7 @@ impl LocalSdp {
                     .prev_sdp
                     .borrow()
                     .as_ref()
-                    .map(|prev| prev == current)
-                    .unwrap_or_default()
+                    .is_some_and(|prev| prev == current)
             })
     }
 

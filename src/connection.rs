@@ -36,7 +36,7 @@ use crate::{
 #[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
     /// [`ConnectionHandle`]'s [`Weak`] pointer is detached.
-    #[display("ConnectionHandle is in detached state")]
+    #[display("`ConnectionHandle` is in detached state")]
     Detached,
 
     /// [`MediaState`] of a [`Sender`] transits to an opposite of the requested
@@ -44,9 +44,8 @@ pub enum ChangeMediaStateError {
     ///
     /// [`Sender`]: crate::peer::media::Sender
     #[display(
-        "MediaState transits to opposite ({}) of the \
-               requested MediaExchangeState",
-        _0
+        "`MediaState` transits to opposite ({_0}) of the requested \
+         `MediaExchangeState`"
     )]
     TransitionIntoOppositeState(MediaState),
 

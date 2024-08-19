@@ -6,6 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.5.1] · unreleased
+[0.5.1]: /../../tree/medea-jason-0.5.1
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.5.0...medea-jason-0.5.1)
+
+### Upgraded
+
+- Dependencies:
+    - [`derive-more`] to `1.0` ([#181]).
+
+[#181]: /../../pull/181
+
+
+
+
 ## [0.5.0] · 2024-08-05
 [0.5.0]: /../../tree/medea-jason-0.5.0
 
@@ -361,5 +376,6 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+[`derive_more`]: https://docs.rs/derive_more
 [Semantic Versioning 2.0.0]: https://semver.org
 [SFU]: https://webrtcglossary.com/sfu

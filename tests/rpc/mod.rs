@@ -372,9 +372,8 @@ mod transport_close_reason_on_drop {
         assert_eq!(
             close_reason,
             ClientDisconnect::RpcClientUnexpectedlyDropped,
-            "RpcClient sets RpcTransport close reason '{:?}' instead of \
-             'RpcClientUnexpectedlyDropped'.",
-            close_reason,
+            "`RpcClient` sets `RpcTransport` close reason '{close_reason:?}' \
+             instead of 'RpcClientUnexpectedlyDropped'",
         );
     }
 
@@ -402,9 +401,8 @@ mod transport_close_reason_on_drop {
         assert_eq!(
             close_reason,
             ClientDisconnect::RoomClosed,
-            "RpcClient sets RpcTransport close reason '{:?}' instead of \
-             'RoomClosed'.",
-            close_reason,
+            "`RpcClient` sets `RpcTransport` close reason '{close_reason:?}' \
+             instead of 'RoomClosed'",
         );
     }
 }

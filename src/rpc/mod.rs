@@ -84,7 +84,7 @@ impl ConnectionInfo {
 #[cause(error = platform::Error)]
 pub enum ConnectionInfoParseError {
     /// [`Url::parse`] returned error.
-    #[display("Failed to parse provided URL: {}", _0)]
+    #[display("Failed to parse provided URL: {_0}")]
     UrlParse(url::ParseError),
 
     /// Provided URL doesn't have important segments.
@@ -152,7 +152,7 @@ pub enum CloseReason {
     ByServer(CloseByServerReason),
 
     /// Closed by client.
-    #[display("{}", reason)]
+    #[display("{reason}")]
     ByClient {
         /// Reason of closing.
         reason: ClientDisconnect,
@@ -200,7 +200,7 @@ pub enum ConnectionLostReason {
 #[cause(error = platform::Error)]
 pub enum RpcClientError {
     /// Occurs if WebSocket connection to remote media server failed.
-    #[display("Connection failed: {}", _0)]
+    #[display("Connection failed: {_0}")]
     RpcTransportError(#[cause] platform::TransportError),
 
     /// Occurs if [`Weak`] pointer to the [`WebSocketRpcClient`] can't be
@@ -208,11 +208,11 @@ pub enum RpcClientError {
     ///
     /// [`Rc`]: std::rc::Rc
     /// [`Weak`]: std::rc::Weak
-    #[display("RpcClient unexpectedly gone.")]
+    #[display("RpcClient unexpectedly gone")]
     RpcClientGone,
 
     /// Occurs if [`WebSocketRpcClient::connect`] fails.
-    #[display("Connection failed. {:?}", _0)]
+    #[display("Connection failed: {_0:?}")]
     ConnectionFailed(ClosedStateReason),
 }
 
@@ -223,14 +223,14 @@ pub enum CloseMsg {
     ///
     /// Determines by close code `1000` and existence of
     /// [`CloseByServerReason`].
-    #[display("Normal. Code: {}, Reason: {}", _0, _1)]
+    #[display("Normal. Code: {_0}, Reason: {_1}")]
     Normal(u16, CloseByServerReason),
 
     /// Connection was unexpectedly closed. Consider reconnecting.
     ///
     /// Unexpected close determines by non-`1000` close code and for close code
     /// `1000` without reason.
-    #[display("Abnormal. Code: {}", _0)]
+    #[display("Abnormal. Code: {_0}")]
     Abnormal(u16),
 }
 
