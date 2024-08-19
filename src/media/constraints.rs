@@ -28,19 +28,19 @@ use crate::{
 #[repr(u8)]
 pub enum FacingMode {
     /// Facing towards a user (a self-view camera).
-    #[display(fmt = "user")]
+    #[display("user")]
     User = 0,
 
     /// Facing away from a user (viewing an environment).
-    #[display(fmt = "environment")]
+    #[display("environment")]
     Environment = 1,
 
     /// Facing to the left of a user.
-    #[display(fmt = "left")]
+    #[display("left")]
     Left = 2,
 
     /// Facing to the right of a user.
-    #[display(fmt = "right")]
+    #[display("right")]
     Right = 3,
 }
 

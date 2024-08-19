@@ -1,8 +1,8 @@
 //! Connection loss detection via ping/pong mechanism.
 
-use std::{cell::RefCell, fmt, rc::Rc, time::Duration};
+use std::{cell::RefCell, rc::Rc, time::Duration};
 
-use derive_more::Mul;
+use derive_more::{Debug, Mul};
 use futures::{channel::mpsc, future, stream::LocalBoxStream, StreamExt as _};
 use medea_client_api_proto::{ClientMsg, ServerMsg};
 
@@ -11,7 +11,7 @@ use crate::{platform, utils::TaskHandle};
 /// Idle timeout of [`WebSocketRpcClient`].
 ///
 /// [`WebSocketRpcClient`]: super::WebSocketRpcClient
-#[derive(Debug, Copy, Clone)]
+#[derive(Clone, Copy, Debug)]
 pub struct IdleTimeout(pub Duration);
 
 /// Ping interval of [`WebSocketRpcClient`].
@@ -21,8 +21,10 @@ pub struct IdleTimeout(pub Duration);
 pub struct PingInterval(pub Duration);
 
 /// Inner data of [`Heartbeat`].
+#[derive(Debug)]
 struct Inner {
     /// [`platform::RpcTransport`] which heartbeats.
+    #[debug("{transport:p}")]
     transport: Rc<dyn platform::RpcTransport>,
 
     /// Idle timeout of the [`platform::RpcTransport`].
@@ -45,19 +47,6 @@ struct Inner {
 
     /// [`mpsc::UnboundedSender`]s for a [`Heartbeat::on_idle`].
     on_idle_subs: Vec<mpsc::UnboundedSender<()>>,
-}
-
-impl fmt::Debug for Inner {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Inner")
-            .field("idle_timeout", &self.idle_timeout)
-            .field("ping_interval", &self.ping_interval)
-            .field("handle_ping_task", &self.handle_ping_task)
-            .field("idle_watchdog_task", &self.idle_watchdog_task)
-            .field("last_ping_num", &self.last_ping_num)
-            .field("on_idle_subs", &self.on_idle_subs)
-            .finish_non_exhaustive()
-    }
 }
 
 impl Inner {

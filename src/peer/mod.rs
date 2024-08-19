@@ -684,13 +684,11 @@ impl PeerConnection {
             self.peer.ice_connection_state(),
         );
 
-        if let Some(peer_connection_state) = self.peer.connection_state() {
-            Self::on_connection_state_changed(
-                self.id,
-                &self.peer_events_sender,
-                peer_connection_state,
-            );
-        }
+        Self::on_connection_state_changed(
+            self.id,
+            &self.peer_events_sender,
+            self.peer.connection_state(),
+        );
     }
 
     /// Marks [`PeerConnection`] to trigger ICE restart.

@@ -9,7 +9,7 @@ use js_sys::{Object, Reflect};
 ///
 /// __Use it only in [`js_callback`]'s closures.__
 macro_rules! cb_assert_eq {
-    ($a:expr, $b:expr) => {
+    ($a:expr, $b:expr$(,)?) => {
         if $a != $b {
             return Err(format!("{:?} != {:?}", $a, $b));
         }
@@ -312,7 +312,7 @@ fn local_constraints(
 
 /// Waits for [`Result`] from [`oneshot::Receiver`] with tests result.
 ///
-/// Also it will check result of test and will panic if some error will be
+/// Also, it will check result of test and will panic if some error will be
 /// found.
 async fn wait_and_check_test_result(
     rx: oneshot::Receiver<Result<(), String>>,
@@ -323,8 +323,8 @@ async fn wait_and_check_test_result(
     finally();
     match result {
         Either::Left((oneshot_fut_result, _)) => {
-            let assert_result = oneshot_fut_result.expect("Cancelled.");
-            assert_result.expect("Assertion failed");
+            let assert_result = oneshot_fut_result.expect("cancelled");
+            assert_result.expect("assertion failed");
         }
         Either::Right(_) => {
             panic!("callback didn't fired");

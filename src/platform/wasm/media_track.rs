@@ -101,8 +101,8 @@ impl MediaStreamTrack {
             web_sys::MediaStreamTrackState::Ended => {
                 MediaStreamTrackState::Ended
             }
-            web_sys::MediaStreamTrackState::__Nonexhaustive => {
-                unreachable!("Unknown `MediaStreamTrackState`: {state:?}")
+            _ => {
+                unreachable!("unknown `MediaStreamTrackState`: {state:?}")
             }
         }
     }

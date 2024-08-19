@@ -18,8 +18,8 @@ impl From<web_sys::MediaDeviceKind> for MediaDeviceKind {
             web_sys::MediaDeviceKind::Audioinput => Self::AudioInput,
             web_sys::MediaDeviceKind::Videoinput => Self::VideoInput,
             web_sys::MediaDeviceKind::Audiooutput => Self::AudioOutput,
-            web_sys::MediaDeviceKind::__Nonexhaustive => {
-                unreachable!("Unknown MediaDeviceKind::{value:?}")
+            _ => {
+                unreachable!("unknown `MediaDeviceKind::{value:?}`")
             }
         }
     }
