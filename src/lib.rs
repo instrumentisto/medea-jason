@@ -152,8 +152,6 @@
     clippy::unnecessary_safety_doc,
     unreachable_pub
 )]
-// TODO: Remove on next `derive_more` major version.
-#![allow(clippy::uninlined_format_args, clippy::use_debug)]
 
 #[macro_use]
 pub mod utils;

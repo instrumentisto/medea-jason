@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.6.1] · Unreleased
+## [0.6.1] · unreleased
 [0.6.1]: /../../tree/medea-client-api-proto-0.6.1/proto/client-api
 
 ### Upgraded
@@ -233,5 +233,5 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-
+[`derive-more`]: https://docs.rs/derive_more
 [Semantic Versioning 2.0.0]: https://semver.org

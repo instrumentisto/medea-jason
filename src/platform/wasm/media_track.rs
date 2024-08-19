@@ -102,7 +102,7 @@ impl MediaStreamTrack {
                 MediaStreamTrackState::Ended
             }
             _ => {
-                unreachable!("Unknown `MediaStreamTrackState`: {state:?}")
+                unreachable!("unknown `MediaStreamTrackState`: {state:?}")
             }
         }
     }

@@ -10,7 +10,7 @@ pub mod tracks_store;
 
 use std::{marker::PhantomData, sync::mpsc};
 
-use derive_more::{Display, Error as DeriveError, From};
+use derive_more::{Display, Error as StdError, From};
 use serde_json::Value as Json;
 use tokio::task;
 use uuid::Uuid;
@@ -23,7 +23,7 @@ pub use self::{
 };
 
 /// All errors which can happen while working with [`Object`]s.
-#[derive(Debug, Display, DeriveError, From)]
+#[derive(Debug, Display, From, StdError)]
 pub enum Error {
     /// Error while interacting with a browser.
     Browser(browser::Error),

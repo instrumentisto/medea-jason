@@ -85,7 +85,7 @@ impl AsRef<endpoint::Id> for Id {
 /// [`Element`]: crate::Element
 /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
 #[derive(Clone, Debug, Display, Eq, PartialEq)]
-#[display("local://{}/{}/{}", room_id, member_id, endpoint_id)]
+#[display("local://{room_id}/{member_id}/{endpoint_id}")]
 pub struct LocalSrcUri {
     /// ID of the [`Room`].
     ///
@@ -178,23 +178,23 @@ impl Serialize for LocalSrcUri {
 #[derive(Debug, Display, Error)]
 pub enum LocalSrcUriParseError {
     /// Protocol of the provided URI is not `local://`.
-    #[display("Provided URI protocol is not `local://`: {}", _0)]
+    #[display("Provided URI protocol is not `local://`: {_0}")]
     NotLocal(#[error(not(source))] Box<str>),
 
     /// Too many paths in the provided URI.
     ///
     /// `local://room_id/member_id/endpoint_id/redundant_path` for example.
-    #[display("Too many paths in URI: {}", _0)]
+    #[display("Too many paths in URI: {_0}")]
     TooManyPaths(#[error(not(source))] Box<str>),
 
     /// Some paths are missing in the provided URI.
     ///
     /// `local://room_id//qwerty` for example.
-    #[display("Missing paths in URI: {}", _0)]
+    #[display("Missing paths in URI: {_0}")]
     MissingPaths(#[error(not(source))] Box<str>),
 
     /// Error of parsing the provided URI.
-    #[display("Cannot parse provided URI `{}`: {}", _0, _1)]
+    #[display("Cannot parse provided URI `{_0}`: {_1}")]
     UrlParseErr(Box<str>, #[error(source)] url::ParseError),
 
     /// Provided URI is empty.

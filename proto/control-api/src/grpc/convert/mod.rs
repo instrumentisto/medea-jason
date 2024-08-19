@@ -24,13 +24,13 @@ pub enum ProtobufError {
     /// [`Element`]: crate::Element
     /// [`LocalSrcUri`]: crate::endpoint::web_rtc_play::LocalSrcUri
     /// [`WebRtcPlay`]: crate::endpoint::WebRtcPlay
-    #[display("Source URI parse error: {}", _0)]
+    #[display("Source URI parse error: {_0}")]
     LocalSrcUriParseErr(LocalSrcUriParseError),
 
     /// [`Element`] is expected to be of another type.
     ///
     /// [`Element`]: crate::Element
-    #[display("`{}` media element expected to be of type `{}`", _1, _0)]
+    #[display("`{_1}` media element expected to be of type `{_0}`")]
     #[from(ignore)]
     ExpectedElement(&'static str, Box<str>),
 
@@ -44,14 +44,14 @@ pub enum ProtobufError {
     ///
     /// [`Element`]: crate::Element
     /// [`Fid`]: crate::Fid
-    #[display("Expected media element for `{}`, but none specified", _0)]
+    #[display("Expected media element for `{_0}`, but none specified")]
     #[from(ignore)]
     NoElementForId(#[error(not(source))] Box<str>),
 
     /// Error of parsing a [`CallbackUrl`].
     ///
     /// [`CallbackUrl`]: super::CallbackUrl
-    #[display("gRPC callback URL parse error: {}", _0)]
+    #[display("gRPC callback URL parse error: {_0}")]
     CallbackUrlParseErr(CallbackUrlParseError),
 
     /// Some [`Element`] specifies invalid [`Duration`].
@@ -59,9 +59,7 @@ pub enum ProtobufError {
     /// [`Duration`]: std::time::Duration
     /// [`Element`]: crate::Element
     #[display(
-        "`Element(id: {})` specifies field `{}` with invalid duration",
-        _0,
-        _1
+        "`Element(id: {_0})` specifies field `{_1}` with invalid duration"
     )]
     #[from(ignore)]
     InvalidDuration(Box<str>, &'static str),
@@ -69,13 +67,13 @@ pub enum ProtobufError {
     /// Error of parsing a [`Fid`].
     ///
     /// [`Fid`]: crate::Fid
-    #[display("FID parse error: {}", _0)]
+    #[display("FID parse error: {_0}")]
     ParseFidErr(ParseFidError),
 
     /// Error of parsing a [`DateTime`].
     ///
     /// [`DateTime`]: time::OffsetDateTime
-    #[display("`DateTime` parse error: {}", _0)]
+    #[display("`DateTime` parse error: {_0}")]
     TimeParseErr(time::error::Parse),
 
     /// Such API call is unimplemented.

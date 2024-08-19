@@ -2,7 +2,7 @@
 name = "medea-jason"
 version = "0.5.1-dev"
 edition = "2021"
-rust-version = "1.65"
+rust-version = "1.75"
 description = "Client library for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "MPL-2.0"
@@ -41,7 +41,7 @@ async-trait = "0.1"
 backoff = { version = "0.4", features = ["futures"] }
 bitflags = "2.6"
 derivative = "2.2"
-derive_more = { version = "1.0", features = ["display", "from", "into", "as_ref", "deref", "mul"] }
+derive_more = { version = "1.0", features = ["as_ref", "debug", "deref", "display", "from", "into", "mul"] }
 futures = "0.3"
 log = "0.4"
 medea-client-api-proto = { version = "0.6.1-dev", path = "proto/client-api" }
@@ -98,8 +98,9 @@ wee_alloc = { version = "0.4", optional = true }
         "RtcIceServer",
         "RtcIceTransportPolicy",
         "RtcOfferOptions",
-        "RtcPeerConnection", "RtcPeerConnectionIceEvent",
-        "RtcPeerConnectionIceErrorEvent", "RtcPeerConnectionState",
+        "RtcPeerConnection",
+        "RtcPeerConnectionIceEvent", "RtcPeerConnectionIceErrorEvent",
+        "RtcPeerConnectionState",
         "RtcRtpCapabilities",
         "RtcRtpCodecParameters",
         "RtcRtpEncodingParameters",

@@ -1429,9 +1429,8 @@ mod rpc_close_reason_on_room_drop {
         assert_eq!(
             close_reason,
             ClientDisconnect::RoomUnexpectedlyDropped,
-            "Room sets RPC close reason '{:?} instead of \
-             'RoomUnexpectedlyDropped'.",
-            close_reason,
+            "`Room` sets RPC close reason '{close_reason:?} instead of \
+             'RoomUnexpectedlyDropped'",
         )
     }
 
@@ -1459,8 +1458,8 @@ mod rpc_close_reason_on_room_drop {
         assert_eq!(
             close_reason,
             ClientDisconnect::RoomClosed,
-            "Room sets RPC close reason '{:?}' instead of 'RoomClosed.",
-            close_reason,
+            "`Room` sets RPC close reason '{close_reason:?}' instead of \
+             'RoomClosed",
         );
     }
 }
@@ -2192,8 +2191,7 @@ async fn set_media_state_return_media_error() {
         err.message(),
         format!(
             "Failed to get local tracks: MediaDevices.getUserMedia() failed: \
-             Error: {}",
-            ERROR_MSG
+             Error: {ERROR_MSG}",
         )
     );
 
@@ -2638,12 +2636,10 @@ mod set_local_media_settings {
                 .await
                 .is_ok(),
                 is_should_be_ok,
-                "audio_required: {}; add_audio: {}; video_required: {}; \
-                 add_video: {}",
-                audio_required,
-                add_audio,
-                video_required,
-                add_video,
+                "audio_required: {audio_required}; \
+                 add_audio: {add_audio}; \
+                 video_required: {video_required}; \
+                 add_video: {add_video}",
             );
 
             timeout(1000, test_rx)

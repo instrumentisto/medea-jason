@@ -6,21 +6,6 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.2.1] · Unreleased
-[0.2.1]: https://github.com/instrumentisto/medea/tree/medea-control-api-mock-0.2.1/mock/control-api
-
-[Diff](https://github.com/instrumentisto/medea/compare/medea-control-api-mock-0.2.0...medea-control-api-mock-0.2.1)
-
-### Upgraded
-
-- Dependencies:
-  - [`derive-more`] to `1.0` ([#181]).
-
-[#181]: /../../pull/181
-
-
-
-
 ## [0.2.0] · 2021-04-09
 [0.2.0]: https://github.com/instrumentisto/medea/tree/medea-control-api-mock-0.2.0/mock/control-api
 

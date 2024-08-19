@@ -1,6 +1,6 @@
 //! HTTP client interacting with Medea via its Control API.
 
-use derive_more::{Display, Error as DeriveError, From};
+use derive_more::{Display, Error as StdError, From};
 use medea_control_api_mock::{
     api::Response,
     callback::CallbackItem,
@@ -8,7 +8,7 @@ use medea_control_api_mock::{
 };
 
 /// All errors which can happen while working with a Control API.
-#[derive(Debug, Display, DeriveError, From)]
+#[derive(Debug, Display, From, StdError)]
 pub enum Error {
     Reqwest(reqwest::Error),
 }

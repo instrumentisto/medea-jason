@@ -1,8 +1,8 @@
 //! Medea media server member representation.
 
-use std::{cell::RefCell, collections::HashMap, env, fmt, time::Duration};
+use std::{cell::RefCell, collections::HashMap, env, time::Duration};
 
-use derive_more::{Display, Error as DeriveError, From};
+use derive_more::{Debug, Display, Error as StdError, From};
 use medea_e2e::{
     browser::{mock, Statement, Window},
     object::{
@@ -14,7 +14,7 @@ use medea_e2e::{
 use crate::conf;
 
 /// All errors which can happen while working with a [`Member`].
-#[derive(Debug, Display, DeriveError, From)]
+#[derive(Debug, Display, From, StdError)]
 pub enum Error {
     /// [`Room`] or a [`ConnectionStore`] object errored.
     Object(object::Error),
@@ -65,6 +65,7 @@ impl Builder {
 }
 
 /// [`Object`] representing a `Member` connected to a media server.
+#[derive(Debug)]
 pub struct Member {
     /// ID of this [`Member`] on a media server.
     id: String,
@@ -89,35 +90,29 @@ pub struct Member {
     ///
     /// If value is `true` then this [`MediaKind`] and [`MediaSourceKind`] is
     /// enabled.
+    #[debug(skip)]
     send_state: RefCell<HashMap<(MediaKind, MediaSourceKind), bool>>,
 
     /// Media receiving state of this [`Member`].
     ///
     /// If value is `true` then this [`MediaKind`] and [`MediaSourceKind`] is
     /// enabled.
+    #[debug(skip)]
     recv_state: RefCell<HashMap<(MediaKind, MediaSourceKind), bool>>,
 
     /// [`Room`]'s [`Object`] that this [`Member`] is intended to join.
+    #[debug(skip)]
     room: Object<Room>,
 
     /// Storage of [`Connection`]s thrown by this [`Member`]'s [`Room`].
     ///
     /// [`Connection`]: object::connection::Connection
+    #[debug(skip)]
     connection_store: Object<ConnectionStore>,
 
     /// [`Window`] in which this [`Member`] is exists.
+    #[debug(skip)]
     window: Window,
-}
-
-impl fmt::Debug for Member {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Member")
-            .field("id", &self.id)
-            .field("is_send", &self.is_send)
-            .field("is_recv", &self.is_recv)
-            .field("is_joined", &self.is_joined)
-            .finish_non_exhaustive()
-    }
 }
 
 impl Member {

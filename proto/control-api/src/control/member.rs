@@ -106,7 +106,7 @@ pub struct Spec {
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
 #[from(&str, String)]
-#[into(owned(String))]
+#[into(String)]
 #[repr(transparent)]
 pub struct Id(Box<str>);
 
@@ -194,13 +194,13 @@ pub enum ParseSidError {
     /// `ws://localhost:8080/ws//qwerty`, for example.
     ///
     /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
-    #[display("Missing paths in URI: {}", _0)]
+    #[display("Missing paths in URI: {_0}")]
     MissingPaths(#[error(not(source))] Box<str>),
 
     /// Error of parsing the provided [URI].
     ///
     /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
-    #[display("Cannot parse provided URI `{}`: {}", _0, _1)]
+    #[display("Cannot parse provided URI `{_0}`: {_1}")]
     InvalidUrl(Box<str>, #[error(source)] url::ParseError),
 }
 
@@ -294,5 +294,5 @@ impl Credentials {
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
 #[from(&str, String)]
-#[into(owned(String))]
+#[into(String)]
 pub struct PlainCredentials(Box<str>); // TODO: Use `secrecy` crate.

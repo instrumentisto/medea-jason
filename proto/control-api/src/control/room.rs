@@ -73,7 +73,7 @@ pub enum PipelineSpec {
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
 #[from(&str, String)]
-#[into(owned(String))]
+#[into(String)]
 #[repr(transparent)]
 pub struct Id(Box<str>);
 

@@ -21,7 +21,7 @@ use crate::{
 };
 
 /// Fid to `Room` element.
-#[derive(Clone, Debug, AsRef, From, Into)]
+#[derive(AsRef, Clone, Debug, From, Into)]
 #[as_ref(forward)]
 pub struct Fid(String);
 

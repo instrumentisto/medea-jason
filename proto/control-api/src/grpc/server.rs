@@ -22,9 +22,6 @@ use crate::{
 };
 
 /// [`Box`]ed [`Error`] with [`Send`] and [`Sync`].
-///
-/// [`Error`]: std::error::Error
-#[allow(clippy::absolute_paths)] // intentional
 type StdError = Box<dyn Error + Send + Sync + 'static>;
 
 #[async_trait]
@@ -199,12 +196,12 @@ pub enum CallbackApiClientError {
     /// [gRPC] server errored.
     ///
     /// [gRPC]: https://grpc.io
-    #[display("gRPC server errored: {}", _0)]
+    #[display("gRPC server errored: {_0}")]
     Tonic(tonic::Status),
 
     /// Failed to convert from [gRPC] response.
     ///
     /// [gRPC]: https://grpc.io
-    #[display("Failed to convert from gRPC response: {}", _0)]
+    #[display("Failed to convert from gRPC response: {_0}")]
     InvalidProtobuf(ProtobufError),
 }

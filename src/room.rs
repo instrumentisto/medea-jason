@@ -3,14 +3,13 @@
 use std::{
     cell::RefCell,
     collections::{HashMap, HashSet},
-    fmt,
     future::Future,
     rc::{Rc, Weak},
 };
 
 use async_recursion::async_recursion;
 use async_trait::async_trait;
-use derive_more::{Display, From};
+use derive_more::{Debug, Display, From};
 use futures::{
     channel::mpsc, future, future::LocalBoxFuture, FutureExt as _,
     StreamExt as _, TryFutureExt as _,
@@ -121,16 +120,16 @@ pub enum RoomJoinError {
     Detached,
 
     /// Returned if the mandatory callback wasn't set.
-    #[display("`{}` callback isn't set.", _0)]
+    #[display("`{_0}` callback isn't set")]
     #[from(ignore)]
     CallbackNotSet(&'static str),
 
     /// [`ConnectionInfo`] parsing failed.
-    #[display("Failed to parse ConnectionInfo: {}", _0)]
+    #[display("Failed to parse `ConnectionInfo`: {_0}")]
     ConnectionInfoParse(ConnectionInfoParseError),
 
     /// [`RpcSession`] returned [`SessionError`].
-    #[display("WebSocketSession error occurred: {}", _0)]
+    #[display("`WebSocketSession` error occurred: {_0}")]
     SessionError(#[cause] SessionError),
 }
 
@@ -147,7 +146,7 @@ pub struct HandleDetachedError;
 #[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
-    #[display("RoomHandle is in detached state")]
+    #[display("`RoomHandle` is in detached state")]
     Detached,
 
     /// Validating [`TracksRequest`] doesn't pass.
@@ -174,9 +173,8 @@ pub enum ChangeMediaStateError {
     ///
     /// [`Sender`]: peer::media::Sender
     #[display(
-        "MediaState of Sender transits to opposite ({}) of the \
-               requested MediaExchangeState",
-        _0
+        "`MediaState` of `Sender` transits to opposite ({_0}) of the \
+         requested `MediaExchangeState`"
     )]
     TransitionIntoOppositeState(MediaState),
 }
@@ -955,8 +953,10 @@ impl Room {
 /// Actual data of a [`Room`].
 ///
 /// Shared between an external [`RoomHandle`] and Rust side ([`Room`]).
+#[derive(Debug)]
 struct InnerRoom {
     /// Client to talk with media server via Client API RPC.
+    #[debug(skip)]
     rpc: Rc<dyn RpcSession>,
 
     /// Constraints to local [`local::Track`]s that are being published by
@@ -1002,23 +1002,6 @@ struct InnerRoom {
     /// Note that `None` will be considered as error and `is_err` will be
     /// `true` in [`CloseReason`] provided to callback.
     close_reason: RefCell<CloseReason>,
-}
-
-impl fmt::Debug for InnerRoom {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("InnerRoom")
-            .field("send_constraints", &self.send_constraints)
-            .field("recv_constraints", &self.recv_constraints)
-            .field("peers", &self.peers)
-            .field("media_manager", &self.media_manager)
-            .field("connections", &self.connections)
-            .field("on_local_track", &self.on_local_track)
-            .field("on_failed_local_media", &self.on_failed_local_media)
-            .field("on_connection_loss", &self.on_connection_loss)
-            .field("on_close", &self.on_close)
-            .field("close_reason", &self.close_reason)
-            .finish_non_exhaustive()
-    }
 }
 
 /// Errors occurring in [`RoomHandle::set_local_media_settings()`] method.
@@ -1569,7 +1552,7 @@ impl InnerRoom {
 /// Error of a [`RpcEvent`] containing a [`PeerId`] that a [`Room`] is not aware
 /// of.
 #[derive(Clone, Copy, Debug, Display)]
-#[display("Peer with id {} doesnt exist", _0)]
+#[display("Peer with id {_0} doesnt exist")]
 struct UnknownPeerIdError(PeerId);
 
 /// RPC events handling.
