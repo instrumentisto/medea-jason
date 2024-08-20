@@ -11,8 +11,8 @@ import 'room.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<JasonHandle>>
-abstract class JasonHandle implements RustOpaqueInterface {
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Jason>>
+abstract class Jason implements RustOpaqueInterface {
   /// Closes the provided [`RoomHandle`].
   void jasonCloseRoom({required RoomHandle roomToDelete});
 
@@ -27,7 +27,7 @@ abstract class JasonHandle implements RustOpaqueInterface {
   /// Returns a [`MediaManagerHandle`].
   MediaManagerHandle jasonMediaManager();
 
-  factory JasonHandle({required PlatformInt64 dartHandlerPort}) =>
+  factory Jason({required PlatformInt64 dartHandlerPort}) =>
       RustLib.instance.api
-          .crateApiDartApiJasonJasonHandleNew(dartHandlerPort: dartHandlerPort);
+          .crateApiDartApiJasonJasonNew(dartHandlerPort: dartHandlerPort);
 }

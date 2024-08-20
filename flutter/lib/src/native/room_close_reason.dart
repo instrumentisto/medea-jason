@@ -11,17 +11,17 @@ class NativeRoomCloseReason implements RoomCloseReason {
 
   @override
   String reason() {
-    return _closeReason.reason();
+    return _closeReason.reason;
   }
 
   @override
   bool isClosedByServer() {
-    return _closeReason.isClosedByServer();
+    return _closeReason.isClosedByServer;
   }
 
   @override
   bool isErr() {
-    return _closeReason.isErr();
+    return _closeReason.isErr;
   }
 
   @override

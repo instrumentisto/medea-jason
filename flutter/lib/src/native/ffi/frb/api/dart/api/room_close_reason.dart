@@ -6,12 +6,26 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import '../../../frb_generated.dart';
-import '../api.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomCloseReason>>
-abstract class RoomCloseReason implements RustOpaqueInterface, ForeignClass {
+/// Reason of why a [`Room`] is closed.
+class RoomCloseReason {
+  /// Returns the [`Room`]'s close reason.
+  final String reason;
+
+  /// Indicates whether the [`Room`] was closed by server.
+  final bool isClosedByServer;
+
+  /// Indicates whether the [`Room`] close reason is considered as an error.
+  final bool isErr;
+
+  const RoomCloseReason({
+    required this.reason,
+    required this.isClosedByServer,
+    required this.isErr,
+  });
+
   /// Constructs a [`ForeignClass`] from the given raw pointer via
   /// [`Box::from_raw()`].
   ///
@@ -21,18 +35,16 @@ abstract class RoomCloseReason implements RustOpaqueInterface, ForeignClass {
   static RoomCloseReason fromPtr({required int ptr}) => RustLib.instance.api
       .crateApiDartApiRoomCloseReasonRoomCloseReasonFromPtr(ptr: ptr);
 
-  /// Indicates whether the [`Room`] was closed by server.
-  ///
-  /// [`Room`]: room::Room
-  bool isClosedByServer();
+  @override
+  int get hashCode =>
+      reason.hashCode ^ isClosedByServer.hashCode ^ isErr.hashCode;
 
-  /// Indicates whether the [`Room`] close reason is considered as an error.
-  ///
-  /// [`Room`]: room::Room
-  bool isErr();
-
-  /// Returns the [`Room`]'s close reason.
-  ///
-  /// [`Room`]: room::Room
-  String reason();
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RoomCloseReason &&
+          runtimeType == other.runtimeType &&
+          reason == other.reason &&
+          isClosedByServer == other.isClosedByServer &&
+          isErr == other.isErr;
 }

@@ -98,7 +98,7 @@ ExternalLibrary _dlLoad() {
 
 class Jason implements base.Jason {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late frb.JasonHandle opaque;
+  late frb.Jason opaque;
 
   /// Creates a new instance of [Jason].
   static Future<Jason> init() async {
@@ -120,7 +120,7 @@ class Jason implements base.Jason {
     var port =
         // ignore: invalid_use_of_internal_member
         ((RustLib.instance.api) as BaseApiImpl).portManager.dartHandlerPort;
-    jason.opaque = frb.JasonHandle(dartHandlerPort: port);
+    jason.opaque = frb.Jason(dartHandlerPort: port);
     RustHandlesStorage().insertHandle(jason);
 
     return jason;

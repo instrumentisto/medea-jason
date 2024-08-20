@@ -8,13 +8,13 @@ use crate::{
 
 #[derive(Debug, From)]
 #[frb(opaque)]
-pub struct JasonHandle(jason::Jason);
+pub struct Jason(jason::Jason);
 
 // Only used on single thread
-unsafe impl Send for JasonHandle {}
-unsafe impl Sync for JasonHandle {}
+unsafe impl Send for Jason {}
+unsafe impl Sync for Jason {}
 
-impl JasonHandle {
+impl Jason {
     #[frb(sync)]
     pub fn new(dart_handler_port: i64) -> Self {
         unsafe {

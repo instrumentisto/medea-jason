@@ -38,8 +38,8 @@ pub use crate::media::MediaDirection;
 
 pub use self::{
     api::{
-        ConnectionHandle, LocalMediaTrack, MediaManagerHandle, ReconnectHandle,
-        RemoteMediaTrack, RoomCloseReason, RoomHandle,
+        ConnectionHandle, Jason, LocalMediaTrack, MediaManagerHandle,
+        ReconnectHandle, RemoteMediaTrack, RoomCloseReason, RoomHandle,
     },
     err::DartError as Error,
 };

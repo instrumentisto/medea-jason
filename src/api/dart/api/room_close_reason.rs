@@ -1,43 +1,33 @@
 //! Reason of a [`Room`] closing.
-//!
-//! [`Room`]: room::Room
 
 use derive_more::From;
 use flutter_rust_bridge::frb;
 
 use crate::{api::dart::api::ForeignClass, room as core};
 
+#[cfg(doc)]
+use crate::room::Room;
+
 /// Reason of why a [`Room`] is closed.
 #[derive(Debug, From)]
-#[frb(opaque)]
-pub struct RoomCloseReason(core::RoomCloseReason);
-
-impl RoomCloseReason {
+pub struct RoomCloseReason {
     /// Returns the [`Room`]'s close reason.
-    ///
-    /// [`Room`]: room::Room
-    #[frb(sync)]
-    #[must_use]
-    pub fn reason(&self) -> String {
-        self.0.reason()
-    }
+    pub reason: String,
 
     /// Indicates whether the [`Room`] was closed by server.
-    ///
-    /// [`Room`]: room::Room
-    #[frb(sync)]
-    #[must_use]
-    pub fn is_closed_by_server(&self) -> bool {
-        self.0.is_closed_by_server()
-    }
+    pub is_closed_by_server: bool,
 
     /// Indicates whether the [`Room`] close reason is considered as an error.
-    ///
-    /// [`Room`]: room::Room
-    #[frb(sync)]
-    #[must_use]
-    pub fn is_err(&self) -> bool {
-        self.0.is_err()
+    pub is_err: bool,
+}
+
+impl From<core::RoomCloseReason> for RoomCloseReason {
+    fn from(r: core::RoomCloseReason) -> Self {
+        Self {
+            reason: r.reason,
+            is_closed_by_server: r.is_closed_by_server,
+            is_err: r.is_err,
+        }
     }
 }
 

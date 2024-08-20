@@ -71,7 +71,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.2.0';
 
   @override
-  int get rustContentHash => 562002844;
+  int get rustContentHash => -1487711878;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -120,19 +120,17 @@ abstract class RustLibApi extends BaseApi {
   void crateApiDartApiConnectionHandleConnectionHandleOnRemoteTrackAdded(
       {required ConnectionHandle that, required Object f});
 
-  void crateApiDartApiJasonJasonHandleJasonCloseRoom(
-      {required JasonHandle that, required RoomHandle roomToDelete});
+  void crateApiDartApiJasonJasonJasonCloseRoom(
+      {required Jason that, required RoomHandle roomToDelete});
 
-  void crateApiDartApiJasonJasonHandleJasonDispose({required JasonHandle that});
+  void crateApiDartApiJasonJasonJasonDispose({required Jason that});
 
-  RoomHandle crateApiDartApiJasonJasonHandleJasonInitRoom(
-      {required JasonHandle that});
+  RoomHandle crateApiDartApiJasonJasonJasonInitRoom({required Jason that});
 
-  MediaManagerHandle crateApiDartApiJasonJasonHandleJasonMediaManager(
-      {required JasonHandle that});
+  MediaManagerHandle crateApiDartApiJasonJasonJasonMediaManager(
+      {required Jason that});
 
-  JasonHandle crateApiDartApiJasonJasonHandleNew(
-      {required PlatformInt64 dartHandlerPort});
+  Jason crateApiDartApiJasonJasonNew({required PlatformInt64 dartHandlerPort});
 
   Object crateApiDartApiLocalMediaTrackLocalMediaTrackFree(
       {required LocalMediaTrack that});
@@ -292,15 +290,6 @@ abstract class RustLibApi extends BaseApi {
   RoomCloseReason crateApiDartApiRoomCloseReasonRoomCloseReasonFromPtr(
       {required int ptr});
 
-  bool crateApiDartApiRoomCloseReasonRoomCloseReasonIsClosedByServer(
-      {required RoomCloseReason that});
-
-  bool crateApiDartApiRoomCloseReasonRoomCloseReasonIsErr(
-      {required RoomCloseReason that});
-
-  String crateApiDartApiRoomCloseReasonRoomCloseReasonReason(
-      {required RoomCloseReason that});
-
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_ConnectionHandle;
 
@@ -310,13 +299,11 @@ abstract class RustLibApi extends BaseApi {
   CrossPlatformFinalizerArg
       get rust_arc_decrement_strong_count_ConnectionHandlePtr;
 
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_JasonHandle;
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Jason;
 
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_JasonHandle;
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Jason;
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_JasonHandlePtr;
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_JasonPtr;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_LocalMediaTrack;
@@ -353,15 +340,6 @@ abstract class RustLibApi extends BaseApi {
 
   CrossPlatformFinalizerArg
       get rust_arc_decrement_strong_count_RemoteMediaTrackPtr;
-
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_RoomCloseReason;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_RoomCloseReason;
-
-  CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_RoomCloseReasonPtr;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_RoomHandle;
@@ -737,12 +715,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiJasonJasonHandleJasonCloseRoom(
-      {required JasonHandle that, required RoomHandle roomToDelete}) {
+  void crateApiDartApiJasonJasonJasonCloseRoom(
+      {required Jason that, required RoomHandle roomToDelete}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
             that, serializer);
         sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
             roomToDelete, serializer);
@@ -752,25 +730,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiDartApiJasonJasonHandleJasonCloseRoomConstMeta,
+      constMeta: kCrateApiDartApiJasonJasonJasonCloseRoomConstMeta,
       argValues: [that, roomToDelete],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiDartApiJasonJasonHandleJasonCloseRoomConstMeta =>
+  TaskConstMeta get kCrateApiDartApiJasonJasonJasonCloseRoomConstMeta =>
       const TaskConstMeta(
-        debugName: "JasonHandle_jason_close_room",
+        debugName: "Jason_jason_close_room",
         argNames: ["that", "roomToDelete"],
       );
 
   @override
-  void crateApiDartApiJasonJasonHandleJasonDispose(
-      {required JasonHandle that}) {
+  void crateApiDartApiJasonJasonJasonDispose({required Jason that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
             that, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
       },
@@ -778,25 +755,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiDartApiJasonJasonHandleJasonDisposeConstMeta,
+      constMeta: kCrateApiDartApiJasonJasonJasonDisposeConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiDartApiJasonJasonHandleJasonDisposeConstMeta =>
+  TaskConstMeta get kCrateApiDartApiJasonJasonJasonDisposeConstMeta =>
       const TaskConstMeta(
-        debugName: "JasonHandle_jason_dispose",
+        debugName: "Jason_jason_dispose",
         argNames: ["that"],
       );
 
   @override
-  RoomHandle crateApiDartApiJasonJasonHandleJasonInitRoom(
-      {required JasonHandle that}) {
+  RoomHandle crateApiDartApiJasonJasonJasonInitRoom({required Jason that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
             that, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
       },
@@ -805,25 +781,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiDartApiJasonJasonHandleJasonInitRoomConstMeta,
+      constMeta: kCrateApiDartApiJasonJasonJasonInitRoomConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiDartApiJasonJasonHandleJasonInitRoomConstMeta =>
+  TaskConstMeta get kCrateApiDartApiJasonJasonJasonInitRoomConstMeta =>
       const TaskConstMeta(
-        debugName: "JasonHandle_jason_init_room",
+        debugName: "Jason_jason_init_room",
         argNames: ["that"],
       );
 
   @override
-  MediaManagerHandle crateApiDartApiJasonJasonHandleJasonMediaManager(
-      {required JasonHandle that}) {
+  MediaManagerHandle crateApiDartApiJasonJasonJasonMediaManager(
+      {required Jason that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
             that, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
       },
@@ -832,22 +808,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiDartApiJasonJasonHandleJasonMediaManagerConstMeta,
+      constMeta: kCrateApiDartApiJasonJasonJasonMediaManagerConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta
-      get kCrateApiDartApiJasonJasonHandleJasonMediaManagerConstMeta =>
-          const TaskConstMeta(
-            debugName: "JasonHandle_jason_media_manager",
-            argNames: ["that"],
-          );
+  TaskConstMeta get kCrateApiDartApiJasonJasonJasonMediaManagerConstMeta =>
+      const TaskConstMeta(
+        debugName: "Jason_jason_media_manager",
+        argNames: ["that"],
+      );
 
   @override
-  JasonHandle crateApiDartApiJasonJasonHandleNew(
-      {required PlatformInt64 dartHandlerPort}) {
+  Jason crateApiDartApiJasonJasonNew({required PlatformInt64 dartHandlerPort}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -856,18 +830,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       },
       codec: SseCodec(
         decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle,
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiDartApiJasonJasonHandleNewConstMeta,
+      constMeta: kCrateApiDartApiJasonJasonNewConstMeta,
       argValues: [dartHandlerPort],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiDartApiJasonJasonHandleNewConstMeta =>
+  TaskConstMeta get kCrateApiDartApiJasonJasonNewConstMeta =>
       const TaskConstMeta(
-        debugName: "JasonHandle_new",
+        debugName: "Jason_new",
         argNames: ["dartHandlerPort"],
       );
 
@@ -2277,8 +2251,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 70)!;
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason,
+        decodeSuccessData: sse_decode_room_close_reason,
         decodeErrorData: null,
       ),
       constMeta: kCrateApiDartApiRoomCloseReasonRoomCloseReasonFromPtrConstMeta,
@@ -2290,90 +2263,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta
       get kCrateApiDartApiRoomCloseReasonRoomCloseReasonFromPtrConstMeta =>
           const TaskConstMeta(
-            debugName: "RoomCloseReason_from_ptr",
+            debugName: "room_close_reason_from_ptr",
             argNames: ["ptr"],
-          );
-
-  @override
-  bool crateApiDartApiRoomCloseReasonRoomCloseReasonIsClosedByServer(
-      {required RoomCloseReason that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 71)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta:
-          kCrateApiDartApiRoomCloseReasonRoomCloseReasonIsClosedByServerConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiDartApiRoomCloseReasonRoomCloseReasonIsClosedByServerConstMeta =>
-          const TaskConstMeta(
-            debugName: "RoomCloseReason_is_closed_by_server",
-            argNames: ["that"],
-          );
-
-  @override
-  bool crateApiDartApiRoomCloseReasonRoomCloseReasonIsErr(
-      {required RoomCloseReason that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 72)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiDartApiRoomCloseReasonRoomCloseReasonIsErrConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiDartApiRoomCloseReasonRoomCloseReasonIsErrConstMeta =>
-          const TaskConstMeta(
-            debugName: "RoomCloseReason_is_err",
-            argNames: ["that"],
-          );
-
-  @override
-  String crateApiDartApiRoomCloseReasonRoomCloseReasonReason(
-      {required RoomCloseReason that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 73)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiDartApiRoomCloseReasonRoomCloseReasonReasonConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiDartApiRoomCloseReasonRoomCloseReasonReasonConstMeta =>
-          const TaskConstMeta(
-            debugName: "RoomCloseReason_reason",
-            argNames: ["that"],
           );
 
   RustArcIncrementStrongCountFnType
@@ -2384,13 +2275,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       get rust_arc_decrement_strong_count_ConnectionHandle => wire
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle;
 
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_JasonHandle => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle;
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Jason =>
+      wire.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason;
 
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_JasonHandle => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle;
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Jason =>
+      wire.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_LocalMediaTrack => wire
@@ -2425,14 +2314,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack;
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_RoomCloseReason => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_RoomCloseReason => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason;
-
-  RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_RoomHandle => wire
           .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle;
 
@@ -2449,11 +2330,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  JasonHandle
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+  Jason
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return JasonHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return JasonImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -2489,14 +2370,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RoomCloseReason
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return RoomCloseReasonImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
   RoomHandle
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
           dynamic raw) {
@@ -2513,11 +2386,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  JasonHandle
-      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+  Jason
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return JasonHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return JasonImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -2553,14 +2426,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RoomCloseReason
-      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return RoomCloseReasonImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
   RoomHandle
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
           dynamic raw) {
@@ -2590,11 +2455,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  JasonHandle
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+  Jason
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return JasonHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return JasonImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -2627,14 +2492,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return RemoteMediaTrackImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
-  RoomCloseReason
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return RoomCloseReasonImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -3015,6 +2872,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RoomCloseReason dco_decode_room_close_reason(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return RoomCloseReason(
+      reason: dco_decode_String(arr[0]),
+      isClosedByServer: dco_decode_bool(arr[1]),
+      isErr: dco_decode_bool(arr[2]),
+    );
+  }
+
+  @protected
   int dco_decode_u_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
@@ -3048,11 +2918,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  JasonHandle
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+  Jason
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return JasonHandleImpl.frbInternalSseDecode(
+    return JasonImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -3093,15 +2963,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RoomCloseReason
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return RoomCloseReasonImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
-  }
-
-  @protected
   RoomHandle
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
           SseDeserializer deserializer) {
@@ -3120,11 +2981,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  JasonHandle
-      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+  Jason
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return JasonHandleImpl.frbInternalSseDecode(
+    return JasonImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -3165,15 +3026,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RoomCloseReason
-      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return RoomCloseReasonImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
-  }
-
-  @protected
   RoomHandle
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
           SseDeserializer deserializer) {
@@ -3206,11 +3058,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  JasonHandle
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
+  Jason
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return JasonHandleImpl.frbInternalSseDecode(
+    return JasonImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -3247,15 +3099,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return RemoteMediaTrackImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
-  }
-
-  @protected
-  RoomCloseReason
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return RoomCloseReasonImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -3701,6 +3544,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RoomCloseReason sse_decode_room_close_reason(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_reason = sse_decode_String(deserializer);
+    var var_isClosedByServer = sse_decode_bool(deserializer);
+    var var_isErr = sse_decode_bool(deserializer);
+    return RoomCloseReason(
+        reason: var_reason,
+        isClosedByServer: var_isClosedByServer,
+        isErr: var_isErr);
+  }
+
+  @protected
   int sse_decode_u_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint32();
@@ -3735,11 +3590,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
-          JasonHandle self, SseSerializer serializer) {
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
+          Jason self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as JasonHandleImpl).frbInternalSseEncode(move: true), serializer);
+        (self as JasonImpl).frbInternalSseEncode(move: true), serializer);
   }
 
   @protected
@@ -3784,16 +3639,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-          RoomCloseReason self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as RoomCloseReasonImpl).frbInternalSseEncode(move: true),
-        serializer);
-  }
-
-  @protected
-  void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
           RoomHandle self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3813,12 +3658,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
-          JasonHandle self, SseSerializer serializer) {
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
+          Jason self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as JasonHandleImpl).frbInternalSseEncode(move: false),
-        serializer);
+        (self as JasonImpl).frbInternalSseEncode(move: false), serializer);
   }
 
   @protected
@@ -3863,16 +3707,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-          RoomCloseReason self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as RoomCloseReasonImpl).frbInternalSseEncode(move: false),
-        serializer);
-  }
-
-  @protected
-  void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
           RoomHandle self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3908,11 +3742,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonHandle(
-          JasonHandle self, SseSerializer serializer) {
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
+          Jason self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as JasonHandleImpl).frbInternalSseEncode(move: null), serializer);
+        (self as JasonImpl).frbInternalSseEncode(move: null), serializer);
   }
 
   @protected
@@ -3952,16 +3786,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
         (self as RemoteMediaTrackImpl).frbInternalSseEncode(move: null),
-        serializer);
-  }
-
-  @protected
-  void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomCloseReason(
-          RoomCloseReason self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as RoomCloseReasonImpl).frbInternalSseEncode(move: null),
         serializer);
   }
 
@@ -4350,6 +4174,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_room_close_reason(
+      RoomCloseReason self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.reason, serializer);
+    sse_encode_bool(self.isClosedByServer, serializer);
+    sse_encode_bool(self.isErr, serializer);
+  }
+
+  @protected
   void sse_encode_u_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint32(self);
@@ -4463,32 +4296,32 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
 }
 
 @sealed
-class JasonHandleImpl extends RustOpaque implements JasonHandle {
+class JasonImpl extends RustOpaque implements Jason {
   // Not to be used by end users
-  JasonHandleImpl.frbInternalDcoDecode(List<dynamic> wire)
+  JasonImpl.frbInternalDcoDecode(List<dynamic> wire)
       : super.frbInternalDcoDecode(wire, _kStaticData);
 
   // Not to be used by end users
-  JasonHandleImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+  JasonImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
       : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_JasonHandle,
+        RustLib.instance.api.rust_arc_increment_strong_count_Jason,
     rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_JasonHandle,
+        RustLib.instance.api.rust_arc_decrement_strong_count_Jason,
     rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_JasonHandlePtr,
+        RustLib.instance.api.rust_arc_decrement_strong_count_JasonPtr,
   );
 
   /// Closes the provided [`RoomHandle`].
   void jasonCloseRoom({required RoomHandle roomToDelete}) =>
-      RustLib.instance.api.crateApiDartApiJasonJasonHandleJasonCloseRoom(
+      RustLib.instance.api.crateApiDartApiJasonJasonJasonCloseRoom(
           that: this, roomToDelete: roomToDelete);
 
   /// Closes the provided [`RoomHandle`].
   void jasonDispose() =>
-      RustLib.instance.api.crateApiDartApiJasonJasonHandleJasonDispose(
+      RustLib.instance.api.crateApiDartApiJasonJasonJasonDispose(
         that: this,
       );
 
@@ -4496,13 +4329,13 @@ class JasonHandleImpl extends RustOpaque implements JasonHandle {
   ///
   /// [`Room`]: room::Room
   RoomHandle jasonInitRoom() =>
-      RustLib.instance.api.crateApiDartApiJasonJasonHandleJasonInitRoom(
+      RustLib.instance.api.crateApiDartApiJasonJasonJasonInitRoom(
         that: this,
       );
 
   /// Returns a [`MediaManagerHandle`].
   MediaManagerHandle jasonMediaManager() =>
-      RustLib.instance.api.crateApiDartApiJasonJasonHandleJasonMediaManager(
+      RustLib.instance.api.crateApiDartApiJasonJasonJasonMediaManager(
         that: this,
       );
 }
@@ -4807,50 +4640,6 @@ class RemoteMediaTrackImpl extends RustOpaque implements RemoteMediaTrack {
   void onUnmuted({required Object f}) => RustLib.instance.api
       .crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnUnmuted(
           that: this, f: f);
-}
-
-@sealed
-class RoomCloseReasonImpl extends RustOpaque implements RoomCloseReason {
-  // Not to be used by end users
-  RoomCloseReasonImpl.frbInternalDcoDecode(List<dynamic> wire)
-      : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  RoomCloseReasonImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_RoomCloseReason,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_RoomCloseReason,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_RoomCloseReasonPtr,
-  );
-
-  /// Indicates whether the [`Room`] was closed by server.
-  ///
-  /// [`Room`]: room::Room
-  bool isClosedByServer() => RustLib.instance.api
-          .crateApiDartApiRoomCloseReasonRoomCloseReasonIsClosedByServer(
-        that: this,
-      );
-
-  /// Indicates whether the [`Room`] close reason is considered as an error.
-  ///
-  /// [`Room`]: room::Room
-  bool isErr() =>
-      RustLib.instance.api.crateApiDartApiRoomCloseReasonRoomCloseReasonIsErr(
-        that: this,
-      );
-
-  /// Returns the [`Room`]'s close reason.
-  ///
-  /// [`Room`]: room::Room
-  String reason() =>
-      RustLib.instance.api.crateApiDartApiRoomCloseReasonRoomCloseReasonReason(
-        that: this,
-      );
 }
 
 @sealed

@@ -63,7 +63,7 @@ use crate::{
 pub use dart_sys::Dart_Handle;
 
 pub use self::{
-    connection_handle::ConnectionHandle, jason::JasonHandle,
+    connection_handle::ConnectionHandle, jason::Jason,
     local_media_track::LocalMediaTrack, media_manager::MediaManagerHandle,
     reconnect_handle::ReconnectHandle, remote_media_track::RemoteMediaTrack,
     room::RoomHandle, room_close_reason::RoomCloseReason,
