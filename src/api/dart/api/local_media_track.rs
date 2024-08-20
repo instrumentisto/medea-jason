@@ -7,6 +7,11 @@ use crate::{
     platform::{self, utils::dart_future::IntoDartFuture},
 };
 
+/// Strongly referenced [`Track`] received from a
+/// [getUserMedia()][1]/[getDisplayMedia()][2] request.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
+/// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct LocalMediaTrack(core::LocalMediaTrack);

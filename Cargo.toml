@@ -61,7 +61,7 @@ android_logger = "0.14"
 simple_logger = "5.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-# TODO: Switch to dart-sys when flutter_rust_bridge will.
+# TODO: Switch to dart-sys when flutter_rust_bridge does.
 dart-sys = { package = "dart-sys-fork", version = "4.1" }
 flutter_rust_bridge = { version = "=2.2.0", default-features = false, features = ["rust-async", "anyhow", "dart-opaque"]}
 libc = "0.2"

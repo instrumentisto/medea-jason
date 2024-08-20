@@ -7,6 +7,9 @@ use crate::{
     platform,
 };
 
+/// Wrapper around a received remote [MediaStreamTrack][1].
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct RemoteMediaTrack(core::Track);

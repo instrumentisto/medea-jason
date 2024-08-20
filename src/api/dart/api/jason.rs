@@ -6,6 +6,10 @@ use crate::{
     jason,
 };
 
+/// General library interface.
+///
+/// Responsible for managing shared transports, local media and room
+/// initialization.
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct Jason(jason::Jason);

@@ -14,6 +14,18 @@ use crate::{
     platform::{self, utils::dart_future::IntoDartFuture},
 };
 
+/// External handle to a [`MediaManager`].
+///
+/// [`MediaManager`] performs all media acquisition requests
+/// ([getUserMedia()][1]/[getDisplayMedia()][2]) and stores all received tracks
+/// for further reusage.
+///
+/// [`MediaManager`] stores weak references to [`local::Track`]s, so if there
+/// are no strong references to some track, then this track is stopped and
+/// deleted from [`MediaManager`].
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
+/// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct MediaManagerHandle(pub(crate) core::MediaManagerHandle);

@@ -9,6 +9,10 @@ use crate::{
     room as core,
 };
 
+#[cfg(doc)]
+use crate::room::Room;
+
+/// External handle to a [`Room`].
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct RoomHandle(pub(crate) core::RoomHandle);
@@ -24,8 +28,6 @@ impl RoomHandle {
     /// Authorization token has a fixed format:
     /// `{{ Host URL }}/{{ Room ID }}/{{ Member ID }}?token={{ Auth Token }}`
     /// (e.g. `wss://medea.com/MyConf1/Alice?token=777`).
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn join(&self, token: String) -> DartOpaque {
@@ -62,7 +64,6 @@ impl RoomHandle {
     /// If recovering from fail state isn't possible then affected media types
     /// will be disabled.
     ///
-    /// [`Room`]: room::Room
     /// [`PeerConnection`]: crate::peer::PeerConnection
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     #[frb(sync)]
@@ -90,8 +91,6 @@ impl RoomHandle {
     }
 
     /// Mutes outbound audio in the provided [`Room`].
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn mute_audio(&self) -> DartOpaque {
@@ -107,8 +106,6 @@ impl RoomHandle {
     }
 
     /// Unmutes outbound audio in the provided [`Room`].
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn unmute_audio(&self) -> DartOpaque {
@@ -124,8 +121,6 @@ impl RoomHandle {
     }
 
     /// Enables outbound audio in the provided [`Room`].
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn enable_audio(&self) -> DartOpaque {
@@ -141,8 +136,6 @@ impl RoomHandle {
     }
 
     /// Disables outbound audio in the provided [`Room`].
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn disable_audio(&self) -> DartOpaque {
@@ -164,8 +157,6 @@ impl RoomHandle {
     /// # Errors
     ///
     /// If `source_kind` is not a [`MediaSourceKind`] index.
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn mute_video(
@@ -190,8 +181,6 @@ impl RoomHandle {
     /// # Errors
     ///
     /// If `source_kind` is not a [`MediaSourceKind`] index.
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn unmute_video(
@@ -216,8 +205,6 @@ impl RoomHandle {
     /// # Errors
     ///
     /// If `source_kind` is not [`MediaSourceKind`] index.
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn enable_video(
@@ -242,8 +229,6 @@ impl RoomHandle {
     /// # Errors
     ///
     /// If `source_kind` is not [`MediaSourceKind`] index.
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn disable_video(
@@ -262,8 +247,6 @@ impl RoomHandle {
     }
 
     /// Enables inbound audio in the provided [`Room`].
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn enable_remote_audio(&self) -> DartOpaque {
@@ -279,8 +262,6 @@ impl RoomHandle {
     }
 
     /// Disables inbound audio in the provided [`Room`].
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn disable_remote_audio(&self) -> DartOpaque {
@@ -302,8 +283,6 @@ impl RoomHandle {
     /// # Errors
     ///
     /// If `source_kind` is not [`MediaSourceKind`] index.
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn enable_remote_video(
@@ -328,8 +307,6 @@ impl RoomHandle {
     /// # Errors
     ///
     /// If `source_kind` is not [`MediaSourceKind`] index.
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn disable_remote_video(
@@ -369,8 +346,6 @@ impl RoomHandle {
     /// # Errors
     ///
     /// If [`RoomHandle::on_close()`] errors.
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     pub fn on_close(&self, cb: DartOpaque) -> Result<(), DartOpaque> {
         self.0
@@ -393,7 +368,6 @@ impl RoomHandle {
     /// If [`RoomHandle::on_local_track()`] errors.
     ///
     /// [`MediaStreamSettings`]: media::MediaStreamSettings
-    /// [`Room`]: room::Room
     #[frb(sync)]
     pub fn on_local_track(&self, cb: DartOpaque) -> Result<(), DartOpaque> {
         self.0

@@ -7,6 +7,9 @@ use crate::{
     rpc as core,
 };
 
+/// External handle used to reconnect to a media server when connection is lost.
+///
+/// This handle will be passed to a `Room.on_connection_loss` callback.
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct ReconnectHandle(core::ReconnectHandle);

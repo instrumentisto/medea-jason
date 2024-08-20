@@ -9,6 +9,7 @@ use crate::{
     platform::{self, utils::dart_future::IntoDartFuture},
 };
 
+/// External handler to a [`Connection`] with a remote `Member`.
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct ConnectionHandle(core::ConnectionHandle);
