@@ -10,6 +10,7 @@ import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
+import '../util/rust_opaque.dart' as util;
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/callback.dart' as callback;
 import 'ffi/completer.dart' as completer;
@@ -98,7 +99,7 @@ ExternalLibrary _dlLoad() {
 
 class Jason implements base.Jason {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late frb.Jason opaque;
+  late util.RustOpaque<frb.Jason> opaque;
 
   /// Creates a new instance of [Jason].
   static Future<Jason> init() async {
@@ -120,7 +121,7 @@ class Jason implements base.Jason {
     var port =
         // ignore: invalid_use_of_internal_member
         ((RustLib.instance.api) as BaseApiImpl).portManager.dartHandlerPort;
-    jason.opaque = frb.Jason(dartHandlerPort: port);
+    jason.opaque = util.RustOpaque(frb.Jason(dartHandlerPort: port));
     RustHandlesStorage().insertHandle(jason);
 
     return jason;
@@ -130,19 +131,19 @@ class Jason implements base.Jason {
 
   @override
   MediaManagerHandle mediaManager() {
-    return NativeMediaManagerHandle(opaque.jasonMediaManager());
+    return NativeMediaManagerHandle(opaque.inner.jasonMediaManager());
   }
 
   @override
   RoomHandle initRoom() {
-    return NativeRoomHandle(opaque.jasonInitRoom());
+    return NativeRoomHandle(opaque.inner.jasonInitRoom());
   }
 
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
     room as NativeRoomHandle;
 
-    opaque.jasonCloseRoom(roomToDelete: room.opaque);
+    opaque.inner.jasonCloseRoom(roomToDelete: room.opaque.inner);
     room.opaque.dispose();
   }
 
@@ -151,7 +152,7 @@ class Jason implements base.Jason {
   void free() {
     if (!opaque.isDisposed) {
       RustHandlesStorage().removeHandle(this);
-      opaque.jasonDispose();
+      opaque.inner.jasonDispose();
       opaque.dispose();
     }
   }

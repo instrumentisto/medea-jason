@@ -127,6 +127,10 @@ void main() {
         allOf(predicate((e) =>
             e is FormatException &&
             e.message.contains('relative URL without a base'))));
+
+    jason.closeRoom(room);
+    jason.free();
+    room.free();
   });
 
   testWidgets('Primitive arguments Callback validation',

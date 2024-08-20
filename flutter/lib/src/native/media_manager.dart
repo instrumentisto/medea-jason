@@ -4,6 +4,7 @@ import 'dart:io';
 import '../../medea_jason.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
 import '../util/move_semantic.dart';
+import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/frb/frb.dart' as frb;
 import 'local_media_track.dart';
@@ -12,12 +13,12 @@ import 'media_display_details.dart';
 
 class NativeMediaManagerHandle implements MediaManagerHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  final frb.MediaManagerHandle opaque;
+  final RustOpaque<frb.MediaManagerHandle> opaque;
 
   /// Creates a new [MediaManagerHandle] backed by the Rust struct behind the
   /// provided [frb.MediaManagerHandle].
   NativeMediaManagerHandle(frb.MediaManagerHandle mediaManager)
-      : opaque = mediaManager {
+      : opaque = RustOpaque(mediaManager) {
     RustHandlesStorage().insertHandle(this);
   }
 
@@ -25,7 +26,7 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   Future<List<LocalMediaTrack>> initLocalTracks(
       base_settings.MediaStreamSettings caps) async {
     Pointer tracks;
-    tracks = await (opaque.initLocalTracks(
+    tracks = await (opaque.inner.initLocalTracks(
         caps: (caps as MediaStreamSettings).setting) as Future) as Pointer;
 
     return frb
@@ -37,7 +38,7 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   @override
   Future<List<MediaDeviceDetails>> enumerateDevices() async {
     Pointer devices;
-    devices = await (opaque.enumerateDevices() as Future);
+    devices = await (opaque.inner.enumerateDevices() as Future);
     return frb
         .vecMediaDeviceDetailsFromRaw(ptr: devices.address)
         .map((info) => NativeMediaDeviceDetails(info))
@@ -52,7 +53,7 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
     }
 
     Pointer devices;
-    devices = await (opaque.enumerateDisplays() as Future) as Pointer;
+    devices = await (opaque.inner.enumerateDisplays() as Future) as Pointer;
 
     return frb
         .vecMediaDisplayDetailsFromRaw(ptr: devices.address)
@@ -62,27 +63,27 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
 
   @override
   Future<void> setOutputAudioId(String deviceId) async {
-    await (opaque.setOutputAudioId(deviceId: deviceId) as Future);
+    await (opaque.inner.setOutputAudioId(deviceId: deviceId) as Future);
   }
 
   @override
   Future<void> setMicrophoneVolume(int level) async {
-    await (opaque.setMicrophoneVolume(level: level) as Future);
+    await (opaque.inner.setMicrophoneVolume(level: level) as Future);
   }
 
   @override
   Future<int> microphoneVolume() async {
-    return await (opaque.microphoneVolume() as Future) as int;
+    return await (opaque.inner.microphoneVolume() as Future) as int;
   }
 
   @override
   Future<bool> microphoneVolumeIsAvailable() async {
-    return await (opaque.microphoneVolumeIsAvailable() as Future) as bool;
+    return await (opaque.inner.microphoneVolumeIsAvailable() as Future) as bool;
   }
 
   @override
   void onDeviceChange(void Function() cb) {
-    opaque.onDeviceChange(cb: cb);
+    opaque.inner.onDeviceChange(cb: cb);
   }
 
   @moveSemantics
