@@ -88,6 +88,7 @@ final testConfigs = FlutterTestConfiguration(
         given.steps(),
     createWorld: (config) => Future.sync(() async {
           await clearWorld();
+          await webrtc.initFfiBridge();
           await webrtc.enableFakeMedia();
 
           var world = CustomWorld();

@@ -84,6 +84,7 @@ class Call {
   Future<void> start(String roomId, String memberId, bool isPublish,
       bool publishVideo, bool publishAudio, bool fakeMedia) async {
     if (fakeMedia) {
+      await webrtc.initFfiBridge();
       await webrtc.enableFakeMedia();
     }
 
