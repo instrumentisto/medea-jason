@@ -63,7 +63,11 @@ ExternalLibrary _dlLoad() {
   }
 
   const base = 'medea_jason';
-  final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
+  final path = Platform.isWindows
+      ? '$base.dll'
+      : Platform.isLinux
+          ? 'lib$base.so'
+          : 'lib$base.dylib';
   final el = ExternalLibrary.open(path);
   final dl = el.ffiDynamicLibrary;
 
