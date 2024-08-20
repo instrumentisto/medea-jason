@@ -325,9 +325,8 @@ jobs:
         platform:
           - android
           - linux
-          # TODO: Re-enable once fixed stability on CI
-          #- ios
-          #- macos
+          - ios
+          - macos
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}

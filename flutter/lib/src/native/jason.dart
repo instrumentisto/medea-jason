@@ -102,6 +102,7 @@ class Jason implements base.Jason {
 
   /// Creates a new instance of [Jason].
   static Future<Jason> init() async {
+    // Init medea_flutter_webrtc.
     await initFfiBridge();
     if (!RustLib.instance.initialized) {
       await RustLib.init(externalLibrary: el);
@@ -117,6 +118,7 @@ class Jason implements base.Jason {
 
     var jason = Jason._();
     var port =
+        // ignore: invalid_use_of_internal_member
         ((RustLib.instance.api) as BaseApiImpl).portManager.dartHandlerPort;
     jason.opaque = frb.JasonHandle(dartHandlerPort: port);
     RustHandlesStorage().insertHandle(jason);

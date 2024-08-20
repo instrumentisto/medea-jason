@@ -23,8 +23,7 @@ dependencies:
   faker_dart: ^0.2.2
   freezed_annotation: ^2.4.1
   http: ">=0.13.6 <2.0.0"
-  medea_flutter_webrtc:
-    path: /media/alexlapa/drive2/CLionProjects3/flutter-webrtc
+  medea_flutter_webrtc: 0.11.0-dev+rev.977a6d27694e535b1a00c3822642eeca6fffbb57
   retry: ^3.1.2
 
 dev_dependencies:
