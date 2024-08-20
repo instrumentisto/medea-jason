@@ -418,21 +418,21 @@ impl InnerMediaConnections {
                 MediaType::Video(settings) => {
                     let mut init = TransceiverInit::new(direction);
 
-                    let (target_codecs, target_scalability_mode) =
-                        probe_video_codecs(&settings.svc_settings).await;
+                    // let (target_codecs, target_scalability_mode) =
+                    //     probe_video_codecs(&settings.svc_settings).await;
 
-                    let encoding_params = get_encodings_params(
-                        settings.encoding_parameters,
-                        target_scalability_mode,
-                    );
-                    if !encoding_params.is_empty() {
-                        init.sending_encodings(encoding_params);
-                    }
+                    // let encoding_params = get_encodings_params(
+                    //     settings.encoding_parameters,
+                    //     target_scalability_mode,
+                    // );
+                    // if !encoding_params.is_empty() {
+                    //     init.sending_encodings(encoding_params);
+                    // }
 
                     let transceiver = peer.add_transceiver(kind, init).await;
-                    if !target_codecs.is_empty() {
-                        transceiver.set_codec_preferences(target_codecs);
-                    }
+                    // if !target_codecs.is_empty() {
+                    //     transceiver.set_codec_preferences(target_codecs);
+                    // }
                     transceiver
                 }
             }

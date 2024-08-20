@@ -858,9 +858,8 @@ pub struct TrackPatchEvent {
     /// Muting and unmuting can be performed without adding/removing tracks
     /// from transceivers, hence renegotiation is not required.
     pub muted: Option<bool>,
-
-    /// [`EncodingParameters`] for the [`Track`] which should be patched.
-    pub encoding_parameters: Option<Vec<EncodingParameters>>,
+    // /// [`EncodingParameters`] for the [`Track`] which should be patched.
+    // pub encoding_parameters: Option<Vec<EncodingParameters>>,
 }
 
 /// Media exchange direction of a `Track`.
@@ -913,7 +912,7 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
                 }
             }),
             receivers: None,
-            encoding_parameters: None,
+            // encoding_parameters: None,
         }
     }
 }
@@ -927,7 +926,7 @@ impl TrackPatchEvent {
             muted: None,
             media_direction: None,
             receivers: None,
-            encoding_parameters: None,
+            // encoding_parameters: None,
         }
     }
 
@@ -952,9 +951,9 @@ impl TrackPatchEvent {
             self.receivers = Some(receivers.clone());
         }
 
-        if let Some(encodings) = &another.encoding_parameters {
-            self.encoding_parameters = Some(encodings.clone());
-        }
+        // if let Some(encodings) = &another.encoding_parameters {
+        //     self.encoding_parameters = Some(encodings.clone());
+        // }
     }
 }
 
@@ -1046,12 +1045,11 @@ pub struct VideoSettings {
 
     /// Source kind of these [`VideoSettings`].
     pub source_kind: MediaSourceKind,
-
-    /// [`EncodingParameters`] of these [`VideoSettings`].
-    pub encoding_parameters: Vec<EncodingParameters>,
-
-    /// [`SvcSettings`] of these [`VideoSettings`].
-    pub svc_settings: Vec<SvcSettings>,
+    // /// [`EncodingParameters`] of these [`VideoSettings`].
+    // pub encoding_parameters: Vec<EncodingParameters>,
+    //
+    // /// [`SvcSettings`] of these [`VideoSettings`].
+    // pub svc_settings: Vec<SvcSettings>,
 }
 
 /// Possible media sources of a video [`Track`].
