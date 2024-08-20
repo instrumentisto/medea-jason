@@ -1,5 +1,3 @@
-use std::panic::{RefUnwindSafe, UnwindSafe};
-
 use derive_more::From;
 use flutter_rust_bridge::{frb, DartOpaque};
 
@@ -12,6 +10,12 @@ use crate::{
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct ReconnectHandle(core::ReconnectHandle);
+
+impl ForeignClass for ReconnectHandle {}
+
+// Only used on single thread
+unsafe impl Send for ReconnectHandle {}
+unsafe impl Sync for ReconnectHandle {}
 
 impl ReconnectHandle {
     /// Tries to reconnect a [`Room`] after the provided delay in milliseconds.
@@ -82,9 +86,3 @@ impl ReconnectHandle {
         .into_dart_opaque()
     }
 }
-
-impl ForeignClass for ReconnectHandle {}
-impl RefUnwindSafe for ReconnectHandle {}
-impl UnwindSafe for ReconnectHandle {}
-unsafe impl Send for ReconnectHandle {}
-unsafe impl Sync for ReconnectHandle {}

@@ -57,8 +57,8 @@ impl<T> Function<T> {
     ///
     /// [`Dart_Handle`]: dart_sys::Dart_Handle
     #[must_use]
-    pub fn new(dart_fn: DartOpaque) -> Self {
-        let opaque = dart_fn.into_inner().unwrap();
+    pub fn new(cb: DartOpaque) -> Self {
+        let opaque = cb.into_inner().unwrap();
         let ptr = opaque.create_dart_handle();
         let dart_fn = unsafe { dart_api::new_persistent_handle(ptr.cast()) };
 

@@ -1,5 +1,3 @@
-use std::panic::{RefUnwindSafe, UnwindSafe};
-
 use derive_more::From;
 use flutter_rust_bridge::{frb, DartOpaque};
 use tracerr::Traced;
@@ -14,6 +12,10 @@ use crate::{
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct RoomHandle(pub(crate) core::RoomHandle);
+
+// Only used on single thread
+unsafe impl Send for RoomHandle {}
+unsafe impl Sync for RoomHandle {}
 
 impl RoomHandle {
     /// Connects to a media server and joins the [`Room`] with the provided
@@ -432,8 +434,3 @@ impl RoomHandle {
         Ok(())
     }
 }
-
-impl RefUnwindSafe for RoomHandle {}
-impl UnwindSafe for RoomHandle {}
-unsafe impl Send for RoomHandle {}
-unsafe impl Sync for RoomHandle {}

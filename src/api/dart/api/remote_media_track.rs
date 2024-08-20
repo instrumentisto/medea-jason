@@ -1,5 +1,3 @@
-use std::panic::{RefUnwindSafe, UnwindSafe};
-
 use derive_more::From;
 use flutter_rust_bridge::{frb, DartOpaque};
 
@@ -12,6 +10,12 @@ use crate::{
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct RemoteMediaTrack(core::Track);
+
+impl ForeignClass for RemoteMediaTrack {}
+
+// Only used on single thread
+unsafe impl Send for RemoteMediaTrack {}
+unsafe impl Sync for RemoteMediaTrack {}
 
 impl RemoteMediaTrack {
     /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
@@ -86,9 +90,3 @@ impl RemoteMediaTrack {
         self.0.media_direction()
     }
 }
-
-impl ForeignClass for RemoteMediaTrack {}
-impl RefUnwindSafe for RemoteMediaTrack {}
-impl UnwindSafe for RemoteMediaTrack {}
-unsafe impl Send for RemoteMediaTrack {}
-unsafe impl Sync for RemoteMediaTrack {}

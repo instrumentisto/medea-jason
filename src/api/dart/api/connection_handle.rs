@@ -1,5 +1,3 @@
-use std::panic::{RefUnwindSafe, UnwindSafe};
-
 use derive_more::From;
 use flutter_rust_bridge::{frb, DartOpaque};
 use tracerr::Traced;
@@ -14,6 +12,12 @@ use crate::{
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct ConnectionHandle(core::ConnectionHandle);
+
+impl ForeignClass for ConnectionHandle {}
+
+// Only used on single thread
+unsafe impl Send for ConnectionHandle {}
+unsafe impl Sync for ConnectionHandle {}
 
 impl ConnectionHandle {
     /// Sets a callback to be invoked once the provided `connection` is closed.
@@ -150,9 +154,3 @@ impl ConnectionHandle {
         .into_dart_opaque()
     }
 }
-
-impl ForeignClass for ConnectionHandle {}
-impl RefUnwindSafe for ConnectionHandle {}
-impl UnwindSafe for ConnectionHandle {}
-unsafe impl Send for ConnectionHandle {}
-unsafe impl Sync for ConnectionHandle {}

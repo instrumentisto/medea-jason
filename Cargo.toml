@@ -62,8 +62,7 @@ simple_logger = "5.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 dart-sys = "4.1"
-# TODO: remove thread-pool feature
-flutter_rust_bridge = { version = "=2.2.0", default-features = false, features = ["rust-async", "anyhow", "thread-pool", "dart-opaque"]}
+flutter_rust_bridge = { version = "=2.2.0", default-features = false, features = ["rust-async", "anyhow", "dart-opaque"]}
 libc = "0.2"
 
 [target.'cfg(target_family = "wasm")'.dependencies]

@@ -11,6 +11,12 @@ use crate::{
 #[frb(opaque)]
 pub struct LocalMediaTrack(core::LocalMediaTrack);
 
+impl ForeignClass for LocalMediaTrack {}
+
+// Only used on single thread
+unsafe impl Send for LocalMediaTrack {}
+unsafe impl Sync for LocalMediaTrack {}
+
 impl LocalMediaTrack {
     /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of the
     /// provided [`LocalMediaTrack`].
@@ -106,7 +112,3 @@ impl LocalMediaTrack {
 pub fn vec_local_tracks_from_raw(ptr: usize) -> Vec<LocalMediaTrack> {
     unsafe { Vec::<LocalMediaTrack>::from_ptr(ptr).into_iter().collect() }
 }
-
-impl ForeignClass for LocalMediaTrack {}
-unsafe impl Send for LocalMediaTrack {}
-unsafe impl Sync for LocalMediaTrack {}

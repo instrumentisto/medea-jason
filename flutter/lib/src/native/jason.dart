@@ -64,13 +64,8 @@ ExternalLibrary _dlLoad() {
 
   const base = 'medea_jason';
   final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
-  late final el = ExternalLibrary.open(path);
-  late final dl = el.ffiDynamicLibrary;
-  // late final dl = Platform.isIOS
-  //     ? DynamicLibrary.process()
-  //     : Platform.isMacOS
-  //         ? DynamicLibrary.executable()
-  //         : DynamicLibrary.open(path);
+  final el = ExternalLibrary.open(path);
+  final dl = el.ffiDynamicLibrary;
 
   var initResult = dl.lookupFunction<IntPtr Function(Pointer<Void>),
           int Function(Pointer<Void>)>('init_jason_dart_api_dl')(
@@ -99,24 +94,21 @@ class Jason implements base.Jason {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   late frb.JasonHandle opaque;
 
-  /// Constructs a new [Jason] backed by the Rust struct behind the provided
-  /// [frb.Jason].
+  /// Creates a new instance of [Jason].
   static Future<Jason> init() async {
     await initFfiBridge();
-    // var lib = ExternalLibrary.open('medea_jason');
-    // var lib = await loadExternalLibrary(const ExternalLibraryLoaderConfig(
-    //     stem: 'medea_jason', ioDirectory: '', webPrefix: ''));
     if (!RustLib.instance.initialized) {
       await RustLib.init(externalLibrary: el);
+
+      frb.onPanic(cb: (msg) async {
+        msg as String;
+        await RustHandlesStorage().freeAll();
+        if (_onPanicCallback != null) {
+          _onPanicCallback!(msg);
+        }
+      });
     }
 
-    frb.onPanic(cb: (msg) async {
-      msg as String;
-      await RustHandlesStorage().freeAll();
-      if (_onPanicCallback != null) {
-        _onPanicCallback!(msg);
-      }
-    });
     var jason = Jason._();
     var port =
         ((RustLib.instance.api) as BaseApiImpl).portManager.dartHandlerPort;

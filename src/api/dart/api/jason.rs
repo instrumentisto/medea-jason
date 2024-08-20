@@ -1,22 +1,27 @@
-use std::panic::{RefUnwindSafe, UnwindSafe};
-
 use derive_more::From;
 use flutter_rust_bridge::frb;
 
-use crate::api::{self, api::DART_HANDLER_PORT};
+use crate::{
+    api::{self, api::DART_HANDLER_PORT},
+    jason,
+};
 
 #[derive(Debug, From)]
 #[frb(opaque)]
-pub struct JasonHandle(crate::jason::Jason);
+pub struct JasonHandle(jason::Jason);
+
+// Only used on single thread
+unsafe impl Send for JasonHandle {}
+unsafe impl Sync for JasonHandle {}
 
 impl JasonHandle {
     #[frb(sync)]
-    pub fn new(dart_handler_port: i64) -> JasonHandle {
+    pub fn new(dart_handler_port: i64) -> Self {
         unsafe {
             DART_HANDLER_PORT.replace(dart_handler_port);
         }
 
-        Self(crate::jason::Jason::new(None))
+        Self(jason::Jason::new(None))
     }
 
     /// Creates a new [`Room`] and returns its [`RoomHandle`].
@@ -49,8 +54,3 @@ impl JasonHandle {
         self.0.dispose();
     }
 }
-
-impl RefUnwindSafe for JasonHandle {}
-impl UnwindSafe for JasonHandle {}
-unsafe impl Send for JasonHandle {}
-unsafe impl Sync for JasonHandle {}

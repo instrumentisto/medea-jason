@@ -1,5 +1,3 @@
-use std::panic::{RefUnwindSafe, UnwindSafe};
-
 use derive_more::From;
 use flutter_rust_bridge::{frb, DartOpaque};
 use tracerr::Traced;
@@ -19,6 +17,10 @@ use crate::{
 #[derive(Debug, From)]
 #[frb(opaque)]
 pub struct MediaManagerHandle(pub(crate) core::MediaManagerHandle);
+
+// Only used on single thread
+unsafe impl Send for MediaManagerHandle {}
+unsafe impl Sync for MediaManagerHandle {}
 
 impl MediaManagerHandle {
     /// Returns [`LocalMediaTrack`]s objects, built from the provided
@@ -165,8 +167,3 @@ impl MediaManagerHandle {
         Ok(())
     }
 }
-
-impl RefUnwindSafe for MediaManagerHandle {}
-impl UnwindSafe for MediaManagerHandle {}
-unsafe impl Send for MediaManagerHandle {}
-unsafe impl Sync for MediaManagerHandle {}

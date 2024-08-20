@@ -25,9 +25,15 @@ non_snake_case,
     clippy::empty_structs_with_brackets,
     clippy::use_self,
     clippy::wildcard_imports,
+    clippy::unreadable_literal,
     let_underscore_drop,
     unused_qualifications,
-    unit_bindings
+    unit_bindings,
+    clippy::redundant_else,
+    clippy::significant_drop_tightening,
+    clippy::cast_possible_truncation,
+    clippy::cast_lossless,
+    clippy::cast_possible_wrap
 )]
 #[rustfmt::skip]
 mod api_bridge_generated;
