@@ -68,7 +68,9 @@ ExternalLibrary _dlLoad() {
       : Platform.isLinux || Platform.isAndroid
           ? 'lib$base.so'
           : 'lib$base.dylib';
-  final el = ExternalLibrary.open(path);
+  final el = Platform.isIOS
+      ? ExternalLibrary.process(iKnowHowToUseIt: true)
+      : ExternalLibrary.open(path);
   final dl = el.ffiDynamicLibrary;
 
   var initResult = dl.lookupFunction<IntPtr Function(Pointer<Void>),
