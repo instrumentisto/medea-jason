@@ -1,7 +1,6 @@
 //! Reason of a [`Room`] closing.
 
 use derive_more::From;
-use flutter_rust_bridge::frb;
 
 use crate::{api::dart::api::ForeignClass, room as core};
 
