@@ -65,7 +65,7 @@ ExternalLibrary _dlLoad() {
   const base = 'medea_jason';
   final path = Platform.isWindows
       ? '$base.dll'
-      : Platform.isLinux
+      : Platform.isLinux || Platform.isAndroid
           ? 'lib$base.so'
           : 'lib$base.dylib';
   final el = ExternalLibrary.open(path);
