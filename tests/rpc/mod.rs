@@ -1,9 +1,9 @@
 //! Tests for [`medea_jason::rpc::RpcClient`].
 
-// mod heartbeat;
-// mod reconnect_handle;
-// mod rpc_session;
-// mod websocket;
+mod heartbeat;
+mod reconnect_handle;
+mod rpc_session;
+mod websocket;
 
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 

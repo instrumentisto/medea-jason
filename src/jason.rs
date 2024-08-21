@@ -1,9 +1,7 @@
 //! General library interface.
 
-use futures::{future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _};
-use medea_client_api_proto::{Command, Event};
-use std::{cell::RefCell, collections::VecDeque, rc::Rc};
-use tracerr::Traced;
+use futures::FutureExt as _;
+use std::{cell::RefCell, rc::Rc, thread};
 
 use crate::platform;
 
@@ -11,8 +9,7 @@ use crate::{
     media::{MediaManager, MediaManagerHandle},
     room::{Room, RoomHandle},
     rpc::{
-        ClientDisconnect, CloseReason, ConnectionInfo, RpcSession,
-        SessionError, WebSocketRpcClient, WebSocketRpcSession,
+        ClientDisconnect, RpcSession, WebSocketRpcClient, WebSocketRpcSession,
     },
 };
 
@@ -55,7 +52,7 @@ impl Jason {
     /// [`WebSocketRpcClient`] will be created for each [`Room`].
     #[must_use]
     pub fn new(rpc: Option<Rc<WebSocketRpcClient>>) -> Self {
-        if !std::thread::panicking() {
+        if !thread::panicking() {
             platform::set_panic_hook();
         }
         if !log::logger().enabled(&log::Metadata::builder().build()) {

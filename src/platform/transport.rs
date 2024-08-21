@@ -116,6 +116,6 @@ pub enum TransportError {
     SendMessage(platform::Error),
 
     /// Occurs when message is sent to a closed socket.
-    #[display(fmt = "Underlying socket is closed")]
+    #[display("Underlying socket is closed")]
     ClosedSocket,
 }

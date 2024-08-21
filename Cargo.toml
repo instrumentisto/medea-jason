@@ -68,15 +68,13 @@ libc = "0.2"
 [target.'cfg(target_family = "wasm")'.dependencies]
 backoff = { version = "0.4", features = ["wasm-bindgen"] }
 console_error_panic_hook = { version = "0.1", optional = true }
-js-sys = { path = "/media/alexlapa/drive2/AndroidStudioProjects/wasm-bindgen/crates/js-sys" }
-wasm-bindgen = { path = "/media/alexlapa/drive2/AndroidStudioProjects/wasm-bindgen" }
-wasm-bindgen-futures = { path = "/media/alexlapa/drive2/AndroidStudioProjects/wasm-bindgen/crates/futures" }
+js-sys = "0.3"
+talc = { version = "4.4", default-features = false, features = ["lock_api"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
-talc = { path = "/media/alexlapa/drive2/CLionProjects3/talc/talc", features = ["lock_api", "counters"], default-features = false }
-wasm-tracing-allocator = "0.1.1"
-#talc = { version = "4.4", features = ["lock_api"], default-features = false }
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
-    path = "/media/alexlapa/drive2/AndroidStudioProjects/wasm-bindgen/crates/web-sys"
+    version = "0.3"
     features = [
         "console",
         "ConstrainBooleanParameters",
@@ -98,8 +96,8 @@ wasm-tracing-allocator = "0.1.1"
         "RtcIceServer",
         "RtcIceTransportPolicy",
         "RtcOfferOptions",
-        "RtcPeerConnection", "RtcPeerConnectionIceEvent",
-#        "RtcPeerConnectionIceErrorEvent",
+        "RtcPeerConnection",
+        "RtcPeerConnectionIceEvent", "RtcPeerConnectionIceErrorEvent",
         "RtcPeerConnectionState",
         "RtcRtpCapabilities",
         "RtcRtpCodecParameters",
@@ -120,11 +118,4 @@ cc = "1.1"
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 instant = { version = "0.1", features = ["wasm-bindgen"] }
-wasm-bindgen-test = { path = "/media/alexlapa/drive2/AndroidStudioProjects/wasm-bindgen/crates/test" }
-
-[patch.crates-io]
-web-sys = { path = "/media/alexlapa/drive2/AndroidStudioProjects/wasm-bindgen/crates/web-sys" }
-js-sys = { path = "/media/alexlapa/drive2/AndroidStudioProjects/wasm-bindgen/crates/js-sys" }
-wasm-bindgen = { path = "/media/alexlapa/drive2/AndroidStudioProjects/wasm-bindgen" }
-wasm-bindgen-shared = { path = "/media/alexlapa/drive2/AndroidStudioProjects/wasm-bindgen/crates/shared" }
-
+wasm-bindgen-test = "0.3"
