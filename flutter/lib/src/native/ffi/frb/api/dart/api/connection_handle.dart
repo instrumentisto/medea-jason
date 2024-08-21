@@ -13,20 +13,20 @@ import '../api.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ConnectionHandle>>
 abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
-  /// Disables inbound audio in the provided `connection`.
+  /// Disables inbound audio in the associated [`Connection`].
   Object disableRemoteAudio();
 
-  /// Disables inbound video in the provided `connection`.
+  /// Disables inbound video in the associated [`Connection`].
   ///
-  /// Affects only video with the specific [`MediaSourceKind`], if specified.
+  /// Affects only video with the provided [`MediaSourceKind`], if any.
   Object disableRemoteVideo({MediaSourceKind? sourceKind});
 
-  /// Enables inbound audio in the provided `connection`.
+  /// Enables inbound audio in the associated [`Connection`].
   Object enableRemoteAudio();
 
-  /// Enables inbound video in the provided `connection`.
+  /// Enables inbound video in the associated [`Connection`].
   ///
-  /// Affects only video with the specific [`MediaSourceKind`], if specified.
+  /// Affects only video with the provided [`MediaSourceKind`], if any.
   Object enableRemoteVideo({MediaSourceKind? sourceKind});
 
   /// Constructs a [`ForeignClass`] from the given raw pointer via
@@ -38,34 +38,37 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
   static ConnectionHandle fromPtr({required int ptr}) => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleFromPtr(ptr: ptr);
 
-  /// Returns remote `Member` ID of the provided `connection`.
+  /// Returns ID of remote `Member` ID of the associated [`Connection`].
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::get_remote_member_id()`] errors.
+  /// If the [`core::ConnectionHandle::get_remote_member_id()`] method errors.
   String getRemoteMemberId();
 
-  /// Sets a callback to be invoked once the provided `connection` is closed.
+  /// Sets a callback to be invoked once the associated [`Connection`] is
+  /// closed.
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::on_close()`] errors.
+  /// If the [`core::ConnectionHandle::on_close()`] method errors.
   void onClose({required Object f});
 
-  /// Sets a callback to be invoked when a quality score of the provided
-  /// `connection` is updated by a server.
+  /// Sets a callback to be invoked once a quality score of the associated
+  /// [`Connection`] is updated by a media server.
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::on_quality_score_update()`] errors.
+  /// If the [`core::ConnectionHandle::on_quality_score_update()`] method
+  /// errors.
   void onQualityScoreUpdate({required Object f});
 
   /// Sets a callback to be invoked once a new [`remote::Track`] is added to
-  /// the provided `connection`.
+  /// the associated [`Connection`].
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::on_remote_track_added()`] errors.
+  /// If the [`core::ConnectionHandle::on_remote_track_added()`] method
+  /// errors.
   ///
   /// [`remote::Track`]: media::track::remote::Track
   void onRemoteTrackAdded({required Object f});

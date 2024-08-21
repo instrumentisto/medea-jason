@@ -1,6 +1,10 @@
-use derive_more::From;
-use flutter_rust_bridge::{frb, DartOpaque};
+//! External handle used to reconnect to a media server when connection is lost.
 
+use flutter_rust_bridge::{frb, DartOpaque};
+use send_wrapper::SendWrapper;
+
+#[cfg(doc)]
+use crate::room::Room;
 use crate::{
     api::{dart::api::ForeignClass, Error, Error as DartError},
     platform::utils::dart_future::IntoDartFuture,
@@ -9,16 +13,20 @@ use crate::{
 
 /// External handle used to reconnect to a media server when connection is lost.
 ///
-/// This handle will be passed to a `Room.on_connection_loss` callback.
-#[derive(Debug, From)]
+/// This handle will be passed to a [`RoomHandle::on_connection_loss`] callback.
+///
+/// [`Room::on_connection_loss`]: super::RoomHandle::on_connection_loss
+#[derive(Debug)]
 #[frb(opaque)]
-pub struct ReconnectHandle(core::ReconnectHandle);
+pub struct ReconnectHandle(SendWrapper<core::ReconnectHandle>);
+
+impl From<core::ReconnectHandle> for ReconnectHandle {
+    fn from(value: core::ReconnectHandle) -> Self {
+        Self(SendWrapper::new(value))
+    }
+}
 
 impl ForeignClass for ReconnectHandle {}
-
-// Only used on single thread
-unsafe impl Send for ReconnectHandle {}
-unsafe impl Sync for ReconnectHandle {}
 
 impl ReconnectHandle {
     /// Tries to reconnect a [`Room`] after the provided delay in milliseconds.
@@ -26,8 +34,6 @@ impl ReconnectHandle {
     /// If the [`Room`] is already reconnecting then new reconnection attempt
     /// won't be performed. Instead, it will wait for the first reconnection
     /// attempt result and use it here.
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn reconnect_with_delay(&self, delay_ms: u32) -> DartOpaque {
@@ -61,8 +67,6 @@ impl ReconnectHandle {
     /// If the [`Room`] is already reconnecting then new reconnection attempt
     /// won't be performed. Instead, it will wait for the first reconnection
     /// attempt result and use it here.
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn reconnect_with_backoff(

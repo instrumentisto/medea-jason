@@ -16,16 +16,15 @@ abstract class Jason implements RustOpaqueInterface {
   /// Closes the provided [`RoomHandle`].
   void jasonCloseRoom({required RoomHandle roomToDelete});
 
-  /// Closes the provided [`RoomHandle`].
+  /// Closes this [`Jason`].
   void jasonDispose();
 
   /// Creates a new [`Room`] and returns its [`RoomHandle`].
-  ///
-  /// [`Room`]: room::Room
   RoomHandle jasonInitRoom();
 
   /// Returns a [`MediaManagerHandle`].
   MediaManagerHandle jasonMediaManager();
 
+  /// Instantiates a new [`Jason`] interface to interact with this library.
   factory Jason() => RustLib.instance.api.crateApiDartApiJasonJasonNew();
 }

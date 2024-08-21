@@ -47,12 +47,12 @@ abstract class RemoteMediaTrack implements RustOpaqueInterface, ForeignClass {
   /// [`MediaDirection`] is changed.
   void onMediaDirectionChanged({required Object f});
 
-  /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.
+  /// Sets callback to invoke once this [`RemoteMediaTrack`] is muted.
   void onMuted({required Object f});
 
-  /// Sets callback to invoke when this [`RemoteMediaTrack`] is stopped.
+  /// Sets callback to invoke once this [`RemoteMediaTrack`] is stopped.
   void onStopped({required Object f});
 
-  /// Sets callback to invoke when this [`RemoteMediaTrack`] is unmuted.
+  /// Sets callback to invoke once this [`RemoteMediaTrack`] is unmuted.
   void onUnmuted({required Object f});
 }

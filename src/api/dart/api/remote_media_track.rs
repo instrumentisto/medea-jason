@@ -1,5 +1,9 @@
-use derive_more::From;
+//! Wrapper around a received remote [MediaStreamTrack][1].
+//!
+//! [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
+
 use flutter_rust_bridge::{frb, DartOpaque};
+use send_wrapper::SendWrapper;
 
 use crate::{
     api::{api::DART_HANDLER_PORT, dart::api::ForeignClass, MediaDirection},
@@ -10,15 +14,17 @@ use crate::{
 /// Wrapper around a received remote [MediaStreamTrack][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
-#[derive(Debug, From)]
+#[derive(Debug)]
 #[frb(opaque)]
-pub struct RemoteMediaTrack(core::Track);
+pub struct RemoteMediaTrack(SendWrapper<core::Track>);
+
+impl From<core::Track> for RemoteMediaTrack {
+    fn from(value: core::Track) -> Self {
+        Self(SendWrapper::new(value))
+    }
+}
 
 impl ForeignClass for RemoteMediaTrack {}
-
-// Only used on single thread
-unsafe impl Send for RemoteMediaTrack {}
-unsafe impl Sync for RemoteMediaTrack {}
 
 impl RemoteMediaTrack {
     /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
@@ -33,21 +39,21 @@ impl RemoteMediaTrack {
         })
     }
 
-    /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.
+    /// Sets callback to invoke once this [`RemoteMediaTrack`] is muted.
     #[frb(sync)]
     #[must_use]
     pub fn on_muted(&self, f: DartOpaque) {
         self.0.on_muted(platform::Function::new(f));
     }
 
-    /// Sets callback to invoke when this [`RemoteMediaTrack`] is unmuted.
+    /// Sets callback to invoke once this [`RemoteMediaTrack`] is unmuted.
     #[frb(sync)]
     #[must_use]
     pub fn on_unmuted(&self, f: DartOpaque) {
         self.0.on_unmuted(platform::Function::new(f));
     }
 
-    /// Sets callback to invoke when this [`RemoteMediaTrack`] is stopped.
+    /// Sets callback to invoke once this [`RemoteMediaTrack`] is stopped.
     #[frb(sync)]
     #[must_use]
     pub fn on_stopped(&self, f: DartOpaque) {

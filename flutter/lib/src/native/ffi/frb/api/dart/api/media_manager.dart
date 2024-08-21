@@ -33,6 +33,7 @@ abstract class MediaManagerHandle implements RustOpaqueInterface {
   Object microphoneVolumeIsAvailable();
 
   /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
+  ///
   /// Sets an ideal [frameRate][1] constraint.
   ///
   /// # Errors

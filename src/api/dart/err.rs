@@ -135,11 +135,11 @@ impl DartError {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from)] // intentional
 impl From<DartError> for DartOpaque {
     fn from(val: DartError) -> Self {
         let boxed = unsafe { Box::from_raw(val.0.as_ptr()) };
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // intentional
         Self::new((*boxed).cast(), unsafe { DART_HANDLER_PORT.unwrap() })
     }
 }

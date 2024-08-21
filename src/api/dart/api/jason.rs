@@ -1,40 +1,47 @@
-use derive_more::From;
 use flutter_rust_bridge::frb;
+use send_wrapper::SendWrapper;
 
 use crate::{api, jason};
+#[cfg(doc)]
+use crate::{
+    api::{MediaManagerHandle, RoomHandle},
+    room::Room,
+};
 
 /// General library interface.
 ///
 /// Responsible for managing shared transports, local media and room
 /// initialization.
-#[derive(Debug, From)]
+#[derive(Debug)]
 #[frb(opaque)]
-pub struct Jason(jason::Jason);
+pub struct Jason(SendWrapper<jason::Jason>);
 
-// Only used on single thread
-unsafe impl Send for Jason {}
-unsafe impl Sync for Jason {}
+impl From<jason::Jason> for Jason {
+    fn from(value: jason::Jason) -> Self {
+        Self(SendWrapper::new(value))
+    }
+}
 
 impl Jason {
+    /// Instantiates a new [`Jason`] interface to interact with this library.
     #[frb(sync)]
+    #[must_use]
     pub fn new() -> Self {
-        Self(jason::Jason::new(None))
+        Self(SendWrapper::new(jason::Jason::new(None)))
     }
 
     /// Creates a new [`Room`] and returns its [`RoomHandle`].
-    ///
-    /// [`Room`]: room::Room
     #[frb(sync)]
     #[must_use]
     pub fn jason_init_room(&self) -> api::RoomHandle {
-        api::RoomHandle(self.0.init_room())
+        self.0.init_room().into()
     }
 
     /// Returns a [`MediaManagerHandle`].
     #[frb(sync)]
     #[must_use]
     pub fn jason_media_manager(&self) -> api::MediaManagerHandle {
-        api::MediaManagerHandle(self.0.media_manager())
+        self.0.media_manager().into()
     }
 
     /// Closes the provided [`RoomHandle`].
@@ -44,10 +51,10 @@ impl Jason {
         self.0.close_room(&room_to_delete.0);
     }
 
-    /// Closes the provided [`RoomHandle`].
+    /// Closes this [`Jason`].
     #[frb(sync)]
     #[must_use]
     pub fn jason_dispose(self) {
-        self.0.dispose();
+        self.0.take().dispose();
     }
 }

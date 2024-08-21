@@ -5,7 +5,7 @@
 
 #![allow(
     clippy::as_conversions,
-    clippy::doc_markdown, // TODO: From generated code in #[frb].
+    clippy::doc_markdown, // because generated code in `#[frb]` macro
     clippy::missing_panics_doc,
     clippy::needless_pass_by_value,
     clippy::undocumented_unsafe_blocks,
@@ -126,7 +126,7 @@ pub struct ApiMediaDeviceDetails {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
     pub group_id: Option<String>,
 
-    /// Indicates whether the last attempt to use the provided device failed.
+    /// Indicator whether the last attempt to use the provided device failed.
     pub is_failed: bool,
 }
 
@@ -349,8 +349,8 @@ impl From<ApiMediaStreamSettings> for media::MediaStreamSettings {
 
 impl<T> ForeignClass for Vec<T> {}
 
-/// Returns the [`Vec<ApiMediaDeviceDetails>`] from the [`ForeignClass`]
-/// address.
+/// Returns the [`Vec<ApiMediaDeviceDetails>`] from the provided
+/// [`ForeignClass`] address.
 #[frb(sync, type_64bit_int)]
 #[must_use]
 pub fn vec_media_device_details_from_raw(
@@ -359,7 +359,7 @@ pub fn vec_media_device_details_from_raw(
     unsafe { Vec::<ApiMediaDeviceDetails>::from_ptr(ptr) }
 }
 
-/// Returns the [`Vec<RustOpaque<ApiMediaDisplayDetails>>`] from the
+/// Returns the [`Vec<RustOpaque<ApiMediaDisplayDetails>>`] from the provided
 /// [`ForeignClass`] address.
 #[frb(sync, type_64bit_int)]
 #[must_use]

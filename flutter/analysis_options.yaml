@@ -2,8 +2,8 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
-    - 'lib/src/native/ffi/frb/**'
     - '**.g.dart'
+    - 'lib/src/native/ffi/frb/**'
 
 linter:
   rules: # https://dart-lang.github.io/linter/lints/index.html

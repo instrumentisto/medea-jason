@@ -16,12 +16,12 @@ part 'api.freezed.dart';
 // These functions are ignored (category: IgnoreBecauseExplicitAttribute): `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`
 // These functions are ignored (category: IgnoreBecauseNotAllowedOwner): `from_ptr`, `into_ptr`
 
-/// Returns the [`Vec<ApiMediaDeviceDetails>`] from the [`ForeignClass`]
-/// address.
+/// Returns the [`Vec<ApiMediaDeviceDetails>`] from the provided
+/// [`ForeignClass`] address.
 List<ApiMediaDeviceDetails> vecMediaDeviceDetailsFromRaw({required int ptr}) =>
     RustLib.instance.api.crateApiDartApiVecMediaDeviceDetailsFromRaw(ptr: ptr);
 
-/// Returns the [`Vec<RustOpaque<ApiMediaDisplayDetails>>`] from the
+/// Returns the [`Vec<RustOpaque<ApiMediaDisplayDetails>>`] from the provided
 /// [`ForeignClass`] address.
 List<ApiMediaDisplayDetails> vecMediaDisplayDetailsFromRaw(
         {required int ptr}) =>
@@ -195,7 +195,7 @@ class ApiMediaDeviceDetails {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
   final String? groupId;
 
-  /// Indicates whether the last attempt to use the provided device failed.
+  /// Indicator whether the last attempt to use the provided device failed.
   final bool isFailed;
 
   const ApiMediaDeviceDetails({

@@ -1,5 +1,7 @@
-use derive_more::From;
+//! External handler to a [`Connection`] with a remote `Member`.
+
 use flutter_rust_bridge::{frb, DartOpaque};
+use send_wrapper::SendWrapper;
 use tracerr::Traced;
 
 use crate::{
@@ -8,39 +10,44 @@ use crate::{
     media::MediaSourceKind,
     platform::{self, utils::dart_future::IntoDartFuture},
 };
+#[cfg(doc)]
+use crate::{connection::Connection, media::track::remote};
 
 /// External handler to a [`Connection`] with a remote `Member`.
-#[derive(Debug, From)]
+#[derive(Debug)]
 #[frb(opaque)]
-pub struct ConnectionHandle(core::ConnectionHandle);
+pub struct ConnectionHandle(SendWrapper<core::ConnectionHandle>);
+
+impl From<core::ConnectionHandle> for ConnectionHandle {
+    fn from(value: core::ConnectionHandle) -> Self {
+        Self(SendWrapper::new(value))
+    }
+}
 
 impl ForeignClass for ConnectionHandle {}
 
-// Only used on single thread
-unsafe impl Send for ConnectionHandle {}
-unsafe impl Sync for ConnectionHandle {}
-
 impl ConnectionHandle {
-    /// Sets a callback to be invoked once the provided `connection` is closed.
+    /// Sets a callback to be invoked once the associated [`Connection`] is
+    /// closed.
     ///
     /// # Errors
     ///
-    /// If [`ConnectionHandle::on_close()`] errors.
+    /// If the [`core::ConnectionHandle::on_close()`] method errors.
     #[frb(sync)]
     pub fn on_close(&self, f: DartOpaque) -> Result<(), DartOpaque> {
         self.0
             .on_close(platform::Function::new(f))
-            .map_err(DartError::from)?;
-
-        Ok(())
+            .map_err(DartError::from)
+            .map_err(Into::into)
     }
 
     /// Sets a callback to be invoked once a new [`remote::Track`] is added to
-    /// the provided `connection`.
+    /// the associated [`Connection`].
     ///
     /// # Errors
     ///
-    /// If [`ConnectionHandle::on_remote_track_added()`] errors.
+    /// If the [`core::ConnectionHandle::on_remote_track_added()`] method
+    /// errors.
     ///
     /// [`remote::Track`]: media::track::remote::Track
     #[frb(sync)]
@@ -50,17 +57,17 @@ impl ConnectionHandle {
     ) -> Result<(), DartOpaque> {
         self.0
             .on_remote_track_added(platform::Function::new(f))
-            .map_err(DartError::from)?;
-
-        Ok(())
+            .map_err(DartError::from)
+            .map_err(Into::into)
     }
 
-    /// Sets a callback to be invoked when a quality score of the provided
-    /// `connection` is updated by a server.
+    /// Sets a callback to be invoked once a quality score of the associated
+    /// [`Connection`] is updated by a media server.
     ///
     /// # Errors
     ///
-    /// If [`ConnectionHandle::on_quality_score_update()`] errors.
+    /// If the [`core::ConnectionHandle::on_quality_score_update()`] method
+    /// errors.
     #[frb(sync)]
     pub fn on_quality_score_update(
         &self,
@@ -68,22 +75,24 @@ impl ConnectionHandle {
     ) -> Result<(), DartOpaque> {
         self.0
             .on_quality_score_update(platform::Function::new(f))
-            .map_err(DartError::from)?;
-
-        Ok(())
+            .map_err(DartError::from)
+            .map_err(Into::into)
     }
 
-    /// Returns remote `Member` ID of the provided `connection`.
+    /// Returns ID of remote `Member` ID of the associated [`Connection`].
     ///
     /// # Errors
     ///
-    /// If [`ConnectionHandle::get_remote_member_id()`] errors.
+    /// If the [`core::ConnectionHandle::get_remote_member_id()`] method errors.
     #[frb(sync)]
     pub fn get_remote_member_id(&self) -> Result<String, DartOpaque> {
-        Ok(self.0.get_remote_member_id().map_err(DartError::from)?)
+        self.0
+            .get_remote_member_id()
+            .map_err(DartError::from)
+            .map_err(Into::into)
     }
 
-    /// Enables inbound audio in the provided `connection`.
+    /// Enables inbound audio in the associated [`Connection`].
     #[frb(sync)]
     #[must_use]
     pub fn enable_remote_audio(&self) -> DartOpaque {
@@ -98,7 +107,7 @@ impl ConnectionHandle {
         .into_dart_opaque()
     }
 
-    /// Disables inbound audio in the provided `connection`.
+    /// Disables inbound audio in the associated [`Connection`].
     #[frb(sync)]
     #[must_use]
     pub fn disable_remote_audio(&self) -> DartOpaque {
@@ -113,9 +122,9 @@ impl ConnectionHandle {
         .into_dart_opaque()
     }
 
-    /// Enables inbound video in the provided `connection`.
+    /// Enables inbound video in the associated [`Connection`].
     ///
-    /// Affects only video with the specific [`MediaSourceKind`], if specified.
+    /// Affects only video with the provided [`MediaSourceKind`], if any.
     #[frb(sync)]
     #[must_use]
     pub fn enable_remote_video(
@@ -135,9 +144,9 @@ impl ConnectionHandle {
         result
     }
 
-    /// Disables inbound video in the provided `connection`.
+    /// Disables inbound video in the associated [`Connection`].
     ///
-    /// Affects only video with the specific [`MediaSourceKind`], if specified.
+    /// Affects only video with the provided [`MediaSourceKind`], if any.
     #[frb(sync)]
     #[must_use]
     pub fn disable_remote_video(

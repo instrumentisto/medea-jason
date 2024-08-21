@@ -1,22 +1,20 @@
 //! Reason of a [`Room`] closing.
 
-use derive_more::From;
-
 use crate::{api::dart::api::ForeignClass, room as core};
 
 #[cfg(doc)]
 use crate::room::Room;
 
 /// Reason of why a [`Room`] is closed.
-#[derive(Debug, From)]
+#[derive(Debug)]
 pub struct RoomCloseReason {
-    /// Returns the [`Room`]'s close reason.
+    /// [`Room`]'s close reason.
     pub reason: String,
 
-    /// Indicates whether the [`Room`] was closed by server.
+    /// Indicator whether the [`Room`] was closed by server.
     pub is_closed_by_server: bool,
 
-    /// Indicates whether the [`Room`] close reason is considered as an error.
+    /// Indicator whether the [`Room`] close reason is considered as an error.
     pub is_err: bool,
 }
 

@@ -12,8 +12,8 @@ import '../api.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
 
-/// Returns the [`Vec<LocalMediaTrack>`] from the
-/// [`ForeignClass`] address.
+/// Returns the [`Vec<LocalMediaTrack>`] from the provided [`ForeignClass`]
+/// address.
 List<LocalMediaTrack> vecLocalTracksFromRaw({required int ptr}) =>
     RustLib.instance.api
         .crateApiDartApiLocalMediaTrackVecLocalTracksFromRaw(ptr: ptr);
@@ -58,11 +58,11 @@ abstract class LocalMediaTrack implements RustOpaqueInterface, ForeignClass {
   /// Sets the provided `OnAudioLevelChangedCallback` for this
   /// [`LocalMediaTrack`].
   ///
-  /// It's called for live [`LocalMediaTrack`]s when their audio level
+  /// It's called for live [`LocalMediaTrack`]s once their audio level
   /// changes.
   void onAudioLevelChanged({required Object f});
 
-  /// Sets callback to invoke when this [`LocalMediaTrack`] is ended.
+  /// Sets callback to be invoked once this [`LocalMediaTrack`] is ended.
   void onEnded({required Object f});
 
   /// Returns a [`media::MediaStreamTrackState::Live`] if this

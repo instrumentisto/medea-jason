@@ -4253,68 +4253,71 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
         .instance.api.rust_arc_decrement_strong_count_ConnectionHandlePtr,
   );
 
-  /// Disables inbound audio in the provided `connection`.
+  /// Disables inbound audio in the associated [`Connection`].
   Object disableRemoteAudio() => RustLib.instance.api
           .crateApiDartApiConnectionHandleConnectionHandleDisableRemoteAudio(
         that: this,
       );
 
-  /// Disables inbound video in the provided `connection`.
+  /// Disables inbound video in the associated [`Connection`].
   ///
-  /// Affects only video with the specific [`MediaSourceKind`], if specified.
+  /// Affects only video with the provided [`MediaSourceKind`], if any.
   Object disableRemoteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api
           .crateApiDartApiConnectionHandleConnectionHandleDisableRemoteVideo(
               that: this, sourceKind: sourceKind);
 
-  /// Enables inbound audio in the provided `connection`.
+  /// Enables inbound audio in the associated [`Connection`].
   Object enableRemoteAudio() => RustLib.instance.api
           .crateApiDartApiConnectionHandleConnectionHandleEnableRemoteAudio(
         that: this,
       );
 
-  /// Enables inbound video in the provided `connection`.
+  /// Enables inbound video in the associated [`Connection`].
   ///
-  /// Affects only video with the specific [`MediaSourceKind`], if specified.
+  /// Affects only video with the provided [`MediaSourceKind`], if any.
   Object enableRemoteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api
           .crateApiDartApiConnectionHandleConnectionHandleEnableRemoteVideo(
               that: this, sourceKind: sourceKind);
 
-  /// Returns remote `Member` ID of the provided `connection`.
+  /// Returns ID of remote `Member` ID of the associated [`Connection`].
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::get_remote_member_id()`] errors.
+  /// If the [`core::ConnectionHandle::get_remote_member_id()`] method errors.
   String getRemoteMemberId() => RustLib.instance.api
           .crateApiDartApiConnectionHandleConnectionHandleGetRemoteMemberId(
         that: this,
       );
 
-  /// Sets a callback to be invoked once the provided `connection` is closed.
+  /// Sets a callback to be invoked once the associated [`Connection`] is
+  /// closed.
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::on_close()`] errors.
+  /// If the [`core::ConnectionHandle::on_close()`] method errors.
   void onClose({required Object f}) => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleOnClose(that: this, f: f);
 
-  /// Sets a callback to be invoked when a quality score of the provided
-  /// `connection` is updated by a server.
+  /// Sets a callback to be invoked once a quality score of the associated
+  /// [`Connection`] is updated by a media server.
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::on_quality_score_update()`] errors.
+  /// If the [`core::ConnectionHandle::on_quality_score_update()`] method
+  /// errors.
   void onQualityScoreUpdate({required Object f}) => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdate(
           that: this, f: f);
 
   /// Sets a callback to be invoked once a new [`remote::Track`] is added to
-  /// the provided `connection`.
+  /// the associated [`Connection`].
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::on_remote_track_added()`] errors.
+  /// If the [`core::ConnectionHandle::on_remote_track_added()`] method
+  /// errors.
   ///
   /// [`remote::Track`]: media::track::remote::Track
   void onRemoteTrackAdded({required Object f}) => RustLib.instance.api
@@ -4346,15 +4349,13 @@ class JasonImpl extends RustOpaque implements Jason {
       RustLib.instance.api.crateApiDartApiJasonJasonJasonCloseRoom(
           that: this, roomToDelete: roomToDelete);
 
-  /// Closes the provided [`RoomHandle`].
+  /// Closes this [`Jason`].
   void jasonDispose() =>
       RustLib.instance.api.crateApiDartApiJasonJasonJasonDispose(
         that: this,
       );
 
   /// Creates a new [`Room`] and returns its [`RoomHandle`].
-  ///
-  /// [`Room`]: room::Room
   RoomHandle jasonInitRoom() =>
       RustLib.instance.api.crateApiDartApiJasonJasonJasonInitRoom(
         that: this,
@@ -4430,13 +4431,13 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
   /// Sets the provided `OnAudioLevelChangedCallback` for this
   /// [`LocalMediaTrack`].
   ///
-  /// It's called for live [`LocalMediaTrack`]s when their audio level
+  /// It's called for live [`LocalMediaTrack`]s once their audio level
   /// changes.
   void onAudioLevelChanged({required Object f}) => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackOnAudioLevelChanged(
           that: this, f: f);
 
-  /// Sets callback to invoke when this [`LocalMediaTrack`] is ended.
+  /// Sets callback to be invoked once this [`LocalMediaTrack`] is ended.
   void onEnded({required Object f}) => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackOnEnded(that: this, f: f);
 
@@ -4504,6 +4505,7 @@ class MediaManagerHandleImpl extends RustOpaque implements MediaManagerHandle {
       );
 
   /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
+  ///
   /// Sets an ideal [frameRate][1] constraint.
   ///
   /// # Errors
@@ -4567,8 +4569,6 @@ class ReconnectHandleImpl extends RustOpaque implements ReconnectHandle {
   /// If the [`Room`] is already reconnecting then new reconnection attempt
   /// won't be performed. Instead, it will wait for the first reconnection
   /// attempt result and use it here.
-  ///
-  /// [`Room`]: room::Room
   Object reconnectWithBackoff(
           {required int startingDelay,
           required double multiplier,
@@ -4587,8 +4587,6 @@ class ReconnectHandleImpl extends RustOpaque implements ReconnectHandle {
   /// If the [`Room`] is already reconnecting then new reconnection attempt
   /// won't be performed. Instead, it will wait for the first reconnection
   /// attempt result and use it here.
-  ///
-  /// [`Room`]: room::Room
   Object reconnectWithDelay({required int delayMs}) => RustLib.instance.api
       .crateApiDartApiReconnectHandleReconnectHandleReconnectWithDelay(
           that: this, delayMs: delayMs);
@@ -4654,16 +4652,16 @@ class RemoteMediaTrackImpl extends RustOpaque implements RemoteMediaTrack {
       .crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMediaDirectionChanged(
           that: this, f: f);
 
-  /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.
+  /// Sets callback to invoke once this [`RemoteMediaTrack`] is muted.
   void onMuted({required Object f}) => RustLib.instance.api
       .crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMuted(that: this, f: f);
 
-  /// Sets callback to invoke when this [`RemoteMediaTrack`] is stopped.
+  /// Sets callback to invoke once this [`RemoteMediaTrack`] is stopped.
   void onStopped({required Object f}) => RustLib.instance.api
       .crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnStopped(
           that: this, f: f);
 
-  /// Sets callback to invoke when this [`RemoteMediaTrack`] is unmuted.
+  /// Sets callback to invoke once this [`RemoteMediaTrack`] is unmuted.
   void onUnmuted({required Object f}) => RustLib.instance.api
       .crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnUnmuted(
           that: this, f: f);
@@ -4702,22 +4700,22 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
 
   /// Disables inbound video in the provided [`Room`].
   ///
-  /// Affects only video with the specific [`MediaSourceKind`], if specified.
+  /// Affects only video with the provided [`MediaSourceKind`], if any.
   ///
   /// # Errors
   ///
-  /// If `source_kind` is not [`MediaSourceKind`] index.
+  /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object disableRemoteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleDisableRemoteVideo(
           that: this, sourceKind: sourceKind);
 
   /// Disables outbound video in the provided [`Room`].
   ///
-  /// Affects only video with specific [`MediaSourceKind`] if specified.
+  /// Affects only video with the provided [`MediaSourceKind`], if any.
   ///
   /// # Errors
   ///
-  /// If `source_kind` is not [`MediaSourceKind`] index.
+  /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object disableVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleDisableVideo(
           that: this, sourceKind: sourceKind);
@@ -4736,22 +4734,22 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
 
   /// Enables inbound video in the provided [`Room`].
   ///
-  /// Affects only video with the specific [`MediaSourceKind`], if specified.
+  /// Affects only video with the provided [`MediaSourceKind`], if any.
   ///
   /// # Errors
   ///
-  /// If `source_kind` is not [`MediaSourceKind`] index.
+  /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object enableRemoteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleEnableRemoteVideo(
           that: this, sourceKind: sourceKind);
 
   /// Enables outbound video in the provided [`Room`].
   ///
-  /// Affects only video with specific [`MediaSourceKind`] if specified.
+  /// Affects only video with the provided [`MediaSourceKind`], if any.
   ///
   /// # Errors
   ///
-  /// If `source_kind` is not [`MediaSourceKind`] index.
+  /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object enableVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleEnableVideo(
           that: this, sourceKind: sourceKind);
@@ -4773,11 +4771,11 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
 
   /// Mutes outbound video in the provided [`Room`].
   ///
-  /// Affects only video with specific [`MediaSourceKind`] if specified.
+  /// Affects only video with the provided [`MediaSourceKind`], if any.
   ///
   /// # Errors
   ///
-  /// If `source_kind` is not a [`MediaSourceKind`] index.
+  /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object muteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleMuteVideo(
           that: this, sourceKind: sourceKind);
@@ -4787,15 +4785,16 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   ///
   /// # Errors
   ///
-  /// If [`RoomHandle::on_close()`] errors.
+  /// If the [`core::RoomHandle::on_close()`] method errors.
   void onClose({required Object cb}) => RustLib.instance.api
       .crateApiDartApiRoomRoomHandleOnClose(that: this, cb: cb);
 
-  /// Sets a callback to be invoked once a connection with server is lost.
+  /// Sets a callback to be invoked once a connection with a media server is
+  /// lost.
   ///
   /// # Errors
   ///
-  /// If [`RoomHandle::on_connection_loss()`] errors.
+  /// If the [`core::RoomHandle::on_connection_loss()`] method errors.
   void onConnectionLoss({required Object cb}) => RustLib.instance.api
       .crateApiDartApiRoomRoomHandleOnConnectionLoss(that: this, cb: cb);
 
@@ -4803,23 +4802,27 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   ///
   /// # Errors
   ///
-  /// If [`RoomHandle::on_failed_local_media()`] errors.
+  /// If the [`core::RoomHandle::on_failed_local_media()`] method errors.
   void onFailedLocalMedia({required Object cb}) => RustLib.instance.api
       .crateApiDartApiRoomRoomHandleOnFailedLocalMedia(that: this, cb: cb);
 
-  /// Sets a callback to be invoked when a new [`LocalMediaTrack`] is added
+  /// Sets a callback to be invoked once a new [`LocalMediaTrack`] is added
   /// to the provided [`Room`].
   ///
   /// This might happen in such cases:
   /// 1. Media server initiates a media request.
-  /// 2. `enable_audio`/`enable_video` is called.
-  /// 3. [`MediaStreamSettings`] updated via `set_local_media_settings`.
+  /// 2. [`enable_audio()`]/[`enable_video()`] is called.
+  /// 3. [`MediaStreamSettings`] are updated via
+  ///    [`set_local_media_settings()`].
   ///
   /// # Errors
   ///
-  /// If [`RoomHandle::on_local_track()`] errors.
+  /// If the [`core::RoomHandle::on_local_track()`] method errors.
   ///
+  /// [`enable_audio()`]: RoomHandle::enable_audio
+  /// [`enable_video()`]: RoomHandle::enable_video
   /// [`MediaStreamSettings`]: media::MediaStreamSettings
+  /// [`set_local_media_settings()`]: RoomHandle::set_local_media_settings
   void onLocalTrack({required Object cb}) => RustLib.instance.api
       .crateApiDartApiRoomRoomHandleOnLocalTrack(that: this, cb: cb);
 
@@ -4828,35 +4831,39 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   ///
   /// # Errors
   ///
-  /// If [`RoomHandle::on_new_connection()`] errors.
+  /// If the [`core::RoomHandle::on_new_connection()`] method errors.
   ///
   /// [`Connection`]: connection::Connection
   void onNewConnection({required Object cb}) => RustLib.instance.api
       .crateApiDartApiRoomRoomHandleOnNewConnection(that: this, cb: cb);
 
-  /// Updates this [`Room`]'s [`ApiMediaStreamSettings`]. This affects all the
-  /// [`PeerConnection`]s in this [`Room`]. If [`ApiMediaStreamSettings`] are
-  /// configured for some [`Room`], then this [`Room`] can only send media
-  /// tracks that correspond to these settings. [`ApiMediaStreamSettings`]
-  /// update will change media tracks in all sending peers, so that might
-  /// cause a new [getUserMedia()][1] request to happen.
+  /// Updates this [`Room`]'s [`ApiMediaStreamSettings`].
   ///
-  /// Media obtaining/injection errors are additionally fired to
-  /// `on_failed_local_media` callback.
+  /// This affects all the [`PeerConnection`]s in this [`Room`]. If
+  /// [`ApiMediaStreamSettings`] are configured for some [`Room`], then this
+  /// [`Room`] can only send media tracks that correspond to these settings.
+  /// [`ApiMediaStreamSettings`] update will change media tracks in all
+  /// sending peers, so that might cause a new [getUserMedia()][1] request to
+  /// happen.
   ///
-  /// If `stop_first` set to `true` then affected local `Tracks` will be
-  /// dropped before new [`ApiMediaStreamSettings`] are applied. This is
-  /// usually required when changing video source device due to hardware
-  /// limitations, e.g. having an active track sourced from device `A` may
-  /// hinder [getUserMedia()][1] requests to device `B`.
+  /// Media obtaining/injection errors are additionally fired to a
+  /// [`on_failed_local_media`] callback.
   ///
-  /// `rollback_on_fail` option configures [`ApiMediaStreamSettings`] update
-  /// request to automatically rollback to previous settings if new settings
-  /// cannot be applied.
+  /// If the `stop_first` argument is [`true`], then affected
+  /// [`LocalMediaTrack`]s will be dropped before new
+  /// [`ApiMediaStreamSettings`] are applied. This is usually required when
+  /// changing video source device due to hardware limitations, e.g. having an
+  /// active track sourced from device `A` may hinder [getUserMedia()][1]
+  /// requests to device `B`.
+  ///
+  /// The `rollback_on_fail` argument configures [`ApiMediaStreamSettings`]
+  /// update request to automatically roll back to previous settings if new
+  /// settings cannot be applied.
   ///
   /// If recovering from fail state isn't possible then affected media types
   /// will be disabled.
   ///
+  /// [`on_failed_local_media`]: RoomHandle::on_failed_local_media
   /// [`PeerConnection`]: crate::peer::PeerConnection
   /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
   Object setLocalMediaSettings(
@@ -4877,11 +4884,11 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
 
   /// Unmutes outbound video in the provided [`Room`].
   ///
-  /// Affects only video with specific [`MediaSourceKind`] if specified.
+  /// Affects only video with the provided [`MediaSourceKind`], if any.
   ///
   /// # Errors
   ///
-  /// If `source_kind` is not a [`MediaSourceKind`] index.
+  /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object unmuteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleUnmuteVideo(
           that: this, sourceKind: sourceKind);

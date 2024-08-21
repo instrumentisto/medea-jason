@@ -1,5 +1,7 @@
-use derive_more::From;
+//! External handle to a [`Room`].
+
 use flutter_rust_bridge::{frb, DartOpaque};
+use send_wrapper::SendWrapper;
 use tracerr::Traced;
 
 use crate::{
@@ -8,18 +10,19 @@ use crate::{
     platform::{self, utils::dart_future::IntoDartFuture},
     room as core,
 };
-
 #[cfg(doc)]
-use crate::room::Room;
+use crate::{media::track::local::LocalMediaTrack, room::Room};
 
 /// External handle to a [`Room`].
-#[derive(Debug, From)]
+#[derive(Debug)]
 #[frb(opaque)]
-pub struct RoomHandle(pub(crate) core::RoomHandle);
+pub struct RoomHandle(pub(crate) SendWrapper<core::RoomHandle>);
 
-// Only used on single thread
-unsafe impl Send for RoomHandle {}
-unsafe impl Sync for RoomHandle {}
+impl From<core::RoomHandle> for RoomHandle {
+    fn from(value: core::RoomHandle) -> Self {
+        Self(SendWrapper::new(value))
+    }
+}
 
 impl RoomHandle {
     /// Connects to a media server and joins the [`Room`] with the provided
@@ -41,29 +44,33 @@ impl RoomHandle {
         .into_dart_opaque()
     }
 
-    /// Updates this [`Room`]'s [`ApiMediaStreamSettings`]. This affects all the
-    /// [`PeerConnection`]s in this [`Room`]. If [`ApiMediaStreamSettings`] are
-    /// configured for some [`Room`], then this [`Room`] can only send media
-    /// tracks that correspond to these settings. [`ApiMediaStreamSettings`]
-    /// update will change media tracks in all sending peers, so that might
-    /// cause a new [getUserMedia()][1] request to happen.
+    /// Updates this [`Room`]'s [`ApiMediaStreamSettings`].
     ///
-    /// Media obtaining/injection errors are additionally fired to
-    /// `on_failed_local_media` callback.
+    /// This affects all the [`PeerConnection`]s in this [`Room`]. If
+    /// [`ApiMediaStreamSettings`] are configured for some [`Room`], then this
+    /// [`Room`] can only send media tracks that correspond to these settings.
+    /// [`ApiMediaStreamSettings`] update will change media tracks in all
+    /// sending peers, so that might cause a new [getUserMedia()][1] request to
+    /// happen.
     ///
-    /// If `stop_first` set to `true` then affected local `Tracks` will be
-    /// dropped before new [`ApiMediaStreamSettings`] are applied. This is
-    /// usually required when changing video source device due to hardware
-    /// limitations, e.g. having an active track sourced from device `A` may
-    /// hinder [getUserMedia()][1] requests to device `B`.
+    /// Media obtaining/injection errors are additionally fired to a
+    /// [`on_failed_local_media`] callback.
     ///
-    /// `rollback_on_fail` option configures [`ApiMediaStreamSettings`] update
-    /// request to automatically rollback to previous settings if new settings
-    /// cannot be applied.
+    /// If the `stop_first` argument is [`true`], then affected
+    /// [`LocalMediaTrack`]s will be dropped before new
+    /// [`ApiMediaStreamSettings`] are applied. This is usually required when
+    /// changing video source device due to hardware limitations, e.g. having an
+    /// active track sourced from device `A` may hinder [getUserMedia()][1]
+    /// requests to device `B`.
+    ///
+    /// The `rollback_on_fail` argument configures [`ApiMediaStreamSettings`]
+    /// update request to automatically roll back to previous settings if new
+    /// settings cannot be applied.
     ///
     /// If recovering from fail state isn't possible then affected media types
     /// will be disabled.
     ///
+    /// [`on_failed_local_media`]: RoomHandle::on_failed_local_media
     /// [`PeerConnection`]: crate::peer::PeerConnection
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     #[frb(sync)]
@@ -152,11 +159,11 @@ impl RoomHandle {
 
     /// Mutes outbound video in the provided [`Room`].
     ///
-    /// Affects only video with specific [`MediaSourceKind`] if specified.
+    /// Affects only video with the provided [`MediaSourceKind`], if any.
     ///
     /// # Errors
     ///
-    /// If `source_kind` is not a [`MediaSourceKind`] index.
+    /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
     #[frb(sync)]
     #[must_use]
     pub fn mute_video(
@@ -176,11 +183,11 @@ impl RoomHandle {
 
     /// Unmutes outbound video in the provided [`Room`].
     ///
-    /// Affects only video with specific [`MediaSourceKind`] if specified.
+    /// Affects only video with the provided [`MediaSourceKind`], if any.
     ///
     /// # Errors
     ///
-    /// If `source_kind` is not a [`MediaSourceKind`] index.
+    /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
     #[frb(sync)]
     #[must_use]
     pub fn unmute_video(
@@ -200,11 +207,11 @@ impl RoomHandle {
 
     /// Enables outbound video in the provided [`Room`].
     ///
-    /// Affects only video with specific [`MediaSourceKind`] if specified.
+    /// Affects only video with the provided [`MediaSourceKind`], if any.
     ///
     /// # Errors
     ///
-    /// If `source_kind` is not [`MediaSourceKind`] index.
+    /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
     #[frb(sync)]
     #[must_use]
     pub fn enable_video(
@@ -224,11 +231,11 @@ impl RoomHandle {
 
     /// Disables outbound video in the provided [`Room`].
     ///
-    /// Affects only video with specific [`MediaSourceKind`] if specified.
+    /// Affects only video with the provided [`MediaSourceKind`], if any.
     ///
     /// # Errors
     ///
-    /// If `source_kind` is not [`MediaSourceKind`] index.
+    /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
     #[frb(sync)]
     #[must_use]
     pub fn disable_video(
@@ -278,11 +285,11 @@ impl RoomHandle {
 
     /// Enables inbound video in the provided [`Room`].
     ///
-    /// Affects only video with the specific [`MediaSourceKind`], if specified.
+    /// Affects only video with the provided [`MediaSourceKind`], if any.
     ///
     /// # Errors
     ///
-    /// If `source_kind` is not [`MediaSourceKind`] index.
+    /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
     #[frb(sync)]
     #[must_use]
     pub fn enable_remote_video(
@@ -302,11 +309,11 @@ impl RoomHandle {
 
     /// Disables inbound video in the provided [`Room`].
     ///
-    /// Affects only video with the specific [`MediaSourceKind`], if specified.
+    /// Affects only video with the provided [`MediaSourceKind`], if any.
     ///
     /// # Errors
     ///
-    /// If `source_kind` is not [`MediaSourceKind`] index.
+    /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
     #[frb(sync)]
     #[must_use]
     pub fn disable_remote_video(
@@ -329,15 +336,15 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// If [`RoomHandle::on_new_connection()`] errors.
+    /// If the [`core::RoomHandle::on_new_connection()`] method errors.
     ///
     /// [`Connection`]: connection::Connection
     #[frb(sync)]
     pub fn on_new_connection(&self, cb: DartOpaque) -> Result<(), DartOpaque> {
-        Ok(self
-            .0
+        self.0
             .on_new_connection(platform::Function::new(cb))
-            .map_err(DartError::from)?)
+            .map_err(DartError::from)
+            .map_err(Into::into)
     }
 
     /// Sets a callback to be invoked once the provided [`Room`] is closed,
@@ -345,57 +352,59 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// If [`RoomHandle::on_close()`] errors.
+    /// If the [`core::RoomHandle::on_close()`] method errors.
     #[frb(sync)]
     pub fn on_close(&self, cb: DartOpaque) -> Result<(), DartOpaque> {
         self.0
             .on_close(platform::Function::new(cb))
-            .map_err(DartError::from)?;
-
-        Ok(())
+            .map_err(DartError::from)
+            .map_err(Into::into)
     }
 
-    /// Sets a callback to be invoked when a new [`LocalMediaTrack`] is added
+    /// Sets a callback to be invoked once a new [`LocalMediaTrack`] is added
     /// to the provided [`Room`].
     ///
     /// This might happen in such cases:
     /// 1. Media server initiates a media request.
-    /// 2. `enable_audio`/`enable_video` is called.
-    /// 3. [`MediaStreamSettings`] updated via `set_local_media_settings`.
+    /// 2. [`enable_audio()`]/[`enable_video()`] is called.
+    /// 3. [`MediaStreamSettings`] are updated via
+    ///    [`set_local_media_settings()`].
     ///
     /// # Errors
     ///
-    /// If [`RoomHandle::on_local_track()`] errors.
+    /// If the [`core::RoomHandle::on_local_track()`] method errors.
     ///
+    /// [`enable_audio()`]: RoomHandle::enable_audio
+    /// [`enable_video()`]: RoomHandle::enable_video
     /// [`MediaStreamSettings`]: media::MediaStreamSettings
+    /// [`set_local_media_settings()`]: RoomHandle::set_local_media_settings
     #[frb(sync)]
     pub fn on_local_track(&self, cb: DartOpaque) -> Result<(), DartOpaque> {
         self.0
             .on_local_track(platform::Function::new(cb))
-            .map_err(DartError::from)?;
-
-        Ok(())
+            .map_err(DartError::from)
+            .map_err(Into::into)
     }
 
-    /// Sets a callback to be invoked once a connection with server is lost.
+    /// Sets a callback to be invoked once a connection with a media server is
+    /// lost.
     ///
     /// # Errors
     ///
-    /// If [`RoomHandle::on_connection_loss()`] errors.
+    /// If the [`core::RoomHandle::on_connection_loss()`] method errors.
     #[frb(sync)]
     pub fn on_connection_loss(&self, cb: DartOpaque) -> Result<(), DartOpaque> {
         self.0
             .on_connection_loss(platform::Function::new(cb))
-            .map_err(DartError::from)?;
-
-        Ok(())
+            .map_err(DartError::from)
+            .map_err(Into::into)
     }
 
     /// Sets a callback to be invoked on local media acquisition failures.
     ///
     /// # Errors
     ///
-    /// If [`RoomHandle::on_failed_local_media()`] errors.
+    /// If the [`core::RoomHandle::on_failed_local_media()`] method errors.
     #[frb(sync)]
     pub fn on_failed_local_media(
         &self,
@@ -403,8 +412,7 @@ impl RoomHandle {
     ) -> Result<(), DartOpaque> {
         self.0
             .on_failed_local_media(platform::Function::new(cb))
-            .map_err(DartError::from)?;
-
-        Ok(())
+            .map_err(DartError::from)
+            .map_err(Into::into)
     }
 }

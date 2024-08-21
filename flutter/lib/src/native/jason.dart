@@ -103,7 +103,7 @@ class Jason implements base.Jason {
 
   /// Creates a new instance of [Jason].
   static Future<Jason> init() async {
-    // Init medea_flutter_webrtc.
+    // Init `medea_flutter_webrtc`.
     await initFfiBridge();
     if (!RustLib.instance.initialized) {
       await RustLib.init(externalLibrary: el);

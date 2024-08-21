@@ -2,6 +2,8 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
+import 'package:medea_jason/src/native/ffi/foreign_value.dart';
+
 typedef _ErrorSetterFnC = Void Function(Handle);
 typedef _ErrorSetterFnDart = void Function(Object);
 

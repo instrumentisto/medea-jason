@@ -1,7 +1,11 @@
-use derive_more::From;
+//! External handle to a [`MediaManager`].
+
 use flutter_rust_bridge::{frb, DartOpaque};
+use send_wrapper::SendWrapper;
 use tracerr::Traced;
 
+#[cfg(doc)]
+use crate::media::{track::local::LocalMediaTrack, MediaManager};
 use crate::{
     api::{
         api::{
@@ -18,21 +22,23 @@ use crate::{
 ///
 /// [`MediaManager`] performs all media acquisition requests
 /// ([getUserMedia()][1]/[getDisplayMedia()][2]) and stores all received tracks
-/// for further reusage.
+/// for further re-usage.
 ///
 /// [`MediaManager`] stores weak references to [`local::Track`]s, so if there
 /// are no strong references to some track, then this track is stopped and
-/// deleted from [`MediaManager`].
+/// deleted from the [`MediaManager`].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
-/// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-#[derive(Debug, From)]
+/// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
+#[derive(Debug)]
 #[frb(opaque)]
-pub struct MediaManagerHandle(pub(crate) core::MediaManagerHandle);
+pub struct MediaManagerHandle(pub(crate) SendWrapper<core::MediaManagerHandle>);
 
-// Only used on single thread
-unsafe impl Send for MediaManagerHandle {}
-unsafe impl Sync for MediaManagerHandle {}
+impl From<core::MediaManagerHandle> for MediaManagerHandle {
+    fn from(value: core::MediaManagerHandle) -> Self {
+        Self(SendWrapper::new(value))
+    }
+}
 
 impl MediaManagerHandle {
     /// Returns [`LocalMediaTrack`]s objects, built from the provided
@@ -162,6 +168,7 @@ impl MediaManagerHandle {
     }
 
     /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
+    ///
     /// Sets an ideal [frameRate][1] constraint.
     ///
     /// # Errors
@@ -174,8 +181,7 @@ impl MediaManagerHandle {
         let manager = self.0.clone();
         manager
             .on_device_change(platform::Function::new(cb))
-            .map_err(DartError::from)?;
-
-        Ok(())
+            .map_err(DartError::from)
+            .map_err(Into::into)
     }
 }

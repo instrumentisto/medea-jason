@@ -7,17 +7,17 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import '../../../frb_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
 
 /// Reason of why a [`Room`] is closed.
 class RoomCloseReason {
-  /// Returns the [`Room`]'s close reason.
+  /// [`Room`]'s close reason.
   final String reason;
 
-  /// Indicates whether the [`Room`] was closed by server.
+  /// Indicator whether the [`Room`] was closed by server.
   final bool isClosedByServer;
 
-  /// Indicates whether the [`Room`] close reason is considered as an error.
+  /// Indicator whether the [`Room`] close reason is considered as an error.
   final bool isErr;
 
   const RoomCloseReason({
