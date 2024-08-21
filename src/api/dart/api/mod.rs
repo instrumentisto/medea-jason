@@ -4,13 +4,13 @@
 //! [Flutter]: https://flutter.dev
 
 #![allow(
-clippy::as_conversions,
-clippy::doc_markdown, // TODO: From generated code in #[frb].
-clippy::missing_panics_doc,
-clippy::needless_pass_by_value,
-clippy::undocumented_unsafe_blocks,
-clippy::unwrap_used,
-non_snake_case,
+    clippy::as_conversions,
+    clippy::doc_markdown, // TODO: From generated code in #[frb].
+    clippy::missing_panics_doc,
+    clippy::needless_pass_by_value,
+    clippy::undocumented_unsafe_blocks,
+    clippy::unwrap_used,
+    non_snake_case,
 )]
 
 #[allow(
@@ -69,6 +69,7 @@ pub use self::{
     room::RoomHandle, room_close_reason::RoomCloseReason,
 };
 
+/// Used to create [`DartOpaque`]s on the Rust side.
 pub static mut DART_HANDLER_PORT: Option<i64> = None;
 
 /// Rust structure having wrapper class in Dart.
@@ -380,4 +381,13 @@ pub fn log_dart_exception(message: String, stack_trace: String) {
 #[must_use]
 pub fn on_panic(cb: DartOpaque) {
     platform::set_panic_callback(platform::Function::new(cb));
+}
+
+/// Sets the provided [`DART_HANDLER_PORT`].
+#[frb(sync)]
+#[must_use]
+pub fn set_dart_opaque_message_port(dart_handler_port: i64) {
+    unsafe {
+        DART_HANDLER_PORT.replace(dart_handler_port);
+    }
 }

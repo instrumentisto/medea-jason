@@ -36,6 +36,11 @@ void logDartException({required String message, required String stackTrace}) =>
 void onPanic({required Object cb}) =>
     RustLib.instance.api.crateApiDartApiOnPanic(cb: cb);
 
+/// Sets the provided [`DART_HANDLER_PORT`].
+void setDartOpaqueMessagePort({required PlatformInt64 dartHandlerPort}) =>
+    RustLib.instance.api.crateApiDartApiSetDartOpaqueMessagePort(
+        dartHandlerPort: dartHandlerPort);
+
 abstract class ForeignClass {}
 
 /// Constraints applicable to audio tracks.

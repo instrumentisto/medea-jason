@@ -1,10 +1,7 @@
 use derive_more::From;
 use flutter_rust_bridge::frb;
 
-use crate::{
-    api::{self, api::DART_HANDLER_PORT},
-    jason,
-};
+use crate::{api, jason};
 
 /// General library interface.
 ///
@@ -20,11 +17,7 @@ unsafe impl Sync for Jason {}
 
 impl Jason {
     #[frb(sync)]
-    pub fn new(dart_handler_port: i64) -> Self {
-        unsafe {
-            DART_HANDLER_PORT.replace(dart_handler_port);
-        }
-
+    pub fn new() -> Self {
         Self(jason::Jason::new(None))
     }
 

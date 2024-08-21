@@ -15,13 +15,9 @@ import '../api.dart';
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>
 abstract class RoomHandle implements RustOpaqueInterface {
   /// Disables outbound audio in the provided [`Room`].
-  ///
-  /// [`Room`]: room::Room
   Object disableAudio();
 
   /// Disables inbound audio in the provided [`Room`].
-  ///
-  /// [`Room`]: room::Room
   Object disableRemoteAudio();
 
   /// Disables inbound video in the provided [`Room`].
@@ -31,8 +27,6 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// # Errors
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
-  ///
-  /// [`Room`]: room::Room
   Object disableRemoteVideo({MediaSourceKind? sourceKind});
 
   /// Disables outbound video in the provided [`Room`].
@@ -42,18 +36,12 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// # Errors
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
-  ///
-  /// [`Room`]: room::Room
   Object disableVideo({MediaSourceKind? sourceKind});
 
   /// Enables outbound audio in the provided [`Room`].
-  ///
-  /// [`Room`]: room::Room
   Object enableAudio();
 
   /// Enables inbound audio in the provided [`Room`].
-  ///
-  /// [`Room`]: room::Room
   Object enableRemoteAudio();
 
   /// Enables inbound video in the provided [`Room`].
@@ -63,8 +51,6 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// # Errors
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
-  ///
-  /// [`Room`]: room::Room
   Object enableRemoteVideo({MediaSourceKind? sourceKind});
 
   /// Enables outbound video in the provided [`Room`].
@@ -74,8 +60,6 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// # Errors
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
-  ///
-  /// [`Room`]: room::Room
   Object enableVideo({MediaSourceKind? sourceKind});
 
   /// Connects to a media server and joins the [`Room`] with the provided
@@ -84,13 +68,9 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// Authorization token has a fixed format:
   /// `{{ Host URL }}/{{ Room ID }}/{{ Member ID }}?token={{ Auth Token }}`
   /// (e.g. `wss://medea.com/MyConf1/Alice?token=777`).
-  ///
-  /// [`Room`]: room::Room
   Object join({required String token});
 
   /// Mutes outbound audio in the provided [`Room`].
-  ///
-  /// [`Room`]: room::Room
   Object muteAudio();
 
   /// Mutes outbound video in the provided [`Room`].
@@ -100,8 +80,6 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// # Errors
   ///
   /// If `source_kind` is not a [`MediaSourceKind`] index.
-  ///
-  /// [`Room`]: room::Room
   Object muteVideo({MediaSourceKind? sourceKind});
 
   /// Sets a callback to be invoked once the provided [`Room`] is closed,
@@ -110,8 +88,6 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// # Errors
   ///
   /// If [`RoomHandle::on_close()`] errors.
-  ///
-  /// [`Room`]: room::Room
   void onClose({required Object cb});
 
   /// Sets a callback to be invoked once a connection with server is lost.
@@ -141,7 +117,6 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// If [`RoomHandle::on_local_track()`] errors.
   ///
   /// [`MediaStreamSettings`]: media::MediaStreamSettings
-  /// [`Room`]: room::Room
   void onLocalTrack({required Object cb});
 
   /// Sets a callback to be invoked once a new [`Connection`] with some remote
@@ -177,7 +152,6 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// If recovering from fail state isn't possible then affected media types
   /// will be disabled.
   ///
-  /// [`Room`]: room::Room
   /// [`PeerConnection`]: crate::peer::PeerConnection
   /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
   Object setLocalMediaSettings(
@@ -186,8 +160,6 @@ abstract class RoomHandle implements RustOpaqueInterface {
       required bool rollbackOnFail});
 
   /// Unmutes outbound audio in the provided [`Room`].
-  ///
-  /// [`Room`]: room::Room
   Object unmuteAudio();
 
   /// Unmutes outbound video in the provided [`Room`].
@@ -197,7 +169,5 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// # Errors
   ///
   /// If `source_kind` is not a [`MediaSourceKind`] index.
-  ///
-  /// [`Room`]: room::Room
   Object unmuteVideo({MediaSourceKind? sourceKind});
 }

@@ -108,6 +108,10 @@ class Jason implements base.Jason {
     if (!RustLib.instance.initialized) {
       await RustLib.init(externalLibrary: el);
 
+      var port =
+          // ignore: invalid_use_of_internal_member
+          ((RustLib.instance.api) as BaseApiImpl).portManager.dartHandlerPort;
+
       frb.onPanic(cb: (msg) async {
         msg as String;
         await RustHandlesStorage().freeAll();
@@ -115,13 +119,12 @@ class Jason implements base.Jason {
           _onPanicCallback!(msg);
         }
       });
+      frb.setDartOpaqueMessagePort(dartHandlerPort: port);
     }
 
     var jason = Jason._();
-    var port =
-        // ignore: invalid_use_of_internal_member
-        ((RustLib.instance.api) as BaseApiImpl).portManager.dartHandlerPort;
-    jason.opaque = util.RustOpaque(frb.Jason(dartHandlerPort: port));
+
+    jason.opaque = util.RustOpaque(frb.Jason());
     RustHandlesStorage().insertHandle(jason);
 
     return jason;
