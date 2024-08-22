@@ -9,7 +9,7 @@ use std::{
 
 use async_recursion::async_recursion;
 use async_trait::async_trait;
-use derive_more::{Debug, Display, From};
+use derive_more::{Debug, Display, From, Into};
 use futures::{
     channel::mpsc, future, future::LocalBoxFuture, FutureExt as _,
     StreamExt as _, TryFutureExt as _,
@@ -51,15 +51,15 @@ type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 /// Reason of why [`Room`] has been closed.
 ///
 /// This struct is passed into [`RoomHandle::on_close`] callback.
-#[derive(Debug)]
+#[derive(Debug, Into)]
 pub struct RoomCloseReason {
+    /// Reason of closing.
+    pub(crate) reason: String,
+
     /// Indicator if [`Room`] is closed by server.
     ///
     /// `true` if [`CloseReason::ByServer`].
     pub(crate) is_closed_by_server: bool,
-
-    /// Reason of closing.
-    pub(crate) reason: String,
 
     /// Indicator if closing is considered as error.
     ///

@@ -16,7 +16,7 @@ use dart_sys::{Dart_Handle, Dart_PersistentHandle};
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{utils::DartError, DartValue},
+    api::{DartValue, Error as DartError},
     platform::dart::utils::{dart_api, dart_future::FutureFromDart},
 };
 
@@ -25,7 +25,7 @@ mod completer {
     use dart_sys::Dart_Handle;
 
     use crate::{
-        api::{utils::DartError, DartValue},
+        api::{DartValue, Error as DartError},
         platform::Error,
     };
 

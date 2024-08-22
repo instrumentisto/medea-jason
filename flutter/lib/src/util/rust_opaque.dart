@@ -1,46 +1,35 @@
-import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-/// Wrapper around a [FrbOpaque] that can be `null` once disposed.
+/// Wrapper around a [RustOpaqueInterface] that can be `null` once disposed.
 ///
 /// Accessing the opaque type after it's disposed will throw a [StateError].
-class RustOpaque<T extends FrbOpaque> {
+class RustOpaque<T extends RustOpaqueInterface> {
   T _opaque;
 
-  /// Constructs a [RustOpaque] value from the provided [FrbOpaque] value.
+  /// Constructs a [RustOpaque] value from the provided [RustOpaqueInterface]
+  /// value.
   RustOpaque(this._opaque);
 
-  /// Returns the underlying [FrbOpaque].
+  /// Returns the underlying [RustOpaqueInterface].
   ///
-  /// Throws a [StateError] if the underlying [FrbOpaque] has been freed.
-  T get innerOpaque {
-    if (_opaque.isStale()) {
+  /// Throws a [StateError] if the underlying [RustOpaqueInterface] has been
+  /// freed.
+  T get inner {
+    if (_opaque.isDisposed) {
       throw StateError('`RustOpaque` cannot be used after dispose');
     }
     return _opaque;
   }
 
-  /// Returns the underlying [FrbOpaque] with move semantics.
-  ///
-  /// Throws a [StateError] if the underlying [FrbOpaque] has been freed.
-  T get moveOpaque {
-    if (_opaque.isStale()) {
-      throw StateError('`RustOpaque` cannot be used after dispose');
-    }
-    _opaque.move = true;
-    return _opaque;
-  }
+  /// Indicates whether this [RustOpaqueInterface] is disposed.
+  bool get isDisposed => _opaque.isDisposed;
 
   /// Sets the inner opaque value to the provided one.
-  set innerOpaque(T value) {
+  set inner(T value) {
     _opaque = value;
   }
 
-  /// Indicates whether this [FrbOpaque] is disposed.
-  bool isStale() {
-    return _opaque.isStale();
-  }
-
-  /// Disposes the underlying [FrbOpaque].
+  /// Disposes the underlying [RustOpaqueInterface].
   void dispose() {
     _opaque.dispose();
   }

@@ -2,8 +2,7 @@ import '../interface/reconnect_handle.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/jason_api.g.dart' as frb;
-import 'jason.dart';
+import 'ffi/frb/frb.dart' as frb;
 
 class NativeReconnectHandle implements ReconnectHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
@@ -22,8 +21,7 @@ class NativeReconnectHandle implements ReconnectHandle {
       throw ArgumentError.value(delayMs, 'delayMs', 'Expected `u32`');
     }
 
-    await (api.reconnectHandleReconnectWithDelay(
-        reconnectHandle: opaque.innerOpaque, delayMs: delayMs) as Future);
+    await (opaque.inner.reconnectWithDelay(delayMs: delayMs) as Future);
   }
 
   @override
@@ -46,8 +44,7 @@ class NativeReconnectHandle implements ReconnectHandle {
       }
     }
 
-    await (api.reconnectHandleReconnectWithBackoff(
-        reconnectHandle: opaque.innerOpaque,
+    await (opaque.inner.reconnectWithBackoff(
         startingDelay: startingDelayMs,
         multiplier: multiplier,
         maxDelay: maxDelay,
@@ -57,7 +54,7 @@ class NativeReconnectHandle implements ReconnectHandle {
   @moveSemantics
   @override
   void free() {
-    if (!opaque.isStale()) {
+    if (!opaque.isDisposed) {
       RustHandlesStorage().removeHandle(this);
 
       opaque.dispose();

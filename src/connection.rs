@@ -285,7 +285,7 @@ pub struct HandleDetachedError;
 /// External handler to a [`Connection`] with a remote `Member`.
 ///
 /// Actually, represents a [`Weak`]-based handle to `InnerConnection`.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ConnectionHandle(Weak<InnerConnection>);
 
 /// Actual data of a connection with a specific remote `Member`.

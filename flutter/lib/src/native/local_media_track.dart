@@ -5,8 +5,7 @@ import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/jason_api.g.dart' as frb;
-import 'jason.dart';
+import 'ffi/frb/frb.dart' as frb;
 
 class NativeLocalMediaTrack implements LocalMediaTrack {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
@@ -21,48 +20,47 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
 
   @override
   MediaKind kind() {
-    return api.localMediaTrackKind(track: opaque.innerOpaque);
+    return opaque.inner.kind();
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return api.localMediaTrackMediaSourceKind(track: opaque.innerOpaque);
+    return opaque.inner.mediaSourceKind();
   }
 
   @override
   webrtc.MediaStreamTrack getTrack() {
-    return api.localMediaTrackGetTrack(track: opaque.innerOpaque)
-        as webrtc.MediaStreamTrack;
+    return opaque.inner.getTrack() as webrtc.MediaStreamTrack;
   }
 
   @moveSemantics
   @override
   Future<void> free() async {
-    if (!opaque.isStale()) {
+    if (!opaque.isDisposed) {
       RustHandlesStorage().removeHandle(this);
-      await (api.localMediaTrackFree(track: opaque.moveOpaque) as Future);
+      await (opaque.inner.free() as Future);
+      opaque.dispose();
     }
   }
 
   @override
   void onEnded(OnEndedCallback f) {
-    api.localMediaTrackOnEnded(track: opaque.innerOpaque, f: f);
+    opaque.inner.onEnded(f: f);
   }
 
   @override
   Future<MediaStreamTrackState> state() async {
-    var index =
-        await (api.localMediaTrackState(track: opaque.innerOpaque) as Future);
+    var index = await (opaque.inner.state() as Future);
     return MediaStreamTrackState.values[index];
   }
 
   @override
   bool isOnAudioLevelAvailable() {
-    return api.isOnAudioLevelAvailable(track: opaque.innerOpaque);
+    return opaque.inner.isOnAudioLevelAvailable();
   }
 
   @override
   void onAudioLevelChanged(OnAudioLevelChangedCallback f) {
-    api.onAudioLevelChanged(track: opaque.innerOpaque, f: f);
+    opaque.inner.onAudioLevelChanged(f: f);
   }
 }

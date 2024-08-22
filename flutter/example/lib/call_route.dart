@@ -75,12 +75,14 @@ class _CallState extends State<CallRoute> {
 
   final Map<String, ConnectWidgets> _widgets = {};
 
-  final Call _call = Call();
+  Call? _call;
   late String _roomId;
   late String _memberId;
 
   @override
   void initState() {
+    super.initState();
+
     _roomId = widget.roomId;
     _memberId = widget.memberId;
     _isPublish = widget.isPublish;
@@ -88,171 +90,177 @@ class _CallState extends State<CallRoute> {
     _publishAudio = widget.publishAudio;
     _fakeMedia = widget.fakeMedia;
 
-    _call.onNewRemoteStream((track, remoteId, conn) async {
-      final trackId = track.getTrack().id();
-      if (track.mediaDirection() == jason.TrackMediaDirection.sendRecv) {
-        var renderer = createVideoRenderer();
-        await renderer.initialize();
-        await renderer.setSrcObject(track.getTrack());
+    () async {
+      var call = await Call.create();
+      call.onNewRemoteStream((track, remoteId, conn) async {
+        final trackId = track.getTrack().id();
+        if (track.mediaDirection() == jason.TrackMediaDirection.sendRecv) {
+          var renderer = createVideoRenderer();
+          await renderer.initialize();
+          await renderer.setSrcObject(track.getTrack());
 
-        var connectionWidgets = _widgets[remoteId];
+          var connectionWidgets = _widgets[remoteId];
 
-        if (connectionWidgets == null) {
-          connectionWidgets = ConnectWidgets();
-          connectionWidgets.videoTracks =
-              Map.from({trackId: VideoView(renderer)});
-          connectionWidgets.name = Text(remoteId);
-          connectionWidgets.toggleButtons = [
-            TextButton(
-              onPressed: () {
-                if (!connectionWidgets!.recvVideoDevice) {
-                  conn.enableRemoteVideo(jason.MediaSourceKind.device);
-                } else {
-                  conn.disableRemoteVideo(jason.MediaSourceKind.device);
-                }
-                connectionWidgets.recvVideoDevice =
-                    !connectionWidgets.recvVideoDevice;
-              },
-              child: const Text('Toggle device video recv'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (!connectionWidgets!.recvVideoDisplay) {
-                  conn.enableRemoteVideo(jason.MediaSourceKind.display);
-                } else {
-                  conn.disableRemoteVideo(jason.MediaSourceKind.display);
-                }
-                connectionWidgets.recvVideoDisplay =
-                    !connectionWidgets.recvVideoDisplay;
-              },
-              child: const Text('Toggle display video recv'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (!connectionWidgets!.recvAudio) {
-                  conn.enableRemoteAudio();
-                } else {
-                  conn.disableRemoteAudio();
-                }
-                connectionWidgets.recvAudio = !connectionWidgets.recvAudio;
-              },
-              child: const Text('Toggle audio recv'),
-            )
-          ];
-        } else {
-          connectionWidgets.videoTracks[trackId] = VideoView(renderer);
-        }
-
-        setState(() {
-          _widgets[remoteId] = connectionWidgets!;
-        });
-      }
-
-      track.onMediaDirectionChanged(
-        (newDir) async {
-          var remoteTracks = _widgets[remoteId];
-
-          if (newDir == jason.TrackMediaDirection.sendRecv) {
-            var renderer = createVideoRenderer();
-            await renderer.initialize();
-            await renderer.setSrcObject(track.getTrack());
-
-            if (remoteTracks == null) {
-              remoteTracks = ConnectWidgets();
-              remoteTracks.videoTracks =
-                  Map.from({trackId: VideoView(renderer)});
-            } else {
-              remoteTracks.videoTracks[trackId] = VideoView(renderer);
-            }
+          if (connectionWidgets == null) {
+            connectionWidgets = ConnectWidgets();
+            connectionWidgets.videoTracks =
+                Map.from({trackId: VideoView(renderer)});
+            connectionWidgets.name = Text(remoteId);
+            connectionWidgets.toggleButtons = [
+              TextButton(
+                onPressed: () {
+                  if (!connectionWidgets!.recvVideoDevice) {
+                    conn.enableRemoteVideo(jason.MediaSourceKind.device);
+                  } else {
+                    conn.disableRemoteVideo(jason.MediaSourceKind.device);
+                  }
+                  connectionWidgets.recvVideoDevice =
+                      !connectionWidgets.recvVideoDevice;
+                },
+                child: const Text('Toggle device video recv'),
+              ),
+              TextButton(
+                onPressed: () {
+                  if (!connectionWidgets!.recvVideoDisplay) {
+                    conn.enableRemoteVideo(jason.MediaSourceKind.display);
+                  } else {
+                    conn.disableRemoteVideo(jason.MediaSourceKind.display);
+                  }
+                  connectionWidgets.recvVideoDisplay =
+                      !connectionWidgets.recvVideoDisplay;
+                },
+                child: const Text('Toggle display video recv'),
+              ),
+              TextButton(
+                onPressed: () {
+                  if (!connectionWidgets!.recvAudio) {
+                    conn.enableRemoteAudio();
+                  } else {
+                    conn.disableRemoteAudio();
+                  }
+                  connectionWidgets.recvAudio = !connectionWidgets.recvAudio;
+                },
+                child: const Text('Toggle audio recv'),
+              )
+            ];
           } else {
-            if (remoteTracks != null) {
-              remoteTracks.videoTracks.remove(trackId);
-            }
+            connectionWidgets.videoTracks[trackId] = VideoView(renderer);
           }
 
           setState(() {
-            _widgets[remoteId] = remoteTracks!;
+            _widgets[remoteId] = connectionWidgets!;
           });
-        },
-      );
-    });
+        }
+        track.onMediaDirectionChanged(
+          (newDir) async {
+            var remoteTracks = _widgets[remoteId];
 
-    _call.onLocalAudioTrack((track) {
-      track.onAudioLevelChanged((volume) {
-        setState(() {
-          currentAudioLevel = volume / 100;
+            if (newDir == jason.TrackMediaDirection.sendRecv) {
+              var renderer = createVideoRenderer();
+              await renderer.initialize();
+              await renderer.setSrcObject(track.getTrack());
+
+              if (remoteTracks == null) {
+                remoteTracks = ConnectWidgets();
+                remoteTracks.videoTracks =
+                    Map.from({trackId: VideoView(renderer)});
+              } else {
+                remoteTracks.videoTracks[trackId] = VideoView(renderer);
+              }
+            } else {
+              if (remoteTracks != null) {
+                remoteTracks.videoTracks.remove(trackId);
+              }
+            }
+
+            setState(() {
+              _widgets[remoteId] = remoteTracks!;
+            });
+          },
+        );
+      });
+
+      call.onLocalAudioTrack((track) {
+        track.onAudioLevelChanged((volume) {
+          setState(() {
+            currentAudioLevel = volume / 100;
+          });
         });
       });
-    });
+      call.onLocalDeviceStream((track) async {
+        if (localCameraVideo == null) {
+          var renderer = createVideoRenderer();
+          await renderer.initialize();
+          await renderer.setSrcObject(track);
+          localCameraVideo = VideoView(renderer, mirror: true);
 
-    _call.onLocalDeviceStream((track) async {
-      if (localCameraVideo == null) {
-        var renderer = createVideoRenderer();
-        await renderer.initialize();
-        await renderer.setSrcObject(track);
-        localCameraVideo = VideoView(renderer, mirror: true);
-
-        var localTracks = _widgets['I'];
-        if (localTracks == null) {
-          localTracks = ConnectWidgets();
-          localTracks.videoTracks = Map.from({'I': localCameraVideo!});
+          var localTracks = _widgets['I'];
+          if (localTracks == null) {
+            localTracks = ConnectWidgets();
+            localTracks.videoTracks = Map.from({'I': localCameraVideo!});
+          } else {
+            localTracks.videoTracks['I'] = localCameraVideo!;
+          }
+          setState(() {
+            _widgets['I'] = localTracks!;
+          });
         } else {
-          localTracks.videoTracks['I'] = localCameraVideo!;
+          await localCameraVideo!.videoRenderer.setSrcObject(track);
         }
-        setState(() {
-          _widgets['I'] = localTracks!;
-        });
-      } else {
-        await localCameraVideo!.videoRenderer.setSrcObject(track);
-      }
-    });
+      });
 
-    _call.onLocalDisplayStream((track) async {
-      if (localScreenVideo == null) {
-        var renderer = createVideoRenderer();
-        await renderer.initialize();
-        await renderer.setSrcObject(track);
-        localScreenVideo = VideoView(renderer, mirror: true);
+      call.onLocalDisplayStream((track) async {
+        if (localScreenVideo == null) {
+          var renderer = createVideoRenderer();
+          await renderer.initialize();
+          await renderer.setSrcObject(track);
+          localScreenVideo = VideoView(renderer, mirror: true);
 
-        var localTracks = _widgets['I'];
-        if (localTracks == null) {
-          localTracks = ConnectWidgets();
-          localTracks.videoTracks = Map.from({'I': localScreenVideo!});
+          var localTracks = _widgets['I'];
+          if (localTracks == null) {
+            localTracks = ConnectWidgets();
+            localTracks.videoTracks = Map.from({'I': localScreenVideo!});
+          } else {
+            localTracks.videoTracks['I'] = localScreenVideo!;
+          }
+          setState(() {
+            _widgets['I'] = localTracks!;
+          });
         } else {
-          localTracks.videoTracks['I'] = localScreenVideo!;
+          await localScreenVideo!.videoRenderer.setSrcObject(track);
         }
-        setState(() {
-          _widgets['I'] = localTracks!;
-        });
-      } else {
-        await localScreenVideo!.videoRenderer.setSrcObject(track);
-      }
-    });
+      });
+      call.onDeviceChange(() {
+        var snackBar = const SnackBar(content: Text('On device change'));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      });
 
-    _call.onDeviceChange(() {
-      var snackBar = const SnackBar(content: Text('On device change'));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    });
+      call.onError((err) {
+        var snackBar = SnackBar(content: Text(err));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      });
 
-    _call.onError((err) {
-      var snackBar = SnackBar(content: Text(err));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    });
+      call.start(
+        _roomId,
+        _memberId,
+        _isPublish,
+        _publishVideo,
+        _publishAudio,
+        _fakeMedia,
+      );
 
-    _call.start(
-      _roomId,
-      _memberId,
-      _isPublish,
-      _publishVideo,
-      _publishAudio,
-      _fakeMedia,
-    );
-
-    super.initState();
+      setState(() {
+        _call = call;
+      });
+    }();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_call == null) {
+      return const SizedBox.shrink();
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Medea call demo'), actions: <Widget>[
         TextButton(
@@ -262,7 +270,7 @@ class _CallState extends State<CallRoute> {
           ),
           child: const Text('MediaSetting'),
           onPressed: () async {
-            await mediaSettingDialog(context, _call);
+            await mediaSettingDialog(context, _call!);
           },
         ),
         TextButton(
@@ -272,7 +280,7 @@ class _CallState extends State<CallRoute> {
           ),
           child: const Text('Create'),
           onPressed: () async {
-            await controlApiCreateDialog(context, _call);
+            await controlApiCreateDialog(context, _call!);
           },
         ),
         TextButton(
@@ -282,7 +290,7 @@ class _CallState extends State<CallRoute> {
           ),
           child: const Text('Get'),
           onPressed: () async {
-            await controlApiGetDialog(context, _call);
+            await controlApiGetDialog(context, _call!);
           },
         ),
         TextButton(
@@ -292,7 +300,7 @@ class _CallState extends State<CallRoute> {
           ),
           child: const Text('Delete'),
           onPressed: () async {
-            await controlApiDeleteDialog(context, _call);
+            await controlApiDeleteDialog(context, _call!);
           },
         ),
         TextButton(
@@ -302,7 +310,7 @@ class _CallState extends State<CallRoute> {
           ),
           child: const Text('Callbacks'),
           onPressed: () async {
-            await showCallbacks(context, _call);
+            await showCallbacks(context, _call!);
           },
         ),
       ]),
@@ -345,7 +353,7 @@ class _CallState extends State<CallRoute> {
                       _audioEnabled = !_audioEnabled;
                     });
 
-                    await _call.toggleAudio(_audioEnabled);
+                    await _call!.toggleAudio(_audioEnabled);
                   },
                   heroTag: null,
                   child: Icon(_audioEnabled ? Icons.mic_off : Icons.mic),
@@ -358,7 +366,7 @@ class _CallState extends State<CallRoute> {
                       _videoEnabled = !_videoEnabled;
                     });
 
-                    await _call.toggleVideo(_videoEnabled);
+                    await _call!.toggleVideo(_videoEnabled);
                   },
                   heroTag: null,
                   child: Icon(
@@ -367,7 +375,7 @@ class _CallState extends State<CallRoute> {
                 )),
             FloatingActionButton(
               onPressed: () async {
-                await _call.dispose();
+                await _call!.dispose();
                 Navigator.pop(context);
               },
               heroTag: null,

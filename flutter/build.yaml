@@ -4,4 +4,5 @@ targets:
       - $package$
       - test/**
       - pubspec.*
-      - lib/src/native/ffi/jason_api.g.dart
+      - lib/src/native/ffi/frb/api/dart/api.dart
+      - lib/src/native/ffi/frb/media/constraints.dart
