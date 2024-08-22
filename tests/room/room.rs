@@ -716,8 +716,8 @@ mod disable_send_tracks {
     }
 
     /// Tests that when [`JsMediaSouceKind::Device`] is provided to the
-    /// [`RoomHandle::disable_video`] and [`RoomHandle::enable_video`], the
-    /// only device video will be disabled/enabled.
+    /// [`RoomHandle::disable_video`] and [`RoomHandle::enable_video`], only
+    /// device video will be disabled/enabled.
     #[wasm_bindgen_test]
     async fn disable_enable_device_video() {
         let audio_track = audio_track(TrackId(1), false);
@@ -932,7 +932,7 @@ mod disable_send_tracks {
         let (audio_track, video_track) = get_test_unrequired_tracks();
         let (room, peer, _, _) = get_test_room_and_exist_peer(
             vec![audio_track, video_track],
-            Some(media_stream_settings(true, true)),
+            Some(media_stream_settings(false, false)),
         )
         .await;
 
@@ -940,18 +940,19 @@ mod disable_send_tracks {
             MediaKind::Video,
             TrackDirection::Send,
             None,
-            media_exchange_state::Stable::Enabled.into()
+            media_exchange_state::Stable::Disabled.into()
         ));
 
         let room_handle = api::RoomHandle::from(room.new_handle());
-        let (disable_video_result, enable_video_result) =
+        let (enable_video_result, disable_video_result) =
             futures::future::join(
-                JsFuture::from(room_handle.disable_video(None)),
                 JsFuture::from(room_handle.enable_video(None)),
+                JsFuture::from(room_handle.disable_video(None)),
             )
             .await;
-        disable_video_result.unwrap_err();
-        enable_video_result.unwrap();
+
+        enable_video_result.unwrap_err();
+        disable_video_result.unwrap();
 
         assert!(peer.is_all_transceiver_sides_in_media_state(
             MediaKind::Video,
