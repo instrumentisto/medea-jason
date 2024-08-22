@@ -433,14 +433,14 @@ ifeq ($(shell brew list | grep -Fx llvm),)
 	brew install llvm
 endif
 endif
-	flutter_rust_bridge_codegen \
-		--rust-input src/api/dart/api.rs \
-		--dart-output flutter/lib/src/native/ffi/jason_api.g.dart \
-		--rust-output src/api/dart/api_bridge_generated.rs \
-		--dart-enums-style \
-		--inline-rust \
-		--no-build-runner \
-		--skip-add-mod-to-lib
+	flutter_rust_bridge_codegen generate \
+		--rust-input=crate::api::dart::api \
+		--rust-root=. \
+		--rust-output src/api/dart/api/api_bridge_generated.rs \
+		--no-add-mod-to-lib \
+		--dart-output=flutter/lib/src/native/ffi/frb \
+		--no-web \
+		--local
 	cd flutter && \
 	dart pub run build_runner build --delete-conflicting-outputs
 

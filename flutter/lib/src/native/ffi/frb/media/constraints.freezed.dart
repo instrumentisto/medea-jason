@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'jason_api.g.dart';
+part of 'constraints.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -13,377 +13,6 @@ T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-/// @nodoc
-mixin _$ApiConstrainFacingMode {
-  FacingMode get field0 => throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(FacingMode field0) exact,
-    required TResult Function(FacingMode field0) ideal,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(FacingMode field0)? exact,
-    TResult? Function(FacingMode field0)? ideal,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(FacingMode field0)? exact,
-    TResult Function(FacingMode field0)? ideal,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ApiConstrainFacingMode_Exact value) exact,
-    required TResult Function(ApiConstrainFacingMode_Ideal value) ideal,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ApiConstrainFacingMode_Exact value)? exact,
-    TResult? Function(ApiConstrainFacingMode_Ideal value)? ideal,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ApiConstrainFacingMode_Exact value)? exact,
-    TResult Function(ApiConstrainFacingMode_Ideal value)? ideal,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-
-  @JsonKey(ignore: true)
-  $ApiConstrainFacingModeCopyWith<ApiConstrainFacingMode> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ApiConstrainFacingModeCopyWith<$Res> {
-  factory $ApiConstrainFacingModeCopyWith(ApiConstrainFacingMode value,
-          $Res Function(ApiConstrainFacingMode) then) =
-      _$ApiConstrainFacingModeCopyWithImpl<$Res, ApiConstrainFacingMode>;
-  @useResult
-  $Res call({FacingMode field0});
-}
-
-/// @nodoc
-class _$ApiConstrainFacingModeCopyWithImpl<$Res,
-        $Val extends ApiConstrainFacingMode>
-    implements $ApiConstrainFacingModeCopyWith<$Res> {
-  _$ApiConstrainFacingModeCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_value.copyWith(
-      field0: null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as FacingMode,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$ApiConstrainFacingMode_ExactImplCopyWith<$Res>
-    implements $ApiConstrainFacingModeCopyWith<$Res> {
-  factory _$$ApiConstrainFacingMode_ExactImplCopyWith(
-          _$ApiConstrainFacingMode_ExactImpl value,
-          $Res Function(_$ApiConstrainFacingMode_ExactImpl) then) =
-      __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({FacingMode field0});
-}
-
-/// @nodoc
-class __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>
-    extends _$ApiConstrainFacingModeCopyWithImpl<$Res,
-        _$ApiConstrainFacingMode_ExactImpl>
-    implements _$$ApiConstrainFacingMode_ExactImplCopyWith<$Res> {
-  __$$ApiConstrainFacingMode_ExactImplCopyWithImpl(
-      _$ApiConstrainFacingMode_ExactImpl _value,
-      $Res Function(_$ApiConstrainFacingMode_ExactImpl) _then)
-      : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_$ApiConstrainFacingMode_ExactImpl(
-      null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as FacingMode,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$ApiConstrainFacingMode_ExactImpl
-    implements ApiConstrainFacingMode_Exact {
-  const _$ApiConstrainFacingMode_ExactImpl(this.field0);
-
-  @override
-  final FacingMode field0;
-
-  @override
-  String toString() {
-    return 'ApiConstrainFacingMode.exact(field0: $field0)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ApiConstrainFacingMode_ExactImpl &&
-            (identical(other.field0, field0) || other.field0 == field0));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, field0);
-
-  @JsonKey(ignore: true)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ApiConstrainFacingMode_ExactImplCopyWith<
-          _$ApiConstrainFacingMode_ExactImpl>
-      get copyWith => __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<
-          _$ApiConstrainFacingMode_ExactImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(FacingMode field0) exact,
-    required TResult Function(FacingMode field0) ideal,
-  }) {
-    return exact(field0);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(FacingMode field0)? exact,
-    TResult? Function(FacingMode field0)? ideal,
-  }) {
-    return exact?.call(field0);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(FacingMode field0)? exact,
-    TResult Function(FacingMode field0)? ideal,
-    required TResult orElse(),
-  }) {
-    if (exact != null) {
-      return exact(field0);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ApiConstrainFacingMode_Exact value) exact,
-    required TResult Function(ApiConstrainFacingMode_Ideal value) ideal,
-  }) {
-    return exact(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ApiConstrainFacingMode_Exact value)? exact,
-    TResult? Function(ApiConstrainFacingMode_Ideal value)? ideal,
-  }) {
-    return exact?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ApiConstrainFacingMode_Exact value)? exact,
-    TResult Function(ApiConstrainFacingMode_Ideal value)? ideal,
-    required TResult orElse(),
-  }) {
-    if (exact != null) {
-      return exact(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class ApiConstrainFacingMode_Exact implements ApiConstrainFacingMode {
-  const factory ApiConstrainFacingMode_Exact(final FacingMode field0) =
-      _$ApiConstrainFacingMode_ExactImpl;
-
-  @override
-  FacingMode get field0;
-  @override
-  @JsonKey(ignore: true)
-  _$$ApiConstrainFacingMode_ExactImplCopyWith<
-          _$ApiConstrainFacingMode_ExactImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$ApiConstrainFacingMode_IdealImplCopyWith<$Res>
-    implements $ApiConstrainFacingModeCopyWith<$Res> {
-  factory _$$ApiConstrainFacingMode_IdealImplCopyWith(
-          _$ApiConstrainFacingMode_IdealImpl value,
-          $Res Function(_$ApiConstrainFacingMode_IdealImpl) then) =
-      __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({FacingMode field0});
-}
-
-/// @nodoc
-class __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>
-    extends _$ApiConstrainFacingModeCopyWithImpl<$Res,
-        _$ApiConstrainFacingMode_IdealImpl>
-    implements _$$ApiConstrainFacingMode_IdealImplCopyWith<$Res> {
-  __$$ApiConstrainFacingMode_IdealImplCopyWithImpl(
-      _$ApiConstrainFacingMode_IdealImpl _value,
-      $Res Function(_$ApiConstrainFacingMode_IdealImpl) _then)
-      : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_$ApiConstrainFacingMode_IdealImpl(
-      null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as FacingMode,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$ApiConstrainFacingMode_IdealImpl
-    implements ApiConstrainFacingMode_Ideal {
-  const _$ApiConstrainFacingMode_IdealImpl(this.field0);
-
-  @override
-  final FacingMode field0;
-
-  @override
-  String toString() {
-    return 'ApiConstrainFacingMode.ideal(field0: $field0)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ApiConstrainFacingMode_IdealImpl &&
-            (identical(other.field0, field0) || other.field0 == field0));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, field0);
-
-  @JsonKey(ignore: true)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ApiConstrainFacingMode_IdealImplCopyWith<
-          _$ApiConstrainFacingMode_IdealImpl>
-      get copyWith => __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<
-          _$ApiConstrainFacingMode_IdealImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(FacingMode field0) exact,
-    required TResult Function(FacingMode field0) ideal,
-  }) {
-    return ideal(field0);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(FacingMode field0)? exact,
-    TResult? Function(FacingMode field0)? ideal,
-  }) {
-    return ideal?.call(field0);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(FacingMode field0)? exact,
-    TResult Function(FacingMode field0)? ideal,
-    required TResult orElse(),
-  }) {
-    if (ideal != null) {
-      return ideal(field0);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ApiConstrainFacingMode_Exact value) exact,
-    required TResult Function(ApiConstrainFacingMode_Ideal value) ideal,
-  }) {
-    return ideal(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ApiConstrainFacingMode_Exact value)? exact,
-    TResult? Function(ApiConstrainFacingMode_Ideal value)? ideal,
-  }) {
-    return ideal?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ApiConstrainFacingMode_Exact value)? exact,
-    TResult Function(ApiConstrainFacingMode_Ideal value)? ideal,
-    required TResult orElse(),
-  }) {
-    if (ideal != null) {
-      return ideal(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class ApiConstrainFacingMode_Ideal implements ApiConstrainFacingMode {
-  const factory ApiConstrainFacingMode_Ideal(final FacingMode field0) =
-      _$ApiConstrainFacingMode_IdealImpl;
-
-  @override
-  FacingMode get field0;
-  @override
-  @JsonKey(ignore: true)
-  _$$ApiConstrainFacingMode_IdealImplCopyWith<
-          _$ApiConstrainFacingMode_IdealImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
 
 /// @nodoc
 mixin _$ConstrainBoolean {
@@ -427,7 +56,9 @@ mixin _$ConstrainBoolean {
   }) =>
       throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ConstrainBooleanCopyWith<ConstrainBoolean> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -451,6 +82,8 @@ class _$ConstrainBooleanCopyWithImpl<$Res, $Val extends ConstrainBoolean>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -486,6 +119,8 @@ class __$$ConstrainBoolean_ExactImplCopyWithImpl<$Res>
       $Res Function(_$ConstrainBoolean_ExactImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -502,8 +137,8 @@ class __$$ConstrainBoolean_ExactImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ConstrainBoolean_ExactImpl implements ConstrainBoolean_Exact {
-  const _$ConstrainBoolean_ExactImpl(this.field0);
+class _$ConstrainBoolean_ExactImpl extends ConstrainBoolean_Exact {
+  const _$ConstrainBoolean_ExactImpl(this.field0) : super._();
 
   @override
   final bool field0;
@@ -524,7 +159,9 @@ class _$ConstrainBoolean_ExactImpl implements ConstrainBoolean_Exact {
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainBoolean_ExactImplCopyWith<_$ConstrainBoolean_ExactImpl>
@@ -594,14 +231,18 @@ class _$ConstrainBoolean_ExactImpl implements ConstrainBoolean_Exact {
   }
 }
 
-abstract class ConstrainBoolean_Exact implements ConstrainBoolean {
+abstract class ConstrainBoolean_Exact extends ConstrainBoolean {
   const factory ConstrainBoolean_Exact(final bool field0) =
       _$ConstrainBoolean_ExactImpl;
+  const ConstrainBoolean_Exact._() : super._();
 
   @override
   bool get field0;
+
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainBoolean_ExactImplCopyWith<_$ConstrainBoolean_ExactImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -627,6 +268,8 @@ class __$$ConstrainBoolean_IdealImplCopyWithImpl<$Res>
       $Res Function(_$ConstrainBoolean_IdealImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -643,8 +286,8 @@ class __$$ConstrainBoolean_IdealImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ConstrainBoolean_IdealImpl implements ConstrainBoolean_Ideal {
-  const _$ConstrainBoolean_IdealImpl(this.field0);
+class _$ConstrainBoolean_IdealImpl extends ConstrainBoolean_Ideal {
+  const _$ConstrainBoolean_IdealImpl(this.field0) : super._();
 
   @override
   final bool field0;
@@ -665,7 +308,9 @@ class _$ConstrainBoolean_IdealImpl implements ConstrainBoolean_Ideal {
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainBoolean_IdealImplCopyWith<_$ConstrainBoolean_IdealImpl>
@@ -735,14 +380,18 @@ class _$ConstrainBoolean_IdealImpl implements ConstrainBoolean_Ideal {
   }
 }
 
-abstract class ConstrainBoolean_Ideal implements ConstrainBoolean {
+abstract class ConstrainBoolean_Ideal extends ConstrainBoolean {
   const factory ConstrainBoolean_Ideal(final bool field0) =
       _$ConstrainBoolean_IdealImpl;
+  const ConstrainBoolean_Ideal._() : super._();
 
   @override
   bool get field0;
+
+  /// Create a copy of ConstrainBoolean
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainBoolean_IdealImplCopyWith<_$ConstrainBoolean_IdealImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -795,7 +444,9 @@ mixin _$ConstrainU32 {
   }) =>
       throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ConstrainU32CopyWith<ConstrainU32> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -819,6 +470,8 @@ class _$ConstrainU32CopyWithImpl<$Res, $Val extends ConstrainU32>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -852,6 +505,8 @@ class __$$ConstrainU32_ExactImplCopyWithImpl<$Res>
       $Res Function(_$ConstrainU32_ExactImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -868,8 +523,8 @@ class __$$ConstrainU32_ExactImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ConstrainU32_ExactImpl implements ConstrainU32_Exact {
-  const _$ConstrainU32_ExactImpl(this.field0);
+class _$ConstrainU32_ExactImpl extends ConstrainU32_Exact {
+  const _$ConstrainU32_ExactImpl(this.field0) : super._();
 
   @override
   final int field0;
@@ -890,7 +545,9 @@ class _$ConstrainU32_ExactImpl implements ConstrainU32_Exact {
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainU32_ExactImplCopyWith<_$ConstrainU32_ExactImpl> get copyWith =>
@@ -966,13 +623,17 @@ class _$ConstrainU32_ExactImpl implements ConstrainU32_Exact {
   }
 }
 
-abstract class ConstrainU32_Exact implements ConstrainU32 {
+abstract class ConstrainU32_Exact extends ConstrainU32 {
   const factory ConstrainU32_Exact(final int field0) = _$ConstrainU32_ExactImpl;
+  const ConstrainU32_Exact._() : super._();
 
   @override
   int get field0;
+
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainU32_ExactImplCopyWith<_$ConstrainU32_ExactImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -996,6 +657,8 @@ class __$$ConstrainU32_IdealImplCopyWithImpl<$Res>
       $Res Function(_$ConstrainU32_IdealImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1012,8 +675,8 @@ class __$$ConstrainU32_IdealImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ConstrainU32_IdealImpl implements ConstrainU32_Ideal {
-  const _$ConstrainU32_IdealImpl(this.field0);
+class _$ConstrainU32_IdealImpl extends ConstrainU32_Ideal {
+  const _$ConstrainU32_IdealImpl(this.field0) : super._();
 
   @override
   final int field0;
@@ -1034,7 +697,9 @@ class _$ConstrainU32_IdealImpl implements ConstrainU32_Ideal {
   @override
   int get hashCode => Object.hash(runtimeType, field0);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainU32_IdealImplCopyWith<_$ConstrainU32_IdealImpl> get copyWith =>
@@ -1110,13 +775,17 @@ class _$ConstrainU32_IdealImpl implements ConstrainU32_Ideal {
   }
 }
 
-abstract class ConstrainU32_Ideal implements ConstrainU32 {
+abstract class ConstrainU32_Ideal extends ConstrainU32 {
   const factory ConstrainU32_Ideal(final int field0) = _$ConstrainU32_IdealImpl;
+  const ConstrainU32_Ideal._() : super._();
 
   @override
   int get field0;
+
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainU32_IdealImplCopyWith<_$ConstrainU32_IdealImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1140,6 +809,8 @@ class __$$ConstrainU32_RangeImplCopyWithImpl<$Res>
       $Res Function(_$ConstrainU32_RangeImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1161,8 +832,8 @@ class __$$ConstrainU32_RangeImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ConstrainU32_RangeImpl implements ConstrainU32_Range {
-  const _$ConstrainU32_RangeImpl(this.field0, this.field1);
+class _$ConstrainU32_RangeImpl extends ConstrainU32_Range {
+  const _$ConstrainU32_RangeImpl(this.field0, this.field1) : super._();
 
   @override
   final int field0;
@@ -1186,7 +857,9 @@ class _$ConstrainU32_RangeImpl implements ConstrainU32_Range {
   @override
   int get hashCode => Object.hash(runtimeType, field0, field1);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainU32_RangeImplCopyWith<_$ConstrainU32_RangeImpl> get copyWith =>
@@ -1262,15 +935,19 @@ class _$ConstrainU32_RangeImpl implements ConstrainU32_Range {
   }
 }
 
-abstract class ConstrainU32_Range implements ConstrainU32 {
+abstract class ConstrainU32_Range extends ConstrainU32 {
   const factory ConstrainU32_Range(final int field0, final int field1) =
       _$ConstrainU32_RangeImpl;
+  const ConstrainU32_Range._() : super._();
 
   @override
   int get field0;
   int get field1;
+
+  /// Create a copy of ConstrainU32
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainU32_RangeImplCopyWith<_$ConstrainU32_RangeImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

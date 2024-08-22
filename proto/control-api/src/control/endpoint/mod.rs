@@ -82,8 +82,8 @@ pub enum Spec {
 )]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-#[from(types("&str", String, web_rtc_play::Id, web_rtc_publish::Id))]
-#[into(owned(types(String, web_rtc_play::Id, web_rtc_publish::Id)))]
+#[from(Box<str>, &str, String, web_rtc_play::Id, web_rtc_publish::Id)]
+#[into(Box<str>, String, web_rtc_play::Id, web_rtc_publish::Id)]
 #[repr(transparent)]
 pub struct Id(Box<str>);
 

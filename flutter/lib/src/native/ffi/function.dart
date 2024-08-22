@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:ffi';
 
-import '../jason.dart';
 import 'foreign_value.dart';
+import 'frb/api/dart/api.dart' as frb;
 import 'function.g.dart' as bridge;
 
 void registerFunctions(DynamicLibrary dl) {
@@ -21,7 +21,7 @@ void _callFn(Object fn, ForeignValue value) {
       if (fn is dynamic Function(dynamic)) {
         var res = fn(arg);
         if (res is Future<void>) {
-          res.catchError((e, stack) => api.logDartException(
+          res.catchError((e, stack) => frb.logDartException(
               message: e.toString(), stackTrace: stack.toString()));
         }
       } else if (fn is void Function(int)) {
@@ -32,11 +32,11 @@ void _callFn(Object fn, ForeignValue value) {
     } else {
       var res = (fn as dynamic Function())();
       if (res is Future<void>) {
-        res.catchError((e, stack) => api.logDartException(
+        res.catchError((e, stack) => frb.logDartException(
             message: e.toString(), stackTrace: stack.toString()));
       }
     }
   } catch (e, stack) {
-    api.logDartException(message: e.toString(), stackTrace: stack.toString());
+    frb.logDartException(message: e.toString(), stackTrace: stack.toString());
   }
 }

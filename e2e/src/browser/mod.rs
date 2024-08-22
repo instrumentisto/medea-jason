@@ -14,7 +14,7 @@ use std::{
     },
 };
 
-use derive_more::{Display, Error, From};
+use derive_more::{Display, Error as StdError, From};
 use fantoccini::wd::WindowHandle;
 use serde_json::Value as Json;
 
@@ -24,7 +24,7 @@ pub use self::client::{WebDriverClient, WebDriverClientBuilder};
 pub use self::js::Statement;
 
 /// All errors which can happen while working with a browser.
-#[derive(Debug, Display, Error, From)]
+#[derive(Debug, Display, From, StdError)]
 pub enum Error {
     /// Failed to deserialize a result of the executed JS code.
     ///
@@ -38,7 +38,7 @@ pub enum Error {
     /// Failed to initialize TLS for establishing a [WebDriver] session.
     ///
     /// [WebDriver]: https://w3.org/TR/webdriver
-    #[display(fmt = "Failed to initialize TLS: {_0}")]
+    #[display("Failed to initialize TLS: {_0}")]
     TlsInit(io::Error),
 
     /// Error occurred while executing some browser action by a [WebDriver].

@@ -35,7 +35,7 @@ use self::{
 pub use local_sdp::DESCRIPTION_APPROVE_TIMEOUT;
 
 /// Synchronization state of a [`Component`].
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SyncState {
     /// State desynced, and should be synced on a RPC reconnection.
     Desynced,
@@ -80,7 +80,7 @@ pub enum SyncState {
 ///               |                |
 ///               +----------------+
 /// ```
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum NegotiationState {
     /// [`Component`] is new or negotiation is completed.
     Stable,

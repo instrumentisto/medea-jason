@@ -79,8 +79,8 @@ pub struct Spec {
 )]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-#[from(types("&str", String))]
-#[into(owned(types(String)))]
+#[from(Box<str>, &str, String)]
+#[into(Box<str>, String)]
 #[repr(transparent)]
 pub struct Id(Box<str>);
 

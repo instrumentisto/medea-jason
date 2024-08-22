@@ -16,11 +16,12 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
+    await webrtc.initFfiBridge();
     await webrtc.enableFakeMedia();
   });
 
   testWidgets('MediaManager', (WidgetTester tester) async {
-    var jason = Jason();
+    var jason = await Jason.init();
     var mediaManager = jason.mediaManager();
 
     var devices = await mediaManager.enumerateDevices();
@@ -97,7 +98,7 @@ void main() {
   });
 
   testWidgets('RoomHandle', (WidgetTester tester) async {
-    var jason = Jason();
+    var jason = await Jason.init();
     var room = jason.initRoom();
     room.onFailedLocalMedia((_) {});
     room.onConnectionLoss((_) {});
@@ -126,6 +127,10 @@ void main() {
         allOf(predicate((e) =>
             e is FormatException &&
             e.message.contains('relative URL without a base'))));
+
+    jason.closeRoom(room);
+    jason.free();
+    room.free();
   });
 
   testWidgets('Primitive arguments Callback validation',
@@ -288,7 +293,7 @@ void main() {
       (WidgetTester widgetTester) async {
     final firePanic =
         dl.lookupFunction<Void Function(), void Function()>('fire_panic');
-    final jason = Jason();
+    final jason = await Jason.init();
     var completer = Completer();
     onPanic((msg) => completer.complete(msg));
     try {
@@ -296,7 +301,7 @@ void main() {
     } catch (e) {
       var res = await completer.future;
       expect(res as String, contains('panicked at'));
-      expect(jason.opaque.isStale(), true);
+      expect(jason.opaque.isDisposed, true);
       return;
     }
     throw Exception('Exception not fired on panic');
@@ -305,7 +310,7 @@ void main() {
   testWidgets('Enumerate displays', (WidgetTester widgetTester) async {
     var shouldWork = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
 
-    var jason = Jason();
+    var jason = await Jason.init();
     var media = jason.mediaManager();
 
     if (!shouldWork) {

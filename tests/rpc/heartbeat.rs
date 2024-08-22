@@ -53,7 +53,7 @@ async fn sends_pong_on_received_ping() {
         let msg = test_rx.await.unwrap();
         match msg {
             ClientMsg::Pong(_) => (),
-            _ => panic!("Received not pong message! Message: {:?}", msg),
+            _ => panic!("received not pong message! Message: {msg:?}"),
         }
     })
     .await
@@ -125,7 +125,7 @@ async fn pre_sends_pong() {
             assert_eq!(n, 1);
         }
         _ => {
-            panic!("Received not pong message! Message: {:?}", msg);
+            panic!("received not pong message! Message: {msg:?}");
         }
     }
 }

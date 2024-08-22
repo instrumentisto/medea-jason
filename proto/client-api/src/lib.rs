@@ -1074,19 +1074,19 @@ pub enum Codec {
     /// [VP8] codec.
     ///
     /// [VP8]: https://en.wikipedia.org/wiki/VP8
-    #[display(fmt = "VP8")]
+    #[display("VP8")]
     VP8,
 
     /// [VP9] codec.
     ///
     /// [VP9]: https://en.wikipedia.org/wiki/VP9
-    #[display(fmt = "VP9")]
+    #[display("VP9")]
     VP9,
 
     /// [AV1] codec.
     ///
     /// [AV1]: https://en.wikipedia.org/wiki/AV1
-    #[display(fmt = "AV1")]
+    #[display("AV1")]
     AV1,
 }
 
@@ -1127,91 +1127,91 @@ pub enum ScalabilityMode {
     /// [L1T1] mode.
     ///
     /// [L1T1]: https://w3.org/TR/webrtc-svc#L1T1*
-    #[display(fmt = "L1T1")]
+    #[display("L1T1")]
     L1T1,
 
     /// [L1T2] mode.
     ///
     /// [L1T2]: https://w3.org/TR/webrtc-svc#L1T2*
-    #[display(fmt = "L1T2")]
+    #[display("L1T2")]
     L1T2,
 
     /// [L1T3] mode.
     ///
     /// [L1T3]: https://w3.org/TR/webrtc-svc#L1T3*
-    #[display(fmt = "L1T3")]
+    #[display("L1T3")]
     L1T3,
 
     /// [L2T1] mode.
     ///
     /// [L2T1]: https://w3.org/TR/webrtc-svc#L2T1*
-    #[display(fmt = "L2T1")]
+    #[display("L2T1")]
     L2T1,
 
     /// [L2T2] mode.
     ///
     /// [L2T2]: https://w3.org/TR/webrtc-svc#L2T2*
-    #[display(fmt = "L2T2")]
+    #[display("L2T2")]
     L2T2,
 
     /// [L2T3] mode.
     ///
     /// [L2T3]: https://w3.org/TR/webrtc-svc#L2T3*
-    #[display(fmt = "L2T3")]
+    #[display("L2T3")]
     L2T3,
 
     /// [L3T1] mode.
     ///
     /// [L3T1]: https://w3.org/TR/webrtc-svc#L3T1*
-    #[display(fmt = "L3T1")]
+    #[display("L3T1")]
     L3T1,
 
     /// [L3T2] mode.
     ///
     /// [L3T2]: https://w3.org/TR/webrtc-svc#L3T2*
-    #[display(fmt = "L3T2")]
+    #[display("L3T2")]
     L3T2,
 
     /// [L3T3] mode.
     ///
     /// [L3T3]: https://w3.org/TR/webrtc-svc#L3T3*
-    #[display(fmt = "L3T3")]
+    #[display("L3T3")]
     L3T3,
 
     /// [S2T1] mode.
     ///
     /// [S2T1]: https://w3.org/TR/webrtc-svc#S2T1*
-    #[display(fmt = "S2T1")]
+    #[display("S2T1")]
     S2T1,
 
     /// [S2T2] mode.
     ///
     /// [S2T2]: https://w3.org/TR/webrtc-svc#S2T2*
-    #[display(fmt = "S2T2")]
+    #[display("S2T2")]
     S2T2,
 
     /// [S2T3] mode.
     ///
     /// [S2T3]: https://w3.org/TR/webrtc-svc#S2T3*
-    #[display(fmt = "S2T3")]
+    #[display("S2T3")]
     S2T3,
 
     /// [S3T1] mode.
     ///
     /// [S3T1]: https://w3.org/TR/webrtc-svc#S3T1*
-    #[display(fmt = "S3T1")]
+    #[display("S3T1")]
     S3T1,
 
     /// [S3T2] mode.
     ///
     /// [S3T2]: https://w3.org/TR/webrtc-svc#S3T2*
-    #[display(fmt = "S3T2")]
+    #[display("S3T2")]
     S3T2,
 
     /// [S3T3] mode.
     ///
     /// [S3T3]: https://w3.org/TR/webrtc-svc#S3T3*
-    #[display(fmt = "S3T3")]
+    #[display("S3T3")]
     S3T3,
 }
 

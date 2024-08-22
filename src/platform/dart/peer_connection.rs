@@ -46,7 +46,7 @@ mod peer_connection {
 
     use dart_sys::Dart_Handle;
 
-    use crate::{api::DartValueArg, platform::Error};
+    use crate::platform::Error;
 
     extern "C" {
         /// Returns [`IceConnectionState`] of the provided [`PeerConnection`].
@@ -62,9 +62,7 @@ mod peer_connection {
         ) -> Result<(), Error>;
 
         /// Returns a [`ConnectionState`] of the provided [`PeerConnection`].
-        pub fn connection_state(
-            peer: Dart_Handle,
-        ) -> Result<ptr::NonNull<DartValueArg<Option<i32>>>, Error>;
+        pub fn connection_state(peer: Dart_Handle) -> Result<i32, Error>;
 
         /// Requests an ICE candidate gathering redoing on both ends of the
         /// connection.
@@ -314,18 +312,13 @@ impl RtcPeerConnection {
     }
 
     /// Returns [`PeerConnectionState`] of this [`RtcPeerConnection`].
-    ///
-    /// Returns [`None`] if failed to parse a [`PeerConnectionState`].
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
-    pub fn connection_state(&self) -> Option<PeerConnectionState> {
+    pub fn connection_state(&self) -> PeerConnectionState {
         let conn_state =
-            unsafe { peer_connection::connection_state(self.handle.get()) }
+            unsafe { peer_connection::ice_connection_state(self.handle.get()) }
                 .unwrap();
-        let conn_state =
-            Option::try_from(unsafe { *Box::from_raw(conn_state.as_ptr()) })
-                .unwrap()?;
-        Some(peer_connection_state_from_int(conn_state))
+        peer_connection_state_from_int(conn_state)
     }
 
     /// Sets `handler` for an [`iceconnectionstatechange`][1] event.
@@ -617,10 +610,10 @@ impl Drop for RtcPeerConnection {
 #[derive(Display)]
 pub enum RtcSdpType {
     /// Description is an initial proposal in an offer/answer exchange.
-    #[display(fmt = "offer")]
+    #[display("offer")]
     Offer,
 
     /// Description is a definitive choice in an offer/answer exchange.
-    #[display(fmt = "answer")]
+    #[display("answer")]
     Answer,
 }

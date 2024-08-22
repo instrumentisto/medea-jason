@@ -4,8 +4,7 @@ import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/jason_api.g.dart' as frb;
-import 'jason.dart';
+import 'ffi/frb/frb.dart' as frb;
 
 class NativeRemoteMediaTrack implements RemoteMediaTrack {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
@@ -20,55 +19,54 @@ class NativeRemoteMediaTrack implements RemoteMediaTrack {
 
   @override
   bool muted() {
-    return api.remoteMediaTrackMuted(track: opaque.innerOpaque);
+    return opaque.inner.muted();
   }
 
   @override
   MediaKind kind() {
-    return api.remoteMediaTrackKind(track: opaque.innerOpaque);
+    return opaque.inner.kind();
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return api.remoteMediaTrackMediaSourceKind(track: opaque.innerOpaque);
+    return opaque.inner.mediaSourceKind();
   }
 
   @override
   TrackMediaDirection mediaDirection() {
-    return api.remoteMediaTrackMediaDirection(track: opaque.innerOpaque);
+    return opaque.inner.mediaDirection();
   }
 
   @override
   webrtc.MediaStreamTrack getTrack() {
-    return api.remoteMediaTrackGetTrack(track: opaque.innerOpaque)
-        as webrtc.MediaStreamTrack;
+    return opaque.inner.getTrack() as webrtc.MediaStreamTrack;
   }
 
   @override
   void onMuted(void Function() f) {
-    return api.remoteMediaTrackOnMuted(track: opaque.innerOpaque, f: f);
+    return opaque.inner.onMuted(f: f);
   }
 
   @override
   void onUnmuted(void Function() f) {
-    return api.remoteMediaTrackOnUnmuted(track: opaque.innerOpaque, f: f);
+    return opaque.inner.onUnmuted(f: f);
   }
 
   @override
   void onStopped(void Function() f) {
-    return api.remoteMediaTrackOnStopped(track: opaque.innerOpaque, f: f);
+    return opaque.inner.onStopped(f: f);
   }
 
   @override
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
-    api.remoteMediaTrackOnMediaDirectionChanged(
-        track: opaque.innerOpaque, f: (i) => f(TrackMediaDirection.values[i]));
+    opaque.inner
+        .onMediaDirectionChanged(f: (i) => f(TrackMediaDirection.values[i]));
   }
 
   @moveSemantics
   @override
   Future<void> free() async {
-    if (!opaque.isStale()) {
+    if (!opaque.isDisposed) {
       RustHandlesStorage().removeHandle(this);
 
       opaque.dispose();

@@ -4,39 +4,27 @@
 
 use std::rc::Rc;
 
-use js_sys::{
-    Array as JsArray, Function as JsFunction, Iterator as JsIterator, JSON,
-};
+use js_sys::{Array as JsArray, JSON};
 use medea_client_api_proto::stats::{RtcStat, RtcStatsType};
 use tracerr::Traced;
 use wasm_bindgen::{prelude::*, JsCast};
+use web_sys::RtcStatsReport;
 
-use crate::platform::{self, wasm::get_property_by_name, RtcStatsError};
+use crate::platform::{self, RtcStatsError};
 
 /// All available [`RtcStatsType`]s of a [`platform::RtcPeerConnection`].
 #[derive(Clone, Debug)]
 pub struct RtcStats(pub Vec<RtcStat>);
 
-impl TryFrom<&JsValue> for RtcStats {
+impl TryFrom<RtcStatsReport> for RtcStats {
     type Error = Traced<RtcStatsError>;
 
-    fn try_from(stats: &JsValue) -> Result<Self, Self::Error> {
-        use RtcStatsError::{Platform, UndefinedEntries};
-
-        let entries_fn =
-            get_property_by_name(&stats, "entries", |func: JsValue| {
-                Some(func.unchecked_into::<JsFunction>())
-            })
-            .ok_or_else(|| tracerr::new!(UndefinedEntries))?;
-
-        let iterator = entries_fn
-            .call0(stats.as_ref())
-            .map_err(|e| tracerr::new!(Platform(platform::Error::from(e))))?
-            .unchecked_into::<JsIterator>();
+    fn try_from(stats: RtcStatsReport) -> Result<Self, Self::Error> {
+        use RtcStatsError::Platform;
 
         let mut out = Vec::new();
 
-        for stat in iterator {
+        for stat in stats.entries() {
             let stat = stat.map_err(|e| {
                 tracerr::new!(Platform(platform::Error::from(e)))
             })?;

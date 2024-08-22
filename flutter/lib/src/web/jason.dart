@@ -10,6 +10,13 @@ import 'room_handle.dart';
 class Jason extends base.Jason {
   final wasm.Jason obj = wasm.Jason();
 
+  /// Creates a new instance of [Jason].
+  static Future<Jason> init() async {
+    return Jason._();
+  }
+
+  Jason._();
+
   @override
   MediaManagerHandle mediaManager() {
     return fallibleFunction(() => WebMediaManagerHandle(obj.media_manager()));

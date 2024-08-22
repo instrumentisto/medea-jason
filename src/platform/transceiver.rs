@@ -71,7 +71,7 @@ impl From<RtcRtpTransceiverDirection> for Direction {
             D::Recvonly => Self::RECV,
             D::Inactive => Self::INACTIVE,
             D::Sendrecv => Self::SEND | Self::RECV,
-            D::__Nonexhaustive => {
+            _ => {
                 unreachable!("unexpected transceiver direction")
             }
         }

@@ -1,8 +1,8 @@
 [package]
 name = "medea-jason"
-version = "0.5.0"
+version = "0.5.1-dev"
 edition = "2021"
-rust-version = "1.65"
+rust-version = "1.75"
 description = "Client library for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "MPL-2.0"
@@ -36,15 +36,15 @@ dart-codegen = ["medea-macro/dart-codegen"]
 mockable = ["mockall"]
 
 [dependencies]
-async-recursion = "1.0"
+async-recursion = "1.1"
 async-trait = "0.1"
 backoff = { version = "0.4", features = ["futures"] }
-bitflags = "2.0"
+bitflags = "2.6"
 derivative = "2.2"
-derive_more = "0.99"
+derive_more = { version = "1.0", features = ["as_ref", "debug", "deref", "display", "from", "into", "mul"] }
 futures = "0.3"
 log = "0.4"
-medea-client-api-proto = { version = "0.6", path = "proto/client-api" }
+medea-client-api-proto = { version = "0.6.1-dev", path = "proto/client-api" }
 medea-macro = { version = "0.3", path = "crates/medea-macro" }
 medea-reactive = { version = "0.1", path = "crates/medea-reactive" }
 mockall = { version = "0.13", optional = true }
@@ -52,7 +52,7 @@ sealed = "0.5"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tracerr = "0.3"
-url = "2.3"
+url = "2.5"
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.14"
@@ -61,20 +61,24 @@ android_logger = "0.14"
 simple_logger = "5.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-dart-sys = "4.0"
-flutter_rust_bridge = { version = "=1.82.4", default-features = false }
+# TODO: Switch to `dart-sys` once `flutter_rust_bridge` does.
+dart-sys = { version = "4.1", package = "dart-sys-fork" }
+flutter_rust_bridge = { version = "=2.2.0", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
 libc = "0.2"
+send_wrapper = "0.6"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 backoff = { version = "0.4", features = ["wasm-bindgen"] }
 console_error_panic_hook = { version = "0.1", optional = true }
 js-sys = "0.3"
-wasm-bindgen = "0.2"
+# TODO: Pinned until allocator error in unit tests is not fixed.
+wasm-bindgen = "=0.2.92"
 wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
 wee_alloc = { version = "0.4", optional = true }
+# TODO:  Pinned until allocator error in unit tests is not fixed.
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
-    version = "0.3.68"
+    version = "=0.3.69"
     features = [
         "console",
         "ConstrainBooleanParameters",
@@ -96,8 +100,9 @@ wee_alloc = { version = "0.4", optional = true }
         "RtcIceServer",
         "RtcIceTransportPolicy",
         "RtcOfferOptions",
-        "RtcPeerConnection", "RtcPeerConnectionIceEvent",
-        "RtcPeerConnectionIceErrorEvent",
+        "RtcPeerConnection",
+        "RtcPeerConnectionIceEvent", "RtcPeerConnectionIceErrorEvent",
+        "RtcPeerConnectionState",
         "RtcRtpCapabilities",
         "RtcRtpCodecParameters", "RtcRtpCodecCapability",
         "RtcRtpEncodingParameters",
@@ -107,13 +112,13 @@ wee_alloc = { version = "0.4", optional = true }
         "RtcRtpTransceiverInit",
         "RtcSdpType",
         "RtcSessionDescription", "RtcSessionDescriptionInit",
-        "RtcStats",
+        "RtcStats", "RtcStatsReport",
         "RtcTrackEvent",
         "WebSocket", "Window",
     ]
 
 [build-dependencies]
-cc = "1.0"
+cc = "1.1"
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 instant = { version = "0.1", features = ["wasm-bindgen"] }

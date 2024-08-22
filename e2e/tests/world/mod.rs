@@ -4,9 +4,9 @@
 
 pub mod member;
 
-use std::{collections::HashMap, env, fmt, time::Duration};
+use std::{collections::HashMap, env, time::Duration};
 
-use derive_more::{Display, Error, From};
+use derive_more::{Debug, Display, Error as StdError, From};
 use medea_control_api_mock::{
     callback::{CallbackEvent, CallbackItem},
     proto,
@@ -38,7 +38,7 @@ macro_rules! control_api_path {
 }
 
 /// All errors which can happen while working with [`World`].
-#[derive(Debug, Display, Error, From)]
+#[derive(Debug, Display, From, StdError)]
 pub enum Error {
     Control(control::Error),
     Object(object::Error),
@@ -53,35 +53,29 @@ type Result<T> = std::result::Result<T, Error>;
 /// [`World`][1] used by all E2E tests.
 ///
 /// [1]: cucumber::World
-#[derive(cucumber::World)]
+#[derive(cucumber::World, Debug)]
 #[world(init = Self::try_new)]
 pub struct World {
     /// ID of the `Room` created for this [`World`].
     room_id: String,
 
     /// Client of a Medea Control API.
+    #[debug(skip)]
     control_client: control::Client,
 
     /// All [`Member`]s created in this [`World`].
     members: HashMap<String, Member>,
 
     /// All [`Jason`] [`Object`]s created in this [`World`].
+    #[debug(skip)]
     jasons: HashMap<String, Object<Jason>>,
 
     /// [WebDriver] client that all [`Object`]s of this [`World`] will be
     /// created with.
     ///
     /// [WebDriver]: https://w3.org/TR/webdriver
+    #[debug(skip)]
     window_factory: WindowFactory,
-}
-
-impl fmt::Debug for World {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("World")
-            .field("room_id", &self.room_id)
-            .field("members", &self.members)
-            .finish_non_exhaustive()
-    }
 }
 
 impl World {

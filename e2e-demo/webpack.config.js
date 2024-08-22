@@ -1,5 +1,6 @@
 const path = require("path");
 
+const webpack = require('webpack');
 const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
@@ -11,9 +12,7 @@ module.exports = {
     path: dist,
     filename: "bundle.js",
   },
-  devServer: {
-    contentBase: dist,
-  },
+  mode: 'development',
   plugins: [
     new HtmlWebpackPlugin({
       template: 'index.html',
@@ -27,5 +26,8 @@ module.exports = {
       // WasmPackPlugin defaults to compiling in "dev" profile.
       // To change that, use `forceMode: 'release'`.
     }),
-  ]
+  ],
+  experiments: {
+    asyncWebAssembly: true
+  }
 };
