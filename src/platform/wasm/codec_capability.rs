@@ -41,12 +41,11 @@ impl CodecCapability {
             return Err(Error::FailedToGetCapabilities);
         };
 
+        // TODO: Get rid of reflection in #183 which updates web-sys to 0.3.70.
         let Ok(codecs) = Reflect::get(&caps, &JsString::from("codecs")) else {
             return Err(Error::FailedToGetCapabilities);
         };
 
-        // TODO: Stop using reflection when this is released:
-        //       https://github.com/rustwasm/wasm-bindgen/pull/3993
         for codec in Array::from(&codecs).values() {
             let Ok(codec) = codec else {
                 continue;
