@@ -109,10 +109,8 @@ impl LocalMediaTrack {
     #[frb(sync)]
     #[must_use]
     pub fn free(self) -> DartOpaque {
-        let track = self.0.clone();
-
         async move {
-            track.take().maybe_stop().await;
+            self.0.take().maybe_stop().await;
             Ok::<_, Error>(())
         }
         .into_dart_future()

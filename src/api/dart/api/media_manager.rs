@@ -1,16 +1,17 @@
 //! External handle to a [`MediaManager`].
 
 use flutter_rust_bridge::{frb, DartOpaque};
+use futures::TryFutureExt as _;
 use send_wrapper::SendWrapper;
 use tracerr::Traced;
 
 #[cfg(doc)]
-use crate::media::{track::local::LocalMediaTrack, MediaManager};
+use crate::media::track::local::MediaManager;
 use crate::{
     api::{
         api::{
             ApiMediaDeviceDetails, ApiMediaDisplayDetails,
-            ApiMediaStreamSettings,
+            ApiMediaStreamSettings, LocalMediaTrack,
         },
         Error as DartError,
     },
@@ -52,6 +53,12 @@ impl MediaManagerHandle {
         let manager = self.0.clone();
 
         async move { manager.init_local_tracks(caps.into()).await }
+            .map_ok(|tracks| {
+                tracks
+                    .into_iter()
+                    .map(LocalMediaTrack::from)
+                    .collect::<Vec<_>>()
+            })
             .into_dart_future()
             .into_dart_opaque()
     }
