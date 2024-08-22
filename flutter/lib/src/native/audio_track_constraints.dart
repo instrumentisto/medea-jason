@@ -1,5 +1,6 @@
 import '../interface/audio_track_constraints.dart' as base;
-import 'ffi/jason_api.g.dart' as frb;
+import 'ffi/frb/frb.dart' as frb;
+import 'ffi/frb/media/constraints.dart';
 
 class AudioTrackConstraints implements base.AudioTrackConstraints {
   /// Rust `flutter_rust_bridge` API representation.
@@ -13,12 +14,12 @@ class AudioTrackConstraints implements base.AudioTrackConstraints {
 
   @override
   void exactAutoGainControl(bool autoGainControl) {
-    constraints.autoGainControl = frb.ConstrainBoolean_Exact(autoGainControl);
+    constraints.autoGainControl = ConstrainBoolean.exact(autoGainControl);
   }
 
   @override
   void idealAutoGainControl(bool autoGainControl) {
-    constraints.autoGainControl = frb.ConstrainBoolean_Ideal(autoGainControl);
+    constraints.autoGainControl = ConstrainBoolean.ideal(autoGainControl);
   }
 
   @override

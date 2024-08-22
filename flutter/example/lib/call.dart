@@ -20,9 +20,9 @@ class Call {
   /// Provides access to Control API of the media server.
   late ControlApi controlApi = ControlApi(client);
 
-  final Jason _jason = Jason();
-  late final MediaManagerHandle _mediaManager = _jason.mediaManager();
-  late final RoomHandle _room = _jason.initRoom();
+  late Jason _jason;
+  late final MediaManagerHandle _mediaManager;
+  late final RoomHandle _room;
 
   /// Callback for creating/changing a render from a local video device track.
   late Function(webrtc.MediaStreamTrack) _onLocalDeviceTrack;
@@ -66,10 +66,25 @@ class Call {
   /// Indicator of screen sharing.
   bool screenShare = false;
 
+  /// Private constructor use [Call.create()].
+  Call._create();
+
+  /// Creates a new [Call].
+  static Future<Call> create() async {
+    var self = Call._create();
+
+    self._jason = await Jason.init();
+    self._mediaManager = self._jason.mediaManager();
+    self._room = self._jason.initRoom();
+
+    return self;
+  }
+
   /// Starts a call in the specified room.
   Future<void> start(String roomId, String memberId, bool isPublish,
       bool publishVideo, bool publishAudio, bool fakeMedia) async {
     if (fakeMedia) {
+      await webrtc.initFfiBridge();
       await webrtc.enableFakeMedia();
     }
 

@@ -1,5 +1,6 @@
 import '../interface/display_video_track_constraints.dart' as base;
-import 'ffi/jason_api.g.dart' as frb;
+import 'ffi/frb/frb.dart' as frb;
+import 'ffi/frb/media/constraints.dart';
 
 class DisplayVideoTrackConstraints
     implements base.DisplayVideoTrackConstraints {
@@ -13,7 +14,7 @@ class DisplayVideoTrackConstraints
     if (height.isNegative || height.bitLength > 32) {
       throw ArgumentError.value(height, 'height', 'Expected `u32`');
     }
-    constraints.height = frb.ConstrainU32_Exact(height);
+    constraints.height = ConstrainU32.exact(height);
   }
 
   @override
@@ -21,7 +22,7 @@ class DisplayVideoTrackConstraints
     if (height.isNegative || height.bitLength > 32) {
       throw ArgumentError.value(height, 'height', 'Expected `u32`');
     }
-    constraints.height = frb.ConstrainU32_Ideal(height);
+    constraints.height = ConstrainU32.ideal(height);
   }
 
   @override
@@ -29,7 +30,7 @@ class DisplayVideoTrackConstraints
     if (width.isNegative || width.bitLength > 32) {
       throw ArgumentError.value(width, 'width', 'Expected `u32`');
     }
-    constraints.width = frb.ConstrainU32_Exact(width);
+    constraints.width = ConstrainU32.exact(width);
   }
 
   @override
@@ -37,7 +38,7 @@ class DisplayVideoTrackConstraints
     if (width.isNegative || width.bitLength > 32) {
       throw ArgumentError.value(width, 'width', 'Expected `u32`');
     }
-    constraints.width = frb.ConstrainU32_Ideal(width);
+    constraints.width = ConstrainU32.ideal(width);
   }
 
   @override
@@ -45,7 +46,7 @@ class DisplayVideoTrackConstraints
     if (frameRate.isNegative || frameRate.bitLength > 32) {
       throw ArgumentError.value(frameRate, 'frameRate', 'Expected `u32`');
     }
-    constraints.frameRate = frb.ConstrainU32_Exact(frameRate);
+    constraints.frameRate = ConstrainU32.exact(frameRate);
   }
 
   @override
@@ -53,7 +54,7 @@ class DisplayVideoTrackConstraints
     if (frameRate.isNegative || frameRate.bitLength > 32) {
       throw ArgumentError.value(frameRate, 'frameRate', 'Expected `u32`');
     }
-    constraints.frameRate = frb.ConstrainU32_Ideal(frameRate);
+    constraints.frameRate = ConstrainU32.ideal(frameRate);
   }
 
   @override

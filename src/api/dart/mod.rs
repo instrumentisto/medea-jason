@@ -13,24 +13,7 @@
 )]
 
 pub mod api;
-pub mod utils;
-
-#[allow(
-    clippy::absolute_paths,
-    clippy::as_conversions,
-    clippy::default_trait_access,
-    clippy::let_underscore_untyped,
-    clippy::missing_docs_in_private_items,
-    clippy::multiple_unsafe_ops_per_block,
-    clippy::ptr_as_ptr,
-    clippy::undocumented_unsafe_blocks,
-    clippy::empty_structs_with_brackets,
-    clippy::use_self,
-    clippy::wildcard_imports,
-    let_underscore_drop,
-    unused_qualifications
-)]
-mod api_bridge_generated;
+pub mod err;
 
 use std::{
     ffi::{c_void, CString},
@@ -43,7 +26,7 @@ use derive_more::Display;
 use libc::c_char;
 
 use crate::{
-    api::dart::utils::new_panic_error,
+    api::{api::ForeignClass, dart::err::new_panic_error},
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
     platform::utils::{
         c_str_into_string, dart_api, free_dart_native_string,
@@ -58,7 +41,7 @@ pub use self::{
         ConnectionHandle, Jason, LocalMediaTrack, MediaManagerHandle,
         ReconnectHandle, RemoteMediaTrack, RoomCloseReason, RoomHandle,
     },
-    utils::DartError as Error,
+    err::DartError as Error,
 };
 
 /// Wraps the provided function to catch all the Rust panics and propagate them
@@ -71,29 +54,6 @@ pub fn propagate_panic<T>(f: impl FnOnce() -> T) -> T {
         }
         unreachable!("`Dart_PropagateError` should do early return")
     })
-}
-
-/// Rust structure having wrapper class in Dart.
-///
-/// Intended to be passed through FFI boundaries as thin pointers.
-pub trait ForeignClass: Sized {
-    /// Consumes itself returning a wrapped raw pointer obtained via
-    /// [`Box::into_raw()`].
-    #[must_use]
-    fn into_ptr(self) -> ptr::NonNull<Self> {
-        ptr::NonNull::from(Box::leak(Box::new(self)))
-    }
-
-    /// Constructs a [`ForeignClass`] from the given raw pointer via
-    /// [`Box::from_raw()`].
-    ///
-    /// # Safety
-    ///
-    /// Same as for [`Box::from_raw()`].
-    #[must_use]
-    unsafe fn from_ptr(this: ptr::NonNull<Self>) -> Self {
-        unsafe { *Box::from_raw(this.as_ptr()) }
-    }
 }
 
 /// Marker indicating a C-style enum which can be converted from number

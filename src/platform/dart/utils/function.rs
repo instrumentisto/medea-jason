@@ -10,6 +10,7 @@
 use std::marker::PhantomData;
 
 use dart_sys::Dart_PersistentHandle;
+use flutter_rust_bridge::DartOpaque;
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -54,13 +55,13 @@ impl<T> Function<T> {
     /// closure, and persists the provided [`Dart_Handle`] so it won't be moved
     /// by the Dart VM GC.
     ///
-    /// # Safety
-    ///
-    /// The provided [`Dart_Handle`] should be non-`null` and correct.
-    ///
     /// [`Dart_Handle`]: dart_sys::Dart_Handle
     #[must_use]
-    pub const unsafe fn new(dart_fn: Dart_PersistentHandle) -> Self {
+    pub fn new(cb: DartOpaque) -> Self {
+        let opaque = cb.into_inner().unwrap();
+        let ptr = opaque.create_dart_handle();
+        let dart_fn = unsafe { dart_api::new_persistent_handle(ptr.cast()) };
+
         Self {
             dart_fn,
             _arg: PhantomData,
