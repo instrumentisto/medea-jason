@@ -6,7 +6,7 @@ use send_wrapper::SendWrapper;
 use tracerr::Traced;
 
 #[cfg(doc)]
-use crate::media::track::local::MediaManager;
+use crate::media::MediaManager;
 use crate::{
     api::{
         api::{
