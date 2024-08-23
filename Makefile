@@ -1202,12 +1202,12 @@ docker.up.webdriver:
 	-@make docker.down.webdriver browser=chrome
 	-@make docker.down.webdriver browser=firefox
 ifeq ($(browser),firefox)
-	docker run --rm -d --network=host --shm-size 512m \
+	docker run --rm -d --network=host --shm-size 768m \
 		--name medea-webdriver-firefox \
 		ghcr.io/instrumentisto/geckodriver:$(FIREFOX_VERSION) \
 			--binary=/opt/firefox/firefox
 else
-	docker run --rm -d --network=host --shm-size 512m \
+	docker run --rm -d --network=host --shm-size 768m \
 		--name medea-webdriver-chrome \
 		selenoid/chrome:$(CHROME_VERSION)
 endif

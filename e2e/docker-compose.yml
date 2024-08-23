@@ -29,6 +29,6 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME}-webdriver
     image: ${COMPOSE_WEBDRIVER_IMAGE_NAME}:${COMPOSE_WEBDRIVER_IMAGE_VER}
     depends_on: ["control-api-mock", "frontend", "medea"]
-    shm_size: 512m
+    shm_size: 768m
     entrypoint: ${COMPOSE_WEBDRIVER_ENTRYPOINT}
     network_mode: host
