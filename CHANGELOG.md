@@ -11,11 +11,16 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.5.0...medea-jason-0.5.1)
 
+### Fixed
+
+- [VP9] being forced to use `profile-id=2` in [SFU] mode ([#180]).
+
 ### Upgraded
 
 - Dependencies:
     - [`derive-more`] to `1.0` ([#181]).
 
+[#180]: /../../pull/180
 [#181]: /../../pull/181
 
 
@@ -376,6 +381,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-[`derive_more`]: https://docs.rs/derive_more
-[Semantic Versioning 2.0.0]: https://semver.org
 [SFU]: https://webrtcglossary.com/sfu
+[Semantic Versioning 2.0.0]: https://semver.org
+[VP9]: https://bloggeek.me/webrtcglossary/vp9/
+[`derive_more`]: https://docs.rs/derive_more

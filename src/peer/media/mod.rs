@@ -251,49 +251,45 @@ pub enum GetMidsError {
 /// Returns the required [`CodecCapability`]s and [`ScalabilityMode`] for a
 /// [`platform::Transceiver`] based on the provided [`SvcSettings`].
 pub async fn probe_video_codecs(
-    svc: &Vec<SvcSettings>,
+    svc_settings: &Vec<SvcSettings>,
 ) -> (Vec<CodecCapability>, Option<ScalabilityMode>) {
     /// List of required codecs for every [`MediaKind::Video`] of a
     /// [`platform::Transceiver`].
     const REQUIRED_CODECS: [&str; 3] =
         ["video/rtx", "video/red", "video/ulpfec"];
 
-    CodecCapability::get_sender_codec_capabilities(MediaKind::Video)
-        .await
-        .map_or_else(
-            |_| (vec![], None),
-            |codecs| {
-                let mut target_scalability_mode = None;
-                let mut target_codecs = Vec::new();
-                let mut codecs: HashMap<String, CodecCapability> = codecs
-                    .into_iter()
-                    .filter_map(|codec| Some((codec.mime_type().ok()?, codec)))
-                    .collect();
+    let mut target_scalability_mode = None;
+    let mut target_codecs = Vec::new();
 
-                for svc_setting in svc {
-                    if let Some(codec_cap) =
-                        codecs.remove(svc_setting.codec.mime_type())
-                    {
-                        target_codecs.push(codec_cap);
-                        target_scalability_mode =
-                            Some(svc_setting.scalability_mode);
-                        break;
-                    }
-                }
-                if !target_codecs.is_empty() {
-                    codecs
-                        .into_iter()
-                        .filter_map(|(mime, codec)| {
-                            REQUIRED_CODECS
-                                .contains(&mime.as_str())
-                                .then_some(codec)
-                        })
-                        .for_each(|cap| target_codecs.push(cap));
-                }
+    let Ok(codecs) =
+        CodecCapability::get_sender_codec_capabilities(MediaKind::Video).await
+    else {
+        return (target_codecs, target_scalability_mode);
+    };
 
-                (target_codecs, target_scalability_mode)
-            },
-        )
+    let mut codecs: HashMap<String, Vec<_>> =
+        codecs.into_iter().fold(HashMap::new(), |mut map, c| {
+            map.entry(c.mime_type()).or_default().push(c);
+            map
+        });
+
+    for svc in svc_settings {
+        if let Some(mut codec_cap) = codecs.remove(svc.codec.mime_type()) {
+            target_codecs.append(&mut codec_cap);
+            target_scalability_mode = Some(svc.scalability_mode);
+            break;
+        }
+    }
+    if !target_codecs.is_empty() {
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        for (mime, mut c) in codecs {
+            if REQUIRED_CODECS.contains(&mime.as_str()) {
+                target_codecs.append(&mut c);
+            }
+        }
+    }
+
+    (target_codecs, target_scalability_mode)
 }
 
 /// Returns [`SendEncodingParameters`] for a [`platform::Transceiver`] based on
