@@ -20,6 +20,7 @@ All user visible changes to this project will be documented in this file. This p
 - Dependencies:
     - [`derive-more`] to `1.0` ([#181]).
 
+[#180]: /../../pull/180
 [#181]: /../../pull/181
 
 

@@ -14,10 +14,12 @@ use crate::{
 /// [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
 #[derive(Clone, Debug)]
 pub struct CodecCapability {
-    /// An actual JS-side [`RtcRtpCodecCapability`].
+    /// Actual JS-side [`RtcRtpCodecCapability`].
     codec_cap: RtcRtpCodecCapability,
 
-    /// The codec MIME media type/subtype.
+    /// [MIME media type/subtype][2] of the codec.
+    ///
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
     mime_type: String,
 }
 
@@ -41,7 +43,8 @@ impl CodecCapability {
             return Err(Error::FailedToGetCapabilities);
         };
 
-        // TODO: Get rid of reflection in #183 which updates web-sys to 0.3.70.
+        // TODO: Get rid of reflection in #183 which updates `web-sys` to
+        //       0.3.70.
         let Ok(codecs) = Reflect::get(&caps, &JsString::from("codecs")) else {
             return Err(Error::FailedToGetCapabilities);
         };

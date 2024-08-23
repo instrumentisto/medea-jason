@@ -281,7 +281,7 @@ pub async fn probe_video_codecs(
         }
     }
     if !target_codecs.is_empty() {
-        #[allow(clippy::iter_over_hash_type)]
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (mime, mut c) in codecs {
             if REQUIRED_CODECS.contains(&mime.as_str()) {
                 target_codecs.append(&mut c);
