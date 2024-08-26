@@ -606,6 +606,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   BigInt sse_decode_usize(SseDeserializer deserializer);
 
+  // TODO: Modified by hand, must be fixed in frb codegen.
   @protected
   BigInt sse_decode_isize(SseDeserializer deserializer);
 
