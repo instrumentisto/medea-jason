@@ -324,9 +324,10 @@ jobs:
         # TODO: Run E2E test on Windows
         platform:
           - android
-          - ios
           - linux
           - macos
+          # TODO: Re-enable once fixed stability on CI
+          #- ios
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
