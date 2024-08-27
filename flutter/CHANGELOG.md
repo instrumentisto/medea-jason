@@ -7,9 +7,9 @@ All user visible changes to this project will be documented in this file. This p
 
 
 ## [0.6.0] · 2024-08-27
-[0.5.1]: /../../tree/medea-jason-0.5.1/flutter
+[0.6.0]: /../../tree/medea-jason-0.6.0/flutter
 
-See also [`medea-jason` crate 0.5.1 changes](/../../tree/medea-jason-0.5.1/CHANGELOG.md).
+See also [`medea-jason` crate 0.6.0 changes](/../../tree/medea-jason-0.6.0/CHANGELOG.md).
 
 ### Upgraded
 
