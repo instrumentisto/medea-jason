@@ -119,8 +119,8 @@ pub mod callback_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+        T::ResponseBody: Body<Data = Bytes> + std::marker::Send + 'static,
+        <T::ResponseBody as Body>::Error: Into<StdError> + std::marker::Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
@@ -145,7 +145,7 @@ pub mod callback_client {
             >,
             <T as tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + Send + Sync,
+            >>::Error: Into<StdError> + std::marker::Send + std::marker::Sync,
         {
             CallbackClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -210,7 +210,7 @@ pub mod callback_server {
     use tonic::codegen::*;
     /// Generated trait containing gRPC methods that should be implemented for use with CallbackServer.
     #[async_trait]
-    pub trait Callback: Send + Sync + 'static {
+    pub trait Callback: std::marker::Send + std::marker::Sync + 'static {
         /// Fires when a certain callback event happens on a media server.
         async fn on_event(
             &self,
@@ -219,14 +219,14 @@ pub mod callback_server {
     }
     /// Service for receiving callbacks from a media server.
     #[derive(Debug)]
-    pub struct CallbackServer<T: Callback> {
+    pub struct CallbackServer<T> {
         inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    impl<T: Callback> CallbackServer<T> {
+    impl<T> CallbackServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -280,8 +280,8 @@ pub mod callback_server {
     impl<T, B> tonic::codegen::Service<http::Request<B>> for CallbackServer<T>
     where
         T: Callback,
-        B: Body + Send + 'static,
-        B::Error: Into<StdError> + Send + 'static,
+        B: Body + std::marker::Send + 'static,
+        B::Error: Into<StdError> + std::marker::Send + 'static,
     {
         type Response = http::Response<tonic::body::BoxBody>;
         type Error = std::convert::Infallible;
@@ -355,7 +355,7 @@ pub mod callback_server {
             }
         }
     }
-    impl<T: Callback> Clone for CallbackServer<T> {
+    impl<T> Clone for CallbackServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -367,7 +367,9 @@ pub mod callback_server {
             }
         }
     }
-    impl<T: Callback> tonic::server::NamedService for CallbackServer<T> {
-        const NAME: &'static str = "callback.Callback";
+    /// Generated gRPC service name
+    pub const SERVICE_NAME: &str = "callback.Callback";
+    impl<T> tonic::server::NamedService for CallbackServer<T> {
+        const NAME: &'static str = SERVICE_NAME;
     }
 }

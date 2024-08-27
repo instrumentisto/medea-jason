@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.5.1] · 2024-08-27
+## [0.6.0] · 2024-08-27
 [0.5.1]: /../../tree/medea-jason-0.5.1/flutter
 
 See also [`medea-jason` crate 0.5.1 changes](/../../tree/medea-jason-0.5.1/CHANGELOG.md).
@@ -15,7 +15,12 @@ See also [`medea-jason` crate 0.5.1 changes](/../../tree/medea-jason-0.5.1/CHANG
 
 - Flutter to `3.24` ([#181]).
 
-[#181]: /../../pull/182
+### BC Breaks
+
+- `Jason` constructor is now private and static async factory `Jason.init()` should be used ([#182]).
+
+[#181]: /../../pull/181
+[#182]: /../../pull/182
 
 
 

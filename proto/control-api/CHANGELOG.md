@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.12.1] · unreleased
+## [0.12.1] · 2024-08-27
 [0.12.1]: /../../tree/medea-control-api-proto-0.12.1/proto/control-api
 
 [Diff](/../../compare/medea-control-api-proto-0.12.0...medea-control-api-proto-0.12.1)

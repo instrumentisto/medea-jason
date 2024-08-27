@@ -493,8 +493,8 @@ pub mod control_api_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+        T::ResponseBody: Body<Data = Bytes> + std::marker::Send + 'static,
+        <T::ResponseBody as Body>::Error: Into<StdError> + std::marker::Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
@@ -519,7 +519,7 @@ pub mod control_api_client {
             >,
             <T as tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + Send + Sync,
+            >>::Error: Into<StdError> + std::marker::Send + std::marker::Sync,
         {
             ControlApiClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -677,7 +677,7 @@ pub mod control_api_server {
     use tonic::codegen::*;
     /// Generated trait containing gRPC methods that should be implemented for use with ControlApiServer.
     #[async_trait]
-    pub trait ControlApi: Send + Sync + 'static {
+    pub trait ControlApi: std::marker::Send + std::marker::Sync + 'static {
         /// Creates a new `Element` on the media server.
         ///
         /// Non-idempotent. Errors if an `Element` with such ID already exists.
@@ -722,14 +722,14 @@ pub mod control_api_server {
     /// Service allowing to control a media server dynamically, by creating, updating
     /// and destroying pipelines of media `Element`s on it.
     #[derive(Debug)]
-    pub struct ControlApiServer<T: ControlApi> {
+    pub struct ControlApiServer<T> {
         inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    impl<T: ControlApi> ControlApiServer<T> {
+    impl<T> ControlApiServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -783,8 +783,8 @@ pub mod control_api_server {
     impl<T, B> tonic::codegen::Service<http::Request<B>> for ControlApiServer<T>
     where
         T: ControlApi,
-        B: Body + Send + 'static,
-        B::Error: Into<StdError> + Send + 'static,
+        B: Body + std::marker::Send + 'static,
+        B::Error: Into<StdError> + std::marker::Send + 'static,
     {
         type Response = http::Response<tonic::body::BoxBody>;
         type Error = std::convert::Infallible;
@@ -1030,7 +1030,7 @@ pub mod control_api_server {
             }
         }
     }
-    impl<T: ControlApi> Clone for ControlApiServer<T> {
+    impl<T> Clone for ControlApiServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -1042,7 +1042,9 @@ pub mod control_api_server {
             }
         }
     }
-    impl<T: ControlApi> tonic::server::NamedService for ControlApiServer<T> {
-        const NAME: &'static str = "api.ControlApi";
+    /// Generated gRPC service name
+    pub const SERVICE_NAME: &str = "api.ControlApi";
+    impl<T> tonic::server::NamedService for ControlApiServer<T> {
+        const NAME: &'static str = SERVICE_NAME;
     }
 }

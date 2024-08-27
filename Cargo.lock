@@ -2102,7 +2102,7 @@ dependencies = [
 
 [[package]]
 name = "medea-control-api-mock"
-version = "0.2.1-dev"
+version = "0.2.1"
 dependencies = [
  "actix",
  "actix-cors",
@@ -2126,7 +2126,7 @@ dependencies = [
 
 [[package]]
 name = "medea-control-api-proto"
-version = "0.12.1-dev"
+version = "0.12.1"
 dependencies = [
  "async-trait",
  "derive_more 1.0.0",
