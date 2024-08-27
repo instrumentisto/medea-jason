@@ -11,13 +11,15 @@ All user visible changes to this project will be documented in this file. This p
 
 See also [`medea-jason` crate 0.6.0 changes](/../../tree/medea-jason-0.6.0/CHANGELOG.md).
 
-### Upgraded
-
-- Flutter to `3.24` ([#181]).
-
 ### BC Breaks
 
-- `Jason` constructor is now private and static async factory `Jason.init()` should be used ([#182]).
+- `Jason` constructor is now private and static async factory `Jason.init()` should be used instead. ([#182])
+
+### Upgraded
+
+- [Flutter] to 3.24 version. ([#181])
+- Dependencies:
+    - [`flutter_rust_bridge`] to 2.2.0 version. ([#182])
 
 [#181]: /../../pull/181
 [#182]: /../../pull/182
@@ -106,6 +108,8 @@ See also [`medea-jason` crate 0.5.0 changes](/../../tree/medea-jason-0.5.0/CHANG
 
 
 
+[`flutter_rust_bridge`]: https://pub.dev/packages/flutter_rust_bridge
 [`medea-jason`]: https://docs.rs/medea-jason
+[Flutter]: https://flutter.dev
 [Semantic Versioning 2.0.0]: https://semver.org
 [SFU]: https://webrtcglossary.com/sfu

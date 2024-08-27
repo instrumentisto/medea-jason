@@ -14,7 +14,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`derive-more`] to `1.0` ([#181]).
+    - [`derive-more`] to 1.0 version. ([#181])
 
 [#181]: /../../pull/181
 
