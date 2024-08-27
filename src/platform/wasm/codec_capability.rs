@@ -2,9 +2,7 @@
 //!
 //! [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
 
-use js_sys::{Array, JsString, Reflect};
-use wasm_bindgen::JsValue;
-use web_sys::RtcRtpSender;
+use web_sys::{RtcRtpCodecCapability, RtcRtpSender};
 
 use crate::{
     media::MediaKind, platform::codec_capability::CodecCapabilityError as Error,
@@ -14,7 +12,7 @@ use crate::{
 ///
 /// [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
 #[derive(Clone, Debug)]
-pub struct CodecCapability(JsValue);
+pub struct CodecCapability(RtcRtpCodecCapability);
 
 impl CodecCapability {
     /// Returns available [RTCRtpSender]'s [`CodecCapability`]s.
@@ -29,34 +27,35 @@ impl CodecCapability {
     pub async fn get_sender_codec_capabilities(
         kind: MediaKind,
     ) -> Result<Vec<Self>, Error> {
-        // TODO: This Reflect usage is refactored out in #180.
-        let codecs = RtcRtpSender::get_capabilities(&kind.to_string())
-            .and_then(|capabs| {
-                Reflect::get(&capabs, &JsString::from("codecs")).ok()
-            })
-            .ok_or(Error::FailedToGetCapabilities)?;
+        let mut result = Vec::new();
 
-        Ok(Array::from(&codecs).iter().map(Self).collect())
+        let Some(caps) = RtcRtpSender::get_capabilities(&kind.to_string())
+        else {
+            return Err(Error::FailedToGetCapabilities);
+        };
+
+        for codec in caps.get_codecs().values() {
+            let Ok(codec) = codec else {
+                continue;
+            };
+            result.push(Self(RtcRtpCodecCapability::from(codec)));
+        }
+
+        Ok(result)
     }
 
     /// Returns [MIME media type][2] of this [`CodecCapability`].
     ///
-    /// # Errors
-    ///
-    /// With [`Error::FailedToGetMimeType`] if fails to retrieve codec's
-    /// [MIME media type][2].
-    ///
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
-    pub fn mime_type(&self) -> Result<String, Error> {
-        Reflect::get(&self.0, &JsString::from("mimeType"))
-            .ok()
-            .and_then(|a| a.as_string())
-            .ok_or(Error::FailedToGetMimeType)
+    #[must_use]
+    pub fn mime_type(&self) -> String {
+        self.0.get_mime_type()
     }
 
-    /// Returns the underlying [`JsValue`] of this [`CodecCapability`].
+    /// Returns the underlying [`RtcRtpCodecCapability`] of this
+    /// [`CodecCapability`].
     #[must_use]
-    pub const fn handle(&self) -> &JsValue {
+    pub const fn handle(&self) -> &RtcRtpCodecCapability {
         &self.0
     }
 }
