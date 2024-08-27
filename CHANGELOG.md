@@ -6,17 +6,24 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.5.1] · unreleased
-[0.5.1]: /../../tree/medea-jason-0.5.1
+## [0.6.0] · 2024-08-27
+[0.6.0]: /../../tree/medea-jason-0.6.0
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.5.0...medea-jason-0.5.1)
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.5.0...medea-jason-0.6.0)
+
+### Fixed
+
+- [VP9] being forced to use `profile-id=2` in [SFU] mode. ([#180])
 
 ### Upgraded
 
 - Dependencies:
-    - [`derive-more`] to `1.0` ([#181]).
+    - [`derive-more`] to 1.0 version. ([#181])
+    - [`flutter_rust_bridge`] to 2.2.0 version. ([#182])
 
+[#180]: /../../pull/180
 [#181]: /../../pull/181
+[#182]: /../../pull/182
 
 
 
@@ -376,6 +383,8 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-[`derive_more`]: https://docs.rs/derive_more
-[Semantic Versioning 2.0.0]: https://semver.org
 [SFU]: https://webrtcglossary.com/sfu
+[Semantic Versioning 2.0.0]: https://semver.org
+[VP9]: https://bloggeek.me/webrtcglossary/vp9
+[`derive_more`]: https://docs.rs/derive_more
+[`flutter_rust_bridge`]: https://docs.rs/flutter_rust_bridge

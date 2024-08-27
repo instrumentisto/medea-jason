@@ -16,8 +16,10 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
-    await webrtc.initFfiBridge();
-    await webrtc.enableFakeMedia();
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      await webrtc.initFfiBridge();
+      await webrtc.enableFakeMedia();
+    }
   });
 
   testWidgets('MediaManager', (WidgetTester tester) async {

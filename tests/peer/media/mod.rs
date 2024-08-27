@@ -460,7 +460,7 @@ mod codec_probing {
 
     fn target_codecs_mime_types(codecs: &[CodecCapability]) -> Vec<String> {
         let mut mime_types: Vec<_> =
-            codecs.iter().map(|c| c.mime_type().unwrap()).collect();
+            codecs.iter().map(|c| c.mime_type()).collect();
         mime_types.sort();
         mime_types.dedup();
         mime_types
@@ -483,23 +483,45 @@ mod codec_probing {
 
     #[wasm_bindgen_test]
     async fn probes_first_codec_when_many() {
-        let (target_codecs, svc) = probe_video_codecs(&vec![
-            SvcSettings {
-                codec: Codec::VP9,
-                scalability_mode: ScalabilityMode::L1T2,
-            },
-            SvcSettings {
-                codec: Codec::VP8,
-                scalability_mode: ScalabilityMode::L1T1,
-            },
-        ])
-        .await;
+        {
+            let (target_codecs, svc) = probe_video_codecs(&vec![
+                SvcSettings {
+                    codec: Codec::VP9,
+                    scalability_mode: ScalabilityMode::L1T2,
+                },
+                SvcSettings {
+                    codec: Codec::VP8,
+                    scalability_mode: ScalabilityMode::L1T1,
+                },
+            ])
+            .await;
 
-        assert_eq!(svc, Some(ScalabilityMode::L1T2));
-        assert_eq!(
-            target_codecs_mime_types(&target_codecs),
-            vec!["video/VP9", "video/red", "video/rtx", "video/ulpfec"]
-        );
+            assert_eq!(svc, Some(ScalabilityMode::L1T2));
+            assert_eq!(
+                target_codecs_mime_types(&target_codecs),
+                vec!["video/VP9", "video/red", "video/rtx", "video/ulpfec"]
+            );
+        }
+
+        {
+            let (target_codecs, svc) = probe_video_codecs(&vec![
+                SvcSettings {
+                    codec: Codec::VP8,
+                    scalability_mode: ScalabilityMode::L1T1,
+                },
+                SvcSettings {
+                    codec: Codec::VP9,
+                    scalability_mode: ScalabilityMode::L1T2,
+                },
+            ])
+            .await;
+
+            assert_eq!(svc, Some(ScalabilityMode::L1T1));
+            assert_eq!(
+                target_codecs_mime_types(&target_codecs),
+                vec!["video/VP8", "video/red", "video/rtx", "video/ulpfec"]
+            );
+        }
     }
 
     #[wasm_bindgen_test]
@@ -523,10 +545,11 @@ mod codec_probing {
                 .unwrap();
 
         // Filter codecs which are not fully supported by all browsers.
-        let codecs_caps: Vec<_> = target_codecs_mime_types(&caps)
+        let mut codecs_caps: Vec<_> = target_codecs_mime_types(&caps)
             .into_iter()
             .filter(|c| !NOT_FULLY_SUPPORTED_CODECS.contains(&c.as_str()))
             .collect();
+        codecs_caps.sort();
         assert_eq!(
             codecs_caps,
             vec![
