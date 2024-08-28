@@ -229,14 +229,15 @@ jobs:
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.crate == 'medea-jason' }}
 
+      - run: make test.unit crate=${{ matrix.crate }} browser=firefox
+        if: ${{ steps.skip.outputs.no == 'true'
+          && matrix.crate == 'medea-jason'
+          && contains(matrix.browsers, 'firefox') }}
+
       - run: make test.unit crate=${{ matrix.crate }} browser=chrome
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.crate == 'medea-jason'
              && contains(matrix.browsers, 'chrome') }}
-      - run: make test.unit crate=${{ matrix.crate }} browser=firefox
-        if: ${{ steps.skip.outputs.no == 'true'
-             && matrix.crate == 'medea-jason'
-             && contains(matrix.browsers, 'firefox') }}
 
       - run: make test.unit crate=${{ matrix.crate }}
                             features=${{ join(matrix.features, ',') }}
