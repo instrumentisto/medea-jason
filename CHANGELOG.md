@@ -396,4 +396,3 @@ All user visible changes to this project will be documented in this file. This p
 [VP9]: https://bloggeek.me/webrtcglossary/vp9
 [`derive_more`]: https://docs.rs/derive_more
 [`flutter_rust_bridge`]: https://docs.rs/flutter_rust_bridge
-[`medea_flutter_webrtc`]: https://github.com/instrumentisto/medea-flutter-webrtc
