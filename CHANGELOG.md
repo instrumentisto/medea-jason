@@ -6,6 +6,14 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.6.1] · 2024-09-11
+[0.6.1]: /../../tree/medea-jason-0.6.1
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.6.0...medea-jason-0.6.1)
+
+
+
+
 ## [0.6.0] · 2024-08-27
 [0.6.0]: /../../tree/medea-jason-0.6.0
 
@@ -388,3 +396,4 @@ All user visible changes to this project will be documented in this file. This p
 [VP9]: https://bloggeek.me/webrtcglossary/vp9
 [`derive_more`]: https://docs.rs/derive_more
 [`flutter_rust_bridge`]: https://docs.rs/flutter_rust_bridge
+[`medea_flutter_webrtc`]: https://github.com/instrumentisto/medea-flutter-webrtc
