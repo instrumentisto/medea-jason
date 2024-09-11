@@ -842,7 +842,7 @@ impl VideoSource {
     ///
     /// If this [`VideoSource`] is important then without this [`VideoSource`]
     /// call session can't be started.
-    #[allow(clippy::use_self)] // because of `const` only
+    #[expect(clippy::use_self, reason = "because of `const` only")]
     #[must_use]
     pub const fn required(&self) -> bool {
         match self {
@@ -918,7 +918,7 @@ impl TrackConstraints {
     ///
     /// If these [`TrackConstraints`] are important then without them a session
     /// call can't be started.
-    #[allow(clippy::use_self)] // because of `const` only
+    #[expect(clippy::use_self, reason = "because of `const` only")]
     #[must_use]
     pub const fn required(&self) -> bool {
         match self {
@@ -928,27 +928,27 @@ impl TrackConstraints {
     }
 
     /// Returns these [`TrackConstraints`] media source kind.
-    #[allow(clippy::use_self)] // because of `const` only
+    #[expect(clippy::use_self, reason = "because of `const` only")]
     #[must_use]
     pub const fn media_source_kind(&self) -> MediaSourceKind {
         match &self {
-            TrackConstraints::Audio(_) => MediaSourceKind::Device,
-            TrackConstraints::Video(VideoSource::Device(_)) => {
+            TrackConstraints::Audio(..) => MediaSourceKind::Device,
+            TrackConstraints::Video(VideoSource::Device(..)) => {
                 MediaSourceKind::Device
             }
-            TrackConstraints::Video(VideoSource::Display(_)) => {
+            TrackConstraints::Video(VideoSource::Display(..)) => {
                 MediaSourceKind::Display
             }
         }
     }
 
     /// Returns [`MediaKind`] of these [`TrackConstraints`].
-    #[allow(clippy::use_self)] // because of `const` only
+    #[expect(clippy::use_self, reason = "because of `const` only")]
     #[must_use]
     pub const fn media_kind(&self) -> MediaKind {
         match &self {
-            TrackConstraints::Audio(_) => MediaKind::Audio,
-            TrackConstraints::Video(_) => MediaKind::Video,
+            TrackConstraints::Audio(..) => MediaKind::Audio,
+            TrackConstraints::Video(..) => MediaKind::Video,
         }
     }
 }

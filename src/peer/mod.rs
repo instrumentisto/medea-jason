@@ -554,7 +554,10 @@ impl PeerConnection {
                     stat.stats.hash(&mut hasher);
                     let stat_hash = hasher.finish();
 
-                    #[allow(clippy::option_if_let_else)] // false positive: &mut
+                    #[expect( // false positive
+                        clippy::option_if_let_else,
+                        reason = "false positive: &mut"
+                    )]
                     if let Some(last_hash) = stats_cache.get_mut(&stat.id) {
                         if *last_hash == stat_hash {
                             false
@@ -789,14 +792,15 @@ impl PeerConnection {
         HashMap<TrackId, media_exchange_state::Stable>,
         Traced<UpdateLocalStreamError>,
     > {
-        self.inner_update_local_stream(criteria).await.map_err(|e| {
-            drop(self.peer_events_sender.unbounded_send(
-                PeerEvent::FailedLocalMedia {
-                    error: tracerr::map_from(e.clone()),
-                },
-            ));
-            e
-        })
+        self.inner_update_local_stream(criteria)
+            .await
+            .inspect_err(|e| {
+                drop(self.peer_events_sender.unbounded_send(
+                    PeerEvent::FailedLocalMedia {
+                        error: tracerr::map_from(e.clone()),
+                    },
+                ));
+            })
     }
 
     /// Returns [`MediaStreamSettings`] for the provided [`MediaKind`] and
@@ -1035,7 +1039,9 @@ impl PeerConnection {
 }
 
 #[cfg(feature = "mockable")]
-#[allow(clippy::multiple_inherent_impl)]
+// TODO: Try remove on next Rust version upgrade.
+#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
+#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
 impl PeerConnection {
     /// Returns [`RtcStats`] of this [`PeerConnection`].
     ///

@@ -30,7 +30,6 @@ use crate::{
 /// Errors if handshake fails for any underlying reason.
 ///
 /// [WebSocket]: https://en.wikipedia.org/wiki/WebSocket
-#[allow(clippy::unused_async)] // required by `actix_web`
 pub async fn create_ws(
     request: HttpRequest,
     path: Path<String>,
@@ -81,7 +80,7 @@ enum NotificationVariants<'a> {
 
 impl Notification {
     /// Builds `method: Created` [`Notification`].
-    #[allow(clippy::missing_panics_doc)] // intentional
+    #[expect(clippy::missing_panics_doc, reason = "serialization")]
     #[must_use]
     pub fn created(fid: &Fid, element: &Element) -> Self {
         Self(
@@ -94,7 +93,7 @@ impl Notification {
     }
 
     /// Builds `method: Deleted` [`Notification`].
-    #[allow(clippy::missing_panics_doc)] // intentional
+    #[expect(clippy::missing_panics_doc, reason = "serialization")]
     #[must_use]
     pub fn deleted(fid: &Fid) -> Self {
         Self(
@@ -106,7 +105,7 @@ impl Notification {
     }
 
     /// Builds `method: Broadcast` [`Notification`].
-    #[allow(clippy::missing_panics_doc)] // intentional
+    #[expect(clippy::missing_panics_doc, reason = "serialization")]
     #[must_use]
     pub fn broadcast(payload: Value) -> Self {
         Self(

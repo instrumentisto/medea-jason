@@ -160,7 +160,7 @@ where
     fn apply(&self, input: Self::Input, send_cons: &LocalTracksConstraints) {
         self.0.borrow_mut().remove_not_present(&input);
 
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for (id, track) in input {
             if let Some(sync_track) = self.0.borrow().get(&id) {
                 sync_track.apply(track, send_cons);
@@ -245,7 +245,9 @@ impl<S> TracksRepository<S> {
 }
 
 #[cfg(feature = "mockable")]
-#[allow(clippy::multiple_inherent_impl)]
+// TODO: Try remove on next Rust version upgrade.
+#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
+#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
 impl TracksRepository<sender::State> {
     /// Sets [`SyncState`] of all [`sender::State`]s to the
     /// [`SyncState::Synced`].

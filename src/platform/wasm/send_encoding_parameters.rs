@@ -14,8 +14,8 @@ pub struct SendEncodingParameters(RtcRtpEncodingParameters);
 
 impl SendEncodingParameters {
     /// Creates new [`SendEncodingParameters`].
+    #[expect(clippy::needless_pass_by_value, reason = "`cfg` code uniformity")]
     #[must_use]
-    #[allow(clippy::needless_pass_by_value)]
     pub fn new(rid: String, active: bool) -> Self {
         let mut params = RtcRtpEncodingParameters::new();
         _ = params.rid(&rid);

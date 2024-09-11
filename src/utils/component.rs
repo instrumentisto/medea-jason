@@ -171,7 +171,7 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
     }
 
     /// Creates new [`WatchersSpawner`] for the provided object and state.
-    fn new(state: Rc<S>, obj: Rc<O>) -> Self {
+    const fn new(state: Rc<S>, obj: Rc<O>) -> Self {
         Self {
             state,
             obj,

@@ -171,13 +171,12 @@ impl Component {
             peer.track_events_sender.clone(),
         )
         .await
-        .map_err(|e| {
+        .inspect_err(|e| {
             drop(peer.peer_events_sender.unbounded_send(
                 PeerEvent::FailedLocalMedia {
                     error: tracerr::map_from(e.clone()),
                 },
             ));
-            e
         })
         .map_err(tracerr::map_from_and_wrap!())?;
         peer.media_connections
@@ -225,7 +224,6 @@ impl Component {
     /// Watcher for the [`State::connections`] insert update.
     ///
     /// Creates a new [`Connection`] for the given [`PeerConnection`].
-    #[allow(clippy::needless_pass_by_value)] // required by macro
     #[watch(
         self.maybe_update_connections.subscribe().filter_map(future::ready)
     )]

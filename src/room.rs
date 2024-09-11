@@ -291,7 +291,6 @@ impl RoomHandle {
     /// # Errors
     ///
     /// See [`HandleDetachedError`] for details.
-    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     pub fn on_close(
         &self,
         f: platform::Function<api::RoomCloseReason>,
@@ -337,7 +336,6 @@ impl RoomHandle {
     /// # Errors
     ///
     /// See [`HandleDetachedError`] for details.
-    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     pub fn on_connection_loss(
         &self,
         f: platform::Function<api::ReconnectHandle>,
@@ -456,8 +454,6 @@ impl RoomHandle {
                             direction,
                             source_kind,
                         );
-                        // false positive: output expression is not input one
-                        #[allow(clippy::redundant_closure_call)]
                         tracerr::map_from_and_wrap!()(e)
                     })?;
                 if !inner.send_constraints.is_track_enabled(kind, source_kind) {
@@ -987,11 +983,9 @@ struct InnerRoom {
     on_failed_local_media: Rc<platform::Callback<api::Error>>,
 
     /// Callback invoked when a [`RpcSession`] loses connection.
-    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     on_connection_loss: platform::Callback<api::ReconnectHandle>,
 
     /// Callback invoked when this [`Room`] is closed.
-    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     on_close: Rc<platform::Callback<api::RoomCloseReason>>,
 
     /// Reason of [`Room`] closing.
@@ -1330,10 +1324,8 @@ impl InnerRoom {
                 .media_manager
                 .get_tracks(req)
                 .await
-                .map_err(|e| {
+                .inspect_err(|e| {
                     self.on_failed_local_media.call1(e.clone());
-
-                    e
                 })
                 .map_err(tracerr::map_from_and_wrap!())?;
             for (track, is_new) in tracks {
@@ -1465,8 +1457,6 @@ impl InnerRoom {
                         e.as_ref(),
                         UpdateLocalStreamError::CouldNotGetLocalMedia(_)
                     ) {
-                        // false positive: output expression is not input one
-                        #[allow(clippy::redundant_closure_call)]
                         return Err(E::errored(tracerr::map_from_and_wrap!()(
                             e.clone(),
                         )));
@@ -1480,16 +1470,11 @@ impl InnerRoom {
                         )
                         .await
                         .map_err(|err| {
-                            // false positive: output expression is not input
-                            //                 one
-                            #[allow(clippy::redundant_closure_call)]
                             err.recovery_failed(tracerr::map_from_and_wrap!()(
                                 e.clone(),
                             ))
                         })?;
 
-                        // false positive: output expression is not input one
-                        #[allow(clippy::redundant_closure_call)]
                         E::recovered(tracerr::map_from_and_wrap!()(e.clone()))
                     } else if stop_first {
                         self.disable_senders_without_tracks(
@@ -1509,12 +1494,8 @@ impl InnerRoom {
                             }
                         })?;
 
-                        // false positive: output expression is not input one
-                        #[allow(clippy::redundant_closure_call)]
                         E::errored(tracerr::map_from_and_wrap!()(e.clone()))
                     } else {
-                        // false positive: output expression is not input one
-                        #[allow(clippy::redundant_closure_call)]
                         E::errored(tracerr::map_from_and_wrap!()(e.clone()))
                     };
 
@@ -1936,7 +1917,9 @@ impl Drop for InnerRoom {
 }
 
 #[cfg(feature = "mockable")]
-#[allow(clippy::multiple_inherent_impl)]
+// TODO: Try remove on next Rust version upgrade.
+#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
+#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
 impl Room {
     /// Returns [`PeerConnection`] stored in repository by its ID.
     ///

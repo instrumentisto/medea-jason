@@ -93,7 +93,7 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrackstate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
-    #[allow(clippy::unused_async)] // for platform code uniformity
+    #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn ready_state(&self) -> MediaStreamTrackState {
         let state = self.sys_track.ready_state();
         match state {
@@ -151,10 +151,11 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn height(&self) -> Option<u32> {
-        #[allow(
+        #[expect( // no other sane way
             clippy::as_conversions,
             clippy::cast_possible_truncation,
-            clippy::cast_sign_loss
+            clippy::cast_sign_loss,
+            reason = "no other sane way"
         )]
         get_property_by_name(&self.sys_track.get_settings(), "height", |h| {
             h.as_f64().map(|v| v as u32)
@@ -167,10 +168,11 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn width(&self) -> Option<u32> {
-        #[allow(
+        #[expect( // no other sane way
             clippy::as_conversions,
             clippy::cast_possible_truncation,
-            clippy::cast_sign_loss
+            clippy::cast_sign_loss,
+            reason = "no other sane way"
         )]
         get_property_by_name(&self.sys_track.get_settings(), "width", |w| {
             w.as_f64().map(|v| v as u32)
@@ -252,21 +254,17 @@ impl MediaStreamTrack {
         let mut on_ended = self.on_ended.borrow_mut();
         drop(match f {
             None => on_ended.take(),
-            Some(f) => {
-                on_ended.replace(
-                    // PANIC: Unwrapping is OK here, because this function
-                    //        shouldn't error ever.
-                    #[allow(clippy::unwrap_used)] // intentional
-                    EventListener::new_once(
-                        Rc::clone(&self.sys_track),
-                        "ended",
-                        move |_| {
-                            f();
-                        },
-                    )
-                    .unwrap(),
+            Some(f) => on_ended.replace(
+                #[expect(clippy::unwrap_used, reason = "shouldn't error ever")]
+                EventListener::new_once(
+                    Rc::clone(&self.sys_track),
+                    "ended",
+                    move |_| {
+                        f();
+                    },
                 )
-            }
+                .unwrap(),
+            ),
         });
     }
 

@@ -32,7 +32,7 @@ impl CodecCapability {
     /// capabilities.
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#dom-rtcrtpsender
-    #[allow(clippy::unused_async)] // for platform code uniformity
+    #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn get_sender_codec_capabilities(
         kind: MediaKind,
     ) -> Result<Vec<Self>, Error> {

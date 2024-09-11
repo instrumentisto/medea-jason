@@ -57,15 +57,18 @@ impl RoomElement {
     }
 }
 
-#[allow(clippy::fallible_impl_from, clippy::unwrap_used)] // intentional
+#[expect( // unimplemented
+    clippy::fallible_impl_from, clippy::unwrap_used,
+    reason = "unimplemented"
+)]
 impl From<proto::room::Element> for RoomElement {
     fn from(proto: proto::room::Element) -> Self {
         match proto.el.unwrap() {
             proto::room::element::El::Member(member) => {
                 Self::Member(member.into())
             }
-            proto::room::element::El::WebrtcPlay(_)
-            | proto::room::element::El::WebrtcPub(_) => unimplemented!(),
+            proto::room::element::El::WebrtcPlay(..)
+            | proto::room::element::El::WebrtcPub(..) => unimplemented!(),
         }
     }
 }

@@ -32,7 +32,10 @@ struct Inner {
 
     /// Callback to be invoked whenever this [`Track`]'s general
     /// [`MediaDirection`] is changed.
-    #[allow(unused_qualifications)]
+    #[cfg_attr(
+        not(target_family = "wasm"),
+        expect(unused_qualifications, reason = "`cfg` code uniformity")
+    )]
     on_media_direction_changed: platform::Callback<api::MediaDirection>,
 
     /// Current general [`MediaDirection`] of this [`Track`].
@@ -189,7 +192,10 @@ impl Track {
 
     /// Sets callback to be invoked whenever this [`Track`]'s general
     /// [`MediaDirection`] is changed.
-    #[allow(unused_qualifications)]
+    #[cfg_attr(
+        not(target_family = "wasm"),
+        expect(unused_qualifications, reason = "`cfg` code uniformity")
+    )]
     pub fn on_media_direction_changed(
         &self,
         callback: platform::Function<api::MediaDirection>,

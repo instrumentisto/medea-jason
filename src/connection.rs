@@ -74,7 +74,6 @@ pub struct Connections {
     room_recv_constraints: Rc<RecvConstraints>,
 
     /// Callback invoked on remote `Member` media arrival.
-    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     on_new_connection: platform::Callback<api::ConnectionHandle>,
 }
 
@@ -92,7 +91,6 @@ impl Connections {
 
     /// Sets callback, which will be invoked when new [`Connection`] is
     /// established.
-    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     pub fn on_new_connection(
         &self,
         f: platform::Function<api::ConnectionHandle>,
@@ -192,7 +190,7 @@ impl Connections {
     ) -> Vec<Connection> {
         let mut connections = self.connections.borrow_mut();
 
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for partner in partner_members {
             _ = self
                 .members_to_tracks
@@ -231,7 +229,7 @@ impl Connections {
         let mut tracks = self.tracks.borrow_mut();
 
         if let Some(partners) = tracks.remove(track_id) {
-            #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+            #[expect(clippy::iter_over_hash_type, reason = "doesn't matter")]
             for p in partners {
                 if let Some(member_tracks) =
                     self.members_to_tracks.borrow_mut().get_mut(&p)
@@ -257,7 +255,7 @@ impl Connections {
 
     /// Updates this [`Connection`] with the provided [`proto::state::Room`].
     pub fn apply(&self, new_state: &proto::state::Room) {
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for peer in new_state.peers.values() {
             for (track_id, sender) in &peer.senders {
                 if let Some(partners) = self.tracks.borrow().get(track_id) {
@@ -651,7 +649,7 @@ impl Connection {
     pub fn update_quality_score(&self, score: ConnectionQualityScore) {
         if self.0.quality_score.replace(Some(score)) != Some(score) {
             // TODO: Replace with derive?
-            #[allow(clippy::as_conversions)] // intentional
+            #[expect(clippy::as_conversions, reason = "needs refactoring")]
             self.0.on_quality_score_update.call1(score as u8);
         }
     }

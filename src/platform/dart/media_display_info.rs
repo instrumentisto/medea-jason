@@ -43,7 +43,7 @@ impl MediaDisplayInfo {
     }
 
     /// Returns a title describing the represented display.
-    #[allow(clippy::unwrap_in_result)]
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn title(&self) -> Option<String> {
         let title = unsafe { media_display_info::title(self.0.get()) }.unwrap();

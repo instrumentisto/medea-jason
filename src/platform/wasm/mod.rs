@@ -76,7 +76,7 @@ where
 /// If fails to interact with JS side.
 ///
 /// [`Future`]: std::future::Future
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used, reason = "JS interop error is unexpected")]
 pub async fn delay_for(delay: Duration) {
     let delay_ms = delay.as_millis().try_into().unwrap_or(i32::MAX);
     JsFuture::from(Promise::new(&mut |yes, _| {
@@ -115,8 +115,7 @@ where
 #[must_use]
 pub fn window() -> Window {
     // Cannot use `lazy_static` since `window` is `!Sync`.
-    // Safe to unwrap.
-    #![allow(clippy::unwrap_used)] // intentional
+    #![expect(clippy::unwrap_used, reason = "`window` is always present")]
     web_sys::window().unwrap()
 }
 

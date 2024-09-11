@@ -101,7 +101,10 @@ impl Task {
     /// `Rc<?Send + ?Sync>` instead of `Arc<Send + Sync>` since we are sure
     /// that everything will run on a single thread.
     fn into_raw_waker(this: Rc<Self>) -> RawWaker {
-        #![allow(clippy::missing_docs_in_private_items)]
+        #![expect( // not visible
+            clippy::missing_docs_in_private_items,
+            reason = "not visible at all"
+        )]
 
         // Refer to `RawWakerVTable::new()` documentation for better
         // understanding of what the following functions do.

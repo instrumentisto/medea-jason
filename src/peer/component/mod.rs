@@ -487,7 +487,7 @@ impl SynchronizableState for State {
             input.connection_mode,
         );
 
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for (id, sender) in input.senders {
             if !sender.receivers.is_empty() {
                 state.senders.insert(
@@ -499,7 +499,7 @@ impl SynchronizableState for State {
                 );
             }
         }
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for (id, receiver) in input.receivers {
             state.receivers.insert(
                 id,
@@ -509,7 +509,7 @@ impl SynchronizableState for State {
                 )),
             );
         }
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for ice_candidate in input.ice_candidates {
             state.ice_candidates.add(ice_candidate);
         }
@@ -567,7 +567,9 @@ impl Updatable for State {
 }
 
 #[cfg(feature = "mockable")]
-#[allow(clippy::multiple_inherent_impl)]
+// TODO: Try remove on next Rust version upgrade.
+#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
+#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
 impl State {
     /// Waits for a [`State::remote_sdp`] change to be applied.
     pub async fn when_remote_sdp_processed(&self) {

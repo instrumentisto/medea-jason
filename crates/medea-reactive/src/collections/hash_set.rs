@@ -194,7 +194,7 @@ where
     /// values and values that will be inserted.
     ///
     /// [`Stream`]: futures::Stream
-    #[allow(clippy::needless_collect)] // false positive: lifetimes
+    #[expect(clippy::needless_collect, reason = "false positive: lifetimes")]
     pub fn replay_on_insert(&self) -> LocalBoxStream<'static, O> {
         Box::pin(stream::iter(
             self.store
@@ -303,7 +303,7 @@ where
     /// Sends all values of a dropped [`HashSet`] to the
     /// [`HashSet::on_remove()`] subscriptions.
     fn drop(&mut self) {
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for val in self.store.drain() {
             self.on_remove_subs.send_update(val);
         }

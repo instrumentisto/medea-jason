@@ -84,7 +84,7 @@ mod media_devices {
     }
 }
 
-#[allow(clippy::fallible_impl_from)] // intentional
+#[expect(clippy::fallible_impl_from, reason = "FFI error is unexpected")]
 impl From<Error> for GetUserMediaError {
     fn from(err: Error) -> Self {
         let kind = unsafe {

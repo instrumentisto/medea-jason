@@ -11,8 +11,6 @@ pub struct RtcStats(pub Vec<RtcStat>);
 
 #[cfg(feature = "mockable")]
 pub mod mock {
-    #![allow(clippy::missing_safety_doc)]
-
     use crate::api::DartValueArg;
 
     #[no_mangle]

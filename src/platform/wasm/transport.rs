@@ -2,7 +2,8 @@
 //!
 //! [WebSocket]: https://developer.mozilla.org/ru/docs/WebSockets
 
-#![allow(clippy::unwrap_used)]
+// TODO: Needs refactoring.
+#![expect(clippy::unwrap_used, reason = "needs refactoring")]
 
 use std::{cell::RefCell, rc::Rc};
 

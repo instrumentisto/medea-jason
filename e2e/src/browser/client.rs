@@ -53,7 +53,8 @@ impl From<JsResult> for Result<Json> {
 /// Client for interacting with a browser through a [WebDriver] protocol.
 ///
 /// [WebDriver]: https://w3.org/TR/webdriver
-#[allow(clippy::module_name_repetitions)] // TODO: Refactor?
+// TODO: Needs refactoring.
+#[expect(clippy::module_name_repetitions, reason = "needs refactoring")]
 #[derive(Clone, Debug)]
 pub struct WebDriverClient {
     /// Inner implementation of this [`WebDriverClient`].

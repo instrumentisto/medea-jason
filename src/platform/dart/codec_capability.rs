@@ -73,7 +73,7 @@ impl CodecCapability {
         }
         .unwrap();
 
-        #[allow(clippy::map_err_ignore)]
+        #[expect(clippy::map_err_ignore, reason = "not useful")]
         let res: DartHandle = unsafe { FutureFromDart::execute(fut) }
             .await
             .map_err(|_| Error::FailedToGetCapabilities)?;

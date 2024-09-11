@@ -76,12 +76,15 @@ mod completer {
 ///
 /// # Panics
 ///
-/// Panics if the `DELAYED_FUTURE_FUNCTION` isn't set by the Dart side. This is
-/// should be impossible case.
+/// Panics if the `DELAYED_FUTURE_FUNCTION` isn't set by the Dart side. This
+/// should be an impossible case.
 ///
 /// [`Future`]: std::future::Future
 pub async fn delay_for(delay: Duration) {
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect( // overflow is unexpected
+        clippy::cast_possible_truncation,
+        reason = "overflow is unexpected",
+    )]
     let delay = delay.as_millis() as i32;
     let delayed = unsafe { completer::delayed(delay) }.unwrap();
     let delayed_fut = unsafe { FutureFromDart::execute::<()>(delayed) };

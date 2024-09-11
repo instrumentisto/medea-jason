@@ -96,7 +96,7 @@ impl Transceiver {
 
     /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
-    #[allow(clippy::unused_async)] // for platform code uniformity
+    #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn has_direction(&self, direction: TransceiverDirection) -> bool {
         self.direction().contains(direction)
     }
@@ -146,20 +146,20 @@ impl Transceiver {
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#dom-rtcrtpsender
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-setparameters
-    #[allow(clippy::missing_panics_doc)]
+    #[expect(clippy::missing_panics_doc, reason = "not happens")]
     pub async fn update_send_encodings(
         &self,
         encodings: Vec<EncodingParameters>,
     ) -> Result<(), Error> {
         let params = self.0.sender().get_parameters();
-        #[allow(clippy::unwrap_used)] // intentional
+        #[expect(clippy::unwrap_used, reason = "always present")]
         let encs = get_property_by_name(&params, "encodings", |v| {
             v.is_array().then_some(Array::from(&v))
         })
         .unwrap();
 
         for mut enc in encs.iter().map(RtcRtpEncodingParameters::from) {
-            #[allow(clippy::unwrap_used)] // intentional
+            #[expect(clippy::unwrap_used, reason = "always present")]
             let rid =
                 get_property_by_name(&enc, "rid", |v| v.as_string()).unwrap();
 

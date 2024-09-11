@@ -111,7 +111,10 @@ where
                             {
                                 Either::Left(_) => (),
                                 Either::Right(_) => {
-                                    #[allow(clippy::shadow_unrelated)]
+                                    #[expect( // false positive
+                                        clippy::shadow_unrelated,
+                                        reason = "actually related"
+                                    )]
                                     if let Some(this) = weak_this.upgrade() {
                                         let stable = this
                                             .state

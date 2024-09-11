@@ -479,7 +479,9 @@ impl TransceiverSide for State {
 }
 
 #[cfg(feature = "mockable")]
-#[allow(clippy::multiple_inherent_impl)]
+// TODO: Try remove on next Rust version upgrade.
+#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
+#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
 impl State {
     /// Stabilizes the [`MediaExchangeState`] of this [`State`].
     pub fn stabilize(&self) {

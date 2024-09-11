@@ -94,7 +94,7 @@ impl MediaDeviceInfo {
     /// same [groupId][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
-    #[allow(clippy::unwrap_in_result)]
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
         let group_id =
@@ -112,9 +112,9 @@ impl MediaDeviceInfo {
 impl TryFrom<DartHandle> for MediaDeviceInfo {
     type Error = NotInput;
 
-    #[allow(clippy::unwrap_in_result)] // intentional
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     fn try_from(value: DartHandle) -> Result<Self, Self::Error> {
-        #[allow(clippy::map_err_ignore)] // intentional
+        #[expect(clippy::map_err_ignore, reason = "not useful")]
         let kind = unsafe { media_device_info::kind(value.get()) }
             .unwrap()
             .try_into()

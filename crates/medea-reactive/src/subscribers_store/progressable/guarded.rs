@@ -69,7 +69,7 @@ pub struct Guard(Rc<ObservableCell<u32>>);
 impl Guard {
     /// Creates new [`Guard`] on the given `counter`.
     fn new(counter: Rc<ObservableCell<u32>>) -> Self {
-        #[allow(clippy::expect_used)] // intentional
+        #[expect(clippy::expect_used, reason = "overflowing is unexpected")]
         counter.mutate(|mut c| {
             *c = c
                 .checked_add(1)

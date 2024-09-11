@@ -153,10 +153,7 @@ impl FutureFromDart {
 /// [`Future`]: https://api.dart.dev/dart-async/Future-class.html
 #[derive(Debug)]
 #[repr(transparent)]
-pub struct DartFuture<O>(
-    #[allow(dead_code)] Dart_Handle, // read by Dart side
-    PhantomData<*const O>,
-);
+pub struct DartFuture<O>(Dart_Handle, PhantomData<*const O>);
 
 impl<O> DartFuture<O> {
     /// Wraps the given [`DartFuture`] into a [`DartOpaque`] value, so it can be
@@ -209,7 +206,7 @@ where
 
 #[cfg(feature = "mockable")]
 pub mod tests {
-    #![allow(clippy::missing_safety_doc)]
+    #![expect(clippy::missing_safety_doc, reason = "for testing only")]
 
     use dart_sys::Dart_Handle;
 

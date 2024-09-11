@@ -274,7 +274,7 @@ impl From<&State> for proto::state::Sender {
 
 impl State {
     /// Creates new [`State`] with the provided data.
-    #[allow(clippy::too_many_arguments)]
+    #[expect(clippy::too_many_arguments, reason = "not a problem")]
     #[must_use]
     pub fn new(
         id: TrackId,
@@ -605,7 +605,7 @@ impl Component {
     }
 
     /// Disables media exchange on a local track acquisition error.
-    #[allow(clippy::needless_pass_by_value)]
+    #[expect(clippy::needless_pass_by_value, reason = "required by macro")]
     #[watch(self.local_track_state.subscribe())]
     fn local_track_state_changed(
         _: &Sender,
@@ -691,7 +691,9 @@ impl MediaStateControllable for State {
 }
 
 #[cfg(feature = "mockable")]
-#[allow(clippy::multiple_inherent_impl)]
+// TODO: Try remove on next Rust version upgrade.
+#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
+#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
 impl State {
     /// Sets the [`State::sync_state`] to a [`SyncState::Synced`].
     pub fn synced(&self) {
