@@ -6,6 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.6.1] · 2024-09-11
+[0.6.1]: /../../tree/medea-jason-0.6.1/flutter
+
+See also [`medea-jason` crate 0.6.1 changes](/../../tree/medea-jason-0.6.1/CHANGELOG.md).
+
+### Upgraded
+
+- Dependencies:
+    - [`medea_flutter_webrtc`] to 0.11.1 version. ([#186])
+
+[#186]: /../../pull/186
+
+
+
+
 ## [0.6.0] · 2024-08-27
 [0.6.0]: /../../tree/medea-jason-0.6.0/flutter
 
@@ -109,6 +124,7 @@ See also [`medea-jason` crate 0.5.0 changes](/../../tree/medea-jason-0.5.0/CHANG
 
 
 [`flutter_rust_bridge`]: https://pub.dev/packages/flutter_rust_bridge
+[`medea_flutter_webrtc`]: https://pub.dev/packages/medea_flutter_webrtc
 [`medea-jason`]: https://docs.rs/medea-jason
 [Flutter]: https://flutter.dev
 [Semantic Versioning 2.0.0]: https://semver.org
