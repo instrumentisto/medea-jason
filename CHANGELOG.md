@@ -11,6 +11,12 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.6.0...medea-jason-0.6.1)
 
+### Changed
+
+- Bumped up [MSRV] to 1.81. ([fe29ee20])
+
+[fe29ee20]: /../../commit/fe29ee20b7dd210145a2004ebe8389140aec10a3
+
 
 
 
@@ -391,6 +397,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+[MSRV]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
 [SFU]: https://webrtcglossary.com/sfu
 [Semantic Versioning 2.0.0]: https://semver.org
 [VP9]: https://bloggeek.me/webrtcglossary/vp9

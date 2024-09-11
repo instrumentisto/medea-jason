@@ -124,8 +124,8 @@ See also [`medea-jason` crate 0.5.0 changes](/../../tree/medea-jason-0.5.0/CHANG
 
 
 [`flutter_rust_bridge`]: https://pub.dev/packages/flutter_rust_bridge
+[`medea_flutter_webrtc`]: https://pub.dev/packages/medea_flutter_webrtc
 [`medea-jason`]: https://docs.rs/medea-jason
 [Flutter]: https://flutter.dev
 [Semantic Versioning 2.0.0]: https://semver.org
 [SFU]: https://webrtcglossary.com/sfu
-[`medea_flutter_webrtc`]: https://github.com/instrumentisto/medea-flutter-webrtc
