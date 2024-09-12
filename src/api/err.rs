@@ -1,12 +1,5 @@
 //! External API errors.
 
-// TODO: Try use `#![expect]` on next Rust version upgrade.
-#![allow(clippy::multiple_inherent_impl, reason = "`wasm_bindgen` codegen")]
-#![cfg_attr(
-    target_family = "wasm",
-    expect(clippy::mem_forget, reason = "`wasm_bindgen` codegen")
-)]
-
 use std::borrow::Cow;
 
 #[cfg(target_family = "wasm")]
@@ -122,6 +115,12 @@ pub struct LocalMediaInitException {
     trace: Trace,
 }
 
+impl Drop for LocalMediaInitException {
+    fn drop(&mut self) {
+        log::error!("impl Drop for LocalMediaInitException");
+    }
+}
+
 impl LocalMediaInitException {
     /// Creates a new [`LocalMediaInitException`] from the provided error
     /// `kind`, `message`, optional `cause` and `trace`.
@@ -183,6 +182,12 @@ pub struct EnumerateDevicesException {
     trace: Trace,
 }
 
+impl Drop for EnumerateDevicesException {
+    fn drop(&mut self) {
+        log::error!("impl Drop for EnumerateDevicesException");
+    }
+}
+
 impl EnumerateDevicesException {
     /// Creates a new [`EnumerateDevicesException`] from the provided error
     /// `cause` and `trace`.
@@ -215,6 +220,12 @@ pub struct InvalidOutputAudioDeviceIdException {
     trace: Trace,
 }
 
+impl Drop for InvalidOutputAudioDeviceIdException {
+    fn drop(&mut self) {
+        log::error!("impl Drop for InvalidOutputAudioDeviceIdException");
+    }
+}
+
 impl InvalidOutputAudioDeviceIdException {
     /// Creates a new [`InvalidOutputAudioDeviceIdException`] from the provided
     /// error [`Trace`].
@@ -242,6 +253,12 @@ pub struct MicVolumeException {
 
     /// Stacktrace of this [`MicVolumeException`].
     trace: Trace,
+}
+
+impl Drop for MicVolumeException {
+    fn drop(&mut self) {
+        log::error!("impl Drop for MicVolumeException");
+    }
 }
 
 impl MicVolumeException {
@@ -304,6 +321,12 @@ pub struct RpcClientException {
 
     /// Stacktrace of this [`RpcClientException`].
     trace: Trace,
+}
+
+impl Drop for RpcClientException {
+    fn drop(&mut self) {
+        log::error!("impl Drop for RpcClientException");
+    }
 }
 
 impl RpcClientException {
@@ -371,6 +394,12 @@ pub struct InternalException {
 
     /// Stacktrace of this [`InternalException`].
     trace: Trace,
+}
+
+impl Drop for InternalException {
+    fn drop(&mut self) {
+        log::error!("impl Drop for InternalException");
+    }
 }
 
 impl InternalException {
@@ -466,6 +495,12 @@ pub struct MediaStateTransitionException {
     trace: Trace,
 }
 
+impl Drop for MediaStateTransitionException {
+    fn drop(&mut self) {
+        log::error!("impl Drop for MediaStateTransitionException");
+    }
+}
+
 impl MediaStateTransitionException {
     /// Creates a new [`MediaStateTransitionException`] from the provided error
     /// `message` and `trace`.
@@ -524,6 +559,12 @@ pub struct MediaSettingsUpdateException {
     /// Whether media settings were successfully rolled back after new settings
     /// application failed.
     rolled_back: bool,
+}
+
+impl Drop for MediaSettingsUpdateException {
+    fn drop(&mut self) {
+        log::error!("impl Drop for MediaSettingsUpdateException");
+    }
 }
 
 impl MediaSettingsUpdateException {

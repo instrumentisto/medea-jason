@@ -142,7 +142,6 @@ impl Transceiver {
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#dom-rtcrtpsender
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-setparameters
-    #[expect(clippy::missing_panics_doc, reason = "not happens")]
     pub async fn update_send_encodings(
         &self,
         encodings: Vec<EncodingParameters>,
