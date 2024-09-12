@@ -195,7 +195,8 @@ impl RtcPeerConnection {
     }
 
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
-    #[allow(clippy::missing_errors_doc, clippy::unused_async)]
+    // TODO: Needs refactoring.
+    #[expect(clippy::missing_errors_doc, reason = "needs refactoring")]
     pub async fn get_stats(&self) -> RtcPeerConnectionResult<RtcStats> {
         let fut =
             unsafe { peer_connection::get_stats(self.handle.get()) }.unwrap();
@@ -312,7 +313,6 @@ impl RtcPeerConnection {
     }
 
     /// Returns [`PeerConnectionState`] of this [`RtcPeerConnection`].
-    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn connection_state(&self) -> PeerConnectionState {
         let conn_state =

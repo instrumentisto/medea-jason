@@ -164,7 +164,7 @@ pub struct MediaStreamTrack {
 impl MediaStreamTrack {
     /// Creates a new [`MediaStreamTrack`].
     #[must_use]
-    pub fn new(
+    pub const fn new(
         inner: DartHandle,
         source_kind: Option<MediaSourceKind>,
     ) -> Self {
@@ -189,9 +189,9 @@ impl MediaStreamTrack {
     /// Returns [device ID][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-deviceid
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[inline]
     #[must_use]
-    #[allow(clippy::unwrap_in_result)] // intentional
     pub fn device_id(&self) -> Option<String> {
         let device_id =
             unsafe { media_stream_track::device_id(self.inner.get()) }.unwrap();
@@ -213,7 +213,7 @@ impl MediaStreamTrack {
     /// Returns [facing mode][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-facingmode
-    #[allow(clippy::unwrap_in_result)]
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
         let facing_mode =
@@ -229,7 +229,7 @@ impl MediaStreamTrack {
     /// Returns [height][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-height
-    #[allow(clippy::unwrap_in_result)]
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn height(&self) -> Option<u32> {
         let height =
@@ -240,7 +240,7 @@ impl MediaStreamTrack {
     /// Returns [width][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-width
-    #[allow(clippy::unwrap_in_result)]
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn width(&self) -> Option<u32> {
         let width =

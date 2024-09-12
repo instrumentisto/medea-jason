@@ -2,7 +2,8 @@
 //!
 //! [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 
-#![allow(clippy::module_name_repetitions)] // TODO: Needs refactoring.
+// TODO: Needs refactoring.
+#![expect(clippy::module_name_repetitions, reason = "needs refactoring")]
 
 use std::{
     hash::{Hash, Hasher},
@@ -787,7 +788,10 @@ pub enum SenderStatsKind {
 ///
 /// [RTCRtpReceiver]: https://w3.org/TR/webrtc#dom-rtcrtpreceiver
 /// [1]: https://w3.org/TR/webrtc-stats/#dom-rtcstatstype-receiver
-#[allow(clippy::empty_enum_variants_with_brackets)] // required by `serde`
+#[expect( // required by `serde`
+    clippy::empty_enum_variants_with_brackets,
+    reason = "required by `serde`"
+)]
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[serde(tag = "kind", rename_all = "camelCase")]

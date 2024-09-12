@@ -17,7 +17,10 @@ use crate::room;
 #[derive(Debug, From)]
 pub struct RoomCloseReason(room::RoomCloseReason);
 
-#[allow(clippy::missing_const_for_fn)] // required by `wasm_bindgen`
+#[expect( // `wasm_bindgen` doesn't support `const fn`
+    clippy::missing_const_for_fn,
+    reason = "`wasm_bindgen` doesn't support `const fn`"
+)]
 #[wasm_bindgen]
 impl RoomCloseReason {
     /// Returns the [`Room`]'s close reason.

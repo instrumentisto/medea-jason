@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 
-#![allow(clippy::unwrap_used)]
+#![expect(clippy::unwrap_used, reason = "JS interop error is unexpected")]
 
 use std::{
     cell::{Cell, RefCell},
@@ -123,7 +123,7 @@ impl RtcPeerConnection {
     ///
     /// Errors with [`RtcPeerConnectionError::PeerCreationError`] if
     /// [`SysRtcPeerConnection`] creation fails.
-    #[allow(clippy::unused_async)] // for platform code uniformity
+    #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn new<I>(
         ice_servers: I,
         is_force_relayed: bool,
@@ -615,7 +615,7 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     /// [2]: https://w3.org/TR/webrtc#transceivers-set
-    #[allow(clippy::unused_async)] // for platform code uniformity
+    #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn add_transceiver(
         &self,
         kind: MediaKind,

@@ -17,7 +17,7 @@ pub type Factory<'a, T> = Box<dyn Fn() -> LocalBoxFuture<'a, T> + 'static>;
 
 /// Creates [`AllProcessed`] [`Future`] from the provided [`Iterator`] of
 /// [`Factory`]s.
-#[allow(clippy::module_name_repetitions)]
+#[expect(clippy::module_name_repetitions, reason = "naming is saner this way")]
 pub fn when_all_processed<I, T>(futures: I) -> AllProcessed<'static>
 where
     I: IntoIterator<Item = Factory<'static, T>>,
@@ -80,7 +80,7 @@ impl<T> fmt::Debug for Processed<'_, T> {
 /// conditions are still met.
 ///
 /// Inner [`Factory`] can be unwrapped using [`Into`] implementation.
-#[allow(clippy::module_name_repetitions)]
+#[expect(clippy::module_name_repetitions, reason = "naming is saner this way")]
 #[must_use = "futures do nothing unless you `.await` or poll them"]
 pub struct AllProcessed<'a, T = ()> {
     /// Factory creating the underlying [`Future`] and recreating it to recheck

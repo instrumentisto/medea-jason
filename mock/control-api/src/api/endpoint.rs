@@ -277,7 +277,7 @@ impl Endpoint {
     }
 }
 
-#[allow(clippy::fallible_impl_from, clippy::unwrap_used)] // intentional
+#[expect(clippy::fallible_impl_from, clippy::unwrap_used, reason = "unrelated")]
 impl From<proto::member::Element> for Endpoint {
     fn from(proto: proto::member::Element) -> Self {
         match proto.el.unwrap() {

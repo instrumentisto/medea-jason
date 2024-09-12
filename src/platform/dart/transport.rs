@@ -137,7 +137,7 @@ impl Default for WebSocketRpcTransport {
 impl RpcTransport for WebSocketRpcTransport {
     async fn connect(&self, url: ApiUrl) -> TransportResult<()> {
         // TODO: Propagate execution error.
-        #[allow(clippy::map_err_ignore)]
+        #[expect(clippy::map_err_ignore, reason = "needs refactoring")]
         let handle = {
             let on_message = Callback::from_fn_mut({
                 let weak_subs = Rc::downgrade(&self.on_message_subs);
@@ -212,7 +212,7 @@ impl RpcTransport for WebSocketRpcTransport {
         self.close_reason.set(reason);
     }
 
-    #[allow(clippy::unwrap_in_result)]
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     fn send(&self, msg: &ClientMsg) -> TransportResult<()> {
         let state = self.socket_state.get();
         let handle = self

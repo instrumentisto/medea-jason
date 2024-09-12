@@ -288,7 +288,7 @@ impl TryFrom<TracksRequest> for SimpleTracksRequest {
             TooManyDisplayVideoTracks,
         };
 
-        #[allow(clippy::else_if_without_else)]
+        #[expect(clippy::else_if_without_else, reason = "more readable")]
         if value.device_video.len() > 1 {
             return Err(TooManyDeviceVideoTracks);
         } else if value.display_video.len() > 1 {
@@ -307,15 +307,15 @@ impl TryFrom<TracksRequest> for SimpleTracksRequest {
             device_video: None,
             display_video: None,
         };
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for (id, audio) in value.audio {
             drop(req.audio.replace((id, audio)));
         }
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for (id, device) in value.device_video {
             drop(req.device_video.replace((id, device)));
         }
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for (id, display) in value.display_video {
             drop(req.display_video.replace((id, display)));
         }

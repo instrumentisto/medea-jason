@@ -2,12 +2,12 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediadevices
 
-#![allow(clippy::unwrap_used)]
+#![expect(clippy::unwrap_used, reason = "JS interop error is unexpected")]
 
 use std::{cell::RefCell, rc::Rc};
-use wasm_bindgen_futures::JsFuture;
 
 use tracerr::Traced;
+use wasm_bindgen_futures::JsFuture;
 use web_sys::{Event, MediaDevices as SysMediaDevices};
 
 use crate::{
@@ -114,8 +114,8 @@ impl MediaDevices {
     }
 
     /// Unimplemented on WASM targets.
-    #[allow(clippy::missing_errors_doc)]
-    #[allow(clippy::unused_async)] // for platform code uniformity
+    #[expect(clippy::missing_errors_doc, reason = "unimplemented")]
+    #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn enumerate_displays(
         &self,
     ) -> Result<Vec<MediaDisplayInfo>, Traced<Error>> {
@@ -227,7 +227,7 @@ impl MediaDevices {
     /// # Panics
     ///
     /// Always.
-    #[allow(clippy::unused_async)] // for platform code uniformity
+    #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn set_output_audio_id(
         &self,
         _: String,
@@ -263,7 +263,7 @@ impl MediaDevices {
 
     /// Always returns `false` since accessing microphone cannot be implemented
     /// on web platform.
-    #[allow(clippy::unused_async)] // for platform code uniformity
+    #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn microphone_volume_is_available(&self) -> bool {
         false
     }
@@ -278,7 +278,7 @@ impl MediaDevices {
     /// # Panics
     ///
     /// Always.
-    #[allow(clippy::unused_async)] // for platform code uniformity
+    #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn microphone_volume(
         &self,
     ) -> Result<i64, Traced<MicVolumeError>> {
@@ -297,7 +297,7 @@ impl MediaDevices {
     /// # Panics
     ///
     /// Always.
-    #[allow(clippy::unused_async)] // for platform code uniformity
+    #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn set_microphone_volume(
         &self,
         _: i64,

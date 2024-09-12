@@ -1,8 +1,8 @@
 [package]
 name = "medea-jason"
-version = "0.6.0"
+version = "0.6.1"
 edition = "2021"
-rust-version = "1.75"
+rust-version = "1.81"
 description = "Client library for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "MPL-2.0"

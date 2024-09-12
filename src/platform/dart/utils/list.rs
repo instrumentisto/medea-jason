@@ -72,10 +72,13 @@ impl DartList {
     }
 
     /// Returns an element by the provided `index` from this [`DartList`].
-    #[allow(clippy::unwrap_in_result)]
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn get(&self, index: usize) -> Option<DartHandle> {
-        #[allow(clippy::cast_possible_truncation)]
+        #[expect( // intended
+            clippy::cast_possible_truncation,
+            reason = "overflow is unexpected"
+        )]
         let item_ptr =
             unsafe { list::get(self.0.get(), index as u32) }.unwrap();
         unsafe { item_ptr.unbox() }.try_into().unwrap()

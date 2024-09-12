@@ -2,7 +2,10 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 
-#![allow(clippy::new_without_default)]
+#![expect( // intentional
+    clippy::new_without_default,
+    reason = "makes no sense for `wasm_bindgen`"
+)]
 
 use derive_more::{From, Into};
 use wasm_bindgen::prelude::*;

@@ -4,12 +4,13 @@
 //! [Flutter]: https://flutter.dev
 
 // TODO: Improve documentation in this module.
-#![allow(
+#![expect(
     clippy::as_conversions,
     clippy::missing_safety_doc,
     clippy::missing_panics_doc,
     clippy::undocumented_unsafe_blocks,
-    missing_docs
+    missing_docs,
+    reason = "needs refactoring"
 )]
 
 pub mod api;
@@ -72,7 +73,6 @@ pub enum MemoryOwner {
 }
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Dart.
-#[allow(missing_copy_implementations)] // not trivially copyable
 #[derive(Debug)]
 #[repr(u8)]
 pub enum DartValue {
@@ -715,11 +715,11 @@ pub unsafe extern "C" fn box_foreign_value(
 }
 
 #[cfg(feature = "mockable")]
-#[allow(clippy::missing_docs_in_private_items)]
+#[expect(clippy::missing_docs_in_private_items, reason = "for testing only")]
 mod dart_value_extern_tests_helpers {
-    use super::*;
-
     use crate::platform::set_panic_hook;
+
+    use super::propagate_panic;
 
     #[no_mangle]
     pub unsafe extern "C" fn fire_panic() {

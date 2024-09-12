@@ -41,7 +41,10 @@ impl LocalMediaTrack {
 
     /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
     /// audio track, or a [`MediaKind::Video`] if it represents a video track.
-    #[allow(clippy::as_conversions)] // TODO: Needs refactoring.
+    // TODO: Try remove on next Rust upgrade.
+    #[expect(clippy::allow_attributes, reason = "`#[expect]` doesn't work")]
+    // TODO: Needs refactoring.
+    #[allow(clippy::as_conversions, reason = "needs refactoring")]
     pub fn state(&self) -> Promise {
         let this = self.0.clone();
         future_to_promise(

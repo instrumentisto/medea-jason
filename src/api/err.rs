@@ -1,7 +1,11 @@
 //! External API errors.
 
-// For `wasm_bindgen`.
-#![allow(clippy::mem_forget, clippy::multiple_inherent_impl)]
+// TODO: Try use `#![expect]` on next Rust version upgrade.
+#![allow(clippy::multiple_inherent_impl, reason = "`wasm_bindgen` codegen")]
+#![cfg_attr(
+    target_family = "wasm",
+    expect(clippy::mem_forget, reason = "`wasm_bindgen` codegen")
+)]
 
 use std::borrow::Cow;
 
@@ -137,10 +141,13 @@ impl LocalMediaInitException {
     }
 }
 
+#[expect( // `wasm_bindgen` doesn't support `const fn`
+    clippy::missing_const_for_fn,
+    reason = "`wasm_bindgen` doesn't support `const fn`"
+)]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl LocalMediaInitException {
     /// Returns concrete error kind of this [`LocalMediaInitException`].
-    #[allow(clippy::missing_const_for_fn)] // required by `wasm_bindgen`
     #[must_use]
     pub fn kind(&self) -> LocalMediaInitExceptionKind {
         self.kind
@@ -318,10 +325,13 @@ impl RpcClientException {
     }
 }
 
+#[expect( // `wasm_bindgen` doesn't support `const fn`
+    clippy::missing_const_for_fn,
+    reason = "`wasm_bindgen` doesn't support `const fn`"
+)]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl RpcClientException {
     /// Returns concrete error kind of this [`RpcClientException`].
-    #[allow(clippy::missing_const_for_fn)] // required by `wasm_bindgen`
     #[must_use]
     pub fn kind(&self) -> RpcClientExceptionKind {
         self.kind
@@ -473,6 +483,10 @@ impl MediaStateTransitionException {
     }
 }
 
+#[expect( // `wasm_bindgen` doesn't support `const fn`
+    clippy::missing_const_for_fn,
+    reason = "`wasm_bindgen` doesn't support `const fn`"
+)]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl MediaStateTransitionException {
     /// Returns an error message describing the problem.
@@ -488,7 +502,6 @@ impl MediaStateTransitionException {
     }
 
     /// Returns concrete error kind of this [`MediaStateTransitionException`].
-    #[allow(clippy::missing_const_for_fn)] // required by `wasm_bindgen`
     #[must_use]
     pub fn kind(&self) -> MediaStateTransitionExceptionKind {
         self.kind
@@ -530,6 +543,10 @@ impl MediaSettingsUpdateException {
     }
 }
 
+#[expect( // `wasm_bindgen` doesn't support `const fn`
+    clippy::missing_const_for_fn,
+    reason = "`wasm_bindgen` doesn't support `const fn`"
+)]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl MediaSettingsUpdateException {
     /// Returns an error message describing the problem.
@@ -547,7 +564,6 @@ impl MediaSettingsUpdateException {
 
     /// Returns whether media settings were successfully rolled back after new
     /// settings application failed.
-    #[allow(clippy::missing_const_for_fn)] // required by `wasm_bindgen`
     #[must_use]
     pub fn rolled_back(&self) -> bool {
         self.rolled_back

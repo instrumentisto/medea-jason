@@ -23,7 +23,7 @@ pub enum MediaDirection {
 
 impl From<MediaDirection> for u8 {
     // TODO: Generate by derive?
-    #[allow(clippy::as_conversions)] // it's safe conversion
+    #[expect(clippy::as_conversions, reason = "safe conversion")]
     fn from(d: MediaDirection) -> Self {
         d as Self
     }

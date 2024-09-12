@@ -173,7 +173,7 @@ impl Callback {
 
     /// Converts this [`Callback`] into a [`Dart_Handle`], so it can be passed
     /// to Dart.
-    #[allow(clippy::cast_possible_wrap)]
+    #[expect(clippy::cast_possible_wrap, reason = "overflow is unexpected")]
     #[must_use]
     pub fn into_dart(self) -> Dart_Handle {
         let is_finalizable = !matches!(&self.0, Kind::FnOnce(_));
@@ -218,7 +218,7 @@ extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
 
 #[cfg(feature = "mockable")]
 pub mod tests {
-    #![allow(clippy::missing_safety_doc)]
+    #![expect(clippy::missing_safety_doc, reason = "only for testing")]
 
     use dart_sys::Dart_Handle;
 

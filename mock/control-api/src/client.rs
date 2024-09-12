@@ -28,8 +28,7 @@ pub struct Fid(String);
 impl Fid {
     /// Returns `Room`'s ID from this [`Fid`].
     fn room_id(&self) -> &str {
-        // PANIC: Slicing is OK here, as the index is taken from the source.
-        #[allow(clippy::string_slice)] // intentional
+        #[expect(clippy::string_slice, reason = "index is taken from source")]
         self.0.find('/').map_or(self.0.as_str(), |i| &self.0[..i])
     }
 }
@@ -127,7 +126,7 @@ impl ControlClient {
     /// # Errors
     ///
     /// Errors if gRPC request fails.
-    #[allow(clippy::missing_panics_doc)]
+    #[expect(clippy::missing_panics_doc, reason = "locking")]
     pub async fn create(
         &self,
         id: String,
@@ -221,7 +220,7 @@ impl ControlClient {
     /// # Errors
     ///
     /// Errors if gRPC request fails.
-    #[allow(clippy::missing_panics_doc)]
+    #[expect(clippy::missing_panics_doc, reason = "locking")]
     pub async fn delete(&self, fid: Fid) -> Result<proto::Response, Status> {
         let req = id_request(vec![fid.clone().into()]);
         let response = self.get_client().delete(tonic::Request::new(req)).await;

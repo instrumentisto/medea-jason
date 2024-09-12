@@ -46,7 +46,7 @@ impl GrpcCallbackService {
     /// Returns [`GrpcCallbackService`] with provided pointer to [`Vec`] of
     /// [`CallbackItem`]s.
     #[must_use]
-    pub fn new(events: CallbackItems) -> Self {
+    pub const fn new(events: CallbackItems) -> Self {
         Self { events }
     }
 }

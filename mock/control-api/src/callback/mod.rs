@@ -42,7 +42,7 @@ pub struct CallbackItem {
     pub at: String,
 }
 
-#[allow(clippy::fallible_impl_from)] // intentional
+#[expect(clippy::fallible_impl_from, reason = "unrelated")]
 impl From<proto::Request> for CallbackItem {
     fn from(proto: proto::Request) -> Self {
         Self {

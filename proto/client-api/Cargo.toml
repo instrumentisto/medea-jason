@@ -2,7 +2,7 @@
 name = "medea-client-api-proto"
 version = "0.6.1"
 edition = "2021"
-rust-version = "1.75"
+rust-version = "1.81"
 description = "Client API protocol implementation for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "BlueOak-1.0.0"

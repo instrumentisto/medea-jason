@@ -43,15 +43,15 @@ impl Component {
 
     /// Notifies all [`peer::Component`]s about a RPC connection loss.
     pub fn connection_lost(&self) {
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for peer in self.peers.borrow().values() {
             peer.state().connection_lost();
         }
     }
 
-    /// Notifies all [`peer::Component`]s about a RPC connection restore.
+    /// Notifies all [`peer::Component`]s about an RPC connection restore.
     pub fn connection_recovered(&self) {
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for peer in self.peers.borrow().values() {
             peer.state().connection_recovered();
         }
@@ -64,7 +64,7 @@ impl Component {
 
         state.0.borrow_mut().remove_not_present(&new_state.peers);
 
-        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
+        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for (id, peer_state) in new_state.peers {
             let peer = state.0.borrow().get(&id).cloned();
             if let Some(p) = peer {
@@ -161,8 +161,10 @@ impl Repository {
         peers: Rc<RefCell<HashMap<PeerId, peer::Component>>>,
     ) -> TaskHandle {
         let (fut, abort) = future::abortable(async move {
-            // Cannot annotate `async` block with `-> !`.
-            #[allow(clippy::infinite_loop)] // intentional
+            #[expect( // intentional
+                clippy::infinite_loop,
+                reason = "cannot annotate `async` block with `-> !`"
+            )]
             loop {
                 platform::delay_for(Duration::from_secs(1)).await;
 

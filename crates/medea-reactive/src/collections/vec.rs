@@ -192,7 +192,7 @@ where
     /// inserted.
     ///
     /// [`Stream`]: futures::Stream
-    #[allow(clippy::needless_collect)] // false positive: lifetimes
+    #[expect(clippy::needless_collect, reason = "false positive: lifetimes")]
     pub fn replay_on_push(&self) -> LocalBoxStream<'static, O> {
         Box::pin(stream::iter(
             self.store

@@ -51,7 +51,10 @@ pub struct Member {
 
 impl Member {
     /// Converts [`Member`] into protobuf [`proto::Member`].
-    #[allow(clippy::missing_panics_doc)] // intentional
+    #[expect( // intentional
+        clippy::missing_panics_doc,
+        reason = "`Duration` values are not expected to be large"
+    )]
     #[must_use]
     pub fn into_proto(self, member_id: String) -> proto::Member {
         let member_elements = self
@@ -60,9 +63,10 @@ impl Member {
             .map(|(id, endpoint)| (id.clone(), endpoint.into_proto(id)))
             .collect();
 
-        // PANIC: Unwrapping `Duration` conversion is OK here, because its
-        //        values are not expected to be large.
-        #[allow(clippy::unwrap_used)]
+        #[expect( // intentional
+            clippy::unwrap_used,
+            reason = "`Duration` values are not expected to be large"
+        )]
         proto::Member {
             pipeline: member_elements,
             id: member_id,

@@ -45,7 +45,8 @@ pub enum AwaitCompletion {
 }
 
 /// Pointer to a JS object on a browser's side.
-#[allow(clippy::module_name_repetitions)] // TODO: Refactor?
+// TODO: Needs refactoring.
+#[expect(clippy::module_name_repetitions, reason = "needs refactoring")]
 #[derive(Clone, Debug, Display)]
 pub struct ObjectPtr(String);
 
@@ -96,7 +97,7 @@ impl<T> Drop for Object<T> {
 impl<T> Object<T> {
     /// Returns a new [`Object`] with the provided ID and [`browser::Window`].
     #[must_use]
-    pub fn new(id: String, window: browser::Window) -> Self {
+    pub const fn new(id: String, window: browser::Window) -> Self {
         Self {
             ptr: ObjectPtr(id),
             window,

@@ -88,7 +88,10 @@ impl Track {
     }
 
     /// Returns this [`Track`]'s kind (audio/video).
-    #[allow(clippy::missing_const_for_fn)] // not all platforms allow this
+    #[cfg_attr(
+        target_family = "wasm",
+        expect(clippy::missing_const_for_fn, reason = "not on all platforms")
+    )]
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.track.kind()
@@ -148,7 +151,7 @@ pub struct LocalMediaTrack(Rc<Track>);
 impl LocalMediaTrack {
     /// Creates a new [`LocalMediaTrack`] from the provided [`Track`].
     #[must_use]
-    pub fn new(track: Rc<Track>) -> Self {
+    pub const fn new(track: Rc<Track>) -> Self {
         Self(track)
     }
 

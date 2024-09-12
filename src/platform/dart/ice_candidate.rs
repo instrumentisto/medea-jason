@@ -208,7 +208,7 @@ impl IceCandidate {
     }
 
     /// Returns SDP M line index of this [`IceCandidate`].
-    #[allow(clippy::unwrap_in_result)]
+    #[expect(clippy::unwrap_in_result, reason = "unreleated")]
     #[must_use]
     pub fn sdp_m_line_index(&self) -> Option<u16> {
         Some(unsafe {
@@ -221,7 +221,7 @@ impl IceCandidate {
 
     /// Returns SDP MID of this [`IceCandidate`].
     #[must_use]
-    #[allow(clippy::unwrap_in_result)] // intentional
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     pub fn sdp_mid(&self) -> Option<String> {
         let mid = unsafe { ice_candidate::sdp_mid(self.0.get()) }.unwrap();
         Some(unsafe { dart_string_into_rust(mid) })

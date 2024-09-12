@@ -55,7 +55,7 @@ pub enum Error {
 /// Shortcut for a [`Result`] with an [`Error`](enum@Error) inside.
 ///
 /// [`Result`]: std::result::Result
-#[allow(clippy::absolute_paths)] // intentional
+#[expect(clippy::absolute_paths, reason = "one liner")]
 type Result<T> = std::result::Result<T, Error>;
 
 /// [WebDriver] handle of a browser window.

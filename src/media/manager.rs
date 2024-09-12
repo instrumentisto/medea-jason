@@ -136,7 +136,7 @@ impl From<LocalTrackIsEndedError> for GetUserMediaError {
 /// Error occurring when [getDisplayMedia()][1] request fails.
 ///
 /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-#[allow(variant_size_differences)] // `Box`ing still reports this
+#[expect(variant_size_differences, reason = "`Box`ing still reports this")]
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = platform::Error)]
 pub enum GetDisplayMediaError {
@@ -301,9 +301,10 @@ impl InnerMediaManager {
             .borrow_mut()
             .retain(|_, track| Weak::strong_count(track) > 0);
 
-        // PANIC: It's OK to unwrap `Weak` here as we have cleaned the absent
-        //        ones in the line above.
-        #[allow(clippy::unwrap_used)] // intentional
+        #[expect( // intentional
+            clippy::unwrap_used,
+            reason = "absent ones are cleaned in the line above"
+        )]
         let storage: Vec<_> = self
             .tracks
             .borrow()
@@ -428,7 +429,7 @@ impl InnerMediaManager {
         &self,
         device_id: String,
     ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
-        #[allow(clippy::map_err_ignore)] // intentional
+        #[expect(clippy::map_err_ignore, reason = "not useful")]
         self.media_devices
             .set_output_audio_id(device_id)
             .await

@@ -13,7 +13,9 @@ pub async fn instantiate_mocks(window: &Window) {
     MediaDevices::instantiate(window).await;
 }
 
-#[allow(clippy::multiple_inherent_impl)] // better keep these functions here
+// TODO: Try remove on next Rust version upgrade.
+#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
+#[allow(clippy::multiple_inherent_impl, reason = "more proper place")]
 impl Window {
     /// Returns a `WebSocket` object mock for this [`Window`].
     #[must_use]

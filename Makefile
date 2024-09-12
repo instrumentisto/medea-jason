@@ -20,11 +20,11 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.80
-CHROME_VERSION := 126.0
-FIREFOX_VERSION := 128.0.3-driver0.34.0
+RUST_VER := 1.81
+CHROME_VERSION := 127.0
+FIREFOX_VERSION := 130.0-driver0.35.0
 
-CARGO_NDK_VER := 3.5.4-ndkr27-rust$(RUST_VER)
+CARGO_NDK_VER := 3.5.4-ndkr27b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
                    i686-linux-android \

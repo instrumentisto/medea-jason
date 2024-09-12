@@ -13,10 +13,13 @@
 #![forbid(non_ascii_idents)]
 #![warn(
     clippy::absolute_paths,
+    clippy::allow_attributes,
+    clippy::allow_attributes_without_reason,
     clippy::as_conversions,
     clippy::as_ptr_cast_mut,
     clippy::assertions_on_result_states,
     clippy::branches_sharing_code,
+    clippy::cfg_not_test,
     clippy::clear_with_drain,
     clippy::clone_on_ref_ptr,
     clippy::collection_is_never_read,
@@ -87,6 +90,7 @@
     clippy::rest_pat_in_fully_bound_structs,
     clippy::same_name_method,
     clippy::semicolon_inside_block,
+    clippy::set_contains_or_insert,
     clippy::shadow_unrelated,
     clippy::significant_drop_in_scrutinee,
     clippy::significant_drop_tightening,
@@ -147,8 +151,11 @@
     unused_results,
     variant_size_differences
 )]
-// This is OK for testing crate.
-#![allow(clippy::unwrap_used, unused_crate_dependencies)] // intentional
+#![expect( // intentional
+    clippy::unwrap_used,
+    unused_crate_dependencies,
+    reason = "OK for testing crate"
+)]
 
 pub mod browser;
 pub mod object;

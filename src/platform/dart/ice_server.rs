@@ -45,7 +45,7 @@ impl RtcIceServers {
     }
 }
 
-#[allow(clippy::fallible_impl_from)] // intentional
+#[expect(clippy::fallible_impl_from, reason = "FFI error is unexpected")]
 impl<I> From<I> for RtcIceServers
 where
     I: IntoIterator<Item = IceServer>,

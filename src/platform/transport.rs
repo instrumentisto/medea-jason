@@ -1,5 +1,7 @@
 //! Platform-agnostic functionality of RPC transport.
 
+#![cfg_attr(feature = "mockable", expect(unused_lifetimes, reason = "codegen"))]
+
 use async_trait::async_trait;
 use derive_more::Display;
 use futures::stream::LocalBoxStream;
@@ -40,10 +42,8 @@ impl TransportState {
 }
 
 /// RPC transport between a client and a server.
-#[allow(unused_lifetimes)]
 #[async_trait(?Send)]
 #[cfg_attr(feature = "mockable", mockall::automock)]
-#[cfg_attr(feature = "mockable", allow(clippy::missing_docs_in_private_items))]
 pub trait RpcTransport {
     /// Initiates a new [WebSocket] connection to the provided `url`.
     ///

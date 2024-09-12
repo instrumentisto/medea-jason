@@ -1,6 +1,7 @@
 //! Implementations of basic reactive containers.
 
-#![allow(clippy::module_name_repetitions)] // TODO: Refactor?
+// TODO: Needs refactoring.
+#![expect(clippy::module_name_repetitions, reason = "needs refactoring")]
 
 pub mod cell;
 pub mod progressable_cell;
@@ -219,7 +220,6 @@ pub trait OnObservableFieldModification<D> {
 /// Subscriber that implements subscribing and [`Whenable`] in [`Vec`].
 ///
 /// This structure should be wrapped into [`Vec`].
-#[allow(variant_size_differences)]
 pub enum UniversalSubscriber<D> {
     /// Subscriber for [`Whenable`].
     When {
@@ -311,7 +311,7 @@ impl<D: Clone> OnObservableFieldModification<D>
     fn on_modify(&mut self, data: &D) {
         self.borrow_mut().retain(|sub| match sub {
             UniversalSubscriber::When { assert_fn, sender } => {
-                #[allow(clippy::expect_used)] // intentional
+                #[expect(clippy::expect_used, reason = "single use expected")]
                 if (assert_fn)(data) {
                     sender
                         .borrow_mut()

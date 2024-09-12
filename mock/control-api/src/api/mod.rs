@@ -161,7 +161,8 @@ macro_rules! gen_request_macro {
 /// # Errors
 ///
 /// Errors if unable to send message to [`GrpcCallbackServer`] actor.
-#[allow(clippy::missing_panics_doc, clippy::needless_pass_by_value)]
+// TODO: Needs refactoring.
+#[expect(clippy::missing_panics_doc, reason = "needs refactoring")]
 pub async fn get_callbacks(
     state: Data<AppContext>,
 ) -> Result<HttpResponse, HttpError> {
@@ -178,7 +179,6 @@ pub async fn get_callbacks(
 /// Implementation of `Delete` requests to [Control API] mock.
 ///
 /// [Control API]: https://tinyurl.com/yxsqplq7
-#[allow(clippy::needless_pass_by_value)]
 mod delete {
     use super::{AppContext, Data, HttpResponse, Path, Response};
 
@@ -192,7 +192,6 @@ mod delete {
 /// Implementation of `Get` requests to [Control API] mock.
 ///
 /// [Control API]: https://tinyurl.com/yxsqplq7
-#[allow(clippy::needless_pass_by_value)]
 mod get {
     use super::{AppContext, Data, HttpResponse, Path, SingleGetResponse};
 
@@ -206,7 +205,6 @@ mod get {
 /// Implementation of `Post` requests to [Control API] mock.
 ///
 /// [Control API]: https://tinyurl.com/yxsqplq7
-#[allow(clippy::needless_pass_by_value)]
 mod create {
     use super::{
         AppContext, CreateResponse, Data, Element, Fid, HttpError,
@@ -441,7 +439,7 @@ impl Element {
     }
 }
 
-#[allow(clippy::fallible_impl_from)] // intentional
+#[expect(clippy::fallible_impl_from, reason = "unrelated")]
 impl From<proto::Element> for Element {
     fn from(proto: proto::Element) -> Self {
         use proto::element::El;
@@ -459,7 +457,7 @@ impl From<proto::Element> for Element {
     }
 }
 
-#[allow(clippy::fallible_impl_from)] // intentional
+#[expect(clippy::fallible_impl_from, reason = "unrelated")]
 impl From<proto::room::Element> for Element {
     fn from(proto: proto::room::Element) -> Self {
         match proto.el.unwrap() {

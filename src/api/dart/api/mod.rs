@@ -3,37 +3,30 @@
 //!
 //! [Flutter]: https://flutter.dev
 
-#![allow(
+// TODO: Needs refactoring.
+#![expect(
     clippy::as_conversions,
-    clippy::doc_markdown, // because generated code in `#[frb]` macro
-    clippy::missing_panics_doc,
-    clippy::needless_pass_by_value,
-    clippy::undocumented_unsafe_blocks,
     clippy::unwrap_used,
-    non_snake_case,
+    reason = "needs refactoring"
 )]
 
-#[allow(
+#[expect(
     clippy::absolute_paths,
+    clippy::allow_attributes_without_reason,
     clippy::as_conversions,
-    clippy::default_trait_access,
-    clippy::let_underscore_untyped,
+    clippy::cast_lossless,
+    clippy::cast_possible_truncation,
+    clippy::cast_possible_wrap,
     clippy::missing_docs_in_private_items,
-    clippy::multiple_unsafe_ops_per_block,
-    clippy::ptr_as_ptr,
+    clippy::redundant_else,
+    clippy::significant_drop_tightening,
     clippy::undocumented_unsafe_blocks,
-    clippy::empty_structs_with_brackets,
     clippy::use_self,
     clippy::wildcard_imports,
     clippy::unreadable_literal,
-    let_underscore_drop,
     unused_qualifications,
     unit_bindings,
-    clippy::redundant_else,
-    clippy::significant_drop_tightening,
-    clippy::cast_possible_truncation,
-    clippy::cast_lossless,
-    clippy::cast_possible_wrap
+    reason = "codegen"
 )]
 #[rustfmt::skip]
 mod api_bridge_generated;
