@@ -302,6 +302,8 @@ pub enum Command {
 
         /// [`Credential`] of the `Member` to authenticate with.
         credential: Credential,
+
+        capabilities:
     },
 
     /// Request to leave a `Room`.
@@ -1272,6 +1274,23 @@ pub struct EncodingParameters {
     ///
     /// Must be greater than or equal to `1`.
     pub scale_resolution_down_by: Option<u8>,
+}
+
+pub struct Capabilities {
+    pub sender: RtpCapabilities,
+    pub receiver: RtpCapabilities
+
+}
+
+pub struct RtpCapabilities {
+    pub audio: Vec<CodecCapability>,
+    pub video: Vec<CodecCapability>
+}
+
+pub struct CodecCapability {
+    pub mime_type: String,
+    pub clock_rate: u32,
+    pub sdp_fmtp_line: String
 }
 
 /// Estimated connection quality.
