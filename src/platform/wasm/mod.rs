@@ -38,12 +38,11 @@ pub use self::{
 /// Unimplemented on WASM targets.
 pub type MediaDisplayInfo = ();
 
-// #[cfg(feature = "talc")]
-// /// When the `talc` feature is enabled, use `talc` as the global
-// /// allocator.
-// /// SAFETY: The runtime environment must be single-threaded WASM.
-// #[global_allocator]
-// static ALLOCATOR: talc::TalckWasm = unsafe { talc::TalckWasm::new_global() };
+#[cfg(feature = "wee_alloc")]
+/// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
+/// allocator.
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc<'_> = wee_alloc::WeeAlloc::INIT;
 
 /// When the `console_error_panic_hook` feature is enabled, we can call the
 /// `set_panic_hook` function at least once during initialization, and then

@@ -1069,9 +1069,6 @@ mod peer_stats_caching {
     /// [`StatId`].
     #[wasm_bindgen_test]
     async fn sends_updated_stats() {
-        medea_jason::platform::init_logger();
-        medea_jason::platform::set_panic_hook();
-
         let (tx, peer_events_stream) = mpsc::unbounded();
         let manager = Rc::new(MediaManager::default());
         let peer_state = peer::State::new(

@@ -31,7 +31,7 @@ crate-type = ["cdylib", "rlib", "staticlib"]
 lto = "fat"
 
 [features]
-default = ["console_error_panic_hook", "talc"]
+default = ["console_error_panic_hook", "wee_alloc"]
 dart-codegen = ["medea-macro/dart-codegen"]
 mockable = ["mockall"]
 
@@ -71,10 +71,10 @@ send_wrapper = "0.6"
 backoff = { version = "0.4", features = ["wasm-bindgen"] }
 console_error_panic_hook = { version = "0.1", optional = true }
 js-sys = "0.3"
-talc = { version = "4.4", default-features = false, features = ["lock_api"], optional = true }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
+wee_alloc = { version = "0.4", optional = true }
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
     version = "0.3"
     features = [

@@ -25,8 +25,6 @@ wasm_bindgen_test_configure!(run_in_browser);
 /// expected.
 #[wasm_bindgen_test]
 async fn reconnect_with_backoff() {
-    medea_jason::platform::init_logger();
-    medea_jason::platform::set_panic_hook();
     let transport_state = Rc::new(ObservableCell::new(TransportState::Open));
 
     let state_clone = Rc::clone(&transport_state);
