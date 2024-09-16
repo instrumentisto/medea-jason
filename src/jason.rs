@@ -1,12 +1,12 @@
 //! General library interface.
 
-use futures::FutureExt as _;
 use std::{cell::RefCell, rc::Rc, thread};
 
-use crate::platform;
+use futures::FutureExt as _;
 
 use crate::{
     media::{MediaManager, MediaManagerHandle},
+    platform,
     room::{Room, RoomHandle},
     rpc::{
         ClientDisconnect, RpcSession, WebSocketRpcClient, WebSocketRpcSession,
