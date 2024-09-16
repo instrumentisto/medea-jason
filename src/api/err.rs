@@ -1,5 +1,8 @@
 //! External API errors.
 
+// TODO: Try use `#![expect]` on next Rust version upgrade.
+#![allow(clippy::multiple_inherent_impl, reason = "`wasm_bindgen` codegen")]
+
 use std::borrow::Cow;
 
 #[cfg(target_family = "wasm")]
