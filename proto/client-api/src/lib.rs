@@ -303,7 +303,8 @@ pub enum Command {
         /// [`Credential`] of the `Member` to authenticate with.
         credential: Credential,
 
-        capabilities:
+        /// Client reports its capabilities (e.g. available codecs, platform).
+        capabilities: Capabilities
     },
 
     /// Request to leave a `Room`.
@@ -1276,20 +1277,42 @@ pub struct EncodingParameters {
     pub scale_resolution_down_by: Option<u8>,
 }
 
+
+/// Client capabilities (e.g. available codecs, platform)
+#[cfg_attr(feature = "client", derive(Serialize))]
+#[cfg_attr(feature = "server", derive(Deserialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Capabilities {
-    pub sender: RtpCapabilities,
-    pub receiver: RtpCapabilities
+    /// Codec capabilities of the system for sending audio.
+    pub audio_tx: Vec<CodecCapability>,
+
+    /// Codec capabilities of the system for receiving audio.
+    pub audio_rx: Vec<CodecCapability>,
+
+    /// Codec capabilities of the system for sending video.
+    pub video_tx: Vec<CodecCapability>,
+
+    /// Codec capabilities of the system for receiving video.
+    pub video_rx: Vec<CodecCapability>
 
 }
 
-pub struct RtpCapabilities {
-    pub audio: Vec<CodecCapability>,
-    pub video: Vec<CodecCapability>
-}
-
+/// Provides information about codec capabilities. Only capability combinations
+/// that would utilize distinct payload types in a generated SDP offer are
+/// provided.
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct CodecCapability {
+    /// The codec MIME media type/subtype. Valid media types and subtypes are
+    /// listed in [IANA-RTP-2].
+    ///
+    /// [IANA-RTP-2]: https://tinyurl.com/IANA-RTP-2
     pub mime_type: String,
+
+    /// The codec clock rate expressed in Hertz.
     pub clock_rate: u32,
+
+    /// The "format specific parameters" field from the `a=fmtp` line in the SDP
+    /// corresponding to the codec, if one exists.
     pub sdp_fmtp_line: String
 }
 

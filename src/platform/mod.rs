@@ -18,7 +18,6 @@ mod wasm;
 pub use self::wasm::*;
 
 use derive_more::Display;
-
 use crate::utils::Caused;
 
 pub use self::{

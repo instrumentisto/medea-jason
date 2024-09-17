@@ -1,5 +1,6 @@
 [build]
 rustflags = ["--cfg=web_sys_unstable_apis"]
+target = "wasm32-unknown-unknown"
 
 [env]
 CARGO_WORKSPACE_DIR = { value = "", relative = true }

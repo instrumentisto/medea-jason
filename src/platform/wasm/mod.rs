@@ -53,6 +53,7 @@ static ALLOC: wee_alloc::WeeAlloc<'_> = wee_alloc::WeeAlloc::INIT;
 /// <https://github.com/rustwasm/console_error_panic_hook#readme>
 #[cfg(feature = "console_error_panic_hook")]
 pub use console_error_panic_hook::set_once as set_panic_hook;
+use medea_client_api_proto::Capabilities;
 
 /// Initialize [`wasm_logger`] as default application logger.
 ///
@@ -127,5 +128,17 @@ impl Drop for IntervalHandle {
     /// Clears interval with provided ID.
     fn drop(&mut self) {
         window().clear_interval_with_handle(self.0);
+    }
+}
+
+#[must_use]
+pub fn get_capabilities() -> Capabilities {
+    let audio_tx = web_sys::RtcRtpSender::get_capabilities("audio").map(|c|c.codecs())
+
+    Capabilities {
+        audio_tx: vec![],
+        audio_rx: vec![],
+        video_tx: vec![],
+        video_rx: vec![],
     }
 }

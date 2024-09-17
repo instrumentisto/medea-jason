@@ -33,7 +33,7 @@ pub mod utils;
 use std::panic;
 
 use libc::c_void;
-
+use medea_client_api_proto::Capabilities;
 use crate::platform::utils::dart_api;
 
 pub use self::{
@@ -109,4 +109,8 @@ pub fn init_logger() {
     _ = simple_logger::SimpleLogger::new()
         .with_level(log::LevelFilter::Debug)
         .init();
+}
+
+pub fn get_capabilities() -> Capabilities {
+    todo!()
 }

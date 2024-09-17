@@ -10,10 +10,7 @@ use futures::{
     future::LocalBoxFuture,
     stream::{LocalBoxStream, StreamExt as _},
 };
-use medea_client_api_proto::{
-    ClientMsg, CloseReason as CloseByServerReason, Command, Credential, Event,
-    MemberId, RoomId, RpcSettings, ServerMsg,
-};
+use medea_client_api_proto::{Capabilities, ClientMsg, CloseReason as CloseByServerReason, Command, Credential, Event, MemberId, RoomId, RpcSettings, ServerMsg};
 use medea_macro::dispatchable;
 use medea_reactive::ObservableCell;
 use serde::Serialize;
@@ -215,17 +212,19 @@ impl WebSocketRpcClient {
     }
 
     /// Authorizes [`WebSocketRpcClient`] on the Media Server.
-    pub fn authorize(
+    pub fn join_room(
         &self,
         room_id: RoomId,
         member_id: MemberId,
         credential: Credential,
+        capabilities: Capabilities
     ) {
         self.send_command(
             room_id,
             Command::JoinRoom {
                 member_id,
                 credential,
+                capabilities,
             },
         );
     }
