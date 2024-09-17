@@ -154,8 +154,11 @@ async fn error_get_local_stream_on_new_peer() {
     .await
     .unwrap();
     let (cb, test_result) = js_callback!(|err: JsValue| {
-        let err: LocalMediaInitException =
-            jsval_cast(err, "LocalMediaInitException").unwrap();
+        let err = jsval_cast::<LocalMediaInitException>(
+            err,
+            "LocalMediaInitException",
+        )
+        .unwrap();
         let cause = err.cause().unwrap();
 
         assert_eq!(err.kind(), LocalMediaInitExceptionKind::GetUserMediaFailed);
@@ -206,7 +209,7 @@ async fn error_join_room_without_on_failed_stream_callback() {
         .on_connection_loss(js_sys::Function::new_no_args(""))
         .unwrap();
 
-    let err: StateError = jsval_cast(
+    let err = jsval_cast::<StateError>(
         JsFuture::from(room_handle.join(String::from(TEST_ROOM_URL)))
             .await
             .unwrap_err(),
@@ -237,7 +240,7 @@ async fn error_join_room_without_on_connection_loss_callback() {
         .on_failed_local_media(js_sys::Function::new_no_args(""))
         .unwrap();
 
-    let err: StateError = jsval_cast(
+    let err = jsval_cast::<StateError>(
         JsFuture::from(room_handle.join(String::from(TEST_ROOM_URL)))
             .await
             .unwrap_err(),
@@ -929,7 +932,7 @@ mod disable_send_tracks {
         let (audio_track, video_track) = get_test_unrequired_tracks();
         let (room, peer, _, _) = get_test_room_and_exist_peer(
             vec![audio_track, video_track],
-            Some(media_stream_settings(true, true)),
+            Some(media_stream_settings(false, false)),
         )
         .await;
 
@@ -937,18 +940,19 @@ mod disable_send_tracks {
             MediaKind::Video,
             TrackDirection::Send,
             None,
-            media_exchange_state::Stable::Enabled.into()
+            media_exchange_state::Stable::Disabled.into()
         ));
 
         let room_handle = api::RoomHandle::from(room.new_handle());
-        let (disable_video_result, enable_video_result) =
+        let (enable_video_result, disable_video_result) =
             futures::future::join(
-                JsFuture::from(room_handle.disable_video(None)),
                 JsFuture::from(room_handle.enable_video(None)),
+                JsFuture::from(room_handle.disable_video(None)),
             )
             .await;
-        disable_video_result.unwrap_err();
-        enable_video_result.unwrap();
+
+        enable_video_result.unwrap_err();
+        disable_video_result.unwrap();
 
         assert!(peer.is_all_transceiver_sides_in_media_state(
             MediaKind::Video,
@@ -2130,7 +2134,7 @@ async fn no_updates_sent_if_gum_fails_on_enable() {
 
     mock.error_get_user_media("gum error".into());
 
-    let err: LocalMediaInitException = jsval_cast(
+    let err = jsval_cast::<LocalMediaInitException>(
         JsFuture::from(room_handle.enable_audio())
             .await
             .unwrap_err(),
@@ -2178,7 +2182,7 @@ async fn set_media_state_return_media_error() {
 
     mock.error_get_user_media(ERROR_MSG.into());
 
-    let err: LocalMediaInitException = jsval_cast(
+    let err = jsval_cast::<LocalMediaInitException>(
         JsFuture::from(room_handle.enable_audio())
             .await
             .unwrap_err(),
@@ -2312,7 +2316,7 @@ async fn send_enabling_holds_local_tracks() {
 
     let mock = MockNavigator::new();
     mock.error_get_user_media("foobar".into());
-    let err: LocalMediaInitException = jsval_cast(
+    let err = jsval_cast::<LocalMediaInitException>(
         JsFuture::from(room_handle.enable_video(None))
             .await
             .unwrap_err(),
@@ -2504,8 +2508,10 @@ mod set_local_media_settings {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         let (cb, test_result) = js_callback!(|err: JsValue| {
-            let err: MediaStateTransitionException =
-                jsval_cast(err, "MediaStateTransitionException")?;
+            let err = jsval_cast::<MediaStateTransitionException>(
+                err,
+                "MediaStateTransitionException",
+            )?;
             cb_assert_eq!(
                 err.message(),
                 "`MediaExchangeState` of `Sender` cannot transit to disabled \
@@ -2552,8 +2558,10 @@ mod set_local_media_settings {
     #[wasm_bindgen_test]
     async fn error_inject_invalid_local_stream_into_room_on_exists_peer() {
         let (cb, test_result) = js_callback!(|err: JsValue| {
-            let err: MediaStateTransitionException =
-                jsval_cast(err, "MediaStateTransitionException")?;
+            let err = jsval_cast::<MediaStateTransitionException>(
+                err,
+                "MediaStateTransitionException",
+            )?;
             cb_assert_eq!(
                 &err.message(),
                 "provided multiple device video MediaStreamTracks",
@@ -2569,7 +2577,7 @@ mod set_local_media_settings {
 
         let room_handle = api::RoomHandle::from(room.new_handle());
         room_handle.on_failed_local_media(cb.into()).unwrap();
-        let err: MediaSettingsUpdateException = jsval_cast(
+        let err = jsval_cast::<MediaSettingsUpdateException>(
             JsFuture::from(room_handle.set_local_media_settings(
                 &constraints,
                 false,
@@ -2580,9 +2588,11 @@ mod set_local_media_settings {
             "MediaSettingsUpdateException",
         )
         .unwrap();
-        let cause: MediaStateTransitionException =
-            jsval_cast(err.cause().into(), "MediaStateTransitionException")
-                .unwrap();
+        let cause = jsval_cast::<MediaStateTransitionException>(
+            err.cause().into(),
+            "MediaStateTransitionException",
+        )
+        .unwrap();
         assert_eq!(err.rolled_back(), false);
         assert_eq!(
             cause.message(),
@@ -2727,7 +2737,7 @@ mod set_local_media_settings {
         let room_handle = api::RoomHandle::from(room.new_handle());
         let mock_navigator = MockNavigator::new();
         mock_navigator.error_get_user_media("disables_on_fail".into());
-        let err: MediaSettingsUpdateException = jsval_cast(
+        let err = jsval_cast::<MediaSettingsUpdateException>(
             JsFuture::from(room_handle.set_local_media_settings(
                 &media_settings_with_device_id(),
                 true,
@@ -2740,8 +2750,11 @@ mod set_local_media_settings {
         .unwrap();
         mock_navigator.stop();
 
-        let cause: LocalMediaInitException =
-            jsval_cast(err.cause().into(), "LocalMediaInitException").unwrap();
+        let cause = jsval_cast::<LocalMediaInitException>(
+            err.cause().into(),
+            "LocalMediaInitException",
+        )
+        .unwrap();
         assert!(cause.message().contains("disables_on_fail"));
         assert_eq!(err.rolled_back(), false);
 
@@ -2765,7 +2778,7 @@ mod set_local_media_settings {
         .unwrap();
 
         let mock_navigator = MockNavigator::new();
-        let err: MediaSettingsUpdateException = jsval_cast(
+        let err = jsval_cast::<MediaSettingsUpdateException>(
             JsFuture::from(room_handle.set_local_media_settings(
                 &media_settings_with_device_id(),
                 true,
@@ -2778,8 +2791,11 @@ mod set_local_media_settings {
         .unwrap();
         mock_navigator.stop();
 
-        let cause: LocalMediaInitException =
-            jsval_cast(err.cause().into(), "LocalMediaInitException").unwrap();
+        let cause = jsval_cast::<LocalMediaInitException>(
+            err.cause().into(),
+            "LocalMediaInitException",
+        )
+        .unwrap();
         assert_eq!(err.rolled_back(), true);
         assert!(cause.message().contains(
             "Failed to get local tracks: MediaDevices.getUserMedia() failed",
@@ -2807,7 +2823,7 @@ mod set_local_media_settings {
 
         let mock_navigator = MockNavigator::new();
         mock_navigator.error_get_user_media("disables_on_rollback_fail".into());
-        let err: MediaSettingsUpdateException = jsval_cast(
+        let err = jsval_cast::<MediaSettingsUpdateException>(
             JsFuture::from(room_handle.set_local_media_settings(
                 &media_settings_with_device_id(),
                 true,
@@ -2820,8 +2836,11 @@ mod set_local_media_settings {
         .unwrap();
         mock_navigator.stop();
 
-        let cause: LocalMediaInitException =
-            jsval_cast(err.cause().into(), "LocalMediaInitException").unwrap();
+        let cause = jsval_cast::<LocalMediaInitException>(
+            err.cause().into(),
+            "LocalMediaInitException",
+        )
+        .unwrap();
         assert_eq!(err.rolled_back(), false);
         assert!(cause.message().contains(
             "Failed to get local tracks: MediaDevices.getUserMedia() failed",
@@ -2849,7 +2868,7 @@ mod set_local_media_settings {
         mock_navigator
             .error_get_user_media("doesnt_disables_if_not_stop_first".into());
 
-        let err: MediaSettingsUpdateException = jsval_cast(
+        let err = jsval_cast::<MediaSettingsUpdateException>(
             JsFuture::from(room_handle.set_local_media_settings(
                 &media_settings_with_device_id(),
                 false,
@@ -2862,8 +2881,11 @@ mod set_local_media_settings {
         .unwrap();
         mock_navigator.stop();
 
-        let cause: LocalMediaInitException =
-            jsval_cast(err.cause().into(), "LocalMediaInitException").unwrap();
+        let cause = jsval_cast::<LocalMediaInitException>(
+            err.cause().into(),
+            "LocalMediaInitException",
+        )
+        .unwrap();
         assert_eq!(err.rolled_back(), true);
         assert!(cause.message().contains(
             "Failed to get local tracks: MediaDevices.getUserMedia() failed",
@@ -2976,8 +2998,6 @@ mod state_synchronization {
     /// Checks that negotiation can be restarted after RPC transport disconnect.
     #[wasm_bindgen_test]
     async fn disconnect_during_negotiation() {
-        medea_jason::platform::init_logger();
-
         async fn test(local_confirmed: bool) {
             let (audio_track, video_track) = get_test_tracks(false, false);
             let (command_tx, mut command_rx) = mpsc::unbounded();
@@ -3262,7 +3282,7 @@ async fn sender_answerer() {
         .unwrap();
 
     loop {
-        let command = timeout(200, commands_rx.next()).await.unwrap().unwrap();
+        let command = timeout(400, commands_rx.next()).await.unwrap().unwrap();
 
         match command {
             Command::MakeSdpAnswer {

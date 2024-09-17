@@ -310,7 +310,7 @@ fn get_encodings_params(
     encodings
         .into_iter()
         .map(|enc| {
-            let mut enc = SendEncodingParameters::from(enc);
+            let enc = SendEncodingParameters::from(enc);
             if let Some(target_sm) = target_sm {
                 enc.set_scalability_mode(target_sm);
             }
@@ -412,7 +412,7 @@ impl InnerMediaConnections {
                         .await
                 }
                 MediaType::Video(settings) => {
-                    let mut init = TransceiverInit::new(direction);
+                    let init = TransceiverInit::new(direction);
 
                     let (target_codecs, target_scalability_mode) =
                         probe_video_codecs(&settings.svc_settings).await;
@@ -422,7 +422,7 @@ impl InnerMediaConnections {
                         target_scalability_mode,
                     );
                     if !encoding_params.is_empty() {
-                        init.sending_encodings(encoding_params);
+                        init.set_send_encodings(encoding_params);
                     }
 
                     let transceiver = peer.add_transceiver(kind, init).await;

@@ -22,20 +22,20 @@ where
         let inner = JsArray::new();
 
         for ice_server in servers {
-            let mut server = RtcIceServer::new();
+            let server = RtcIceServer::new();
 
             let urls = JsArray::new();
             for url in ice_server.urls {
                 _ = urls.push(&JsValue::from(url));
             }
 
-            _ = server.urls(&urls);
+            server.set_urls(&urls);
 
             if let Some(credential) = ice_server.credential {
-                _ = server.credential(&credential);
+                server.set_credential(&credential);
             }
             if let Some(username) = ice_server.username {
-                _ = server.username(&username);
+                server.set_username(&username);
             }
 
             _ = inner.push(&server.into());

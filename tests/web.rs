@@ -100,7 +100,7 @@ use medea_jason::{
     rpc::ApiUrl,
 };
 use url::Url;
-use wasm_bindgen::{convert::FromWasmAbi, prelude::*};
+use wasm_bindgen::{convert::RefFromWasmAbi, prelude::*};
 use wasm_bindgen_futures::JsFuture;
 use wasm_bindgen_test::*;
 
@@ -143,10 +143,10 @@ extern "C" {
 
 /// Performs a unchecked conversion from a [`JsValue`] into an instance of the
 /// specified `FromWasmAbi<Abi = u32>` implementor.
-pub fn jsval_cast<T: FromWasmAbi<Abi = u32>>(
+pub fn jsval_cast<T: RefFromWasmAbi<Abi = u32>>(
     val: JsValue,
     t: &str,
-) -> Result<T, String> {
+) -> Result<<T as RefFromWasmAbi>::Anchor, String> {
     if !val.is_object() {
         return Err(String::from(
             "`unchecked_jsval_cast` is only applicable to objects",
@@ -164,7 +164,7 @@ pub fn jsval_cast<T: FromWasmAbi<Abi = u32>>(
     let ptr = Reflect::get(&obj, &JsValue::from_str("__wbg_ptr")).unwrap();
     let ptr = ptr.as_f64().unwrap() as u32;
 
-    Ok(unsafe { T::from_abi(ptr) })
+    Ok(unsafe { T::ref_from_abi(ptr) })
 }
 
 pub fn get_test_required_tracks() -> (Track, Track) {

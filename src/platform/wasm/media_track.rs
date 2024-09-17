@@ -11,7 +11,7 @@ use crate::{
     media::{
         track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
     },
-    platform::wasm::{get_property_by_name, utils::EventListener},
+    platform::wasm::utils::EventListener,
 };
 
 /// Wrapper around [MediaStreamTrack][1] received from a
@@ -117,9 +117,7 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
-        get_property_by_name(&self.sys_track.get_settings(), "deviceId", |v| {
-            v.as_string()
-        })
+        self.sys_track.get_settings().get_device_id()
     }
 
     /// Return a [`facingMode`][1] of the underlying [MediaStreamTrack][2].
@@ -128,11 +126,7 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
-        let facing_mode = get_property_by_name(
-            &self.sys_track.get_settings(),
-            "facingMode",
-            |v| v.as_string(),
-        );
+        let facing_mode = self.sys_track.get_settings().get_facing_mode();
         facing_mode.and_then(|fm| match fm.as_ref() {
             "user" => Some(FacingMode::User),
             "environment" => Some(FacingMode::Environment),
@@ -151,15 +145,10 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn height(&self) -> Option<u32> {
-        #[expect( // no other sane way
-            clippy::as_conversions,
-            clippy::cast_possible_truncation,
-            clippy::cast_sign_loss,
-            reason = "no other sane way"
-        )]
-        get_property_by_name(&self.sys_track.get_settings(), "height", |h| {
-            h.as_f64().map(|v| v as u32)
-        })
+        self.sys_track
+            .get_settings()
+            .get_height()
+            .and_then(|w| w.try_into().ok())
     }
 
     /// Return a [`width`][1] of the underlying [MediaStreamTrack][2].
@@ -168,15 +157,10 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn width(&self) -> Option<u32> {
-        #[expect( // no other sane way
-            clippy::as_conversions,
-            clippy::cast_possible_truncation,
-            clippy::cast_sign_loss,
-            reason = "no other sane way"
-        )]
-        get_property_by_name(&self.sys_track.get_settings(), "width", |w| {
-            w.as_f64().map(|v| v as u32)
-        })
+        self.sys_track
+            .get_settings()
+            .get_width()
+            .and_then(|w| w.try_into().ok())
     }
 
     /// Changes an [`enabled`][1] attribute in the underlying
