@@ -51,8 +51,11 @@ async fn failed_get_media_devices_info() {
     match result {
         Ok(_) => assert!(false),
         Err(err) => {
-            let err: EnumerateDevicesException =
-                jsval_cast(err, "EnumerateDevicesException").unwrap();
+            let err = jsval_cast::<EnumerateDevicesException>(
+                err,
+                "EnumerateDevicesException",
+            )
+            .unwrap();
 
             assert_eq!(err.cause().message(), "failed_get_media_devices_info",);
             assert!(&err.trace().contains("at src"));
@@ -80,8 +83,11 @@ async fn failed_get_user_media() {
     match result {
         Ok(_) => assert!(false),
         Err(err) => {
-            let err: LocalMediaInitException =
-                jsval_cast(err, "LocalMediaInitException").unwrap();
+            let err = jsval_cast::<LocalMediaInitException>(
+                err,
+                "LocalMediaInitException",
+            )
+            .unwrap();
             let cause = err.cause().unwrap();
 
             assert_eq!(
@@ -123,8 +129,11 @@ async fn failed_get_user_media2() {
     match result {
         Ok(_) => assert!(false),
         Err(err) => {
-            let err: LocalMediaInitException =
-                jsval_cast(err, "LocalMediaInitException").unwrap();
+            let err = jsval_cast::<LocalMediaInitException>(
+                err,
+                "LocalMediaInitException",
+            )
+            .unwrap();
             let cause = err.cause().unwrap();
 
             assert_eq!(

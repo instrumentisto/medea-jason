@@ -2,7 +2,6 @@
 //!
 //! [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
 
-use js_sys::{Array, JsString, Reflect};
 use web_sys::{RtcRtpCodecCapability, RtcRtpSender};
 
 use crate::{
@@ -13,15 +12,7 @@ use crate::{
 ///
 /// [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
 #[derive(Clone, Debug)]
-pub struct CodecCapability {
-    /// Actual JS-side [`RtcRtpCodecCapability`].
-    codec_cap: RtcRtpCodecCapability,
-
-    /// [MIME media type/subtype][2] of the codec.
-    ///
-    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
-    mime_type: String,
-}
+pub struct CodecCapability(RtcRtpCodecCapability);
 
 impl CodecCapability {
     /// Returns available [RTCRtpSender]'s [`CodecCapability`]s.
@@ -43,30 +34,11 @@ impl CodecCapability {
             return Err(Error::FailedToGetCapabilities);
         };
 
-        // TODO: Get rid of reflection in #183 which updates `web-sys` to
-        //       0.3.70.
-        let Ok(codecs) = Reflect::get(&caps, &JsString::from("codecs")) else {
-            return Err(Error::FailedToGetCapabilities);
-        };
-
-        for codec in Array::from(&codecs).values() {
+        for codec in caps.get_codecs().values() {
             let Ok(codec) = codec else {
                 continue;
             };
-
-            let codec_cap = RtcRtpCodecCapability::from(codec);
-            let Some(mime_type) =
-                Reflect::get(&codec_cap, &JsString::from("mimeType"))
-                    .ok()
-                    .and_then(|v| v.as_string())
-            else {
-                return Err(Error::FailedToGetCapabilities);
-            };
-
-            result.push(Self {
-                codec_cap,
-                mime_type,
-            });
+            result.push(Self(RtcRtpCodecCapability::from(codec)));
         }
 
         Ok(result)
@@ -77,13 +49,13 @@ impl CodecCapability {
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
     #[must_use]
     pub fn mime_type(&self) -> String {
-        self.mime_type.clone()
+        self.0.get_mime_type()
     }
 
     /// Returns the underlying [`RtcRtpCodecCapability`] of this
     /// [`CodecCapability`].
     #[must_use]
     pub const fn handle(&self) -> &RtcRtpCodecCapability {
-        &self.codec_cap
+        &self.0
     }
 }

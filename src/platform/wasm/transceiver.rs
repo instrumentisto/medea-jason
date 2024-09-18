@@ -3,8 +3,9 @@
 use std::{future::Future, rc::Rc};
 
 use derive_more::From;
-use js_sys::Array;
+use js_sys::Reflect;
 use medea_client_api_proto::EncodingParameters;
+use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{
     RtcRtpEncodingParameters, RtcRtpTransceiver, RtcRtpTransceiverInit,
@@ -18,8 +19,6 @@ use crate::{
     },
 };
 
-use super::get_property_by_name;
-
 /// Wrapper around an [`RtcRtpTransceiverInit`].
 #[derive(Debug)]
 pub struct TransceiverInit(RtcRtpTransceiverInit);
@@ -28,8 +27,8 @@ impl TransceiverInit {
     /// Creates a new [`TransceiverInit`].
     #[must_use]
     pub fn new(direction: TransceiverDirection) -> Self {
-        let mut init = RtcRtpTransceiverInit::new();
-        _ = init.direction(direction.into());
+        let init = RtcRtpTransceiverInit::new();
+        init.set_direction(direction.into());
         Self(init)
     }
 
@@ -41,15 +40,12 @@ impl TransceiverInit {
 
     /// Adds the provided [`SendEncodingParameters`] to this
     /// [`TransceiverInit`].
-    pub fn sending_encodings(
-        &mut self,
-        encodings: Vec<SendEncodingParameters>,
-    ) {
+    pub fn set_send_encodings(&self, encodings: Vec<SendEncodingParameters>) {
         let send_encoding = ::js_sys::Array::new();
         for enc in encodings {
             _ = send_encoding.push(enc.handle());
         }
-        _ = self.0.send_encodings(&send_encoding);
+        self.0.set_send_encodings(&send_encoding);
     }
 }
 
@@ -146,36 +142,34 @@ impl Transceiver {
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#dom-rtcrtpsender
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-setparameters
-    #[expect(clippy::missing_panics_doc, reason = "not happens")]
     pub async fn update_send_encodings(
         &self,
         encodings: Vec<EncodingParameters>,
     ) -> Result<(), Error> {
         let params = self.0.sender().get_parameters();
-        #[expect(clippy::unwrap_used, reason = "always present")]
-        let encs = get_property_by_name(&params, "encodings", |v| {
-            v.is_array().then_some(Array::from(&v))
-        })
-        .unwrap();
+        let Some(encs) = params.get_encodings() else {
+            return Ok(());
+        };
 
-        for mut enc in encs.iter().map(RtcRtpEncodingParameters::from) {
-            #[expect(clippy::unwrap_used, reason = "always present")]
-            let rid =
-                get_property_by_name(&enc, "rid", |v| v.as_string()).unwrap();
+        for enc in encs.iter().map(RtcRtpEncodingParameters::from) {
+            let rid = enc.get_rid();
 
-            let Some(encoding) = encodings.iter().find(|e| e.rid == rid) else {
+            let Some(encoding) =
+                encodings.iter().find(|e| Some(&e.rid) == rid.as_ref())
+            else {
                 continue;
             };
 
-            _ = enc.active(encoding.active);
+            enc.set_active(encoding.active);
             if let Some(max_bitrate) = encoding.max_bitrate {
-                _ = enc.max_bitrate(max_bitrate);
+                enc.set_max_bitrate(max_bitrate);
             }
             if let Some(scale_resolution_down_by) =
                 encoding.scale_resolution_down_by
             {
-                _ = enc
-                    .scale_resolution_down_by(scale_resolution_down_by.into());
+                enc.set_scale_resolution_down_by(
+                    scale_resolution_down_by.into(),
+                );
             }
         }
 
@@ -192,14 +186,9 @@ impl Transceiver {
     /// Sets the preferred [`CodecCapability`]s for this [`Transceiver`].
     pub fn set_codec_preferences(&self, codecs: Vec<CodecCapability>) {
         let is_api_available =
-            get_property_by_name(&self.0, "setCodecPreferences", |val| {
-                if val.is_undefined() {
-                    None
-                } else {
-                    Some(val)
-                }
-            })
-            .is_some();
+            Reflect::get(&self.0, &JsValue::from_str("setCodecPreferences"))
+                .map_or(None, |val| (!val.is_undefined()).then_some(val))
+                .is_some();
 
         // Unsupported on Firefox < 128.
         if is_api_available {
