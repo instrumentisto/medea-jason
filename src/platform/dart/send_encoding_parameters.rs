@@ -161,7 +161,7 @@ impl SendEncodingParameters {
     /// Sets [scalabilityMode][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/3zuaee45
-    pub fn set_scalability_mode(&mut self, scalability_mode: ScalabilityMode) {
+    pub fn set_scalability_mode(&self, scalability_mode: ScalabilityMode) {
         let handle = self.0.get();
         unsafe {
             send_encoding_parameters::set_scalability_mode(

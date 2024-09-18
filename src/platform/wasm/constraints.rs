@@ -27,15 +27,15 @@ impl MediaStreamConstraints {
     /// Specifies the nature and settings of the `audio` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
-    pub fn audio(&mut self, audio: AudioTrackConstraints) {
-        _ = self.0.audio(&MediaTrackConstraints::from(audio).into());
+    pub fn audio(&self, audio: AudioTrackConstraints) {
+        self.0.set_audio(&MediaTrackConstraints::from(audio).into());
     }
 
     /// Specifies the nature and settings of the `video` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
-    pub fn video(&mut self, video: DeviceVideoTrackConstraints) {
-        _ = self.0.video(&MediaTrackConstraints::from(video).into());
+    pub fn video(&self, video: DeviceVideoTrackConstraints) {
+        self.0.set_video(&MediaTrackConstraints::from(video).into());
     }
 }
 
@@ -47,17 +47,17 @@ impl Default for MediaStreamConstraints {
 
 impl From<AudioTrackConstraints> for MediaTrackConstraints {
     fn from(track_constraints: AudioTrackConstraints) -> Self {
-        let mut constraints = Self::new();
+        let constraints = Self::new();
 
         if let Some(auto_gain_control) = track_constraints.auto_gain_control {
-            _ = constraints.auto_gain_control(
+            constraints.set_auto_gain_control(
                 &ConstrainBooleanParameters::from(auto_gain_control),
             );
         }
 
         if let Some(device_id) = track_constraints.device_id {
-            _ = constraints
-                .device_id(&ConstrainDomStringParameters::from(&device_id));
+            constraints
+                .set_device_id(&ConstrainDomStringParameters::from(&device_id));
         }
 
         constraints
@@ -66,21 +66,22 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
 
 impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
     fn from(track_constraints: DeviceVideoTrackConstraints) -> Self {
-        let mut constraints = Self::new();
+        let constraints = Self::new();
 
         if let Some(device_id) = track_constraints.device_id {
-            _ = constraints
-                .device_id(&ConstrainDomStringParameters::from(&device_id));
+            constraints
+                .set_device_id(&ConstrainDomStringParameters::from(&device_id));
         }
         if let Some(facing_mode) = track_constraints.facing_mode {
-            _ = constraints
-                .facing_mode(&ConstrainDomStringParameters::from(&facing_mode));
+            constraints.set_facing_mode(&ConstrainDomStringParameters::from(
+                &facing_mode,
+            ));
         }
         if let Some(width) = track_constraints.width {
-            _ = constraints.width(&ConstrainDoubleRange::from(width));
+            constraints.set_width(&ConstrainDoubleRange::from(width));
         }
         if let Some(height) = track_constraints.height {
-            _ = constraints.height(&ConstrainDoubleRange::from(height));
+            constraints.set_height(&ConstrainDoubleRange::from(height));
         }
 
         constraints
@@ -89,12 +90,13 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
 
 impl From<ConstrainU32> for ConstrainDoubleRange {
     fn from(from: ConstrainU32) -> Self {
-        let mut constraint = Self::new();
-        _ = match from {
-            ConstrainU32::Exact(val) => constraint.exact(f64::from(val)),
-            ConstrainU32::Ideal(val) => constraint.ideal(f64::from(val)),
+        let constraint = Self::new();
+        match from {
+            ConstrainU32::Exact(val) => constraint.set_exact(f64::from(val)),
+            ConstrainU32::Ideal(val) => constraint.set_ideal(f64::from(val)),
             ConstrainU32::Range(min, max) => {
-                constraint.min(f64::from(min)).max(f64::from(max))
+                constraint.set_min(f64::from(min));
+                constraint.set_max(f64::from(max));
             }
         };
         constraint
@@ -103,10 +105,10 @@ impl From<ConstrainU32> for ConstrainDoubleRange {
 
 impl From<ConstrainBoolean> for ConstrainBooleanParameters {
     fn from(from: ConstrainBoolean) -> Self {
-        let mut constraint = Self::new();
-        _ = match from {
-            ConstrainBoolean::Exact(val) => constraint.exact(val),
-            ConstrainBoolean::Ideal(val) => constraint.ideal(val),
+        let constraint = Self::new();
+        match from {
+            ConstrainBoolean::Exact(val) => constraint.set_exact(val),
+            ConstrainBoolean::Ideal(val) => constraint.set_ideal(val),
         };
         constraint
     }
@@ -114,14 +116,13 @@ impl From<ConstrainBoolean> for ConstrainBooleanParameters {
 
 impl<T: AsRef<str>> From<&ConstrainString<T>> for ConstrainDomStringParameters {
     fn from(from: &ConstrainString<T>) -> Self {
-        let mut constraint = Self::new();
-        _ =
-            match from {
-                ConstrainString::Exact(val) => constraint
-                    .exact(&wasm_bindgen::JsValue::from_str(val.as_ref())),
-                ConstrainString::Ideal(val) => constraint
-                    .ideal(&wasm_bindgen::JsValue::from_str(val.as_ref())),
-            };
+        let constraint = Self::new();
+        match from {
+            ConstrainString::Exact(val) => constraint
+                .set_exact(&wasm_bindgen::JsValue::from_str(val.as_ref())),
+            ConstrainString::Ideal(val) => constraint
+                .set_ideal(&wasm_bindgen::JsValue::from_str(val.as_ref())),
+        };
         constraint
     }
 }
@@ -151,23 +152,23 @@ impl DisplayMediaStreamConstraints {
     /// Specifies the nature and settings of the `video` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
-    pub fn video(&mut self, video: DisplayVideoTrackConstraints) {
-        _ = self.0.video(&MediaTrackConstraints::from(video).into());
+    pub fn video(&self, video: DisplayVideoTrackConstraints) {
+        self.0.set_video(&MediaTrackConstraints::from(video).into());
     }
 }
 
 impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
     fn from(track_constraints: DisplayVideoTrackConstraints) -> Self {
-        let mut constraints = Self::new();
+        let constraints = Self::new();
 
         if let Some(width) = track_constraints.width {
-            _ = constraints.width(&ConstrainDoubleRange::from(width));
+            constraints.set_width(&ConstrainDoubleRange::from(width));
         }
         if let Some(height) = track_constraints.height {
-            _ = constraints.height(&ConstrainDoubleRange::from(height));
+            constraints.set_height(&ConstrainDoubleRange::from(height));
         }
         if let Some(frame_rate) = track_constraints.frame_rate {
-            _ = constraints.frame_rate(&ConstrainDoubleRange::from(frame_rate));
+            constraints.set_frame_rate(&ConstrainDoubleRange::from(frame_rate));
         }
 
         constraints

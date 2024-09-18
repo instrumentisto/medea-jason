@@ -131,15 +131,15 @@ impl RtcPeerConnection {
     where
         I: IntoIterator<Item = IceServer>,
     {
-        let mut peer_conf = RtcConfiguration::new();
+        let peer_conf = RtcConfiguration::new();
         let policy = if is_force_relayed {
             RtcIceTransportPolicy::Relay
         } else {
             RtcIceTransportPolicy::All
         };
-        _ = peer_conf.bundle_policy(RtcBundlePolicy::MaxBundle);
-        _ = peer_conf.ice_transport_policy(policy);
-        _ = peer_conf.ice_servers(&RtcIceServers::from(ice_servers));
+        peer_conf.set_bundle_policy(RtcBundlePolicy::MaxBundle);
+        peer_conf.set_ice_transport_policy(policy);
+        peer_conf.set_ice_servers(&RtcIceServers::from(ice_servers));
         let peer = SysRtcPeerConnection::new_with_configuration(&peer_conf)
             .map_err(Into::into)
             .map_err(RtcPeerConnectionError::PeerCreationError)
@@ -410,10 +410,9 @@ impl RtcPeerConnection {
         sdp_m_line_index: Option<u16>,
         sdp_mid: &Option<String>,
     ) -> RtcPeerConnectionResult<()> {
-        let mut cand_init = RtcIceCandidateInit::new(candidate);
-        _ = cand_init
-            .sdp_m_line_index(sdp_m_line_index)
-            .sdp_mid(sdp_mid.as_ref().map(String::as_ref));
+        let cand_init = RtcIceCandidateInit::new(candidate);
+        cand_init.set_sdp_m_line_index(sdp_m_line_index);
+        cand_init.set_sdp_mid(sdp_mid.as_ref().map(String::as_ref));
         JsFuture::from(
             self.peer.add_ice_candidate_with_opt_rtc_ice_candidate_init(
                 Some(cand_init).as_ref(),
@@ -451,8 +450,8 @@ impl RtcPeerConnection {
     ) -> RtcPeerConnectionResult<()> {
         let peer: Rc<SysRtcPeerConnection> = Rc::clone(&self.peer);
 
-        let mut desc = RtcSessionDescriptionInit::new(sdp_type);
-        _ = desc.sdp(offer);
+        let desc = RtcSessionDescriptionInit::new(sdp_type);
+        desc.set_sdp(offer);
 
         JsFuture::from(peer.set_local_description(&desc))
             .await
@@ -556,9 +555,9 @@ impl RtcPeerConnection {
     pub async fn create_offer(&self) -> RtcPeerConnectionResult<String> {
         let peer: Rc<SysRtcPeerConnection> = Rc::clone(&self.peer);
 
-        let mut offer_options = RtcOfferOptions::new();
+        let offer_options = RtcOfferOptions::new();
         if self.ice_restart.take() {
-            _ = offer_options.ice_restart(true);
+            offer_options.set_ice_restart(true);
         }
         let create_offer = JsFuture::from(
             peer.create_offer_with_rtc_offer_options(&offer_options),
@@ -590,15 +589,13 @@ impl RtcPeerConnection {
     ) -> RtcPeerConnectionResult<()> {
         let description = match sdp {
             SdpType::Offer(offer) => {
-                let mut desc =
-                    RtcSessionDescriptionInit::new(RtcSdpType::Offer);
-                _ = desc.sdp(&offer);
+                let desc = RtcSessionDescriptionInit::new(RtcSdpType::Offer);
+                desc.set_sdp(&offer);
                 desc
             }
             SdpType::Answer(answer) => {
-                let mut desc =
-                    RtcSessionDescriptionInit::new(RtcSdpType::Answer);
-                _ = desc.sdp(&answer);
+                let desc = RtcSessionDescriptionInit::new(RtcSdpType::Answer);
+                desc.set_sdp(&answer);
                 desc
             }
         };

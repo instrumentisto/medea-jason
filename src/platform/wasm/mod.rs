@@ -17,8 +17,7 @@ pub mod utils;
 use std::time::Duration;
 
 use futures::Future;
-use js_sys::{Promise, Reflect};
-use wasm_bindgen::JsValue;
+use js_sys::Promise;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::Window;
 
@@ -89,22 +88,6 @@ pub async fn delay_for(delay: Duration) {
     .await
     .map(drop)
     .unwrap();
-}
-
-/// Returns property of JS object by name if its defined.
-/// Converts the value with a given predicate.
-pub fn get_property_by_name<T, F, U>(
-    value: &T,
-    name: &str,
-    into: F,
-) -> Option<U>
-where
-    T: AsRef<JsValue>,
-    F: Fn(JsValue) -> Option<U>,
-{
-    Reflect::get(value.as_ref(), &JsValue::from_str(name))
-        .ok()
-        .map_or_else(|| None, into)
 }
 
 /// Returns [`Window`] object.

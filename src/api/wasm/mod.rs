@@ -3,8 +3,6 @@
 //!
 //! [`Jason`]: crate::api::Jason
 
-#![expect(clippy::mem_forget, reason = "`wasm_bindgen` codegen")]
-
 pub mod connection_handle;
 pub mod err;
 pub mod jason;

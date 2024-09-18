@@ -2,10 +2,6 @@
 
 // TODO: Try use `#![expect]` on next Rust version upgrade.
 #![allow(clippy::multiple_inherent_impl, reason = "`wasm_bindgen` codegen")]
-#![cfg_attr(
-    target_family = "wasm",
-    expect(clippy::mem_forget, reason = "`wasm_bindgen` codegen")
-)]
 
 use std::borrow::Cow;
 
