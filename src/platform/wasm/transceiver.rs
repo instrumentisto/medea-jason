@@ -187,16 +187,7 @@ impl Transceiver {
     pub fn set_codec_preferences(&self, codecs: Vec<CodecCapability>) {
         let is_api_available =
             Reflect::get(&self.0, &JsValue::from_str("setCodecPreferences"))
-                .map_or_else(
-                    |_| None,
-                    |val| {
-                        if val.is_undefined() {
-                            None
-                        } else {
-                            Some(val)
-                        }
-                    },
-                )
+                .map_or(None, |val| (!val.is_undefined()).then_some(val))
                 .is_some();
 
         // Unsupported on Firefox < 128.
