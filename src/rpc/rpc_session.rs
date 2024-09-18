@@ -17,7 +17,7 @@ use futures::{
     stream::LocalBoxStream,
     StreamExt,
 };
-use medea_client_api_proto::{Capabilities, Command, Event, MemberId, RoomId};
+use medea_client_api_proto::{Command, Event, MemberId, RoomId};
 use medea_reactive::ObservableCell;
 use tracerr::Traced;
 
@@ -168,9 +168,6 @@ pub struct WebSocketRpcSession {
     /// Current [`SessionState`] of this [`WebSocketRpcSession`].
     state: ObservableCell<SessionState>,
 
-    /// Clients platform capabilities.
-    capabilities: Capabilities,
-
     /// Flag which indicates that [`WebSocketRpcSession`] goes to the
     /// [`SessionState::Lost`] from the [`SessionState::Opened`].
     can_reconnect: Rc<Cell<bool>>,
@@ -188,7 +185,6 @@ impl WebSocketRpcSession {
         let this = Rc::new(Self {
             client,
             state: ObservableCell::new(SessionState::Uninitialized),
-            capabilities: platform::get_capabilities(),
             can_reconnect: Rc::new(Cell::new(false)),
             event_txs: RefCell::default(),
         });
@@ -274,6 +270,8 @@ impl WebSocketRpcSession {
         let mut state_updates = self.state.subscribe();
         let weak_this = Rc::downgrade(self);
         platform::spawn(async move {
+            let capabilities = platform::get_capabilities().await;
+
             while let Some(state) = state_updates.next().await {
                 let this = upgrade_or_break!(weak_this);
                 match state {
@@ -296,7 +294,7 @@ impl WebSocketRpcSession {
                             info.room_id.clone(),
                             info.member_id.clone(),
                             info.credential.clone(),
-                            this.capabilities.clone()
+                            capabilities.clone(),
                         );
                     }
                     S::Uninitialized

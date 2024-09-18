@@ -304,7 +304,7 @@ pub enum Command {
         credential: Credential,
 
         /// Client reports its capabilities (e.g. available codecs, platform).
-        capabilities: Capabilities
+        capabilities: Capabilities,
     },
 
     /// Request to leave a `Room`.
@@ -1277,7 +1277,6 @@ pub struct EncodingParameters {
     pub scale_resolution_down_by: Option<u8>,
 }
 
-
 /// Client capabilities (e.g. available codecs, platform)
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
@@ -1293,8 +1292,7 @@ pub struct Capabilities {
     pub video_tx: Vec<CodecCapability>,
 
     /// Codec capabilities of the system for receiving video.
-    pub video_rx: Vec<CodecCapability>
-
+    pub video_rx: Vec<CodecCapability>,
 }
 
 /// Provides information about codec capabilities. Only capability combinations
@@ -1311,9 +1309,14 @@ pub struct CodecCapability {
     /// The codec clock rate expressed in Hertz.
     pub clock_rate: u32,
 
-    /// The "format specific parameters" field from the `a=fmtp` line in the SDP
-    /// corresponding to the codec, if one exists.
-    pub sdp_fmtp_line: String
+    /// If present, indicates the maximum number of channels (mono=1,
+    /// stereo=2).
+    pub channels: Option<u16>,
+
+    /// Codec-specific parameters that must be signaled to the remote party.
+    ///
+    /// Corresponds to "a=fmtp" parameters in SDP.
+    pub parameters: HashMap<String, String>,
 }
 
 /// Estimated connection quality.

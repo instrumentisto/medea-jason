@@ -10,7 +10,10 @@ use futures::{
     future::LocalBoxFuture,
     stream::{LocalBoxStream, StreamExt as _},
 };
-use medea_client_api_proto::{Capabilities, ClientMsg, CloseReason as CloseByServerReason, Command, Credential, Event, MemberId, RoomId, RpcSettings, ServerMsg};
+use medea_client_api_proto::{
+    Capabilities, ClientMsg, CloseReason as CloseByServerReason, Command,
+    Credential, Event, MemberId, RoomId, RpcSettings, ServerMsg,
+};
 use medea_macro::dispatchable;
 use medea_reactive::ObservableCell;
 use serde::Serialize;
@@ -217,7 +220,7 @@ impl WebSocketRpcClient {
         room_id: RoomId,
         member_id: MemberId,
         credential: Credential,
-        capabilities: Capabilities
+        capabilities: Capabilities,
     ) {
         self.send_command(
             room_id,

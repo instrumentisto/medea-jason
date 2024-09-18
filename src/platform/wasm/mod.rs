@@ -14,12 +14,13 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::time::Duration;
+use std::{collections::HashMap, time::Duration};
 
 use futures::Future;
 use js_sys::Promise;
+use medea_client_api_proto as proto;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::Window;
+use web_sys::{RtcRtpCapabilities, RtcRtpCodecCapability, Window};
 
 pub use self::{
     codec_capability::CodecCapability,
@@ -52,7 +53,6 @@ static ALLOC: wee_alloc::WeeAlloc<'_> = wee_alloc::WeeAlloc::INIT;
 /// <https://github.com/rustwasm/console_error_panic_hook#readme>
 #[cfg(feature = "console_error_panic_hook")]
 pub use console_error_panic_hook::set_once as set_panic_hook;
-use medea_client_api_proto::Capabilities;
 
 /// Initialize [`wasm_logger`] as default application logger.
 ///
@@ -114,14 +114,51 @@ impl Drop for IntervalHandle {
     }
 }
 
+/// Returns [`proto::Capabilities`] of the current platform.
+#[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
 #[must_use]
-pub fn get_capabilities() -> Capabilities {
-    let audio_tx = web_sys::RtcRtpSender::get_capabilities("audio").map(|c|c.codecs())
+pub async fn get_capabilities() -> proto::Capabilities {
+    let convert_caps =
+        |caps: RtcRtpCapabilities| -> Vec<proto::CodecCapability> {
+            caps.get_codecs()
+                .into_iter()
+                .map(RtcRtpCodecCapability::from)
+                .map(|c| -> proto::CodecCapability {
+                    let sdp_fmtp = c.get_sdp_fmtp_line().unwrap_or_default();
 
-    Capabilities {
-        audio_tx: vec![],
-        audio_rx: vec![],
-        video_tx: vec![],
-        video_rx: vec![],
+                    let sdp_fmtp_line = sdp_fmtp
+                        .split(';')
+                        .map(|s| s.split('='))
+                        .filter_map(|mut a| match (a.next(), a.next()) {
+                            (Some(k), Some(v)) => {
+                                Some((k.to_owned(), v.to_owned()))
+                            }
+                            _ => None,
+                        })
+                        .collect::<HashMap<String, String>>();
+
+                    proto::CodecCapability {
+                        mime_type: c.get_mime_type(),
+                        clock_rate: c.get_clock_rate(),
+                        channels: c.get_channels(),
+                        parameters: sdp_fmtp_line,
+                    }
+                })
+                .collect::<Vec<_>>()
+        };
+
+    proto::Capabilities {
+        audio_tx: web_sys::RtcRtpSender::get_capabilities("audio")
+            .map(convert_caps)
+            .unwrap_or_default(),
+        audio_rx: web_sys::RtcRtpReceiver::get_capabilities("audio")
+            .map(convert_caps)
+            .unwrap_or_default(),
+        video_tx: web_sys::RtcRtpSender::get_capabilities("video")
+            .map(convert_caps)
+            .unwrap_or_default(),
+        video_rx: web_sys::RtcRtpReceiver::get_capabilities("video")
+            .map(convert_caps)
+            .unwrap_or_default(),
     }
 }

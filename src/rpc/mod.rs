@@ -9,7 +9,10 @@ pub mod websocket;
 use std::str::FromStr;
 
 use derive_more::{AsRef, Display, From};
-use medea_client_api_proto::{CloseDescription, CloseReason as CloseByServerReason, Credential, MemberId, RoomId};
+use medea_client_api_proto::{
+    CloseDescription, CloseReason as CloseByServerReason, Credential, MemberId,
+    RoomId,
+};
 use tracerr::Traced;
 use url::Url;
 

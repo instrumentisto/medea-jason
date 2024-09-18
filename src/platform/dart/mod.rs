@@ -33,8 +33,9 @@ pub mod utils;
 use std::panic;
 
 use libc::c_void;
-use medea_client_api_proto::Capabilities;
-use crate::platform::utils::dart_api;
+use medea_client_api_proto as proto;
+
+use crate::{media::MediaKind, platform::utils::dart_api};
 
 pub use self::{
     codec_capability::CodecCapability,
@@ -111,6 +112,42 @@ pub fn init_logger() {
         .init();
 }
 
-pub fn get_capabilities() -> Capabilities {
-    todo!()
+/// Returns [`proto::Capabilities`] of the current platform.
+#[must_use]
+pub async fn get_capabilities() -> proto::Capabilities {
+    let convert_caps =
+        |caps: Vec<CodecCapability>| -> Vec<proto::CodecCapability> {
+            caps.into_iter()
+                .map(|c| proto::CodecCapability {
+                    mime_type: c.mime_type(),
+                    clock_rate: c.clock_rate().unwrap_or_default(),
+                    channels: c.channels(),
+                    parameters: c.parameters(),
+                })
+                .collect::<Vec<_>>()
+        };
+
+    let audio_tx =
+        CodecCapability::get_sender_codec_capabilities(MediaKind::Audio)
+            .await
+            .unwrap_or_default();
+    let audio_rx =
+        CodecCapability::get_receiver_codec_capabilities(MediaKind::Audio)
+            .await
+            .unwrap_or_default();
+    let video_tx =
+        CodecCapability::get_sender_codec_capabilities(MediaKind::Video)
+            .await
+            .unwrap_or_default();
+    let video_rx =
+        CodecCapability::get_receiver_codec_capabilities(MediaKind::Video)
+            .await
+            .unwrap_or_default();
+
+    proto::Capabilities {
+        audio_tx: convert_caps(audio_tx),
+        audio_rx: convert_caps(audio_rx),
+        video_tx: convert_caps(video_tx),
+        video_rx: convert_caps(video_rx),
+    }
 }
