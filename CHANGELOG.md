@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.6.2] · 2024-??-??
+[0.6.2]: /../../tree/medea-jason-0.6.2
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.6.1...medea-jason-0.6.2)
+
+### Changed
+
+- Change wasm allocator to [talc]. ([#187])
+
+[#187]: /../../pull/187
+
+
+
+
 ## [0.6.1] · 2024-09-11
 [0.6.1]: /../../tree/medea-jason-0.6.1
 
@@ -403,3 +417,4 @@ All user visible changes to this project will be documented in this file. This p
 [VP9]: https://bloggeek.me/webrtcglossary/vp9
 [`derive_more`]: https://docs.rs/derive_more
 [`flutter_rust_bridge`]: https://docs.rs/flutter_rust_bridge
+[talc]: https://crates.io/crates/talc
