@@ -13,7 +13,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Changed
 
-- Replaced [wee_alloc] WASM allocator with [talc]. ([#187])
+- Replaced [wee_alloc] allocator with [talc] for Web. ([#187])
 
 ### BC Breaks
 
