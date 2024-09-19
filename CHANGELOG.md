@@ -6,14 +6,18 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.6.2] · 2024-??-??
+## [0.6.2] · 2024-??-?? (unreleased)
 [0.6.2]: /../../tree/medea-jason-0.6.2
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.6.1...medea-jason-0.6.2)
 
 ### Changed
 
-- Change wasm allocator to [talc]. ([#187])
+- Replaced [wee_alloc] WASM allocator with [talc]. ([#187])
+
+### BC Breaks
+
+- Replaced `wee_alloc` feature with a `talc`. ([#187])
 
 [#187]: /../../pull/187
 
@@ -418,3 +422,4 @@ All user visible changes to this project will be documented in this file. This p
 [`derive_more`]: https://docs.rs/derive_more
 [`flutter_rust_bridge`]: https://docs.rs/flutter_rust_bridge
 [talc]: https://crates.io/crates/talc
+[wee_alloc]: https://crates.io/crates/wee_alloc
