@@ -1,6 +1,6 @@
 [package]
 name = "medea-jason"
-version = "0.6.2-dev"
+version = "0.7.0-dev"
 edition = "2021"
 rust-version = "1.81"
 description = "Client library for Medea media server."
@@ -31,9 +31,11 @@ crate-type = ["cdylib", "rlib", "staticlib"]
 lto = "fat"
 
 [features]
-default = ["console_error_panic_hook", "wee_alloc"]
+default = ["console_error_panic_hook", "talc"]
+console_error_panic_hook = ["dep:console_error_panic_hook"]
 dart-codegen = ["medea-macro/dart-codegen"]
-mockable = ["mockall"]
+mockable = ["dep:mockall"]
+talc = ["dep:talc"]
 
 [dependencies]
 async-recursion = "1.1"
@@ -71,10 +73,10 @@ send_wrapper = "0.6"
 backoff = { version = "0.4", features = ["wasm-bindgen"] }
 console_error_panic_hook = { version = "0.1", optional = true }
 js-sys = "0.3"
+talc = { version = "4.4", features = ["lock_api"], default-features = false, optional = true }
 wasm-bindgen = "0.2.93"
 wasm-bindgen-futures = "0.4.43"
 wasm-logger = "0.2"
-wee_alloc = { version = "0.4", optional = true }
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
     version = "0.3.70"
     features = [
