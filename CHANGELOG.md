@@ -11,13 +11,14 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.6.1...medea-jason-0.7.0)
 
+### BC Breaks
+
+- [Cargo features]:
+    - Replaced `wee_alloc` with `talc`. ([#187])
+
 ### Changed
 
 - Replaced [`wee_alloc`] allocator with [`talc`] for web. ([#187])
-
-### BC Breaks
-
-- Replaced `wee_alloc` feature with a `talc`. ([#187])
 
 [#187]: /../../pull/187
 
@@ -415,6 +416,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+[Cargo features]: https://doc.rust-lang.org/cargo/reference/features.html
 [MSRV]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
 [SFU]: https://webrtcglossary.com/sfu
 [Semantic Versioning 2.0.0]: https://semver.org
