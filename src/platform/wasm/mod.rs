@@ -39,9 +39,11 @@ pub use self::{
 pub type MediaDisplayInfo = ();
 
 #[cfg(feature = "talc")]
-/// When the `talc` feature is enabled, use `talc` as the global
-/// allocator.
-/// SAFETY: The runtime environment must be single-threaded WASM.
+/// [`talc`] as the global allocator.
+///
+/// # Safety
+///
+/// The runtime environment must be single-threaded WASM.
 #[global_allocator]
 static ALLOCATOR: talc::TalckWasm = unsafe { talc::TalckWasm::new_global() };
 

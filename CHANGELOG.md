@@ -13,7 +13,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Changed
 
-- Replaced [wee_alloc] allocator with [talc] for Web. ([#187])
+- Replaced [`wee_alloc`] allocator with [`talc`] for web. ([#187])
 
 ### BC Breaks
 
@@ -421,5 +421,5 @@ All user visible changes to this project will be documented in this file. This p
 [VP9]: https://bloggeek.me/webrtcglossary/vp9
 [`derive_more`]: https://docs.rs/derive_more
 [`flutter_rust_bridge`]: https://docs.rs/flutter_rust_bridge
-[talc]: https://crates.io/crates/talc
-[wee_alloc]: https://crates.io/crates/wee_alloc
+[`talc`]: https://docs.rs/talc
+[`wee_alloc`]: https://docs.rs/wee_alloc
