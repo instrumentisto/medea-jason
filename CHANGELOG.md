@@ -18,9 +18,16 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Changed
 
-- Replaced [`wee_alloc`] allocator with [`talc`] for web. ([#187])
+- Dependencies:
+    - Replaced [`wee_alloc`] allocator with [`talc`] for web. ([#187])
+
+### Upgraded
+
+- Dependencies:
+    - [`flutter_rust_bridge`] to 2.4.0 version. ([#188])
 
 [#187]: /../../pull/187
+[#188]: /../../pull/188
 
 
 
