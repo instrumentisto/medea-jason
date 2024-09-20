@@ -6,6 +6,25 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.7.0] · 2024-??-?? (unreleased)
+[0.7.0]: /../../tree/medea-jason-0.7.0
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.6.1...medea-jason-0.7.0)
+
+### BC Breaks
+
+- [Cargo features]:
+    - Replaced `wee_alloc` with `talc`. ([#187])
+
+### Changed
+
+- Replaced [`wee_alloc`] allocator with [`talc`] for web. ([#187])
+
+[#187]: /../../pull/187
+
+
+
+
 ## [0.6.1] · 2024-09-11
 [0.6.1]: /../../tree/medea-jason-0.6.1
 
@@ -397,9 +416,12 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+[Cargo features]: https://doc.rust-lang.org/cargo/reference/features.html
 [MSRV]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
 [SFU]: https://webrtcglossary.com/sfu
 [Semantic Versioning 2.0.0]: https://semver.org
 [VP9]: https://bloggeek.me/webrtcglossary/vp9
 [`derive_more`]: https://docs.rs/derive_more
 [`flutter_rust_bridge`]: https://docs.rs/flutter_rust_bridge
+[`talc`]: https://docs.rs/talc
+[`wee_alloc`]: https://docs.rs/wee_alloc
