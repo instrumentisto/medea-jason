@@ -554,7 +554,8 @@ impl RtcPeerConnection {
             offer_options.set_ice_restart(true);
         }
         let create_offer = JsFuture::from(
-            self.peer.create_offer_with_rtc_offer_options(&offer_options),
+            self.peer
+                .create_offer_with_rtc_offer_options(&offer_options),
         )
         .await
         .map_err(Into::into)
@@ -615,18 +616,14 @@ impl RtcPeerConnection {
         kind: MediaKind,
         init: TransceiverInit,
     ) -> Transceiver {
-        let transceiver = self.peer
+        let transceiver = self
+            .peer
             .add_transceiver_with_str_and_init(kind.as_str(), init.handle());
         Transceiver::from(transceiver)
     }
 
     /// Returns [`RtcRtpTransceiver`] (see [RTCRtpTransceiver][1]) from a
     /// [set of this RTCPeerConnection's transceivers][2] by provided `mid`.
-    ///
-    /// # Panics
-    ///
-    /// If fails to [iterate over transceivers on JS side](js_sys::try_iter).
-    /// Not supposed to ever happen.
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     /// [2]: https://w3.org/TR/webrtc#transceivers-set
@@ -637,10 +634,8 @@ impl RtcPeerConnection {
     ) -> impl Future<Output = Option<Transceiver>> + 'static {
         let mut transceiver = None;
 
-        let transceivers =
-            js_sys::try_iter(&self.peer.get_transceivers()).unwrap().unwrap();
-        for tr in transceivers {
-            let tr = RtcRtpTransceiver::from(tr.unwrap());
+        for tr in self.peer.get_transceivers() {
+            let tr = RtcRtpTransceiver::from(tr);
             if let Some(tr_mid) = tr.mid() {
                 if mid.eq(&tr_mid) {
                     transceiver = Some(tr);
