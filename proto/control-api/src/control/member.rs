@@ -310,7 +310,7 @@ impl Zeroize for CredentialString {
 #[derive(AsRef, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-pub struct PlainCredentials(pub SecretBox<CredentialString>);
+pub struct PlainCredentials(SecretBox<CredentialString>);
 
 impl PartialOrd for PlainCredentials {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
