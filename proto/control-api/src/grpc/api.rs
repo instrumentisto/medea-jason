@@ -346,9 +346,9 @@ pub mod web_rtc_publish_endpoint {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                PublishPolicy::Optional => "OPTIONAL",
-                PublishPolicy::Required => "REQUIRED",
-                PublishPolicy::Disabled => "DISABLED",
+                Self::Optional => "OPTIONAL",
+                Self::Required => "REQUIRED",
+                Self::Disabled => "DISABLED",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -393,9 +393,9 @@ pub mod web_rtc_publish_endpoint {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                P2p::Never => "NEVER",
-                P2p::IfPossible => "IF_POSSIBLE",
-                P2p::Always => "ALWAYS",
+                Self::Never => "NEVER",
+                Self::IfPossible => "IF_POSSIBLE",
+                Self::Always => "ALWAYS",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -443,213 +443,15 @@ pub struct Pong {
     #[prost(uint32, tag = "1")]
     pub nonce: u32,
 }
-/// Generated client implementations.
-pub mod control_api_client {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::*;
-    use tonic::codegen::http::Uri;
-    /// Service allowing to control a media server dynamically, by creating, updating
-    /// and destroying pipelines of media `Element`s on it.
-    #[derive(Debug, Clone)]
-    pub struct ControlApiClient<T> {
-        inner: tonic::client::Grpc<T>,
-    }
-    impl ControlApiClient<tonic::transport::Channel> {
-        /// Attempt to create a new client by connecting to a given endpoint.
-        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
-        where
-            D: TryInto<tonic::transport::Endpoint>,
-            D::Error: Into<StdError>,
-        {
-            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
-            Ok(Self::new(conn))
-        }
-    }
-    impl<T> ControlApiClient<T>
-    where
-        T: tonic::client::GrpcService<tonic::body::BoxBody>,
-        T::Error: Into<StdError>,
-        T::ResponseBody: Body<Data = Bytes> + std::marker::Send + 'static,
-        <T::ResponseBody as Body>::Error: Into<StdError> + std::marker::Send,
-    {
-        pub fn new(inner: T) -> Self {
-            let inner = tonic::client::Grpc::new(inner);
-            Self { inner }
-        }
-        pub fn with_origin(inner: T, origin: Uri) -> Self {
-            let inner = tonic::client::Grpc::with_origin(inner, origin);
-            Self { inner }
-        }
-        pub fn with_interceptor<F>(
-            inner: T,
-            interceptor: F,
-        ) -> ControlApiClient<InterceptedService<T, F>>
-        where
-            F: tonic::service::Interceptor,
-            T::ResponseBody: Default,
-            T: tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
-                Response = http::Response<
-                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
-                >,
-            >,
-            <T as tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + std::marker::Send + std::marker::Sync,
-        {
-            ControlApiClient::new(InterceptedService::new(inner, interceptor))
-        }
-        /// Compress requests with the given encoding.
-        ///
-        /// This requires the server to support it otherwise it might respond with an
-        /// error.
-        #[must_use]
-        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.inner = self.inner.send_compressed(encoding);
-            self
-        }
-        /// Enable decompressing responses.
-        #[must_use]
-        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.inner = self.inner.accept_compressed(encoding);
-            self
-        }
-        /// Limits the maximum size of a decoded message.
-        ///
-        /// Default: `4MB`
-        #[must_use]
-        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
-            self.inner = self.inner.max_decoding_message_size(limit);
-            self
-        }
-        /// Limits the maximum size of an encoded message.
-        ///
-        /// Default: `usize::MAX`
-        #[must_use]
-        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
-            self.inner = self.inner.max_encoding_message_size(limit);
-            self
-        }
-        /// Creates a new `Element` on the media server.
-        ///
-        /// Non-idempotent. Errors if an `Element` with such ID already exists.
-        pub async fn create(
-            &mut self,
-            request: impl tonic::IntoRequest<super::CreateRequest>,
-        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Create");
-            let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Create"));
-            self.inner.unary(req, path, codec).await
-        }
-        /// Removes `Element`s from the media server.
-        /// Allows referring multiple `Element`s on the last two levels of a FID.
-        ///
-        /// Idempotent. If no `Element`s with such FIDs exist, then succeeds.
-        pub async fn delete(
-            &mut self,
-            request: impl tonic::IntoRequest<super::IdRequest>,
-        ) -> std::result::Result<tonic::Response<super::Response>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Delete");
-            let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Delete"));
-            self.inner.unary(req, path, codec).await
-        }
-        /// Lookups `Element`s by their FIDs on the media server.
-        /// If no FIDs are specified, then returns all the current `Element`s on the
-        /// media server.
-        pub async fn get(
-            &mut self,
-            request: impl tonic::IntoRequest<super::IdRequest>,
-        ) -> std::result::Result<tonic::Response<super::GetResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Get");
-            let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Get"));
-            self.inner.unary(req, path, codec).await
-        }
-        /// Applies changes to an existing `Element` on the media server, or creates a
-        /// new one in case there is no `Element` with such ID.
-        ///
-        /// Idempotent. If no `Element` with such ID exists, then it will be created,
-        /// otherwise it will be reconfigured. `Element`s that exist on the same
-        /// hierarchy level, but are not specified in the provided spec, will be
-        /// removed.
-        pub async fn apply(
-            &mut self,
-            request: impl tonic::IntoRequest<super::ApplyRequest>,
-        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Apply");
-            let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Apply"));
-            self.inner.unary(req, path, codec).await
-        }
-        /// Checks healthiness of the media server.
-        /// Caller should assert that the returned `Pong` has the same nonce as the
-        /// sent `Ping`.
-        pub async fn healthz(
-            &mut self,
-            request: impl tonic::IntoRequest<super::Ping>,
-        ) -> std::result::Result<tonic::Response<super::Pong>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Healthz");
-            let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Healthz"));
-            self.inner.unary(req, path, codec).await
-        }
-    }
-}
 /// Generated server implementations.
 pub mod control_api_server {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    #![allow(
+        unused_variables,
+        dead_code,
+        missing_docs,
+        clippy::wildcard_imports,
+        clippy::let_unit_value,
+    )]
     use tonic::codegen::*;
     /// Generated trait containing gRPC methods that should be implemented for use with ControlApiServer.
     #[async_trait]
@@ -990,17 +792,19 @@ pub mod control_api_server {
                 }
                 _ => {
                     Box::pin(async move {
-                        Ok(
-                            http::Response::builder()
-                                .status(200)
-                                .header("grpc-status", tonic::Code::Unimplemented as i32)
-                                .header(
-                                    http::header::CONTENT_TYPE,
-                                    tonic::metadata::GRPC_CONTENT_TYPE,
-                                )
-                                .body(empty_body())
-                                .unwrap(),
-                        )
+                        let mut response = http::Response::new(empty_body());
+                        let headers = response.headers_mut();
+                        headers
+                            .insert(
+                                tonic::Status::GRPC_STATUS,
+                                (tonic::Code::Unimplemented as i32).into(),
+                            );
+                        headers
+                            .insert(
+                                http::header::CONTENT_TYPE,
+                                tonic::metadata::GRPC_CONTENT_TYPE,
+                            );
+                        Ok(response)
                     })
                 }
             }

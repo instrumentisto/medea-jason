@@ -217,6 +217,14 @@ impl Zeroize for CredentialString {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Credential(SecretBox<CredentialString>);
 
+impl Credential {
+    /// Provides access to the underlying secret [`str`].
+    #[must_use]
+    pub fn expose_str(&self) -> &str {
+        &self.0.expose_secret().0
+    }
+}
+
 impl<T> From<T> for Credential
 where
     CredentialString: From<T>,
@@ -228,7 +236,7 @@ where
 
 impl Hash for Credential {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.expose_secret().0.hash(state);
+        self.expose_str().hash(state);
     }
 }
 
@@ -238,7 +246,7 @@ impl SerializableSecret for Credential {}
 
 impl PartialEq for Credential {
     fn eq(&self, other: &Self) -> bool {
-        self.0.expose_secret().0.eq(&other.0.expose_secret().0)
+        self.expose_str().eq(other.expose_str())
     }
 }
 

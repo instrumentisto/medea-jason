@@ -157,7 +157,7 @@ impl Display for Sid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}/{}/{}", self.public_url, self.room_id, self.member_id)?;
         if let Some(plain) = &self.creds {
-            write!(f, "?token={}", plain.0.expose_secret())?;
+            write!(f, "?token={}", plain.expose_str())?;
         }
         Ok(())
     }
@@ -321,9 +321,16 @@ impl PartialOrd for PlainCredentials {
     }
 }
 
+impl PlainCredentials {
+    /// Provides access to the underlying secret [`str`].
+    pub fn expose_str(&self) -> &str {
+        &self.0.expose_secret().0
+    }
+}
+
 impl Ord for PlainCredentials {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.0.expose_secret().0.cmp(&other.0.expose_secret().0)
+        self.expose_str().cmp(other.expose_str())
     }
 }
 
@@ -338,13 +345,13 @@ where
 
 impl From<PlainCredentials> for String {
     fn from(value: PlainCredentials) -> Self {
-        value.0.expose_secret().0.to_string()
+        value.expose_str().to_string()
     }
 }
 
 impl Hash for PlainCredentials {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.expose_secret().0.hash(state)
+        self.expose_str().hash(state)
     }
 }
 
@@ -352,6 +359,6 @@ impl Eq for PlainCredentials {}
 
 impl PartialEq for PlainCredentials {
     fn eq(&self, other: &Self) -> bool {
-        self.0.expose_secret().0.eq(&other.0.expose_secret().0)
+        self.expose_str().eq(other.expose_str())
     }
 }
