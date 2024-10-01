@@ -10,10 +10,9 @@ use std::{
 
 use derive_more::{AsRef, Display, Error, From, FromStr, Into};
 use ref_cast::RefCast;
-use secrecy::{
-    zeroize::Zeroize, CloneableSecret, ExposeSecret, SecretBox,
-    SerializableSecret,
-};
+#[cfg(feature = "serde")]
+use secrecy::SerializableSecret;
+use secrecy::{zeroize::Zeroize, CloneableSecret, ExposeSecret, SecretBox};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use url::Url;

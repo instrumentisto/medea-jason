@@ -60,7 +60,10 @@ where
                         ice_servers.get(),
                         string_into_c_str(url),
                         srv.username.clone().into(),
-                        srv.credential.clone().into(),
+                        srv.credential
+                            .clone()
+                            .map(|s| s.expose_str().to_owned())
+                            .into(),
                     )
                 }
                 .unwrap();

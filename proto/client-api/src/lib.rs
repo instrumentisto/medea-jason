@@ -1036,7 +1036,7 @@ pub struct IceServer {
 
     /// Optional secret to authenticate on this [`IceServer`] with.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub credential: Option<String>,
+    pub credential: Option<Credential>,
 }
 
 /// Possible directions of a [`Track`].
