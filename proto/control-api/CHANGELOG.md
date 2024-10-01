@@ -6,6 +6,18 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.12.2] · 2024-??-?? (unreleased)
+[0.12.2]: /../../tree/medea-control-api-proto-0.12.2/proto/control-api
+
+### BC Breaks
+
+- Credentials now are hidden by `secrecy` crate ([#189]). 
+
+[#189]: /../../pull/189
+
+
+
+
 ## [0.12.1] · 2024-08-27
 [0.12.1]: /../../tree/medea-control-api-proto-0.12.1/proto/control-api
 

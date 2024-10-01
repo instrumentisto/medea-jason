@@ -6,6 +6,19 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.7.0] · 2024-??-?? (unreleased)
+[0.7.0]: /../../tree/medea-client-api-proto-0.7.0/proto/client-api
+
+### BC Breaks
+
+- The interior of `Credential` now is private ([#189]).
+- `IceServer::credential` now is `Credential` type instead of `String` ([#189]).
+
+[#189]: /../../pull/189
+
+
+
+
 ## [0.6.1] · 2024-08-27
 [0.6.1]: /../../tree/medea-client-api-proto-0.6.1/proto/client-api
 
