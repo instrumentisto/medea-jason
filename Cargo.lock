@@ -2084,6 +2084,7 @@ dependencies = [
  "async-trait",
  "derive_more 1.0.0",
  "medea-macro",
+ "secrecy",
  "serde",
  "serde_with",
 ]
@@ -2125,6 +2126,7 @@ dependencies = [
  "prost-types",
  "rand",
  "ref-cast",
+ "secrecy",
  "serde",
  "serde_yaml",
  "time",
@@ -2974,6 +2976,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.77",
+]
+
+[[package]]
+name = "secrecy"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba079fa568d52545cd70b334b2ce6f88f62b8fc2bda9290f48a0578388a49331"
+dependencies = [
+ "serde",
+ "zeroize",
 ]
 
 [[package]]

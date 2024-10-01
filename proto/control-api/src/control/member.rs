@@ -1,9 +1,19 @@
 //! [`Member`] definitions.
 
-use std::{collections::HashMap, fmt, time::Duration};
+use std::{
+    cmp::Ordering,
+    collections::HashMap,
+    fmt,
+    hash::{Hash, Hasher},
+    time::Duration,
+};
 
 use derive_more::{AsRef, Display, Error, From, FromStr, Into};
 use ref_cast::RefCast;
+use secrecy::{
+    zeroize::Zeroize, CloneableSecret, ExposeSecret, SecretBox,
+    SerializableSecret,
+};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use url::Url;
@@ -147,7 +157,7 @@ impl Display for Sid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}/{}/{}", self.public_url, self.room_id, self.member_id)?;
         if let Some(plain) = &self.creds {
-            write!(f, "?token={plain}")?;
+            write!(f, "?token={}", plain.0.expose_secret())?;
         }
         Ok(())
     }
@@ -277,22 +287,71 @@ impl Credentials {
     }
 }
 
-/// Plain [`Credentials`] returned in a [`Sid`].
-#[derive(
-    AsRef,
-    Clone,
-    Debug,
-    Display,
-    Eq,
-    From,
-    Hash,
-    Into,
-    Ord,
-    PartialEq,
-    PartialOrd,
-)]
+/// [`String`] wrapper used in [`PlainCredentials`] type.
+///
+/// It's required because of mandatory [`SerializableSecret`] trait impl.
+#[derive(Clone, Debug, Display)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-#[from(&str, String)]
-#[into(String)]
-pub struct PlainCredentials(Box<str>); // TODO: Use `secrecy` crate.
+pub struct CredentialString(String);
+
+#[cfg(feature = "serde")]
+impl SerializableSecret for CredentialString {}
+
+impl CloneableSecret for CredentialString {}
+
+impl Zeroize for CredentialString {
+    fn zeroize(&mut self) {
+        self.0.zeroize();
+    }
+}
+
+/// Plain [`Credentials`] returned in a [`Sid`].
+#[derive(AsRef, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub struct PlainCredentials(pub SecretBox<CredentialString>);
+
+impl PartialOrd for PlainCredentials {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.0
+            .expose_secret()
+            .0
+            .partial_cmp(&other.0.expose_secret().0)
+    }
+}
+
+impl Ord for PlainCredentials {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.0.expose_secret().0.cmp(&other.0.expose_secret().0)
+    }
+}
+
+impl<T> From<T> for PlainCredentials
+where
+    T: ToString,
+{
+    fn from(value: T) -> Self {
+        Self(SecretBox::init_with(|| CredentialString(value.to_string())))
+    }
+}
+
+impl From<PlainCredentials> for String {
+    fn from(value: PlainCredentials) -> Self {
+        value.0.expose_secret().0.to_string()
+    }
+}
+
+impl Hash for PlainCredentials {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.expose_secret().0.hash(state)
+    }
+}
+
+impl Eq for PlainCredentials {}
+
+impl PartialEq for PlainCredentials {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.expose_secret().0.eq(&other.0.expose_secret().0)
+    }
+}

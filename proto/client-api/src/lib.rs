@@ -153,10 +153,17 @@
 pub mod state;
 pub mod stats;
 
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    hash::{Hash, Hasher},
+};
 
 use derive_more::{Constructor, Display, From};
 use medea_macro::dispatchable;
+use secrecy::{
+    zeroize::Zeroize, CloneableSecret, ExposeSecret, SecretBox,
+    SerializableSecret,
+};
 use serde::{Deserialize, Serialize};
 
 use self::stats::RtcStat;
@@ -189,12 +196,51 @@ pub struct PeerId(pub u32);
 )]
 pub struct TrackId(pub u32);
 
-/// Credential used for a `Member` authentication.
-#[derive(
-    Clone, Debug, Deserialize, Display, Eq, From, Hash, PartialEq, Serialize,
-)]
+/// [`String`] wrapper used in [`Credential`] type.
+///
+/// It's required because of mandatory [`SerializableSecret`] trait impl.
+#[derive(Clone, Debug, Deserialize, Serialize, From)]
 #[from(forward)]
-pub struct Credential(pub String);
+struct CredentialString(String);
+
+impl SerializableSecret for CredentialString {}
+
+impl CloneableSecret for CredentialString {}
+
+impl Zeroize for CredentialString {
+    fn zeroize(&mut self) {
+        self.0.zeroize();
+    }
+}
+
+/// Credential used for a `Member` authentication.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Credential(SecretBox<CredentialString>);
+
+impl<T> From<T> for Credential
+where
+    CredentialString: From<T>,
+{
+    fn from(item: T) -> Self {
+        Self(SecretBox::init_with(|| CredentialString::from(item)))
+    }
+}
+
+impl Hash for Credential {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.expose_secret().0.hash(state);
+    }
+}
+
+impl Eq for Credential {}
+
+impl SerializableSecret for Credential {}
+
+impl PartialEq for Credential {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.expose_secret().0.eq(&other.0.expose_secret().0)
+    }
+}
 
 #[cfg(feature = "server")]
 /// Value that is able to be incremented by `1`.
