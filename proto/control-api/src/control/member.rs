@@ -314,15 +314,13 @@ pub struct PlainCredentials(SecretBox<CredentialString>);
 
 impl PartialOrd for PlainCredentials {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.0
-            .expose_secret()
-            .0
-            .partial_cmp(&other.0.expose_secret().0)
+        Some(self.cmp(other))
     }
 }
 
 impl PlainCredentials {
     /// Provides access to the underlying secret [`str`].
+    #[must_use]
     pub fn expose_str(&self) -> &str {
         &self.0.expose_secret().0
     }
@@ -345,13 +343,13 @@ where
 
 impl From<PlainCredentials> for String {
     fn from(value: PlainCredentials) -> Self {
-        value.expose_str().to_string()
+        value.expose_str().to_owned()
     }
 }
 
 impl Hash for PlainCredentials {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.expose_str().hash(state)
+        self.expose_str().hash(state);
     }
 }
 
