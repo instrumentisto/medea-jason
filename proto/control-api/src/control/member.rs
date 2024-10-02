@@ -288,7 +288,7 @@ impl Credentials {
 
 /// [`String`] wrapper used in [`PlainCredentials`] type.
 ///
-/// It's required because of mandatory [`SerializableSecret`] trait impl.
+/// It's required because of mandatory `SerializableSecret` marker trait.
 #[derive(Clone, Debug, Display)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
