@@ -346,6 +346,7 @@ jobs:
       - name: Setup Docker and Docker Compose
         run: |
           brew install colima docker docker-compose
+          colima delete
           colima start
         if: ${{ contains('ios macos', matrix.platform) }}
 
