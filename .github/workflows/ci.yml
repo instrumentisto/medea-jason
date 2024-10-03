@@ -347,7 +347,7 @@ jobs:
         run: |
           brew install colima docker docker-compose
           colima delete
-          colima start
+          colima start --arch x86_64 --cpu 6 --memory 4 --disk 128 --cpu-type qemu64 --verbose
         if: ${{ contains('ios macos', matrix.platform) }}
 
       - uses: subosito/flutter-action@v2
