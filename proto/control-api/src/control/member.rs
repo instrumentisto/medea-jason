@@ -154,6 +154,7 @@ pub struct Sid {
 
 impl Sid {
     /// Exposes [Sid] to connect to a media server with a credentials.
+    #[must_use]
     pub fn expose(&self) -> String {
         let mut sid = String::new();
         write!(
