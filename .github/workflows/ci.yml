@@ -346,7 +346,7 @@ jobs:
       - name: Setup Docker and Docker Compose
         run: |
           brew install colima docker docker-compose
-          colima start
+          colima start --cpu 1 --memory 1 --verbose
         if: ${{ contains('ios macos', matrix.platform) }}
 
       - uses: subosito/flutter-action@v2
