@@ -3,7 +3,7 @@
 use std::{
     cmp::Ordering,
     collections::HashMap,
-    fmt,
+    fmt::Write as _,
     hash::{Hash, Hasher},
     time::Duration,
 };
@@ -152,13 +152,21 @@ pub struct Sid {
     pub creds: Option<PlainCredentials>,
 }
 
-impl Display for Sid {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}/{}/{}", self.public_url, self.room_id, self.member_id)?;
+impl Sid {
+    /// Exposes [Sid] to connect to a media server with a credentials.
+    pub fn expose(&self) -> String {
+        let mut sid = String::new();
+        write!(
+            sid,
+            "{}/{}/{}",
+            self.public_url, self.room_id, self.member_id
+        )
+        .expect("write to `String` never fails");
         if let Some(plain) = &self.creds {
-            write!(f, "?token={}", plain.expose_str())?;
+            write!(sid, "?token={}", plain.expose_str())
+                .expect("write to `String` never fails");
         }
-        Ok(())
+        sid
     }
 }
 
