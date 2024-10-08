@@ -304,7 +304,7 @@ impl PlainCredentials {
     /// Provides access to the underlying secret [`str`].
     #[must_use]
     pub fn expose_str(&self) -> &str {
-        &self.0.expose_secret()
+        self.0.expose_secret()
     }
 }
 
