@@ -10,11 +10,9 @@ use std::{
 
 use derive_more::{AsRef, Display, Error, From, FromStr, Into};
 use ref_cast::RefCast;
+use secrecy::{ExposeSecret, SecretString};
 #[cfg(feature = "serde")]
-use secrecy::SerializableSecret;
-use secrecy::{zeroize::Zeroize, CloneableSecret, ExposeSecret, SecretBox};
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+use serde::{ser, Deserialize, Serialize};
 use url::Url;
 
 use super::{endpoint, room, Pipeline};
@@ -295,30 +293,11 @@ impl Credentials {
     }
 }
 
-/// [`String`] wrapper used in [`PlainCredentials`] type.
-///
-/// It's required because of mandatory `SerializableSecret` marker trait.
-#[derive(Clone, Debug, Display)]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", serde(transparent))]
-pub struct CredentialString(String);
-
-#[cfg(feature = "serde")]
-impl SerializableSecret for CredentialString {}
-
-impl CloneableSecret for CredentialString {}
-
-impl Zeroize for CredentialString {
-    fn zeroize(&mut self) {
-        self.0.zeroize();
-    }
-}
-
 /// Plain [`Credentials`] returned in a [`Sid`].
 #[derive(AsRef, Clone, Debug)]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", derive(Deserialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-pub struct PlainCredentials(SecretBox<CredentialString>);
+pub struct PlainCredentials(SecretString);
 
 impl PartialOrd for PlainCredentials {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -330,7 +309,7 @@ impl PlainCredentials {
     /// Provides access to the underlying secret [`str`].
     #[must_use]
     pub fn expose_str(&self) -> &str {
-        &self.0.expose_secret().0
+        &self.0.expose_secret()
     }
 }
 
@@ -345,7 +324,7 @@ where
     T: ToString,
 {
     fn from(value: T) -> Self {
-        Self(SecretBox::init_with(|| CredentialString(value.to_string())))
+        Self(SecretString::new(value.to_string().into_boxed_str()))
     }
 }
 
@@ -366,5 +345,15 @@ impl Eq for PlainCredentials {}
 impl PartialEq for PlainCredentials {
     fn eq(&self, other: &Self) -> bool {
         self.expose_str().eq(other.expose_str())
+    }
+}
+
+#[cfg(feature = "serde")]
+impl Serialize for PlainCredentials {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: ser::Serializer,
+    {
+        self.0.expose_secret().serialize(serializer)
     }
 }

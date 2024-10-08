@@ -160,11 +160,8 @@ use std::{
 
 use derive_more::{Constructor, Display, From};
 use medea_macro::dispatchable;
-use secrecy::{
-    zeroize::Zeroize, CloneableSecret, ExposeSecret, SecretBox,
-    SerializableSecret,
-};
-use serde::{Deserialize, Serialize};
+use secrecy::{ExposeSecret as _, SecretString};
+use serde::{ser, Deserialize, Serialize};
 
 use self::stats::RtcStat;
 
@@ -196,41 +193,33 @@ pub struct PeerId(pub u32);
 )]
 pub struct TrackId(pub u32);
 
-/// [`String`] wrapper used in [`Credential`] type.
-///
-/// It's required because of mandatory [`SerializableSecret`] trait impl.
-#[derive(Clone, Debug, Deserialize, Serialize, From)]
-#[from(forward)]
-struct CredentialString(String);
+/// Credential used for a `Member` authentication.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Credential(SecretString);
 
-impl SerializableSecret for CredentialString {}
-
-impl CloneableSecret for CredentialString {}
-
-impl Zeroize for CredentialString {
-    fn zeroize(&mut self) {
-        self.0.zeroize();
+impl Serialize for Credential {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: ser::Serializer,
+    {
+        self.0.expose_secret().serialize(serializer)
     }
 }
-
-/// Credential used for a `Member` authentication.
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Credential(SecretBox<CredentialString>);
 
 impl Credential {
     /// Provides access to the underlying secret [`str`].
     #[must_use]
     pub fn expose_str(&self) -> &str {
-        &self.0.expose_secret().0
+        self.0.expose_secret()
     }
 }
 
 impl<T> From<T> for Credential
 where
-    CredentialString: From<T>,
+    T: ToString,
 {
-    fn from(item: T) -> Self {
-        Self(SecretBox::init_with(|| CredentialString::from(item)))
+    fn from(value: T) -> Self {
+        Self(SecretString::new(value.to_string().into_boxed_str()))
     }
 }
 
@@ -241,8 +230,6 @@ impl Hash for Credential {
 }
 
 impl Eq for Credential {}
-
-impl SerializableSecret for Credential {}
 
 impl PartialEq for Credential {
     fn eq(&self, other: &Self) -> bool {
