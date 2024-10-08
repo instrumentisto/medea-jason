@@ -154,13 +154,8 @@ impl Sid {
     /// Exposes [Sid] to connect to a media server with a credentials.
     #[must_use]
     pub fn expose(&self) -> String {
-        let mut sid = String::new();
-        write!(
-            sid,
-            "{}/{}/{}",
-            self.public_url, self.room_id, self.member_id
-        )
-        .expect("write to `String` never fails");
+        let mut sid =
+            format!("{}/{}/{}", self.public_url, self.room_id, self.member_id);
         if let Some(plain) = &self.creds {
             write!(sid, "?token={}", plain.expose_str())
                 .expect("write to `String` never fails");
