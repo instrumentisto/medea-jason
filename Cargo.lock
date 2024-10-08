@@ -2087,6 +2087,7 @@ dependencies = [
  "secrecy",
  "serde",
  "serde_with",
+ "subtle",
 ]
 
 [[package]]
@@ -2129,6 +2130,7 @@ dependencies = [
  "secrecy",
  "serde",
  "serde_yaml",
+ "subtle",
  "time",
  "tonic",
  "tonic-build",

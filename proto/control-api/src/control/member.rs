@@ -339,7 +339,12 @@ impl Eq for PlainCredentials {}
 
 impl PartialEq for PlainCredentials {
     fn eq(&self, other: &Self) -> bool {
-        self.expose_str().eq(other.expose_str())
+        use subtle::ConstantTimeEq as _;
+
+        self.expose_str()
+            .as_bytes()
+            .ct_eq(other.expose_str().as_bytes())
+            .into()
     }
 }
 
