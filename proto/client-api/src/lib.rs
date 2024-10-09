@@ -161,7 +161,7 @@ use std::{
 use derive_more::{Constructor, Display, From};
 use medea_macro::dispatchable;
 use secrecy::{ExposeSecret as _, SecretString};
-use serde::{ser, Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 
 use self::stats::RtcStat;
 
@@ -200,7 +200,7 @@ pub struct Credential(SecretString);
 impl Serialize for Credential {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: ser::Serializer,
+        S: Serializer,
     {
         self.0.expose_secret().serialize(serializer)
     }
@@ -216,10 +216,10 @@ impl Credential {
 
 impl<T> From<T> for Credential
 where
-    T: ToString,
+    T: Into<String>,
 {
     fn from(value: T) -> Self {
-        Self(SecretString::new(value.to_string().into_boxed_str()))
+        Self(value.into().into())
     }
 }
 
@@ -243,7 +243,7 @@ impl PartialEq for Credential {
 }
 
 #[cfg(feature = "server")]
-/// Value that is able to be incremented by `1`.
+/// Value being able to be increment by `1`.
 pub trait Incrementable {
     /// Returns current value + 1.
     #[must_use]

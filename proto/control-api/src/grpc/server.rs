@@ -45,7 +45,7 @@ where
             Ok(sids) => control_proto::CreateResponse {
                 sid: sids
                     .into_iter()
-                    .map(|(id, sid)| (id.to_string(), sid.expose()))
+                    .map(|(id, sid)| (id.to_string(), sid.to_uri_string()))
                     .collect(),
                 error: None,
             },
@@ -129,7 +129,7 @@ where
             Ok(sids) => control_proto::CreateResponse {
                 sid: sids
                     .into_iter()
-                    .map(|(id, sid)| (id.to_string(), sid.expose()))
+                    .map(|(id, sid)| (id.to_string(), sid.to_uri_string()))
                     .collect(),
                 error: None,
             },

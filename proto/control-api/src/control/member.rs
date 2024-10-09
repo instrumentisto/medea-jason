@@ -1,7 +1,6 @@
 //! [`Member`] definitions.
 
 use std::{
-    cmp::Ordering,
     collections::HashMap,
     fmt::Write as _,
     hash::{Hash, Hasher},
@@ -10,9 +9,9 @@ use std::{
 
 use derive_more::{AsRef, Display, Error, From, FromStr, Into};
 use ref_cast::RefCast;
-use secrecy::{ExposeSecret, SecretString};
+use secrecy::{ExposeSecret as _, SecretString};
 #[cfg(feature = "serde")]
-use serde::{ser, Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 use url::Url;
 
 use super::{endpoint, room, Pipeline};
@@ -151,14 +150,18 @@ pub struct Sid {
 }
 
 impl Sid {
-    /// Exposes [Sid] to connect to a media server with a credentials.
+    /// Renders the [URI] string of this [`Sid`]
+    ///
+    /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
+    // TODO: Return `SecretString` once `secrecy` crate allows to unwrap it:
+    //       https://github.com/iqlusioninc/crates/issues/1182
     #[must_use]
-    pub fn expose(&self) -> String {
+    pub fn to_uri_string(&self) -> String {
         let mut sid =
             format!("{}/{}/{}", self.public_url, self.room_id, self.member_id);
         if let Some(plain) = &self.creds {
             write!(sid, "?token={}", plain.expose_str())
-                .expect("write to `String` never fails");
+                .expect("writing to `String` never fails");
         }
         sid
     }
@@ -294,12 +297,6 @@ impl Credentials {
 #[cfg_attr(feature = "serde", serde(transparent))]
 pub struct PlainCredentials(SecretString);
 
-impl PartialOrd for PlainCredentials {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
 impl PlainCredentials {
     /// Provides access to the underlying secret [`str`].
     #[must_use]
@@ -308,24 +305,12 @@ impl PlainCredentials {
     }
 }
 
-impl Ord for PlainCredentials {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.expose_str().cmp(other.expose_str())
-    }
-}
-
 impl<T> From<T> for PlainCredentials
 where
-    T: ToString,
+    T: Into<String>,
 {
     fn from(value: T) -> Self {
-        Self(SecretString::new(value.to_string().into_boxed_str()))
-    }
-}
-
-impl From<PlainCredentials> for String {
-    fn from(value: PlainCredentials) -> Self {
-        value.expose_str().to_owned()
+        Self(value.into().into())
     }
 }
 
@@ -352,7 +337,7 @@ impl PartialEq for PlainCredentials {
 impl Serialize for PlainCredentials {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: ser::Serializer,
+        S: Serializer,
     {
         self.0.expose_secret().serialize(serializer)
     }

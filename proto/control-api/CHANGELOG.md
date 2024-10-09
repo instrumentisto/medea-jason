@@ -11,7 +11,8 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Credentials now are hidden by `secrecy` crate ([#189]). 
+- Made `member::Sid::to_string()` inherent method instead of implementing `fmt::Display`. ([#189])
+- Removed `Ord` and `PartialOrd` implementations from `member::PlainCredentials`. ([#189]) 
 
 [#189]: /../../pull/189
 

@@ -11,8 +11,8 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- The interior of `Credential` now is private ([#189]).
-- `IceServer::credential` now is `Credential` type instead of `String` ([#189]).
+- Made interior of `Credential` private. ([#189])
+- Made `IceServer::credential` to `Credential` instead of `String`. ([#189])
 
 [#189]: /../../pull/189
 
