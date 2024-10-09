@@ -498,7 +498,7 @@ impl From<Credentials> for proto::member::Credentials {
     fn from(creds: Credentials) -> Self {
         match creds {
             Credentials::Hash(hash) => Self::Hash(hash.into()),
-            Credentials::Plain(plain) => Self::Plain(plain.into()),
+            Credentials::Plain(plain) => Self::Plain(plain.expose_str().into()),
         }
     }
 }

@@ -326,7 +326,7 @@ jobs:
           - android
           #- ios # TODO: Re-enable once fixed stability on CI
           - linux
-          - macos
+          #- macos # TODO: Re-enable once `colima start` failing fixed on CI
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}

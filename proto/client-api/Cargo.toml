@@ -1,6 +1,6 @@
 [package]
 name = "medea-client-api-proto"
-version = "0.6.1"
+version = "0.7.0-dev"
 edition = "2021"
 rust-version = "1.81"
 description = "Client API protocol implementation for Medea media server."
@@ -28,5 +28,7 @@ extended-stats = []
 async-trait = { version = "0.1.34", optional = true }
 derive_more = { version = "1.0", features = ["constructor", "display", "from"] }
 medea-macro = { version = "0.3", path = "../../crates/medea-macro" }
+secrecy = { version = "0.10", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_with = "3.0"
+subtle = "2.6"

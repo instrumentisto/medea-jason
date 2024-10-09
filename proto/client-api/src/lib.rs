@@ -153,11 +153,15 @@
 pub mod state;
 pub mod stats;
 
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    hash::{Hash, Hasher},
+};
 
 use derive_more::{Constructor, Display, From};
 use medea_macro::dispatchable;
-use serde::{Deserialize, Serialize};
+use secrecy::{ExposeSecret as _, SecretString};
+use serde::{Deserialize, Serialize, Serializer};
 
 use self::stats::RtcStat;
 
@@ -190,14 +194,56 @@ pub struct PeerId(pub u32);
 pub struct TrackId(pub u32);
 
 /// Credential used for a `Member` authentication.
-#[derive(
-    Clone, Debug, Deserialize, Display, Eq, From, Hash, PartialEq, Serialize,
-)]
-#[from(forward)]
-pub struct Credential(pub String);
+#[derive(Clone, Debug, Deserialize)]
+pub struct Credential(SecretString);
+
+impl Serialize for Credential {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.0.expose_secret().serialize(serializer)
+    }
+}
+
+impl Credential {
+    /// Provides access to the underlying secret [`str`].
+    #[must_use]
+    pub fn expose_str(&self) -> &str {
+        self.0.expose_secret()
+    }
+}
+
+impl<T> From<T> for Credential
+where
+    T: Into<String>,
+{
+    fn from(value: T) -> Self {
+        Self(value.into().into())
+    }
+}
+
+impl Hash for Credential {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.expose_str().hash(state);
+    }
+}
+
+impl Eq for Credential {}
+
+impl PartialEq for Credential {
+    fn eq(&self, other: &Self) -> bool {
+        use subtle::ConstantTimeEq as _;
+
+        self.expose_str()
+            .as_bytes()
+            .ct_eq(other.expose_str().as_bytes())
+            .into()
+    }
+}
 
 #[cfg(feature = "server")]
-/// Value that is able to be incremented by `1`.
+/// Value being able to be increment by `1`.
 pub trait Incrementable {
     /// Returns current value + 1.
     #[must_use]
@@ -982,7 +1028,7 @@ pub struct IceServer {
 
     /// Optional secret to authenticate on this [`IceServer`] with.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub credential: Option<String>,
+    pub credential: Option<Credential>,
 }
 
 /// Possible directions of a [`Track`].
