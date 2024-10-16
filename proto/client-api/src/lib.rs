@@ -160,7 +160,7 @@ use std::{
 
 use derive_more::{Constructor, Display, From, Into};
 use medea_macro::dispatchable;
-use rand::{distributions::Alphanumeric, Rng};
+use rand::{distributions::Alphanumeric, Rng as _};
 use secrecy::{ExposeSecret as _, SecretString};
 use serde::{Deserialize, Serialize, Serializer};
 
@@ -194,15 +194,13 @@ pub struct PeerId(pub u32);
 )]
 pub struct TrackId(pub u32);
 
-/// Secret used for a client authentication on [`IceServer`].
+/// Secret used for a client authentication on an [`IceServer`].
 #[derive(Clone, Debug, Deserialize, From, Into)]
 pub struct IcePassword(SecretString);
 
 impl IcePassword {
-    /// Length of an [`IcePassword`] on a managed embedded [TURN] server.
-    ///
-    /// [TURN]: https://github.com/webrtc-rs/webrtc/tree/master/turn
-    pub const LENGTH: usize = 16;
+    /// Length of a randomly generated [`IcePassword`].
+    const RANDOM_LENGTH: usize = 16;
 
     /// Provides access to the underlying secret [`str`].
     #[must_use]
@@ -210,13 +208,13 @@ impl IcePassword {
         self.0.expose_secret()
     }
 
-    /// Generates a new random [`IcePassword`] for a user.
+    /// Generates a new random [`IcePassword`].
     #[must_use]
-    pub fn generate() -> Self {
+    pub fn random() -> Self {
         Self(
             rand::thread_rng()
                 .sample_iter(&Alphanumeric)
-                .take(Self::LENGTH)
+                .take(Self::RANDOM_LENGTH)
                 .map(char::from)
                 .collect::<String>()
                 .into(),
