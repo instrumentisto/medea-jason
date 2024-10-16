@@ -40,7 +40,7 @@ All user visible changes to this project will be documented in this file. This p
 ## [0.6.0] · 2024-08-05
 [0.6.0]: /../../tree/medea-client-api-proto-0.6.0/proto/client-api
 
-## BC Breaks
+### BC Breaks
 
 - Added `PeerMetrics::PeerConnectionError` variant ([#151]).
 - Added `TrackPatchEvent::encoding_parameters` field ([#164]).
@@ -48,7 +48,7 @@ All user visible changes to this project will be documented in this file. This p
 - Fields of `RtcInboundRtpStreamMediaType`, `RtcOutboundRtpStreamMediaType` and `MediaKind` renamed in `camelCase` ([#173]).
 - Converted `frames_per_second` fields to `Float` instead of `u32`/`u64` ([#173]).
 
-## Added
+### Added
 
 - `PeerConnectionError` type ([#151]).
 - `IceCandidateError` type ([#151]).
