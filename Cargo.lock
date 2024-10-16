@@ -2084,6 +2084,7 @@ dependencies = [
  "async-trait",
  "derive_more 1.0.0",
  "medea-macro",
+ "rand",
  "secrecy",
  "serde",
  "serde_with",

@@ -158,8 +158,9 @@ use std::{
     hash::{Hash, Hasher},
 };
 
-use derive_more::{Constructor, Display, From};
+use derive_more::{Constructor, Display, From, Into};
 use medea_macro::dispatchable;
+use rand::{distributions::Alphanumeric, Rng as _};
 use secrecy::{ExposeSecret as _, SecretString};
 use serde::{Deserialize, Serialize, Serializer};
 
@@ -192,6 +193,55 @@ pub struct PeerId(pub u32);
     Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
 )]
 pub struct TrackId(pub u32);
+
+/// Secret used for a client authentication on an [`IceServer`].
+#[derive(Clone, Debug, Deserialize, From, Into)]
+pub struct IcePassword(SecretString);
+
+impl IcePassword {
+    /// Length of a randomly generated [`IcePassword`].
+    const RANDOM_LENGTH: usize = 16;
+
+    /// Provides access to the underlying secret [`str`].
+    #[must_use]
+    pub fn expose_str(&self) -> &str {
+        self.0.expose_secret()
+    }
+
+    /// Generates a new random [`IcePassword`].
+    #[must_use]
+    pub fn random() -> Self {
+        Self(
+            rand::thread_rng()
+                .sample_iter(&Alphanumeric)
+                .take(Self::RANDOM_LENGTH)
+                .map(char::from)
+                .collect::<String>()
+                .into(),
+        )
+    }
+}
+impl Serialize for IcePassword {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.0.expose_secret().serialize(serializer)
+    }
+}
+
+impl Eq for IcePassword {}
+
+impl PartialEq for IcePassword {
+    fn eq(&self, other: &Self) -> bool {
+        use subtle::ConstantTimeEq as _;
+
+        self.expose_str()
+            .as_bytes()
+            .ct_eq(other.expose_str().as_bytes())
+            .into()
+    }
+}
 
 /// Credential used for a `Member` authentication.
 #[derive(Clone, Debug, Deserialize)]
@@ -1028,7 +1078,7 @@ pub struct IceServer {
 
     /// Optional secret to authenticate on this [`IceServer`] with.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub credential: Option<Credential>,
+    pub credential: Option<IcePassword>,
 }
 
 /// Possible directions of a [`Track`].
