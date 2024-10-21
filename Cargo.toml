@@ -50,7 +50,7 @@ medea-client-api-proto = { version = "0.7.0-dev", path = "proto/client-api" }
 medea-macro = { version = "0.3", path = "crates/medea-macro" }
 medea-reactive = { version = "0.1", path = "crates/medea-reactive" }
 mockall = { version = "0.13", optional = true }
-sealed = "0.5"
+sealed = "0.6"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tracerr = "0.3"

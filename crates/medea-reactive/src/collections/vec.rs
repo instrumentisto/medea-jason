@@ -11,9 +11,10 @@ use crate::subscribers_store::{
 };
 
 /// Reactive vector based on [`Vec`] with additional functionality of tracking
-/// progress made by its subscribers. Its [`Vec::on_push()`] and
-/// [`Vec::on_remove()`] subscriptions return values wrapped in a
-/// [`progressable::Guarded`], and the implementation tracks all
+/// progress made by its subscribers.
+///
+/// Its [`Vec::on_push()`] and [`Vec::on_remove()`] subscriptions return values
+/// wrapped in a [`progressable::Guarded`], and the implementation tracks all
 /// [`progressable::Guard`]s.
 pub type ProgressableVec<T> =
     Vec<T, progressable::SubStore<T>, progressable::Guarded<T>>;

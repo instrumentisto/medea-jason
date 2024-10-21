@@ -903,11 +903,13 @@ pub struct RtcIceCandidatePairStats {
     pub available_outgoing_bitrate: Option<u64>,
 }
 
-/// Each candidate pair in the check list has a foundation and a state.
-/// The foundation is the combination of the foundations of the local and
-/// remote candidates in the pair.  The state is assigned once the check
-/// list for each media stream has been computed.  There are five
-/// potential values that the state can have.
+/// Possible states of a candidate pair.
+///
+/// > Each candidate pair in the check list has a foundation and a state.
+/// > The foundation is the combination of the foundations of the local and
+/// > remote candidates in the pair.  The state is assigned once the check
+/// > list for each media stream has been computed.  There are five
+/// > potential values that the state can have.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum KnownIceCandidatePairState {
@@ -1423,9 +1425,11 @@ pub enum MediaKind {
 }
 
 /// Statistics for the media produced by a [MediaStreamTrack][1] that is
-/// currently attached to an [RTCRtpSender]. This reflects the media that is fed
-/// to the encoder after [getUserMedia] constraints have been applied (i.e. not
-/// the raw media produced by the camera).
+/// currently attached to an [RTCRtpSender].
+///
+/// This reflects the media that is fed to the encoder after [getUserMedia]
+/// constraints have been applied (i.e. not the raw media produced by the
+/// camera).
 ///
 /// [`RtcStatsType::MediaSource`] variant.
 ///

@@ -191,8 +191,7 @@ impl ModExpander {
                 format!("Cannot read `CARGO_MANIFEST_DIR` env var: {e}"),
             )
         })?;
-        let mut path = PathBuf::from(root_path);
-        path.push(get_path_arg(relative_path)?);
+        let path = PathBuf::from(root_path).join(get_path_arg(relative_path)?);
 
         let mut file = File::create(path).map_err(|e| {
             syn::Error::new(
