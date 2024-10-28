@@ -31,10 +31,10 @@ ANDROID_TARGETS := aarch64-linux-android \
                    x86_64-linux-android
 ANDROID_SDK_COMPILE_VERSION = $(strip \
 	$(shell grep compileSdk flutter/android/build.gradle \
-	        | awk '{print $$2}'))
+	        | awk -F'= ' '{print $$2}' | tr -d ' '))
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdk flutter/android/build.gradle \
-	        | awk '{print $$2}'))
+	        | awk -F'= ' '{print $$2}' | tr -d ' '))
 FLUTTER_RUST_BRIDGE_VER ?= $(strip \
 	$(shell grep -A1 'name = "flutter_rust_bridge"' Cargo.lock \
 	        | grep -v 'flutter_rust_bridge' \
