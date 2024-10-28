@@ -359,6 +359,13 @@ jobs:
                        ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin  # Temurin is cached on GitHub Actions Runners.
+          java-version: 17
+          cache: gradle
+        if: ${{ matrix.platform == 'android' }}
+
       - name: Parse Android API versions
         id: api-version
         run: |
@@ -485,7 +492,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin  # Temurin is cached on GitHub Actions Runners.
-          java-version: 21
+          java-version: 17
           cache: gradle
         if: ${{ matrix.platform == 'android' }}
 
