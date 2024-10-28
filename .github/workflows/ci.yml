@@ -537,14 +537,14 @@ jobs:
           >> $GITHUB_OUTPUT
         if: ${{ matrix.platform == 'android' }}
 
-#      - name: Test on min Android API version
-#        uses: reactivecircus/android-emulator-runner@v2
-#        with:
-#          api-level: ${{ steps.api-version.outputs.min }}
-#          arch: x86_64
-#          profile: pixel_2
-#          script: make test.flutter
-#        if: ${{ matrix.platform == 'android' }}
+      - name: Test on min Android API version
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.min }}
+          arch: x86_64
+          profile: pixel_2
+          script: make test.flutter
+        if: ${{ matrix.platform == 'android' }}
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
