@@ -359,6 +359,13 @@ jobs:
                        ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin  # Temurin is cached on GitHub Actions Runners.
+          java-version: 17
+          cache: gradle
+        if: ${{ matrix.platform == 'android' }}
+
       - name: Parse Android API versions
         id: api-version
         run: |
@@ -480,6 +487,13 @@ jobs:
           android: false
           swap-storage: false
           tool-cache: false
+        if: ${{ matrix.platform == 'android' }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin  # Temurin is cached on GitHub Actions Runners.
+          java-version: 17
+          cache: gradle
         if: ${{ matrix.platform == 'android' }}
 
       - name: Enable KVM for Android HW acceleration
