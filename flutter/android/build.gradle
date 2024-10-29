@@ -47,4 +47,3 @@ android {
         minSdk = 24
     }
 }
-

@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.7.0] · 2024-??-?? (unreleased)
+## [0.7.0] · 2024-10-29
 [0.7.0]: /../../tree/medea-client-api-proto-0.7.0/proto/client-api
 
 ### BC Breaks
@@ -16,7 +16,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- `IcePassword` type ([#190]).
+- `IcePassword` type. ([#190])
 
 [#189]: /../../pull/189
 [#190]: /../../pull/190
