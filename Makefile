@@ -282,7 +282,7 @@ endif
 else
 ifeq ($(cargo-build-platform),web)
 ifeq ($(pre-install),yes)
-	curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+	cargo install wasm-pack
 endif
 	@rm -rf ./pkg/
 	wasm-pack build -t web ./ $(if $(call eq,$(debug),no),,--dev) $(args)
