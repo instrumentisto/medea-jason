@@ -21,6 +21,7 @@
     clippy::redundant_else,
     clippy::significant_drop_tightening,
     clippy::undocumented_unsafe_blocks,
+    clippy::unused_trait_names,
     clippy::use_self,
     clippy::wildcard_imports,
     clippy::unreadable_literal,
@@ -380,6 +381,8 @@ pub fn on_panic(cb: DartOpaque) {
 #[frb(sync)]
 #[must_use]
 pub fn set_dart_opaque_message_port(dart_handler_port: i64) {
+    // TODO: Refactor to get rid of `static mut`.
+    #[expect(static_mut_refs, reason = "needs refactoring")]
     unsafe {
         DART_HANDLER_PORT.replace(dart_handler_port);
     }

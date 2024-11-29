@@ -7,7 +7,7 @@ use std::rc::Rc;
 use js_sys::{Array as JsArray, JSON};
 use medea_client_api_proto::stats::{RtcStat, RtcStatsType};
 use tracerr::Traced;
-use wasm_bindgen::{prelude::*, JsCast};
+use wasm_bindgen::{JsCast as _, JsValue, UnwrapThrowExt as _};
 use web_sys::RtcStatsReport;
 
 use crate::platform::{self, RtcStatsError};

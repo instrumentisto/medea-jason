@@ -1017,7 +1017,10 @@ impl AudioTrackConstraints {
     ) -> bool {
         let track = track.as_ref();
         satisfies_track(track, MediaKind::Audio).await
-            && ConstrainString::satisfies(&self.device_id, &track.device_id())
+            && ConstrainString::satisfies(
+                self.device_id.as_ref(),
+                track.device_id().as_ref(),
+            )
         // TODO returns Result<bool, Error>
     }
 
@@ -1132,12 +1135,12 @@ pub enum ConstrainBoolean {
 impl<T: AsRef<str>> ConstrainString<T> {
     /// Checks whether `this` [`ConstrainString`] is satisfied with the given
     /// `setting`.
-    fn satisfies(this: &Option<Self>, setting: &Option<T>) -> bool {
+    fn satisfies(this: Option<&Self>, setting: Option<&T>) -> bool {
         match this {
-            None | Some(Self::Ideal(_)) => true,
-            Some(Self::Exact(constrain)) => setting
-                .as_ref()
-                .map_or(false, |val| val.as_ref() == constrain.as_ref()),
+            None | Some(Self::Ideal(..)) => true,
+            Some(Self::Exact(constrain)) => {
+                setting.map_or(false, |val| val.as_ref() == constrain.as_ref())
+            }
         }
     }
 }
@@ -1246,10 +1249,13 @@ impl DeviceVideoTrackConstraints {
     ) -> bool {
         let track = track.as_ref();
         satisfies_track(track, MediaKind::Video).await
-            && ConstrainString::satisfies(&self.device_id, &track.device_id())
             && ConstrainString::satisfies(
-                &self.facing_mode,
-                &track.facing_mode(),
+                self.device_id.as_ref(),
+                track.device_id().as_ref(),
+            )
+            && ConstrainString::satisfies(
+                self.facing_mode.as_ref(),
+                track.facing_mode().as_ref(),
             )
             && ConstrainU32::satisfies(self.height, track.height())
             && ConstrainU32::satisfies(self.width, track.width())
@@ -1331,15 +1337,18 @@ impl DisplayVideoTrackConstraints {
     ) -> bool {
         let track = track.as_ref();
         satisfies_track(track, MediaKind::Video).await
-            && ConstrainString::satisfies(&self.device_id, &track.device_id())
+            && ConstrainString::satisfies(
+                self.device_id.as_ref(),
+                track.device_id().as_ref(),
+            )
             && ConstrainU32::satisfies(self.height, track.height())
             && ConstrainU32::satisfies(self.width, track.width())
             && track.guess_is_from_display()
     }
 
     /// Merges these [`DisplayVideoTrackConstraints`] with `another` ones,
-    /// meaning that if some constraints are not set on these ones, then they
-    /// will be applied from `another`.
+    /// meaning that if some constraints are not set on these, then they will be
+    /// applied from `another`.
     pub fn merge(&mut self, another: Self) {
         if self.device_id.is_none() && another.device_id.is_some() {
             self.device_id = another.device_id;

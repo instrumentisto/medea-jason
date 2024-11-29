@@ -21,8 +21,9 @@ use crate::{
     api,
     media::{track::remote, MediaKind, MediaSourceKind, RecvConstraints},
     peer::{
-        media_exchange_state, receiver, MediaState, MediaStateControllable,
-        ProhibitedStateError, TransceiverSide,
+        media_exchange_state, receiver, MediaState,
+        MediaStateControllable as _, ProhibitedStateError,
+        TransceiverSide as _,
     },
     platform,
     utils::{Caused, TaskHandle},

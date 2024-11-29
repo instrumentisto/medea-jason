@@ -15,7 +15,7 @@ use futures::{
     channel::mpsc,
     future::{self, LocalBoxFuture},
     stream::LocalBoxStream,
-    StreamExt,
+    StreamExt as _,
 };
 use medea_client_api_proto::{Command, Event, MemberId, RoomId};
 use medea_reactive::ObservableCell;

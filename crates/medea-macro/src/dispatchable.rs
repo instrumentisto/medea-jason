@@ -1,9 +1,9 @@
 //! `#[dispatchable]` macro implementation.
 
-use inflector::Inflector;
+use inflector::Inflector as _;
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2, TokenTree};
-use quote::{quote, ToTokens};
+use quote::{quote, ToTokens as _};
 use syn::{
     parse::{Parse, ParseStream, Result},
     parse_quote, token, FnArg, ItemEnum, Pat, PatIdent, Token,

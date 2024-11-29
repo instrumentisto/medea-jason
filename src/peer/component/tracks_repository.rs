@@ -11,7 +11,7 @@ use std::{
 use derive_more::From;
 use futures::{
     future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
-    TryFutureExt,
+    TryFutureExt as _,
 };
 use medea_client_api_proto::TrackId;
 use medea_reactive::{AllProcessed, Guarded, ProgressableHashMap};

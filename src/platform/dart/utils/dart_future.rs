@@ -217,7 +217,7 @@ pub mod tests {
         },
     };
 
-    use super::{DartFuture, IntoDartFuture};
+    use super::{DartFuture, IntoDartFuture as _};
 
     #[no_mangle]
     pub unsafe extern "C" fn test__future_from_dart__int(

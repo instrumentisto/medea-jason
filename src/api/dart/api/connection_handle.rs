@@ -8,7 +8,7 @@ use crate::{
     api::{dart::api::ForeignClass, Error as DartError},
     connection as core,
     media::MediaSourceKind,
-    platform::{self, utils::dart_future::IntoDartFuture},
+    platform::{self, utils::dart_future::IntoDartFuture as _},
 };
 #[cfg(doc)]
 use crate::{connection::Connection, media::track::remote};

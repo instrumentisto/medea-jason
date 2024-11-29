@@ -14,7 +14,7 @@ use crate::{
     peer::{self, RtcPeerConnectionError},
     platform,
     utils::{
-        component, AsProtoState, SynchronizableState, TaskHandle,
+        component, AsProtoState, SynchronizableState as _, TaskHandle,
         Updatable as _,
     },
 };

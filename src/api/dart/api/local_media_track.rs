@@ -12,7 +12,7 @@ use crate::media::track::local;
 use crate::{
     api::{api::DART_HANDLER_PORT, dart::api::ForeignClass, Error},
     media::{track::local as core, MediaKind, MediaSourceKind},
-    platform::{self, utils::dart_future::IntoDartFuture},
+    platform::{self, utils::dart_future::IntoDartFuture as _},
 };
 
 /// Strongly referenced [`local::Track`] received from a

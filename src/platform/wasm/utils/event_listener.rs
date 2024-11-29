@@ -4,7 +4,7 @@ use std::{ops::Deref, rc::Rc};
 
 use derive_more::{Display, From};
 use tracerr::Traced;
-use wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast};
+use wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast as _};
 
 use crate::{platform, utils::Caused};
 

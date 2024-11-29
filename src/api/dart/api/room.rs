@@ -7,7 +7,7 @@ use tracerr::Traced;
 use crate::{
     api::{api::ApiMediaStreamSettings, Error as DartError},
     media::MediaSourceKind,
-    platform::{self, utils::dart_future::IntoDartFuture},
+    platform::{self, utils::dart_future::IntoDartFuture as _},
     room as core,
 };
 #[cfg(doc)]

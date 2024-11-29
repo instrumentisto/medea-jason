@@ -66,6 +66,8 @@ pub unsafe extern "C" fn init_jason_dart_api_dl(data: *mut c_void) -> isize {
 /// Dart's functions.
 pub fn set_panic_hook() {
     panic::set_hook(Box::new(|bt| {
+        // TODO: Refactor to get rid of `static mut`.
+        #[expect(static_mut_refs, reason = "needs refactoring")]
         if let Some(f) = unsafe { PANIC_FN.as_ref() } {
             f.call1(format!("{bt}"));
         }

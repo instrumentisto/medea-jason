@@ -2,7 +2,7 @@
 
 use std::fmt::{self, Write};
 
-use inflector::Inflector;
+use inflector::Inflector as _;
 use syn::spanned::Spanned as _;
 
 /// Types that can be passed through FFI.

@@ -5,7 +5,7 @@ use std::{cell::RefCell, future::Future, rc::Rc, time::Duration};
 use futures::{
     channel::oneshot,
     future,
-    future::{AbortHandle, FutureExt},
+    future::{AbortHandle, FutureExt as _},
 };
 
 use crate::platform;

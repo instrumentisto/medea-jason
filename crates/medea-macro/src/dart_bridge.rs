@@ -3,7 +3,7 @@
 #[cfg(feature = "dart-codegen")]
 use std::{env, fs::File, io::Write as _, path::PathBuf};
 
-use inflector::Inflector;
+use inflector::Inflector as _;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::{parse_quote, punctuated::Punctuated, spanned::Spanned as _, token};
