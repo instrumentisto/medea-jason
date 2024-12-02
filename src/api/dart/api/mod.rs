@@ -41,9 +41,11 @@ pub mod remote_media_track;
 pub mod room;
 pub mod room_close_reason;
 
-use std::ptr;
-
 use flutter_rust_bridge::{frb, DartOpaque};
+use std::{
+    ptr,
+    sync::atomic::{AtomicI64, Ordering},
+};
 
 use crate::{
     media::{
@@ -64,7 +66,7 @@ pub use self::{
 };
 
 /// Used to create [`DartOpaque`]s on the Rust side.
-pub static mut DART_HANDLER_PORT: Option<i64> = None;
+static DART_HANDLER_PORT: AtomicI64 = AtomicI64::new(0);
 
 /// Rust structure having wrapper class in Dart.
 ///
@@ -381,9 +383,16 @@ pub fn on_panic(cb: DartOpaque) {
 #[frb(sync)]
 #[must_use]
 pub fn set_dart_opaque_message_port(dart_handler_port: i64) {
-    // TODO: Refactor to get rid of `static mut`.
-    #[expect(static_mut_refs, reason = "needs refactoring")]
-    unsafe {
-        DART_HANDLER_PORT.replace(dart_handler_port);
-    }
+    DART_HANDLER_PORT.store(dart_handler_port, Ordering::Relaxed);
+}
+
+/// Returns Dart handler port (if set any).
+///
+/// # Panics
+///
+/// When Dart handler port is not set (equals 0).
+pub fn get_dart_handler_port() -> i64 {
+    let port = DART_HANDLER_PORT.load(Ordering::Relaxed);
+    assert_ne!(port, 0);
+    port
 }
