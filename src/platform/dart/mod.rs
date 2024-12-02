@@ -30,9 +30,8 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::panic;
-
 use libc::c_void;
+use std::{panic, sync::atomic::AtomicBool};
 
 use crate::platform::utils::dart_api;
 
@@ -87,15 +86,20 @@ pub fn set_panic_callback(cb: Function<String>) {
     }
 }
 
+/// Atomic flag which indicates that Android logger is initialized.
+#[cfg(target_os = "android")]
+static IS_ANDROID_LOGGER_INITED: AtomicBool = AtomicBool::new(false);
+
 #[cfg(target_os = "android")]
 /// Initializes [`android_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
-    // TODO: `android_logger::init_once()` should be called only once.
-    android_logger::init_once(
-        android_logger::Config::default()
-            .with_max_level(log::LevelFilter::Debug),
-    );
+    if !IS_ANDROID_LOGGER_INITED.fetch_or(true, Ordering::SeqCst) {
+        android_logger::init_once(
+            android_logger::Config::default()
+                .with_max_level(log::LevelFilter::Debug),
+        );
+    }
 }
 
 #[cfg(any(
