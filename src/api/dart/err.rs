@@ -135,11 +135,9 @@ impl DartError {
     }
 }
 
-#[expect(clippy::fallible_impl_from, reason = "FFI error is unexpected")]
 impl From<DartError> for DartOpaque {
     fn from(val: DartError) -> Self {
         let boxed = unsafe { Box::from_raw(val.0.as_ptr()) };
-        #[expect(clippy::unwrap_used, reason = "FFI error is unexpected")]
         Self::new((*boxed).cast(), get_dart_handler_port())
     }
 }

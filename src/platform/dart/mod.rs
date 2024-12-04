@@ -31,7 +31,9 @@ pub mod transport;
 pub mod utils;
 
 use libc::c_void;
-use std::{panic, sync::atomic::AtomicBool};
+use std::panic;
+#[cfg(target_os = "android")]
+use std::sync::atomic::AtomicBool;
 
 use crate::platform::utils::dart_api;
 

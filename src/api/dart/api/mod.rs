@@ -393,6 +393,6 @@ pub fn set_dart_opaque_message_port(dart_handler_port: i64) {
 /// When Dart handler port is not set (equals 0).
 pub fn get_dart_handler_port() -> i64 {
     let port = DART_HANDLER_PORT.load(Ordering::Relaxed);
-    assert_ne!(port, 0);
+    assert_ne!(port, 0, "DART_HANDLER_PORT is not set");
     port
 }
