@@ -209,6 +209,7 @@ pub mod tests {
     #![expect(clippy::missing_safety_doc, reason = "for testing only")]
 
     use dart_sys::Dart_Handle;
+    use std::cell::{Cell, RefCell};
 
     use crate::{
         api::err::FormatException,
@@ -250,16 +251,17 @@ pub mod tests {
 
     type TestFutureHandleFunction = extern "C" fn(Dart_Handle);
 
-    static mut TEST_FUTURE_HANDLE_FUNCTION: Option<TestFutureHandleFunction> =
-        None;
+    thread_local! {
+        static TEST_FUTURE_HANDLE_FUNCTION: RefCell<
+            Option<TestFutureHandleFunction>
+        > = RefCell::default();
+    }
 
     #[no_mangle]
     pub unsafe extern "C" fn register__test__future_from_dart_handle_fn(
         f: TestFutureHandleFunction,
     ) {
-        unsafe {
-            TEST_FUTURE_HANDLE_FUNCTION = Some(f);
-        }
+        *TEST_FUTURE_HANDLE_FUNCTION.set(Some(f));
     }
 
     #[no_mangle]
@@ -272,7 +274,11 @@ pub mod tests {
                 unsafe { FutureFromDart::execute::<DartHandle>(future.get()) }
                     .await
                     .unwrap();
-            (unsafe { TEST_FUTURE_HANDLE_FUNCTION.unwrap() })(val.get());
+            TEST_FUTURE_HANDLE_FUNCTION.with_borrow(|f| {
+                (f.expect("TEST_FUTURE_HANDLE_FUNCTION must be initialized"))(
+                    val.get(),
+                );
+            });
             Ok(())
         }
         .into_dart_future()

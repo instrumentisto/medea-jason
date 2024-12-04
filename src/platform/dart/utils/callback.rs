@@ -221,6 +221,7 @@ pub mod tests {
     #![expect(clippy::missing_safety_doc, reason = "only for testing")]
 
     use dart_sys::Dart_Handle;
+    use std::cell::{Cell, RefCell};
 
     use crate::api::DartValueArg;
 
@@ -272,24 +273,28 @@ pub mod tests {
 
     type TestCallbackHandleFunction = extern "C" fn(Dart_Handle);
 
-    static mut TEST_CALLBACK_HANDLE_FUNCTION: Option<
-        TestCallbackHandleFunction,
-    > = None;
+    thread_local! {
+        static TEST_CALLBACK_HANDLE_FUNCTION: RefCell<Option<
+            TestCallbackHandleFunction,
+        >> = RefCell::default();
+    }
 
     #[no_mangle]
     pub unsafe extern "C" fn register__test__test_callback_handle_function(
         f: TestCallbackHandleFunction,
     ) {
-        unsafe {
-            TEST_CALLBACK_HANDLE_FUNCTION = Some(f);
-        }
+        TEST_CALLBACK_HANDLE_FUNCTION.set(Some(f));
     }
 
     #[no_mangle]
     pub unsafe extern "C" fn test_callback_listener_dart_handle() -> Dart_Handle
     {
         Callback::from_once(move |val: Dart_Handle| {
-            (unsafe { TEST_CALLBACK_HANDLE_FUNCTION.unwrap() })(val);
+            TEST_CALLBACK_HANDLE_FUNCTION.with_borrow(|f| {
+                (f.expect("TEST_CALLBACK_HANDLE_FUNCTION must be initialized"))(
+                    val,
+                );
+            })
         })
         .into_dart()
     }
