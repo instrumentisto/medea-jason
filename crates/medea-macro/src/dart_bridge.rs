@@ -12,6 +12,7 @@ use syn::{parse_quote, punctuated::Punctuated, spanned::Spanned as _, token};
 use crate::dart_codegen::{DartCodegen, FnRegistrationBuilder};
 
 /// Expands `#[dart_bridge]` attribute placed on a Rust module declaration.
+// TODO: Refactor to get rid of `static mut` in this macro.
 pub(crate) fn expand(
     args: TokenStream,
     input: TokenStream,
