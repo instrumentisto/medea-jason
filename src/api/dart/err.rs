@@ -9,7 +9,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{
-        api::get_dart_handler_port,
+        api::DART_HANDLER_PORT,
         box_dart_handle,
         err::{
             EnumerateDevicesException, FormatException, InternalException,
@@ -135,10 +135,12 @@ impl DartError {
     }
 }
 
+#[expect(clippy::fallible_impl_from, reason = "FFI error is unexpected")]
 impl From<DartError> for DartOpaque {
     fn from(val: DartError) -> Self {
         let boxed = unsafe { Box::from_raw(val.0.as_ptr()) };
-        Self::new((*boxed).cast(), get_dart_handler_port())
+        #[expect(clippy::unwrap_used, reason = "FFI error is unexpected")]
+        Self::new((*boxed).cast(), DART_HANDLER_PORT.get().unwrap())
     }
 }
 

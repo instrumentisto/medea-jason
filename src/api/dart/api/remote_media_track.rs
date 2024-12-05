@@ -6,9 +6,7 @@ use flutter_rust_bridge::{frb, DartOpaque};
 use send_wrapper::SendWrapper;
 
 use crate::{
-    api::{
-        api::get_dart_handler_port, dart::api::ForeignClass, MediaDirection,
-    },
+    api::{api::DART_HANDLER_PORT, dart::api::ForeignClass, MediaDirection},
     media::{track::remote as core, MediaKind, MediaSourceKind},
     platform,
 };
@@ -38,7 +36,7 @@ impl RemoteMediaTrack {
     pub fn get_track(&self) -> DartOpaque {
         DartOpaque::new(
             self.0.get_track().handle() as _,
-            get_dart_handler_port(),
+            DART_HANDLER_PORT.get().unwrap(),
         )
     }
 

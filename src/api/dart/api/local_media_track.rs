@@ -10,7 +10,7 @@ use send_wrapper::SendWrapper;
 #[cfg(doc)]
 use crate::media::track::local;
 use crate::{
-    api::{api::get_dart_handler_port, dart::api::ForeignClass, Error},
+    api::{api::DART_HANDLER_PORT, dart::api::ForeignClass, Error},
     media::{track::local as core, MediaKind, MediaSourceKind},
     platform::{self, utils::dart_future::IntoDartFuture as _},
 };
@@ -42,7 +42,7 @@ impl LocalMediaTrack {
     pub fn get_track(&self) -> DartOpaque {
         DartOpaque::new(
             self.0.get_track().handle() as _,
-            get_dart_handler_port(),
+            DART_HANDLER_PORT.get().unwrap(),
         )
     }
 
