@@ -221,7 +221,7 @@ pub mod tests {
     #![expect(clippy::missing_safety_doc, reason = "only for testing")]
 
     use dart_sys::Dart_Handle;
-    use std::cell::{Cell, RefCell};
+    use std::cell::RefCell;
 
     use crate::api::DartValueArg;
 
@@ -286,6 +286,7 @@ pub mod tests {
         TEST_CALLBACK_HANDLE_FUNCTION.set(Some(f));
     }
 
+    #[expect(clippy::expect_used, reason = "intended behavior")]
     #[no_mangle]
     pub unsafe extern "C" fn test_callback_listener_dart_handle() -> Dart_Handle
     {
@@ -294,7 +295,7 @@ pub mod tests {
                 (f.expect("TEST_CALLBACK_HANDLE_FUNCTION must be initialized"))(
                     val,
                 );
-            })
+            });
         })
         .into_dart()
     }

@@ -209,7 +209,7 @@ pub mod tests {
     #![expect(clippy::missing_safety_doc, reason = "for testing only")]
 
     use dart_sys::Dart_Handle;
-    use std::cell::{Cell, RefCell};
+    use std::cell::RefCell;
 
     use crate::{
         api::err::FormatException,
@@ -261,9 +261,10 @@ pub mod tests {
     pub unsafe extern "C" fn register__test__future_from_dart_handle_fn(
         f: TestFutureHandleFunction,
     ) {
-        *TEST_FUTURE_HANDLE_FUNCTION.set(Some(f));
+        TEST_FUTURE_HANDLE_FUNCTION.set(Some(f));
     }
 
+    #[expect(clippy::expect_used, reason = "intended behavior")]
     #[no_mangle]
     pub unsafe extern "C" fn test__future_from_dart__handle(
         future: Dart_Handle,
