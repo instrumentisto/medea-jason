@@ -116,8 +116,9 @@ pub fn init_logger() {
 /// Initializes [`simple_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
-    // TODO: Should be called only once.
-    _ = simple_logger::SimpleLogger::new()
-        .with_level(log::LevelFilter::Debug)
-        .init();
+    if !IS_LOGGER_INITIALIZED.replace(true) {
+        _ = simple_logger::SimpleLogger::new()
+            .with_level(log::LevelFilter::Debug)
+            .init();
+    }
 }
