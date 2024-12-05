@@ -30,11 +30,13 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use crate::platform::utils::dart_api;
-use libc::c_void;
 #[cfg(target_os = "android")]
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::{cell::RefCell, panic};
+
+use libc::c_void;
+
+use crate::platform::utils::dart_api;
 
 pub use self::{
     codec_capability::CodecCapability,
