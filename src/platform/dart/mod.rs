@@ -30,9 +30,10 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-#[cfg(target_os = "android")]
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::{cell::RefCell, panic};
+use std::{
+    cell::{Cell, RefCell},
+    panic,
+};
 
 use libc::c_void;
 
@@ -89,15 +90,16 @@ pub fn set_panic_callback(cb: Function<String>) {
     PANIC_FN.set(Some(cb));
 }
 
-/// Atomic flag which indicates that Android logger is initialized.
-#[cfg(target_os = "android")]
-static IS_ANDROID_LOGGER_INITED: AtomicBool = AtomicBool::new(false);
+thread_local! {
+    /// Flag which indicates that Android logger is initialized.
+    static IS_LOGGER_INITIALIZED: Cell<bool> = Cell::default();
+}
 
 #[cfg(target_os = "android")]
 /// Initializes [`android_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
-    if !IS_ANDROID_LOGGER_INITED.fetch_or(true, Ordering::SeqCst) {
+    if !IS_LOGGER_INITIALIZED.replace(true) {
         android_logger::init_once(
             android_logger::Config::default()
                 .with_max_level(log::LevelFilter::Debug),
