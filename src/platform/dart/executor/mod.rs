@@ -59,7 +59,7 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// [`rust_executor_poll_task()`] function.
 fn task_wake(task: Rc<Task>) {
     #[expect(clippy::expect_used, reason = "expected behavior")]
-    let wake_port = WAKE_PORT.get().expect("WAKE_POST should be initialized");
+    let wake_port = WAKE_PORT.get().expect("`WAKE_PORT` should be initialized");
     let task = Rc::into_raw(task);
 
     let mut task_addr = Dart_CObject {

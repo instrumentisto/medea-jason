@@ -42,7 +42,9 @@ impl LocalMediaTrack {
     pub fn get_track(&self) -> DartOpaque {
         DartOpaque::new(
             self.0.get_track().handle() as _,
-            DART_HANDLER_PORT.get().unwrap(),
+            DART_HANDLER_PORT
+                .get()
+                .expect("`DART_HANDLER_PORT` must be initialized"),
         )
     }
 
