@@ -1,12 +1,13 @@
 //! Helper functionality for passing [`String`]s through FFI boundaries.
 
-use crate::api::propagate_panic;
 use std::{
     cell::RefCell,
     ffi::{CStr, CString},
     os::raw::c_char,
     ptr,
 };
+
+use crate::api::propagate_panic;
 
 /// Pointer to an extern function that frees the provided Dart native string.
 type FreeDartNativeStringFunction = extern "C" fn(ptr::NonNull<c_char>);

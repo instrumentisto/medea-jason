@@ -220,8 +220,9 @@ extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
 pub mod tests {
     #![expect(clippy::missing_safety_doc, reason = "only for testing")]
 
-    use dart_sys::Dart_Handle;
     use std::cell::RefCell;
+
+    use dart_sys::Dart_Handle;
 
     use crate::api::DartValueArg;
 

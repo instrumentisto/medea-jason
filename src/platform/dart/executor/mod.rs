@@ -2,11 +2,12 @@
 
 mod task;
 
+use std::{cell::Cell, future::Future, ptr, rc::Rc};
+
 use dart_sys::{
     Dart_CObject, Dart_CObject_Type_Dart_CObject_kInt64, Dart_Port,
     _Dart_CObject__bindgen_ty_1,
 };
-use std::{cell::Cell, future::Future, ptr, rc::Rc};
 
 use crate::{api::propagate_panic, platform::utils::dart_api};
 

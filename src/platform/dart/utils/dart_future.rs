@@ -208,8 +208,9 @@ where
 pub mod tests {
     #![expect(clippy::missing_safety_doc, reason = "for testing only")]
 
-    use dart_sys::Dart_Handle;
     use std::cell::RefCell;
+
+    use dart_sys::Dart_Handle;
 
     use crate::{
         api::err::FormatException,
