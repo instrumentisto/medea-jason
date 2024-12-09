@@ -220,8 +220,6 @@ extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
 pub mod tests {
     #![expect(clippy::missing_safety_doc, reason = "only for testing")]
 
-    use std::cell::RefCell;
-
     use dart_sys::Dart_Handle;
 
     use crate::api::DartValueArg;
@@ -274,29 +272,24 @@ pub mod tests {
 
     type TestCallbackHandleFunction = extern "C" fn(Dart_Handle);
 
-    thread_local! {
-        static TEST_CALLBACK_HANDLE_FUNCTION: RefCell<Option<
-            TestCallbackHandleFunction,
-        >> = RefCell::default();
-    }
+    static mut TEST_CALLBACK_HANDLE_FUNCTION: Option<
+        TestCallbackHandleFunction,
+    > = None;
 
     #[no_mangle]
     pub unsafe extern "C" fn register__test__test_callback_handle_function(
         f: TestCallbackHandleFunction,
     ) {
-        TEST_CALLBACK_HANDLE_FUNCTION.set(Some(f));
+        unsafe {
+            TEST_CALLBACK_HANDLE_FUNCTION = Some(f);
+        }
     }
 
-    #[expect(clippy::expect_used, reason = "intended behavior")]
     #[no_mangle]
     pub unsafe extern "C" fn test_callback_listener_dart_handle() -> Dart_Handle
     {
         Callback::from_once(move |val: Dart_Handle| {
-            TEST_CALLBACK_HANDLE_FUNCTION.with_borrow(|f| {
-                (f.expect("TEST_CALLBACK_HANDLE_FUNCTION must be initialized"))(
-                    val,
-                );
-            });
+            (unsafe { TEST_CALLBACK_HANDLE_FUNCTION.unwrap() })(val);
         })
         .into_dart()
     }

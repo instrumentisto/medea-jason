@@ -30,10 +30,7 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::{
-    cell::{Cell, RefCell},
-    panic,
-};
+use std::panic;
 
 use libc::c_void;
 
@@ -69,42 +66,36 @@ pub unsafe extern "C" fn init_jason_dart_api_dl(data: *mut c_void) -> isize {
 /// Dart's functions.
 pub fn set_panic_hook() {
     panic::set_hook(Box::new(|bt| {
-        // PANIC_FN.with_borrow(|f| {
-        //     if let Some(f) = f {
-        //         f.call1(format!("{bt}"));
-        //     }
-        // });
+        // TODO: Refactor to get rid of `static mut`.
+        #[expect(static_mut_refs, reason = "needs refactoring")]
+        if let Some(f) = unsafe { PANIC_FN.as_ref() } {
+            f.call1(format!("{bt}"));
+        }
     }));
 }
 
-thread_local! {
-    /// [`Function`] being called whenever Rust code [`panic`]s.
-    static PANIC_FN: RefCell<Option<Function<String>>> = RefCell::default();
-}
+/// [`Function`] being called whenever Rust code [`panic`]s.
+static mut PANIC_FN: Option<Function<String>> = None;
 
 /// Sets the provided [`Function`] as a callback to be called whenever Rust code
 /// [`panic`]s.
 ///
 /// [`panic`]: panic!
 pub fn set_panic_callback(cb: Function<String>) {
-    PANIC_FN.set(Some(cb));
-}
-
-thread_local! {
-    /// Flag which indicates that Android logger is initialized.
-    static IS_LOGGER_INITIALIZED: Cell<bool> = Cell::default();
+    unsafe {
+        PANIC_FN = Some(cb);
+    }
 }
 
 #[cfg(target_os = "android")]
 /// Initializes [`android_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
-    if !IS_LOGGER_INITIALIZED.replace(true) {
-        android_logger::init_once(
-            android_logger::Config::default()
-                .with_max_level(log::LevelFilter::Debug),
-        );
-    }
+    // TODO: `android_logger::init_once()` should be called only once.
+    android_logger::init_once(
+        android_logger::Config::default()
+            .with_max_level(log::LevelFilter::Debug),
+    );
 }
 
 #[cfg(any(
@@ -116,9 +107,8 @@ pub fn init_logger() {
 /// Initializes [`simple_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
-    if !IS_LOGGER_INITIALIZED.replace(true) {
-        _ = simple_logger::SimpleLogger::new()
-            .with_level(log::LevelFilter::Debug)
-            .init();
-    }
+    // TODO: Should be called only once.
+    _ = simple_logger::SimpleLogger::new()
+        .with_level(log::LevelFilter::Debug)
+        .init();
 }

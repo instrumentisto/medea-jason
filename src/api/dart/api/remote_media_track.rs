@@ -34,12 +34,9 @@ impl RemoteMediaTrack {
     #[frb(sync)]
     #[must_use]
     pub fn get_track(&self) -> DartOpaque {
-        DartOpaque::new(
-            self.0.get_track().handle() as _,
-            DART_HANDLER_PORT
-                .get()
-                .expect("`DART_HANDLER_PORT` must be initialized"),
-        )
+        DartOpaque::new(self.0.get_track().handle() as _, unsafe {
+            DART_HANDLER_PORT.unwrap()
+        })
     }
 
     /// Sets callback to invoke once this [`RemoteMediaTrack`] is muted.

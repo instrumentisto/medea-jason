@@ -41,7 +41,9 @@ pub mod remote_media_track;
 pub mod room;
 pub mod room_close_reason;
 
-use std::{cell::Cell, ptr};
+use std::ptr;
+
+use flutter_rust_bridge::{frb, DartOpaque};
 
 use crate::{
     media::{
@@ -51,7 +53,6 @@ use crate::{
     },
     platform::{self},
 };
-use flutter_rust_bridge::{frb, DartOpaque};
 
 pub use dart_sys::Dart_Handle;
 
@@ -62,10 +63,8 @@ pub use self::{
     room::RoomHandle, room_close_reason::RoomCloseReason,
 };
 
-thread_local! {
-    /// Used to create [`DartOpaque`]s on the Rust side.
-    pub static DART_HANDLER_PORT: Cell<Option<i64>> = Cell::default();
-}
+/// Used to create [`DartOpaque`]s on the Rust side.
+pub static mut DART_HANDLER_PORT: Option<i64> = None;
 
 /// Rust structure having wrapper class in Dart.
 ///
@@ -382,5 +381,9 @@ pub fn on_panic(cb: DartOpaque) {
 #[frb(sync)]
 #[must_use]
 pub fn set_dart_opaque_message_port(dart_handler_port: i64) {
-    DART_HANDLER_PORT.set(Some(dart_handler_port));
+    // TODO: Refactor to get rid of `static mut`.
+    #[expect(static_mut_refs, reason = "needs refactoring")]
+    unsafe {
+        DART_HANDLER_PORT.replace(dart_handler_port);
+    }
 }
