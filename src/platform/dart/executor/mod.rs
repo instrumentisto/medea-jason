@@ -24,7 +24,7 @@ thread_local! {
     ///
     /// Must be initialized with the [`rust_executor_init()`] function during
     /// FFI initialization.
-    static WAKE_PORT: Cell<Option<Dart_Port>> = Cell::default();
+    static WAKE_PORT: Cell<Option<Dart_Port>> = const { Cell::new(None) };
 }
 
 /// Initializes Dart-driven async [`Task`] executor.
