@@ -13,6 +13,8 @@ readme = "README.md"
 keywords = ["medea", "jason", "webrtc", "client", "browser"]
 categories = ["multimedia", "api-bindings", "web-programming", "wasm"]
 include = ["/src/", "/build.rs", "/CHANGELOG.md", "/LICENSE.md"]
+# TODO: Remove when https://github.com/rustwasm/wasm-pack/issues/1441 will be resolved.
+wasm-opt = false
 
 [workspace]
 members = [
