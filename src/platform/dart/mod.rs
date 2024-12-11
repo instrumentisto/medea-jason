@@ -34,7 +34,7 @@ use std::{
     cell::{Cell, RefCell},
     panic,
 };
-use std::sync::Mutex;
+
 use libc::c_void;
 
 use crate::platform::utils::dart_api;
@@ -69,27 +69,25 @@ pub unsafe extern "C" fn init_jason_dart_api_dl(data: *mut c_void) -> isize {
 /// Dart's functions.
 pub fn set_panic_hook() {
     panic::set_hook(Box::new(|bt| {
-        // println!("panic hook fire 1");
-        // if let Some(f) = PANIC_FN.lock().unwrap() {
-        //     println!("panic hook fire call 1");
-        //     f.call1(format!("{bt}"));
-        //     println!("panic hook fire call 2");
-        // } else {
-        //     println!("panic hook fire 3");
-        // }
-        // println!("panic hook fire 2");
+        PANIC_FN.with_borrow(|f| {
+            if let Some(f) = f {
+                f.call1(format!("{bt}"));
+            }
+        });
     }));
 }
 
-// /// [`Function`] being called whenever Rust code [`panic`]s.
-// static PANIC_FN: Mutex<Option<Function<String>>> = Mutex::new(None);
+thread_local! {
+    /// [`Function`] being called whenever Rust code [`panic`]s.
+    static PANIC_FN: RefCell<Option<Function<String>>> = RefCell::default();
+}
 
 /// Sets the provided [`Function`] as a callback to be called whenever Rust code
 /// [`panic`]s.
 ///
 /// [`panic`]: panic!
 pub fn set_panic_callback(cb: Function<String>) {
-    // let _ = PANIC_FN.lock().unwrap().replace(cb);
+    PANIC_FN.set(Some(cb));
 }
 
 thread_local! {

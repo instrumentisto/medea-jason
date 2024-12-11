@@ -8,7 +8,7 @@
 //! is called.
 
 use std::marker::PhantomData;
-use std::sync::atomic::AtomicPtr;
+
 use dart_sys::Dart_PersistentHandle;
 use flutter_rust_bridge::DartOpaque;
 use medea_macro::dart_bridge;
@@ -47,7 +47,7 @@ pub struct Function<T> {
     dart_fn: Dart_PersistentHandle,
 
     /// Type of this closure argument.
-    _arg: PhantomData<AtomicPtr<*const T>>,
+    _arg: PhantomData<*const T>,
 }
 
 impl<T> Function<T> {
