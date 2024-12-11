@@ -6,8 +6,10 @@ use dart_sys::{
     Dart_CObject, Dart_CObject_Type_Dart_CObject_kInt64, Dart_Port,
     _Dart_CObject__bindgen_ty_1,
 };
-use std::{future::Future, ptr, rc::Rc, sync::Mutex};
-
+use arc_swap::ArcSwapOption;
+use std::{future::Future, ptr, rc::Rc};
+use std::sync::Arc;
+use std::sync::atomic::AtomicI64;
 use crate::{api::propagate_panic, platform::utils::dart_api};
 
 pub use self::task::Task;
@@ -22,7 +24,7 @@ pub fn spawn(fut: impl Future<Output = ()> + 'static) {
 ///
 /// Must be initialized with the [`rust_executor_init()`] function during FFI
 /// initialization.
-static WAKE_PORT: Mutex<Option<Dart_Port>> = Mutex::new(None);
+static WAKE_PORT: ArcSwapOption<Dart_Port> = ArcSwapOption::const_empty();
 
 /// Initializes Dart-driven async [`Task`] executor.
 ///
@@ -34,7 +36,7 @@ static WAKE_PORT: Mutex<Option<Dart_Port>> = Mutex::new(None);
 /// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
-    let _ = WAKE_PORT.lock().unwrap().replace(wake_port);
+    drop(WAKE_PORT.swap(Some(Arc::new(wake_port))));
 }
 
 /// Polls the provided [`Task`].
@@ -55,7 +57,7 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// [`WAKE_PORT`]. When received, Dart must poll it by calling the
 /// [`rust_executor_poll_task()`] function.
 fn task_wake(task: Rc<Task>) {
-    let wake_port = WAKE_PORT.lock().unwrap().unwrap();
+    let wake_port = **WAKE_PORT.load().as_ref().unwrap();
     let task = Rc::into_raw(task);
 
     let mut task_addr = Dart_CObject {

@@ -40,6 +40,7 @@ mockable = ["dep:mockall"]
 talc = ["dep:talc"]
 
 [dependencies]
+arc-swap = "1.7"
 async-recursion = "1.1"
 async-trait = "0.1"
 backoff = { version = "0.4", features = ["futures"] }
