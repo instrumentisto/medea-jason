@@ -2,14 +2,18 @@
 
 mod task;
 
+use std::{
+    future::Future,
+    ptr,
+    rc::Rc,
+    sync::{atomic, atomic::AtomicI64},
+};
+
 use dart_sys::{
     Dart_CObject, Dart_CObject_Type_Dart_CObject_kInt64, Dart_Port,
     _Dart_CObject__bindgen_ty_1,
 };
-use arc_swap::ArcSwapOption;
-use std::{future::Future, ptr, rc::Rc};
-use std::sync::Arc;
-use std::sync::atomic::AtomicI64;
+
 use crate::{api::propagate_panic, platform::utils::dart_api};
 
 pub use self::task::Task;
@@ -19,12 +23,15 @@ pub fn spawn(fut: impl Future<Output = ()> + 'static) {
     Task::spawn(Box::pin(fut));
 }
 
+/// Atomic variants of the [`Dart_Port`].
+type AtomicDartPort = AtomicI64;
+
 /// A [`Dart_Port`] used to send [`Task`]'s poll commands so Dart will poll Rust
 /// [`Future`]s.
 ///
 /// Must be initialized with the [`rust_executor_init()`] function during FFI
 /// initialization.
-static WAKE_PORT: ArcSwapOption<Dart_Port> = ArcSwapOption::const_empty();
+static WAKE_PORT: AtomicDartPort = AtomicI64::new(0);
 
 /// Initializes Dart-driven async [`Task`] executor.
 ///
@@ -36,7 +43,7 @@ static WAKE_PORT: ArcSwapOption<Dart_Port> = ArcSwapOption::const_empty();
 /// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
-    drop(WAKE_PORT.swap(Some(Arc::new(wake_port))));
+    WAKE_PORT.store(wake_port, atomic::Ordering::SeqCst);
 }
 
 /// Polls the provided [`Task`].
@@ -57,7 +64,8 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// [`WAKE_PORT`]. When received, Dart must poll it by calling the
 /// [`rust_executor_poll_task()`] function.
 fn task_wake(task: Rc<Task>) {
-    let wake_port = **WAKE_PORT.load().as_ref().unwrap();
+    let wake_port = WAKE_PORT.load(atomic::Ordering::SeqCst);
+    assert!(wake_port > 0, "WAKE_PORT address must be initialized");
     let task = Rc::into_raw(task);
 
     let mut task_addr = Dart_CObject {
