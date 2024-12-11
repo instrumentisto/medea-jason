@@ -69,11 +69,13 @@ pub unsafe extern "C" fn init_jason_dart_api_dl(data: *mut c_void) -> isize {
 /// Dart's functions.
 pub fn set_panic_hook() {
     panic::set_hook(Box::new(|bt| {
+        println!("panic hook fire 1");
         PANIC_FN.with_borrow(|f| {
             if let Some(f) = f {
                 f.call1(format!("{bt}"));
             }
         });
+        println!("panic hook fire 2");
     }));
 }
 
