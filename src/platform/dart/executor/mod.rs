@@ -49,7 +49,7 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
 pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
     println!("4 before");
     // propagate_panic(move || {
-        _ = unsafe { Rc::from_raw(task.as_ptr()).poll() };
+    _ = unsafe { Rc::from_raw(task.as_ptr()).poll() };
     // });
     println!("5 after");
 }

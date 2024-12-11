@@ -72,7 +72,11 @@ pub fn set_panic_hook() {
         println!("panic hook fire 1");
         PANIC_FN.with_borrow(|f| {
             if let Some(f) = f {
+                println!("panic hook fire call 1");
                 f.call1(format!("{bt}"));
+                println!("panic hook fire call 2");
+            } else {
+                println!("panic hook fire 3");
             }
         });
         println!("panic hook fire 2");
