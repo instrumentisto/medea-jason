@@ -40,6 +40,10 @@ class Executor {
   /// Polls a Rust future basing on the provided [message].
   void _pollTask(dynamic message) {
     final task = Pointer.fromAddress(message);
+    print("pollTask 1");
+    // before
     _taskPoll(task);
+    print("pollTask 2");
+    // after
   }
 }
