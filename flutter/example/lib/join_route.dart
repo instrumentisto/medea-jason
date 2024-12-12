@@ -67,7 +67,7 @@ class _JoinRouteState extends State<JoinRoute> {
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.blue,
                 disabledForegroundColor:
-                    Colors.grey.withValues(alpha: (0.38 * 255).round()),
+                    Colors.grey.withValues(alpha: 0.38 * 255),
               ),
               onPressed: () {
                 Navigator.push(
