@@ -23,7 +23,7 @@ pub fn spawn(fut: impl Future<Output = ()> + 'static) {
     Task::spawn(Box::pin(fut));
 }
 
-/// Atomic variants of the [`Dart_Port`].
+/// Atomic variant of the [`Dart_Port`].
 type AtomicDartPort = AtomicI64;
 
 /// A [`Dart_Port`] used to send [`Task`]'s poll commands so Dart will poll Rust

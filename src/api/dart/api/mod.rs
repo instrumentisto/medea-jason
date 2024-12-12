@@ -43,6 +43,8 @@ pub mod room_close_reason;
 
 use std::{cell::Cell, ptr};
 
+use flutter_rust_bridge::{frb, DartOpaque};
+
 use crate::{
     media::{
         self,
@@ -51,7 +53,6 @@ use crate::{
     },
     platform::{self},
 };
-use flutter_rust_bridge::{frb, DartOpaque};
 
 pub use dart_sys::Dart_Handle;
 
