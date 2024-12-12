@@ -2,12 +2,7 @@
 
 mod task;
 
-use std::{
-    future::Future,
-    ptr,
-    rc::Rc,
-    sync::{atomic, atomic::AtomicI64},
-};
+use std::{cell::Cell, future::Future, ptr, rc::Rc};
 
 use dart_sys::{
     Dart_CObject, Dart_CObject_Type_Dart_CObject_kInt64, Dart_Port,
@@ -23,15 +18,14 @@ pub fn spawn(fut: impl Future<Output = ()> + 'static) {
     Task::spawn(Box::pin(fut));
 }
 
-/// Atomic variant of the [`Dart_Port`].
-type AtomicDartPort = AtomicI64;
-
-/// A [`Dart_Port`] used to send [`Task`]'s poll commands so Dart will poll Rust
-/// [`Future`]s.
-///
-/// Must be initialized with the [`rust_executor_init()`] function during FFI
-/// initialization.
-static WAKE_PORT: AtomicDartPort = AtomicI64::new(0);
+thread_local! {
+    /// A [`Dart_Port`] used to send [`Task`]'s poll commands so Dart will poll
+    /// Rust [`Future`]s.
+    ///
+    /// Must be initialized with the [`rust_executor_init()`] function during
+    /// FFI initialization.
+    static WAKE_PORT: Cell<Option<Dart_Port>> = const { Cell::new(None) };
+}
 
 /// Initializes Dart-driven async [`Task`] executor.
 ///
@@ -43,7 +37,7 @@ static WAKE_PORT: AtomicDartPort = AtomicI64::new(0);
 /// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
-    WAKE_PORT.store(wake_port, atomic::Ordering::SeqCst);
+    WAKE_PORT.set(Some(wake_port));
 }
 
 /// Polls the provided [`Task`].
@@ -64,8 +58,9 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// [`WAKE_PORT`]. When received, Dart must poll it by calling the
 /// [`rust_executor_poll_task()`] function.
 fn task_wake(task: Rc<Task>) {
-    let wake_port = WAKE_PORT.load(atomic::Ordering::SeqCst);
-    assert!(wake_port > 0, "WAKE_PORT address must be initialized");
+    println!("{:?}", std::thread::current().id());
+    #[expect(clippy::expect_used, reason = "expected behavior")]
+    let wake_port = WAKE_PORT.get().expect("`WAKE_PORT` should be initialized");
     let task = Rc::into_raw(task);
 
     let mut task_addr = Dart_CObject {
