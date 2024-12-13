@@ -442,7 +442,7 @@ endif
 		--no-web \
 		--local
 	cd flutter && \
-	dart pub run build_runner build --delete-conflicting-outputs
+	dart run build_runner build --delete-conflicting-outputs
 
 
 # Lint Rust sources with Clippy.
