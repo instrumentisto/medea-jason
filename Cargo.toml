@@ -63,9 +63,8 @@ android_logger = "0.14"
 simple_logger = "5.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-# TODO: Switch to `dart-sys` once `flutter_rust_bridge` does.
-dart-sys = { version = "4.1", package = "dart-sys-fork" }
-flutter_rust_bridge = { version = "=2.4.0", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
+dart-sys = { version = "4.1" }
+flutter_rust_bridge = { version = "=2.7.0", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
 libc = "0.2"
 send_wrapper = "0.6"
 
