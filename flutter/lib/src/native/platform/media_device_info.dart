@@ -52,8 +52,5 @@ int _kind(Object deviceInfo) {
       return 1;
     case webrtc.MediaDeviceKind.audiooutput:
       return 2;
-    default:
-      // Not supposed to ever happen.
-      throw StateError('Unknown MediaKind: ${deviceInfo.kind}');
   }
 }
