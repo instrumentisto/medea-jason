@@ -24,10 +24,11 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`flutter_rust_bridge`] to 2.4.0 version. ([#188])
+    - [`flutter_rust_bridge`] to 2.7.0 version. ([#188], [#195])
 
 [#187]: /../../pull/187
 [#188]: /../../pull/188
+[#195]: /../../pull/195
 
 
 
