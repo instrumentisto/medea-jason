@@ -344,8 +344,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "-v";
-				OTHER_LIBTOOLFLAGS = "-v";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -366,21 +364,6 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
-				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-framework",
-					"\"UIKit\"",
-					"-framework",
-					"\"WebRTC\"",
-					"-framework",
-					"\"integration_test\"",
-					"-framework",
-					"\"medea_flutter_webrtc\"",
-					"-framework",
-					"\"medea_jason\"",
-					"-v",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.instrumentisto.medeaJasonExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -440,8 +423,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "-v";
-				OTHER_LIBTOOLFLAGS = "-v";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -490,8 +471,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "-v";
-				OTHER_LIBTOOLFLAGS = "-v";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -515,21 +494,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-framework",
-					"\"UIKit\"",
-					"-framework",
-					"\"WebRTC\"",
-					"-framework",
-					"\"integration_test\"",
-					"-framework",
-					"\"medea_flutter_webrtc\"",
-					"-framework",
-					"\"medea_jason\"",
-					"-v",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.instrumentisto.medeaJasonExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -552,21 +516,6 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
-				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-framework",
-					"\"UIKit\"",
-					"-framework",
-					"\"WebRTC\"",
-					"-framework",
-					"\"integration_test\"",
-					"-framework",
-					"\"medea_flutter_webrtc\"",
-					"-framework",
-					"\"medea_jason\"",
-					"-v",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.instrumentisto.medeaJasonExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
