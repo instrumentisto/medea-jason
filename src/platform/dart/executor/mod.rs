@@ -43,7 +43,7 @@ static WAKE_PORT: AtomicDartPort = AtomicI64::new(0);
 /// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
-    WAKE_PORT.store(wake_port, atomic::Ordering::SeqCst);
+    WAKE_PORT.store(wake_port, atomic::Ordering::Release);
 }
 
 /// Polls the provided [`Task`].
@@ -64,7 +64,7 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// [`WAKE_PORT`]. When received, Dart must poll it by calling the
 /// [`rust_executor_poll_task()`] function.
 fn task_wake(task: Rc<Task>) {
-    let wake_port = WAKE_PORT.load(atomic::Ordering::SeqCst);
+    let wake_port = WAKE_PORT.load(atomic::Ordering::Acquire);
     assert!(wake_port > 0, "WAKE_PORT address must be initialized");
     let task = Rc::into_raw(task);
 
