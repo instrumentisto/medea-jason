@@ -6,6 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [master] · unreleased
+[master]: /../../tree/master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.7.0...master)
+
+### Upgraded
+
+- Dependencies:
+    - [`flutter_rust_bridge`] to 2.7.0 version. ([#195])
+
+[#195]: /../../pull/195
+
+
+
+
 ## [0.7.0] · 2024-10-29
 [0.7.0]: /../../tree/medea-jason-0.7.0
 
@@ -24,11 +39,10 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`flutter_rust_bridge`] to 2.7.0 version. ([#188], [#195])
+    - [`flutter_rust_bridge`] to 2.4.0 version. ([#188])
 
 [#187]: /../../pull/187
 [#188]: /../../pull/188
-[#195]: /../../pull/195
 
 
 
