@@ -6,7 +6,22 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.7.0] · 2024-??-?? (unreleased)
+## [master] · unreleased
+[master]: /../../tree/master/flutter
+
+See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md).
+
+### Upgraded
+
+- Dependencies:
+    - [`flutter_rust_bridge`] to 2.7.0 version. ([#195])
+
+[#195]: /../../pull/195
+
+
+
+
+## [0.7.0] · 2024-10-29
 [0.7.0]: /../../tree/medea-jason-0.7.0/flutter
 
 See also [`medea-jason` crate 0.7.0 changes](/../../tree/medea-jason-0.7.0/CHANGELOG.md).
