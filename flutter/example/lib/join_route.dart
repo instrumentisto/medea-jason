@@ -66,8 +66,7 @@ class _JoinRouteState extends State<JoinRoute> {
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.blue,
-                disabledForegroundColor:
-                    Colors.grey.withValues(alpha: 0.38 * 255),
+                disabledForegroundColor: Colors.grey.withAlpha(0x60),
               ),
               onPressed: () {
                 Navigator.push(
