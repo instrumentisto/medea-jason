@@ -160,7 +160,7 @@ impl<O> DartFuture<O> {
     /// transferred to Dart side via `flutter_rust_bridge` bindings.
     #[must_use]
     pub fn into_dart_opaque(self) -> DartOpaque {
-        DartOpaque::new(self.0.cast(), unsafe { DART_HANDLER_PORT.unwrap() })
+        DartOpaque::new(self.0.cast(), DART_HANDLER_PORT.get().unwrap())
     }
 }
 
@@ -208,6 +208,8 @@ where
 pub mod tests {
     #![expect(clippy::missing_safety_doc, reason = "for testing only")]
 
+    use std::cell::RefCell;
+
     use dart_sys::Dart_Handle;
 
     use crate::{
@@ -250,18 +252,20 @@ pub mod tests {
 
     type TestFutureHandleFunction = extern "C" fn(Dart_Handle);
 
-    static mut TEST_FUTURE_HANDLE_FUNCTION: Option<TestFutureHandleFunction> =
-        None;
+    thread_local! {
+        static TEST_FUTURE_HANDLE_FUNCTION: RefCell<
+            Option<TestFutureHandleFunction>
+        > = RefCell::default();
+    }
 
     #[no_mangle]
     pub unsafe extern "C" fn register__test__future_from_dart_handle_fn(
         f: TestFutureHandleFunction,
     ) {
-        unsafe {
-            TEST_FUTURE_HANDLE_FUNCTION = Some(f);
-        }
+        TEST_FUTURE_HANDLE_FUNCTION.set(Some(f));
     }
 
+    #[expect(clippy::expect_used, reason = "intended behavior")]
     #[no_mangle]
     pub unsafe extern "C" fn test__future_from_dart__handle(
         future: Dart_Handle,
@@ -272,7 +276,11 @@ pub mod tests {
                 unsafe { FutureFromDart::execute::<DartHandle>(future.get()) }
                     .await
                     .unwrap();
-            (unsafe { TEST_FUTURE_HANDLE_FUNCTION.unwrap() })(val.get());
+            TEST_FUTURE_HANDLE_FUNCTION.with_borrow(|f| {
+                f.expect("`TEST_FUTURE_HANDLE_FUNCTION` must be initialized")(
+                    val.get(),
+                );
+            });
             Ok(())
         }
         .into_dart_future()

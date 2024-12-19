@@ -11,6 +11,7 @@ use syn::{parse_quote, punctuated::Punctuated, spanned::Spanned as _, token};
 #[cfg(feature = "dart-codegen")]
 use crate::dart_codegen::{DartCodegen, FnRegistrationBuilder};
 
+// TODO: Refactor to get rid of `static mut` in this macro.
 /// Expands `#[dart_bridge]` attribute placed on a Rust module declaration.
 pub(crate) fn expand(
     args: TokenStream,
