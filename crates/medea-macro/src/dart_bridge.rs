@@ -133,8 +133,8 @@ impl ModExpander {
         let type_aliases =
             self.fn_expanders.iter().map(FnExpander::gen_fn_type);
 
-        let static_muts =
-            self.fn_expanders.iter().map(FnExpander::gen_fn_static_mut);
+        let fn_storages =
+            self.fn_expanders.iter().map(FnExpander::gen_fn_storages);
 
         let register_fn_name = &self.register_fn_name;
         let register_fn_inputs = self
@@ -162,7 +162,7 @@ impl ModExpander {
 
                 #( #type_aliases )*
 
-                #( #static_muts )*
+                #( #fn_storages )*
 
                 #( #errors_slots )*
 
@@ -316,10 +316,10 @@ impl<'a> IdentGenerator<'a> {
         )
     }
 
-    /// Returns a [`syn::Ident`] for the [`FnExpander`]'s `static mut`.
+    /// Returns a [`syn::Ident`] for the [`FnExpander`]'s storage.
     ///
     /// Generates something like `PEER_CONNECTION__CREATE_OFFER__FUNCTION`
-    fn static_mut(&self) -> syn::Ident {
+    fn fn_storage(&self) -> syn::Ident {
         format_ident!(
             "{}__{}__FUNCTION",
             self.prefix.to_string().to_screaming_snake_case(),
@@ -363,11 +363,12 @@ struct FnExpander {
     /// [`syn::Ident`] of the type alias for the extern Dart function pointer.
     type_alias_ident: syn::Ident,
 
-    /// [`syn::Ident`] of the `static mut` storing extern Dart function
+    /// [`syn::Ident`] of the storage storing extern Dart function
     /// pointer.
-    static_mut_ident: syn::Ident,
+    fn_storage_ident: syn::Ident,
 
-    /// [`syn::Ident`] of the function error slot (`static mut Option<Error>`).
+    /// [`syn::Ident`] of the function error slot (`thread_local! {
+    /// RefCell<Option<Error>> }`).
     error_slot_ident: syn::Ident,
 
     /// [`syn::Ident`] of the extern function that saves error in its slot.
@@ -455,7 +456,7 @@ impl FnExpander {
         let ident_generator = IdentGenerator::new(prefix, &item.sig.ident);
         Ok(Self {
             type_alias_ident: ident_generator.type_alias(),
-            static_mut_ident: ident_generator.static_mut(),
+            fn_storage_ident: ident_generator.fn_storage(),
             error_slot_ident: ident_generator.error_slot_name(),
             error_setter_ident: ident_generator.error_setter_name(),
             ident: item.sig.ident,
@@ -505,11 +506,11 @@ impl FnExpander {
     /// PEER_CONNECTION__CREATE_OFFER__FUNCTION.set(Some(create_offer))
     /// ```
     fn gen_register_fn_expr(&self) -> syn::Expr {
-        let fn_static_mut = &self.static_mut_ident;
+        let fn_storage_ident = &self.fn_storage_ident;
         let ident = &self.ident;
 
         parse_quote! {
-            #fn_static_mut.set(Some(#ident))
+            #fn_storage_ident.set(Some(#ident))
         }
     }
 
@@ -531,7 +532,7 @@ impl FnExpander {
         }
     }
 
-    /// Generates `static mut` for the extern Dart function pointer storing.
+    /// Generates `thread_local`s for the extern Dart function pointer storing.
     ///
     /// # Example of generated code
     ///
@@ -543,8 +544,8 @@ impl FnExpander {
     ///         > = ::std::cell::RefCell::default();
     /// }
     /// ```
-    fn gen_fn_static_mut(&self) -> TokenStream {
-        let name = &self.static_mut_ident;
+    fn gen_fn_storages(&self) -> TokenStream {
+        let name = &self.fn_storage_ident;
         let type_alias = &self.type_alias_ident;
 
         quote! {
@@ -564,7 +565,7 @@ impl FnExpander {
     ///     peer: Dart_Handle,
     /// ) -> Result<Dart_Handle, Error> {
     ///     let res = PEER_CONNECTION__CREATE_OFFER__FUNCTION.with_borrow(
-    ///         |static_mut| (*static_mut.as_ref().unwrap())(peer),
+    ///         |__fn_storage| (*__fn_storage.as_ref().unwrap())(peer),
     ///     );
     ///
     ///     if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take() {
@@ -591,13 +592,13 @@ impl FnExpander {
 
         let ret_ty = &self.ret_ty;
 
-        let static_mut = &self.static_mut_ident;
+        let fn_storage_ident = &self.fn_storage_ident;
 
         quote! {
             #( #doc_attrs )*
             pub unsafe fn #name(#args) #ret_ty {
-                let res = #static_mut.with_borrow(|static_mut| {
-                    (*static_mut.as_ref().unwrap())(#( #args_idents ),*)
+                let res = #fn_storage_ident.with_borrow(|__fn_storage| {
+                    (*__fn_storage.as_ref().unwrap())(#( #args_idents ),*)
                 });
                 if let Some(e) = #error_slot.take() {
                   Err(e)
