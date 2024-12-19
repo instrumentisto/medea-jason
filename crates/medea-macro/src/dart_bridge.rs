@@ -502,7 +502,7 @@ impl FnExpander {
     /// # Example of the generated code
     ///
     /// ```ignore
-    /// PEER_CONNECTION__CREATE_OFFER__FUNCTION.set(create_offer)
+    /// PEER_CONNECTION__CREATE_OFFER__FUNCTION.set(Some(create_offer))
     /// ```
     fn gen_register_fn_expr(&self) -> syn::Expr {
         let fn_static_mut = &self.static_mut_ident;
@@ -536,9 +536,12 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// static mut PEER_CONNECTION__CREATE_OFFER__FUNCTION:
-    ///     std::mem::MaybeUninit<PeerConnectionCreateOfferFunction> =
-    ///     std::mem::MaybeUninit::uninit();
+    /// ::std::thread_local! {
+    ///     static PEER_CONNECTION__CREATE_OFFER__FUNCTION:
+    ///         ::std::cell::RefCell<
+    ///             Option<PeerConnectionCreateOfferFunction>
+    ///         > = ::std::cell::RefCell::default();
+    /// }
     /// ```
     fn gen_fn_static_mut(&self) -> TokenStream {
         let name = &self.static_mut_ident;
@@ -547,7 +550,7 @@ impl FnExpander {
         quote! {
             ::std::thread_local! {
                 static #name: ::std::cell::RefCell<Option<#type_alias>> =
-                    ::std::cell::RefCell::new(None);
+                    ::std::cell::RefCell::default();
             }
         }
     }
@@ -560,11 +563,15 @@ impl FnExpander {
     /// pub unsafe fn create_offer(
     ///     peer: Dart_Handle,
     /// ) -> Result<Dart_Handle, Error> {
-    ///     let res =
-    ///       (PEER_CONNECTION__CREATE_OFFER__FUNCTION.assume_init_ref())(peer);
+    ///     let res = PEER_CONNECTION__CREATE_OFFER__FUNCTION.with_borrow(
+    ///         |static_mut| (*static_mut.as_ref().unwrap())(peer),
+    ///     );
     ///
-    ///     if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take()
-    ///         { Err(e) } else { Ok(res) }
+    ///     if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take() {
+    ///         Err(e)
+    ///     } else {
+    ///         Ok(res)
+    ///     }
     /// }
     /// ```
     fn gen_caller_fn(&self) -> TokenStream {
@@ -606,7 +613,11 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// static mut PEER_CONNECTION__CREATE_OFFER__ERROR: Option<Error> = None;
+    /// ::std::thread_local! {
+    ///     static PEER_CONNECTION__CREATE_OFFER__ERROR: ::std::cell::RefCell<
+    ///         Option<Error>,
+    ///     > = ::std::cell::RefCell::default();
+    /// }
     /// ```
     fn get_errors_slot(&self) -> TokenStream {
         let name = &self.error_slot_ident;
@@ -626,10 +637,10 @@ impl FnExpander {
     /// ```ignore
     /// #[no_mangle]
     /// pub unsafe extern "C" fn peer_connection__connection_state__set_error(
-    ///     err: Dart_Handle
+    ///     err: Dart_Handle,
     /// ) {
-    ///     PEER_CONNECTION__CONNECTION_STATE__ERROR =
-    ///         Some(Error::from_handle(err));
+    ///     PEER_CONNECTION__CONNECTION_STATE__ERROR
+    ///         .set(Some(Error::from_handle(err)));
     /// }
     /// ```
     fn gen_error_setter(&self) -> TokenStream {
