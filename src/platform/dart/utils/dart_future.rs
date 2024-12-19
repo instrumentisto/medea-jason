@@ -277,7 +277,7 @@ pub mod tests {
                     .await
                     .unwrap();
             TEST_FUTURE_HANDLE_FUNCTION.with_borrow(|f| {
-                (f.expect("TEST_FUTURE_HANDLE_FUNCTION must be initialized"))(
+                f.expect("`TEST_FUTURE_HANDLE_FUNCTION` must be initialized")(
                     val.get(),
                 );
             });

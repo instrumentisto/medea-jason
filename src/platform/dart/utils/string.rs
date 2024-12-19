@@ -99,13 +99,13 @@ pub unsafe extern "C" fn register_free_dart_native_string(
 
 /// Calls Dart to release memory allocated for the provided native string.
 ///
-/// Should be used when Dart cannot release memory in place, e.g when Rust calls
-/// a Dart function returning a native string.
+/// Should be used when Dart cannot release memory in place, e.g. when Rust
+/// calls a Dart function returning a native string.
 ///
 /// # Safety
 ///
 /// `FREE_DART_NATIVE_STRING` function must be registered and the provided
 /// pointer must be a valid native string.
 pub unsafe fn free_dart_native_string(s: ptr::NonNull<c_char>) {
-    FREE_DART_NATIVE_STRING.with_borrow(|f| (f.unwrap())(s));
+    FREE_DART_NATIVE_STRING.with_borrow(|f| f.unwrap()(s));
 }

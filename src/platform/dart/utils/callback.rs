@@ -293,7 +293,7 @@ pub mod tests {
     {
         Callback::from_once(move |val: Dart_Handle| {
             TEST_CALLBACK_HANDLE_FUNCTION.with_borrow(|f| {
-                (f.expect("TEST_CALLBACK_HANDLE_FUNCTION must be initialized"))(
+                f.expect("`TEST_CALLBACK_HANDLE_FUNCTION` must be initialized")(
                     val,
                 );
             });

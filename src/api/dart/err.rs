@@ -138,7 +138,7 @@ impl DartError {
 impl From<DartError> for DartOpaque {
     fn from(val: DartError) -> Self {
         let boxed = unsafe { Box::from_raw(val.0.as_ptr()) };
-        #[expect(clippy::expect_used, reason = "expected behavior")]
+        #[expect(clippy::expect_used, reason = "intended behavior")]
         Self::new(
             (*boxed).cast(),
             DART_HANDLER_PORT

@@ -31,7 +31,7 @@ pub mod transport;
 pub mod utils;
 
 use std::{
-    cell::{Cell, RefCell},
+    cell::{LazyCell, RefCell},
     panic,
 };
 
@@ -90,21 +90,14 @@ pub fn set_panic_callback(cb: Function<String>) {
     PANIC_FN.set(Some(cb));
 }
 
-thread_local! {
-    /// Flag which indicates that Android logger is initialized.
-    static IS_LOGGER_INITIALIZED: Cell<bool> = Cell::default();
-}
-
 #[cfg(target_os = "android")]
 /// Initializes [`android_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
-    if !IS_LOGGER_INITIALIZED.replace(true) {
-        android_logger::init_once(
-            android_logger::Config::default()
-                .with_max_level(log::LevelFilter::Debug),
-        );
-    }
+    android_logger::init_once(
+        android_logger::Config::default()
+            .with_max_level(log::LevelFilter::Debug),
+    );
 }
 
 #[cfg(any(
@@ -116,9 +109,14 @@ pub fn init_logger() {
 /// Initializes [`simple_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
-    if !IS_LOGGER_INITIALIZED.replace(true) {
-        _ = simple_logger::SimpleLogger::new()
-            .with_level(log::LevelFilter::Debug)
-            .init();
+    thread_local! {
+        /// [`LazyCell`] ensuring that a [`simple_logger`] is initialized only
+        /// once.
+        static INITIALIZED: LazyCell<()> = LazyCell::new(|| {
+            _ = simple_logger::SimpleLogger::new()
+                .with_level(log::LevelFilter::Debug)
+                .init();
+        });
     }
+    INITIALIZED.with(|i| **i);
 }

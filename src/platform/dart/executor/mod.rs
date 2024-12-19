@@ -23,10 +23,10 @@ pub fn spawn(fut: impl Future<Output = ()> + 'static) {
     Task::spawn(Box::pin(fut));
 }
 
-/// Atomic variant of the [`Dart_Port`].
+/// Atomic variant of a [`Dart_Port`].
 type AtomicDartPort = AtomicI64;
 
-/// A [`Dart_Port`] used to send [`Task`]'s poll commands so Dart will poll Rust
+/// [`Dart_Port`] used to send [`Task`]'s poll commands so Dart will poll Rust
 /// [`Future`]s.
 ///
 /// Must be initialized with the [`rust_executor_init()`] function during FFI
@@ -65,7 +65,7 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// [`rust_executor_poll_task()`] function.
 fn task_wake(task: Rc<Task>) {
     let wake_port = WAKE_PORT.load(atomic::Ordering::Acquire);
-    assert!(wake_port > 0, "WAKE_PORT address must be initialized");
+    debug_assert!(wake_port > 0, "`WAKE_PORT` address must be initialized");
     let task = Rc::into_raw(task);
 
     let mut task_addr = Dart_CObject {
