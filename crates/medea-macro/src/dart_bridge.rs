@@ -502,14 +502,14 @@ impl FnExpander {
     /// # Example of the generated code
     ///
     /// ```ignore
-    /// PEER_CONNECTION__CREATE_OFFER__FUNCTION.write(create_offer)
+    /// PEER_CONNECTION__CREATE_OFFER__FUNCTION.set(create_offer)
     /// ```
     fn gen_register_fn_expr(&self) -> syn::Expr {
         let fn_static_mut = &self.static_mut_ident;
         let ident = &self.ident;
 
         parse_quote! {
-            #fn_static_mut.write(#ident)
+            #fn_static_mut.set(Some(#ident))
         }
     }
 
@@ -545,8 +545,10 @@ impl FnExpander {
         let type_alias = &self.type_alias_ident;
 
         quote! {
-            static mut #name: ::std::mem::MaybeUninit<#type_alias> =
-                ::std::mem::MaybeUninit::uninit();
+            ::std::thread_local! {
+                static #name: ::std::cell::RefCell<Option<#type_alias>> =
+                    ::std::cell::RefCell::new(None);
+            }
         }
     }
 
@@ -587,7 +589,9 @@ impl FnExpander {
         quote! {
             #( #doc_attrs )*
             pub unsafe fn #name(#args) #ret_ty {
-                let res = (#static_mut.assume_init_ref())(#( #args_idents ),*);
+                let res = #static_mut.with_borrow(|static_mut| {
+                    (*static_mut.as_ref().unwrap())(#( #args_idents ),*)
+                });
                 if let Some(e) = #error_slot.take() {
                   Err(e)
                 } else {
@@ -608,7 +612,10 @@ impl FnExpander {
         let name = &self.error_slot_ident;
 
         quote! {
-            static mut #name: Option<Error> = None;
+            ::std::thread_local! {
+                static #name: ::std::cell::RefCell<Option<Error>> =
+                    ::std::cell::RefCell::new(None);
+            }
         }
     }
 
@@ -634,7 +641,7 @@ impl FnExpander {
             #[doc = #doc]
             #[no_mangle]
             pub unsafe extern "C" fn #fn_name(err: Dart_Handle) {
-                #error_slot = Some(Error::from_handle(err));
+                #error_slot.set(Some(Error::from_handle(err)));
             }
         }
     }
