@@ -18,19 +18,35 @@ import 'transport.dart' as transport;
 
 /// Registers functions needed for platform utils working.
 void registerFunctions(DynamicLibrary dl) {
+  print("platform_functions::registerFunctions 1");
   object.registerFunctions(dl);
+  print("platform_functions::registerFunctions 2");
   media_track.registerFunctions(dl);
+  print("platform_functions::registerFunctions 3");
   peer_connection.registerFunctions(dl);
+  print("platform_functions::registerFunctions 4");
   transceiver.registerFunctions(dl);
+  print("platform_functions::registerFunctions 5");
   ice_servers.registerFunctions(dl);
+  print("platform_functions::registerFunctions 6");
   constraints.registerFunctions(dl);
+  print("platform_functions::registerFunctions 7");
   media_devices.registerFunctions(dl);
+  print("platform_functions::registerFunctions 8");
   transport.registerFunctions(dl);
-  media_device_info.registerFunctions(dl);
-  media_display_info.registerFunctions(dl);
-  ice_candidate.registerFunctions(dl);
-  send_encoding_parameters.registerFunctions(dl);
-  parameters.registerFunctions(dl);
-  ice_candidate_error.registerFunctions(dl);
+  print("platform_functions::registerFunctions 9");
   codec_capability.registerFunctions(dl);
+  print("platform_functions::registerFunctions 10");
+  media_display_info.registerFunctions(dl);
+  print("platform_functions::registerFunctions 11");
+  ice_candidate.registerFunctions(dl);
+  print("platform_functions::registerFunctions 12");
+  send_encoding_parameters.registerFunctions(dl);
+  print("platform_functions::registerFunctions 13");
+  parameters.registerFunctions(dl);
+  print("platform_functions::registerFunctions 14");
+  ice_candidate_error.registerFunctions(dl);
+  print("platform_functions::registerFunctions 15");
+  media_device_info.registerFunctions(dl);
+  print("platform_functions::registerFunctions 16");
 }

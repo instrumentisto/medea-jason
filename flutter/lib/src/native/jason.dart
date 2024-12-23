@@ -49,6 +49,7 @@ void onPanic(void Function(String)? cb) {
 }
 
 ExternalLibrary _dlLoad() {
+  print("dlload start");
   if (!(Platform.isAndroid ||
       Platform.isLinux ||
       Platform.isWindows ||
@@ -69,31 +70,47 @@ ExternalLibrary _dlLoad() {
       : Platform.isLinux || Platform.isAndroid
           ? 'lib$base.so'
           : 'lib$base.dylib';
+  print("load library 1");
   final el = Platform.isIOS
       ? ExternalLibrary.process(iKnowHowToUseIt: true)
       : ExternalLibrary.open(path);
+  print("load library 2");
   final dl = el.ffiDynamicLibrary;
 
+  print("dlload::init 1");
   var initResult = dl.lookupFunction<IntPtr Function(Pointer<Void>),
           int Function(Pointer<Void>)>('init_jason_dart_api_dl')(
       NativeApi.initializeApiDLData);
+  print("dlload::init 2");
 
   if (initResult != 0) {
     throw 'Failed to initialize Dart API. Code: $initResult';
   }
 
+  print("dlload registerFunctions 1");
   callback.registerFunctions(dl);
+  print("dlload registerFunctions 2");
   completer.registerFunctions(dl);
+  print("dlload registerFunctions 3");
   exceptions.registerFunctions(dl);
+  print("dlload registerFunctions 4");
   future.registerFunctions(dl);
+  print("dlload registerFunctions 5");
   function.registerFunctions(dl);
+  print("dlload registerFunctions 6");
   platform_utils_registerer.registerFunctions(dl);
+  print("dlload registerFunctions 7");
   list.registerFunctions(dl);
+  print("dlload registerFunctions 8");
   map.registerFunctions(dl);
+  print("dlload registerFunctions 9");
   native_string.registerFunctions(dl);
+  print("dlload registerFunctions 10");
 
   executor = Executor(dl);
+  print("dlload::Executor OK");
 
+  print("dlload end");
   return el;
 }
 
@@ -103,14 +120,18 @@ class Jason implements base.Jason {
 
   /// Creates a new instance of [Jason].
   static Future<Jason> init() async {
+    print("Jason::init 1");
     // Init `medea_flutter_webrtc`.
     await initFfiBridge();
+    print("Jason::init 2");
     if (!RustLib.instance.initialized) {
       await RustLib.init(externalLibrary: el);
+      print("Jason::init 3");
 
       var port =
           // ignore: invalid_use_of_internal_member
           ((RustLib.instance.api) as BaseApiImpl).portManager.dartHandlerPort;
+      print("Jason::init 4");
 
       frb.onPanic(cb: (msg) async {
         msg as String;
@@ -119,13 +140,18 @@ class Jason implements base.Jason {
           _onPanicCallback!(msg);
         }
       });
+      print("Jason::init 5");
       frb.setDartOpaqueMessagePort(dartHandlerPort: port);
     }
+    print("Jason::init 6");
 
     var jason = Jason._();
+    print("Jason::init 7");
 
     jason.opaque = util.RustOpaque(frb.Jason());
+    print("Jason::init 8");
     RustHandlesStorage().insertHandle(jason);
+    print("Jason::init 9");
 
     return jason;
   }
