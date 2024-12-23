@@ -30,10 +30,7 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::{
-    cell::{RefCell},
-    panic,
-};
+use std::{cell::RefCell, panic};
 
 use libc::c_void;
 
