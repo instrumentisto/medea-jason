@@ -510,7 +510,8 @@ impl FnExpander {
         let ident = &self.ident;
 
         parse_quote! {
-            #fn_storage_ident.set(Some(#ident))
+            *::sync_unsafe_cell::SyncUnsafeCell::get(&#fn_storage_ident)
+                = Some(#ident)
         }
     }
 
@@ -549,10 +550,9 @@ impl FnExpander {
         let type_alias = &self.type_alias_ident;
 
         quote! {
-            ::std::thread_local! {
-                static #name: ::std::cell::RefCell<Option<#type_alias>> =
-                    ::std::cell::RefCell::default();
-            }
+            static #name: ::sync_unsafe_cell::SyncUnsafeCell<
+                    Option<#type_alias>
+                > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
         }
     }
 
@@ -597,12 +597,17 @@ impl FnExpander {
         quote! {
             #( #doc_attrs )*
             pub unsafe fn #name(#args) #ret_ty {
-                let res = #fn_storage_ident.with_borrow(|__fn_storage| {
-                    (*__fn_storage.as_ref().unwrap())(#( #args_idents ),*)
-                });
+                log::error!("Fn caller 1");
+                let res = (
+                        *(*#fn_storage_ident.get())
+                            .as_ref()
+                            .unwrap()
+                    )(#( #args_idents ),*);
                 if let Some(e) = #error_slot.take() {
+                    log::error!("Fn caller 2");
                   Err(e)
                 } else {
+                    log::error!("Fn caller 3");
                   Ok(res)
                 }
             }
@@ -653,7 +658,9 @@ impl FnExpander {
             #[doc = #doc]
             #[no_mangle]
             pub unsafe extern "C" fn #fn_name(err: Dart_Handle) {
+                log::error!("Fn setter 1");
                 #error_slot.set(Some(Error::from_handle(err)));
+                log::error!("Fn setter 2");
             }
         }
     }
