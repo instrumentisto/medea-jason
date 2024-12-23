@@ -73,13 +73,9 @@ class Call {
   static Future<Call> create() async {
     var self = Call._create();
 
-    print("Call::create 1");
     self._jason = await Jason.init();
-    print("Call::create 2");
     self._mediaManager = self._jason.mediaManager();
-    print("Call::create 3");
     self._room = self._jason.initRoom();
-    print("Call::create 4");
 
     return self;
   }

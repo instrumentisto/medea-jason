@@ -82,7 +82,6 @@ class _CallState extends State<CallRoute> {
   @override
   void initState() {
     super.initState();
-    print("initState 1");
 
     _roomId = widget.roomId;
     _memberId = widget.memberId;
@@ -90,12 +89,9 @@ class _CallState extends State<CallRoute> {
     _publishVideo = widget.publishVideo;
     _publishAudio = widget.publishAudio;
     _fakeMedia = widget.fakeMedia;
-    print("initState 2");
 
     () async {
-      print("initState 3@1");
       var call = await Call.create();
-      print("initState 3@2");
       call.onNewRemoteStream((track, remoteId, conn) async {
         final trackId = track.getTrack().id();
         if (track.mediaDirection() == jason.TrackMediaDirection.sendRecv) {
@@ -155,7 +151,6 @@ class _CallState extends State<CallRoute> {
             _widgets[remoteId] = connectionWidgets!;
           });
         }
-        print("initState 4");
         track.onMediaDirectionChanged(
           (newDir) async {
             var remoteTracks = _widgets[remoteId];
