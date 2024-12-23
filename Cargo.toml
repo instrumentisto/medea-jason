@@ -42,7 +42,6 @@ talc = ["dep:talc"]
 [dependencies]
 async-recursion = "1.1"
 async-trait = "0.1"
-sync-unsafe-cell = "0.1"
 backoff = { version = "0.4", features = ["futures"] }
 bitflags = "2.6"
 derivative = "2.2"
@@ -70,6 +69,7 @@ dart-sys = "4.1"
 flutter_rust_bridge = { version = "=2.7.0", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
 libc = "0.2"
 send_wrapper = "0.6"
+sync-unsafe-cell = "0.1"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 backoff = { version = "0.4", features = ["wasm-bindgen"] }
