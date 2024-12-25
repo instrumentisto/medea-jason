@@ -533,17 +533,18 @@ impl FnExpander {
         }
     }
 
-    /// Generates `thread_local`s for the extern Dart function pointer storing.
+    // TODO: Replace `sync_unsafe_cell` with `std` once the
+    //       following API is stabilized:
+    //       https://doc.rust-lang.org/std/cell/struct.SyncUnsafeCell.html
+    /// Generates storage for the extern Dart function pointer storing.
     ///
     /// # Example of generated code
     ///
     /// ```ignore
-    /// ::std::thread_local! {
-    ///     static PEER_CONNECTION__CREATE_OFFER__FUNCTION:
-    ///         ::std::cell::RefCell<
-    ///             Option<PeerConnectionCreateOfferFunction>
-    ///         > = ::std::cell::RefCell::default();
-    /// }
+    /// static PEER_CONNECTION__CREATE_OFFER__FUNCTION:
+    ///     ::sync_unsafe_cell::SyncUnsafeCell<
+    ///         Option<PeerConnectionCreateOfferFunction>
+    ///     > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
     /// ```
     fn gen_fn_storages(&self) -> TokenStream {
         let name = &self.fn_storage_ident;
@@ -561,14 +562,13 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// pub unsafe fn create_offer(
-    ///     peer: Dart_Handle,
-    /// ) -> Result<Dart_Handle, Error> {
-    ///     let res = PEER_CONNECTION__CREATE_OFFER__FUNCTION.with_borrow(
-    ///         |__fn_storage| (*__fn_storage.as_ref().unwrap())(peer),
-    ///     );
-    ///
-    ///     if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take() {
+    /// pub unsafe fn #name(#args) #ret_ty {
+    ///     let res = (
+    ///         *(*#fn_storage_ident.get())
+    ///             .as_ref()
+    ///             .unwrap()
+    ///         )(#( #args_idents ),*);
+    ///     if let Some(e) = #error_slot.take() {
     ///         Err(e)
     ///     } else {
     ///         Ok(res)
@@ -597,17 +597,14 @@ impl FnExpander {
         quote! {
             #( #doc_attrs )*
             pub unsafe fn #name(#args) #ret_ty {
-                log::error!("Fn caller 1");
                 let res = (
                         *(*#fn_storage_ident.get())
                             .as_ref()
                             .unwrap()
                     )(#( #args_idents ),*);
                 if let Some(e) = #error_slot.take() {
-                    log::error!("Fn caller 2");
                   Err(e)
                 } else {
-                    log::error!("Fn caller 3");
                   Ok(res)
                 }
             }
@@ -658,9 +655,7 @@ impl FnExpander {
             #[doc = #doc]
             #[no_mangle]
             pub unsafe extern "C" fn #fn_name(err: Dart_Handle) {
-                log::error!("Fn setter 1");
                 #error_slot.set(Some(Error::from_handle(err)));
-                log::error!("Fn setter 2");
             }
         }
     }
