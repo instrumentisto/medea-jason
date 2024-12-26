@@ -363,12 +363,11 @@ struct FnExpander {
     /// [`syn::Ident`] of the type alias for the extern Dart function pointer.
     type_alias_ident: syn::Ident,
 
-    /// [`syn::Ident`] of the storage storing extern Dart function
-    /// pointer.
+    /// [`syn::Ident`] of the storage storing extern Dart function pointer.
     fn_storage_ident: syn::Ident,
 
-    /// [`syn::Ident`] of the function error slot (`thread_local! {
-    /// RefCell<Option<Error>> }`).
+    /// [`syn::Ident`] of the function error slot
+    /// (`thread_local! { RefCell<Option<Error>> }`).
     error_slot_ident: syn::Ident,
 
     /// [`syn::Ident`] of the extern function that saves error in its slot.
@@ -503,19 +502,23 @@ impl FnExpander {
     /// # Example of the generated code
     ///
     /// ```ignore
-    /// PEER_CONNECTION__CREATE_OFFER__FUNCTION.set(Some(create_offer))
+    /// SyncUnsafeCell::get(&PEER_CONNECTION__CREATE_OFFER__FUNCTION)
+    ///     = Some(create_offer)
     /// ```
     fn gen_register_fn_expr(&self) -> syn::Expr {
         let fn_storage_ident = &self.fn_storage_ident;
         let ident = &self.ident;
 
+        // TODO: Replace `sync_unsafe_cell` with `std` once the
+        //       following API is stabilized:
+        //       https://doc.rust-lang.org/std/cell/struct.SyncUnsafeCell.html
         parse_quote! {
             *::sync_unsafe_cell::SyncUnsafeCell::get(&#fn_storage_ident)
                 = Some(#ident)
         }
     }
 
-    /// Generates type alias of the extern Dart function.
+    /// Generates a type alias of an extern Dart function.
     ///
     /// # Example of the generated code
     ///
@@ -533,10 +536,7 @@ impl FnExpander {
         }
     }
 
-    // TODO: Replace `sync_unsafe_cell` with `std` once the
-    //       following API is stabilized:
-    //       https://doc.rust-lang.org/std/cell/struct.SyncUnsafeCell.html
-    /// Generates storage for the extern Dart function pointer storing.
+    /// Generates a storage for extern Dart function pointer storing.
     ///
     /// # Example of generated code
     ///
@@ -550,6 +550,9 @@ impl FnExpander {
         let name = &self.fn_storage_ident;
         let type_alias = &self.type_alias_ident;
 
+        // TODO: Replace `sync_unsafe_cell` with `std` once the
+        //       following API is stabilized:
+        //       https://doc.rust-lang.org/std/cell/struct.SyncUnsafeCell.html
         quote! {
             static #name: ::sync_unsafe_cell::SyncUnsafeCell<
                     Option<#type_alias>
@@ -557,7 +560,7 @@ impl FnExpander {
         }
     }
 
-    /// Generates Dart function caller for Rust.
+    /// Generates a Dart function caller for Rust.
     ///
     /// # Example of generated code
     ///

@@ -319,17 +319,16 @@ impl_incrementable!(TrackId);
 
 /// Message sent by Media Server to Web Client.
 #[cfg_attr(
-    target_family = "wasm",
+    any(
+        target_family = "wasm",
+        all(target_arch = "arm", target_os = "android")
+    ),
     expect(variant_size_differences, reason = "`Event` is the most common")
 )]
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "client", derive(Deserialize))]
 #[cfg_attr(feature = "server", derive(Serialize))]
 #[serde(tag = "msg", content = "data")]
-#[cfg_attr(
-    all(target_arch = "arm", target_os = "android"),
-    expect(variant_size_differences, reason = "`Event` is the most common")
-)]
 pub enum ServerMsg {
     /// `ping` message that Media Server is expected to send to Web Client
     /// periodically for probing its aliveness.
@@ -352,16 +351,15 @@ pub enum ServerMsg {
 
 /// Message by Web Client to Media Server.
 #[cfg_attr(
-    target_family = "wasm",
+    any(
+        target_family = "wasm",
+        all(target_arch = "arm", target_os = "android")
+    ),
     expect(variant_size_differences, reason = "`Command` is the most common")
 )]
 #[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
-#[cfg_attr(
-    all(target_arch = "arm", target_os = "android"),
-    expect(variant_size_differences, reason = "`Command` is the most common")
-)]
 pub enum ClientMsg {
     /// `pong` message that Web Client answers with to Media Server in response
     /// to received [`ServerMsg::Ping`].
