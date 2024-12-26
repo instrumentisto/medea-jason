@@ -118,6 +118,9 @@ pub unsafe fn post_c_object(
 /// Once finalizable handle is collected by GC, the provided `callback` is
 /// called.
 ///
+/// The callback can be executed on any thread, will have an isolate group,
+/// but will not have a current isolate.
+///
 /// `peer` argument will be provided to the `callback` on finalize.
 ///
 /// `external_allocation_size` is a size of the `peer` which can be

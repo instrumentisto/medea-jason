@@ -61,10 +61,13 @@ impl backoff::future::Sleeper for Sleeper {
 
     fn sleep(&self, dur: Duration) -> Self::Sleep {
         let (tx, rx) = oneshot::channel();
-        platform::spawn(async move {
-            platform::delay_for(dur).await;
-            _ = tx.send(());
-        });
+        platform::spawn(
+            async move {
+                platform::delay_for(dur).await;
+                _ = tx.send(());
+            },
+            24,
+        );
         Box::pin(rx.map(drop))
     }
 }

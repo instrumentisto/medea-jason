@@ -319,7 +319,10 @@ impl_incrementable!(TrackId);
 
 /// Message sent by Media Server to Web Client.
 #[cfg_attr(
-    target_family = "wasm",
+    any(
+        target_family = "wasm",
+        all(target_arch = "arm", target_os = "android")
+    ),
     expect(variant_size_differences, reason = "`Event` is the most common")
 )]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -348,7 +351,10 @@ pub enum ServerMsg {
 
 /// Message by Web Client to Media Server.
 #[cfg_attr(
-    target_family = "wasm",
+    any(
+        target_family = "wasm",
+        all(target_arch = "arm", target_os = "android")
+    ),
     expect(variant_size_differences, reason = "`Command` is the most common")
 )]
 #[derive(Clone, Debug, PartialEq)]

@@ -190,16 +190,19 @@ where
     fn into_dart_future(self) -> DartFuture<Fut::Output> {
         let completer = Completer::new();
         let dart_future = completer.future();
-        spawn(async move {
-            match self.await {
-                Ok(ok) => {
-                    completer.complete(ok);
+        spawn(
+            async move {
+                match self.await {
+                    Ok(ok) => {
+                        completer.complete(ok);
+                    }
+                    Err(e) => {
+                        completer.complete_error(e.into());
+                    }
                 }
-                Err(e) => {
-                    completer.complete_error(e.into());
-                }
-            }
-        });
+            },
+            21,
+        );
         DartFuture(dart_future, PhantomData)
     }
 }

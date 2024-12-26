@@ -31,8 +31,10 @@ pub mod transport;
 pub mod utils;
 
 use std::{
-    cell::{LazyCell, RefCell},
+    cell::RefCell,
     panic,
+    sync::Mutex,
+    thread::{self, ThreadId},
 };
 
 use libc::c_void;
@@ -55,6 +57,16 @@ pub use self::{
     utils::{completer::delay_for, Function},
 };
 
+/// `Dart` main thread `ID`.
+///
+/// `medea-jason` is supposed to run on a single thread only, however there are
+/// some cases when a second thread might appear (e.g.
+/// [`Dart_NewFinalizableHandle`][1] callback might be called on another
+/// thread).
+///
+/// [1]: https://tinyurl.com/dart-new-finalizable-handle
+pub static DART_MAIN_THREAD: Mutex<Option<ThreadId>> = Mutex::new(None);
+
 /// Function to initialize `dart_api_dl` functions.
 ///
 /// # Safety
@@ -62,6 +74,15 @@ pub use self::{
 /// This function should never be called manually.
 #[no_mangle]
 pub unsafe extern "C" fn init_jason_dart_api_dl(data: *mut c_void) -> isize {
+    assert!(
+        DART_MAIN_THREAD
+            .lock()
+            .unwrap()
+            .replace(thread::current().id())
+            .is_none(),
+        "init_jason_dart_api_dl must be called only once"
+    );
+
     unsafe { dart_api::initialize_api(data) }
 }
 
@@ -109,6 +130,8 @@ pub fn init_logger() {
 /// Initializes [`simple_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
+    use std::cell::LazyCell;
+
     thread_local! {
         /// [`LazyCell`] ensuring that a [`simple_logger`] is initialized only
         /// once.

@@ -1,7 +1,7 @@
 //! Functionality for converting Rust closures into callbacks that can be passed
 //! to Dart and called by Dart.
 
-use std::{os::raw::c_void, ptr};
+use std::{os::raw::c_void, ptr, thread};
 
 use dart_sys::Dart_Handle;
 use derive_more::Debug;
@@ -9,7 +9,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{propagate_panic, DartValue, DartValueArg},
-    platform::{self, utils::dart_api},
+    platform::{self, utils::dart_api, DART_MAIN_THREAD},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/callback.g.dart")]
@@ -205,15 +205,13 @@ impl Callback {
 ///
 /// Cleans finalized [`Callback`] memory.
 extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
-    propagate_panic(move || {
-        // A little trick here. Since finalizers might run after isolate has
-        // already been shut down, calling any Dart API functions will cause a
-        // segfault. We schedule finalizer on the Dart executor, so if the
-        // isolate has already shut down, the operation won't run.
-        platform::spawn(async move {
-            drop(unsafe { Box::from_raw(cb.cast::<Callback>()) });
-        });
-    });
+    if *DART_MAIN_THREAD.lock().unwrap() != Some(thread::current().id()) {
+        // This means that Dart isolate is dead so memory reclamation can be
+        // skipped.
+        return;
+    }
+
+    drop(unsafe { Box::from_raw(cb.cast::<Callback>()) });
 }
 
 #[cfg(feature = "mockable")]

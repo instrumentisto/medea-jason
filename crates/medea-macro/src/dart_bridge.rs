@@ -133,8 +133,8 @@ impl ModExpander {
         let type_aliases =
             self.fn_expanders.iter().map(FnExpander::gen_fn_type);
 
-        let static_muts =
-            self.fn_expanders.iter().map(FnExpander::gen_fn_static_mut);
+        let fn_storages =
+            self.fn_expanders.iter().map(FnExpander::gen_fn_storages);
 
         let register_fn_name = &self.register_fn_name;
         let register_fn_inputs = self
@@ -162,7 +162,7 @@ impl ModExpander {
 
                 #( #type_aliases )*
 
-                #( #static_muts )*
+                #( #fn_storages )*
 
                 #( #errors_slots )*
 
@@ -316,10 +316,10 @@ impl<'a> IdentGenerator<'a> {
         )
     }
 
-    /// Returns a [`syn::Ident`] for the [`FnExpander`]'s `static mut`.
+    /// Returns a [`syn::Ident`] for the [`FnExpander`]'s storage.
     ///
     /// Generates something like `PEER_CONNECTION__CREATE_OFFER__FUNCTION`
-    fn static_mut(&self) -> syn::Ident {
+    fn fn_storage(&self) -> syn::Ident {
         format_ident!(
             "{}__{}__FUNCTION",
             self.prefix.to_string().to_screaming_snake_case(),
@@ -363,11 +363,11 @@ struct FnExpander {
     /// [`syn::Ident`] of the type alias for the extern Dart function pointer.
     type_alias_ident: syn::Ident,
 
-    /// [`syn::Ident`] of the `static mut` storing extern Dart function
-    /// pointer.
-    static_mut_ident: syn::Ident,
+    /// [`syn::Ident`] of the storage storing extern Dart function pointer.
+    fn_storage_ident: syn::Ident,
 
-    /// [`syn::Ident`] of the function error slot (`static mut Option<Error>`).
+    /// [`syn::Ident`] of the function error slot
+    /// (`thread_local! { RefCell<Option<Error>> }`).
     error_slot_ident: syn::Ident,
 
     /// [`syn::Ident`] of the extern function that saves error in its slot.
@@ -455,7 +455,7 @@ impl FnExpander {
         let ident_generator = IdentGenerator::new(prefix, &item.sig.ident);
         Ok(Self {
             type_alias_ident: ident_generator.type_alias(),
-            static_mut_ident: ident_generator.static_mut(),
+            fn_storage_ident: ident_generator.fn_storage(),
             error_slot_ident: ident_generator.error_slot_name(),
             error_setter_ident: ident_generator.error_setter_name(),
             ident: item.sig.ident,
@@ -502,18 +502,23 @@ impl FnExpander {
     /// # Example of the generated code
     ///
     /// ```ignore
-    /// PEER_CONNECTION__CREATE_OFFER__FUNCTION.write(create_offer)
+    /// SyncUnsafeCell::get(&PEER_CONNECTION__CREATE_OFFER__FUNCTION)
+    ///     = Some(create_offer)
     /// ```
     fn gen_register_fn_expr(&self) -> syn::Expr {
-        let fn_static_mut = &self.static_mut_ident;
+        let fn_storage_ident = &self.fn_storage_ident;
         let ident = &self.ident;
 
+        // TODO: Replace `sync_unsafe_cell` with `std` once the
+        //       following API is stabilized:
+        //       https://doc.rust-lang.org/std/cell/struct.SyncUnsafeCell.html
         parse_quote! {
-            #fn_static_mut.write(#ident)
+            *::sync_unsafe_cell::SyncUnsafeCell::get(&#fn_storage_ident)
+                = Some(#ident)
         }
     }
 
-    /// Generates type alias of the extern Dart function.
+    /// Generates a type alias of an extern Dart function.
     ///
     /// # Example of the generated code
     ///
@@ -531,38 +536,46 @@ impl FnExpander {
         }
     }
 
-    /// Generates `static mut` for the extern Dart function pointer storing.
+    /// Generates a storage for extern Dart function pointer storing.
     ///
     /// # Example of generated code
     ///
     /// ```ignore
-    /// static mut PEER_CONNECTION__CREATE_OFFER__FUNCTION:
-    ///     std::mem::MaybeUninit<PeerConnectionCreateOfferFunction> =
-    ///     std::mem::MaybeUninit::uninit();
+    /// static PEER_CONNECTION__CREATE_OFFER__FUNCTION:
+    ///     ::sync_unsafe_cell::SyncUnsafeCell<
+    ///         Option<PeerConnectionCreateOfferFunction>
+    ///     > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
     /// ```
-    fn gen_fn_static_mut(&self) -> TokenStream {
-        let name = &self.static_mut_ident;
+    fn gen_fn_storages(&self) -> TokenStream {
+        let name = &self.fn_storage_ident;
         let type_alias = &self.type_alias_ident;
 
+        // TODO: Replace `sync_unsafe_cell` with `std` once the
+        //       following API is stabilized:
+        //       https://doc.rust-lang.org/std/cell/struct.SyncUnsafeCell.html
         quote! {
-            static mut #name: ::std::mem::MaybeUninit<#type_alias> =
-                ::std::mem::MaybeUninit::uninit();
+            static #name: ::sync_unsafe_cell::SyncUnsafeCell<
+                    Option<#type_alias>
+                > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
         }
     }
 
-    /// Generates Dart function caller for Rust.
+    /// Generates a Dart function caller for Rust.
     ///
     /// # Example of generated code
     ///
     /// ```ignore
-    /// pub unsafe fn create_offer(
-    ///     peer: Dart_Handle,
-    /// ) -> Result<Dart_Handle, Error> {
-    ///     let res =
-    ///       (PEER_CONNECTION__CREATE_OFFER__FUNCTION.assume_init_ref())(peer);
-    ///
-    ///     if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take()
-    ///         { Err(e) } else { Ok(res) }
+    /// pub unsafe fn #name(#args) #ret_ty {
+    ///     let res = (
+    ///         *(*#fn_storage_ident.get())
+    ///             .as_ref()
+    ///             .unwrap()
+    ///         )(#( #args_idents ),*);
+    ///     if let Some(e) = #error_slot.take() {
+    ///         Err(e)
+    ///     } else {
+    ///         Ok(res)
+    ///     }
     /// }
     /// ```
     fn gen_caller_fn(&self) -> TokenStream {
@@ -582,12 +595,16 @@ impl FnExpander {
 
         let ret_ty = &self.ret_ty;
 
-        let static_mut = &self.static_mut_ident;
+        let fn_storage_ident = &self.fn_storage_ident;
 
         quote! {
             #( #doc_attrs )*
             pub unsafe fn #name(#args) #ret_ty {
-                let res = (#static_mut.assume_init_ref())(#( #args_idents ),*);
+                let res = (
+                        *(*#fn_storage_ident.get())
+                            .as_ref()
+                            .unwrap()
+                    )(#( #args_idents ),*);
                 if let Some(e) = #error_slot.take() {
                   Err(e)
                 } else {
@@ -602,13 +619,20 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// static mut PEER_CONNECTION__CREATE_OFFER__ERROR: Option<Error> = None;
+    /// ::std::thread_local! {
+    ///     static PEER_CONNECTION__CREATE_OFFER__ERROR: ::std::cell::RefCell<
+    ///         Option<Error>,
+    ///     > = ::std::cell::RefCell::default();
+    /// }
     /// ```
     fn get_errors_slot(&self) -> TokenStream {
         let name = &self.error_slot_ident;
 
         quote! {
-            static mut #name: Option<Error> = None;
+            ::std::thread_local! {
+                static #name: ::std::cell::RefCell<Option<Error>> =
+                    ::std::cell::RefCell::new(None);
+            }
         }
     }
 
@@ -619,10 +643,10 @@ impl FnExpander {
     /// ```ignore
     /// #[no_mangle]
     /// pub unsafe extern "C" fn peer_connection__connection_state__set_error(
-    ///     err: Dart_Handle
+    ///     err: Dart_Handle,
     /// ) {
-    ///     PEER_CONNECTION__CONNECTION_STATE__ERROR =
-    ///         Some(Error::from_handle(err));
+    ///     PEER_CONNECTION__CONNECTION_STATE__ERROR
+    ///         .set(Some(Error::from_handle(err)));
     /// }
     /// ```
     fn gen_error_setter(&self) -> TokenStream {
@@ -634,7 +658,7 @@ impl FnExpander {
             #[doc = #doc]
             #[no_mangle]
             pub unsafe extern "C" fn #fn_name(err: Dart_Handle) {
-                #error_slot = Some(Error::from_handle(err));
+                #error_slot.set(Some(Error::from_handle(err)));
             }
         }
     }

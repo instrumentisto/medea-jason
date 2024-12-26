@@ -156,17 +156,20 @@ impl LocalSdp {
             DESCRIPTION_APPROVE_TIMEOUT,
             self.0.is_rollback_timeout_stopped.get(),
         );
-        platform::spawn({
-            let this = self.clone();
-            async move {
-                if let Either::Right(_) =
-                    future::select(this.when_approved(), Box::pin(timeout))
-                        .await
-                {
-                    this.rollback();
-                };
-            }
-        });
+        platform::spawn(
+            {
+                let this = self.clone();
+                async move {
+                    if let Either::Right(_) =
+                        future::select(this.when_approved(), Box::pin(timeout))
+                            .await
+                    {
+                        this.rollback();
+                    };
+                }
+            },
+            10,
+        );
 
         drop(self.0.rollback_task_handle.replace(Some(rollback_task)));
     }

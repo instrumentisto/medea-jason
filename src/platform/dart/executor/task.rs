@@ -3,7 +3,7 @@
 //! [`platform::dart::executor`]: crate::platform::executor
 
 use std::{
-    cell::{Cell, RefCell},
+    cell::{BorrowError, Cell, Ref, RefCell},
     mem::ManuallyDrop,
     rc::Rc,
     task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
@@ -22,6 +22,8 @@ struct Inner {
     /// [`Future`]: std::future::Future
     #[debug(skip)]
     future: LocalBoxFuture<'static, ()>,
+
+    id: u64,
 
     /// Handle for waking up this [`Task`].
     waker: Waker,
@@ -48,7 +50,7 @@ impl Task {
     /// Spawns a new [`Task`] that will drive the given [`Future`].
     ///
     /// [`Future`]: std::future::Future
-    pub fn spawn(future: LocalBoxFuture<'static, ()>) {
+    pub fn spawn(future: LocalBoxFuture<'static, ()>, id: u64) {
         let this = Rc::new(Self {
             inner: RefCell::new(None),
             is_scheduled: Cell::new(false),
@@ -56,7 +58,7 @@ impl Task {
 
         let waker =
             unsafe { Waker::from_raw(Self::into_raw_waker(Rc::clone(&this))) };
-        drop(this.inner.borrow_mut().replace(Inner { future, waker }));
+        drop(this.inner.borrow_mut().replace(Inner { future, id, waker }));
 
         Self::wake_by_ref(&this);
     }
@@ -93,6 +95,17 @@ impl Task {
     /// already.
     fn wake_by_ref(this: &Rc<Self>) {
         if !this.is_scheduled.replace(true) {
+            // let id = {
+            //     match this.inner.try_borrow() {
+            //         Ok(v) => match &*v {
+            //             None => String::from("None"),
+            //             Some(i) => i.id.to_string(),
+            //         },
+            //         Err(_) => String::from("BorrowErr"),
+            //     }
+            // };
+            // println!("task_wake {:?}, {id}", std::thread::current().id());
+
             task_wake(Rc::clone(this));
         }
     }

@@ -145,7 +145,7 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
                 }
             }
         });
-        platform::spawn(fut.map(drop));
+        platform::spawn(fut.map(drop), 4);
 
         self.spawned_watchers.push(handle.into());
     }
