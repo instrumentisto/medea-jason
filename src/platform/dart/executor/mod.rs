@@ -9,15 +9,16 @@ use std::{
     sync::{atomic, atomic::AtomicI64},
 };
 
-use crate::{
-    api::propagate_panic,
-    platform::{utils::dart_api, DART_MAIN_THREAD},
-};
 use dart_sys::{
     Dart_CObject, Dart_CObject_Type_Dart_CObject_kInt64, Dart_Port,
     _Dart_CObject__bindgen_ty_1,
 };
 use sync_unsafe_cell::SyncUnsafeCell;
+
+use crate::{
+    api::propagate_panic,
+    platform::{utils::dart_api, DART_MAIN_THREAD},
+};
 
 pub use self::task::Task;
 
@@ -64,7 +65,7 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// [`WAKE_PORT`]. When received, Dart must poll it by calling the
 /// [`rust_executor_poll_task()`] function.
 fn task_wake(task: Rc<Task>) {
-    debug_assert_eq!(
+    assert_eq!(
         Some(std::thread::current().id()),
         *DART_MAIN_THREAD.lock().unwrap(),
         "Futures executor must be run on a single thread"

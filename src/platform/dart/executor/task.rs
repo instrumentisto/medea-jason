@@ -3,7 +3,7 @@
 //! [`platform::dart::executor`]: crate::platform::executor
 
 use std::{
-    cell::{BorrowError, Cell, Ref, RefCell},
+    cell::{Cell, RefCell},
     mem::ManuallyDrop,
     rc::Rc,
     task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
