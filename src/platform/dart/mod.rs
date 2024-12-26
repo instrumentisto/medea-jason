@@ -30,10 +30,7 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::{
-    cell::{LazyCell, RefCell},
-    panic,
-};
+use std::{cell::RefCell, panic};
 
 use libc::c_void;
 
@@ -109,6 +106,8 @@ pub fn init_logger() {
 /// Initializes [`simple_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
+    use std::cell::LazyCell;
+
     thread_local! {
         /// [`LazyCell`] ensuring that a [`simple_logger`] is initialized only
         /// once.
