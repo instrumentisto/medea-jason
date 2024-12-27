@@ -62,11 +62,14 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// [`WAKE_PORT`]. When received, Dart must poll it by calling the
 /// [`rust_executor_poll_task()`] function.
 fn task_wake(task: Rc<Task>) {
-    assert_eq!(
-        Some(thread::current().id()),
-        *DART_MAIN_THREAD.lock().unwrap(),
-        "Futures executor must be run on a single thread"
-    );
+    #[cfg(debug_assertions)]
+    propagate_panic(move || {
+        assert_eq!(
+            Some(thread::current().id()),
+            *DART_MAIN_THREAD.lock().unwrap(),
+            "Futures executor must be run on a single thread"
+        );
+    });
 
     let wake_port = unsafe { *WAKE_PORT.get() }.unwrap();
     let task = Rc::into_raw(task);
