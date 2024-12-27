@@ -1,15 +1,16 @@
 //! Functionality for converting Rust closures into callbacks that can be passed
 //! to Dart and called by Dart.
 
-use std::{os::raw::c_void, ptr, thread};
+use std::{os::raw::c_void, ptr};
 
 use dart_sys::Dart_Handle;
 use derive_more::Debug;
+use futures::channel::oneshot;
 use medea_macro::dart_bridge;
 
 use crate::{
     api::{propagate_panic, DartValue, DartValueArg},
-    platform::{utils::dart_api, DART_MAIN_THREAD},
+    platform::{self, utils::dart_api},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/callback.g.dart")]
@@ -187,14 +188,34 @@ impl Callback {
         };
 
         if is_finalizable {
+            // Since we transfer callback ownership to Dart side we have to do
+            // some gymnastics to reclaim Rust memory:
+            // Dart will call `callback_finalizer` when the object becomes
+            // unreachable. Since this callback might be called on a different
+            // thread we can't reclaim Rust side resources there. So
+            // `callback_finalizer` will signal the main thread to do actual
+            // memory reclamation.
+            let (finalizer_tx, finalizer_rx) = oneshot::channel::<()>();
             unsafe {
                 _ = dart_api::new_finalizable_handle(
                     handle,
-                    f.as_ptr().cast::<c_void>(),
-                    size_of::<Self>() as libc::intptr_t,
+                    Box::into_raw(Box::new(finalizer_tx)).cast(),
+                    // 128 is the approximate size of the channel and memory
+                    // reclamation closure as of rustc 1.81 and futures
+                    // v0.3.31. Ideally, it should be revisited occasionally,
+                    // but it is okay for this value to be approximate since it
+                    // works as a hint for the Dart's GC.
+                    (size_of::<Self>() + 128) as libc::intptr_t,
                     Some(callback_finalizer),
                 );
             }
+            platform::spawn(async move {
+                _ = finalizer_rx.await;
+
+                unsafe {
+                    drop(Box::<Self>::from_raw(f.as_ptr()));
+                };
+            });
         }
 
         handle
@@ -205,13 +226,8 @@ impl Callback {
 ///
 /// Cleans finalized [`Callback`] memory.
 extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
-    if *DART_MAIN_THREAD.lock().unwrap() != Some(thread::current().id()) {
-        // This means that Dart isolate is dead so memory reclamation can be
-        // skipped.
-        return;
-    }
-
-    drop(unsafe { Box::from_raw(cb.cast::<Callback>()) });
+    // Main thread is waiting to do the actual memory reclamation.
+    drop(unsafe { Box::from_raw(cb.cast::<oneshot::Sender<()>>()) });
 }
 
 #[cfg(feature = "mockable")]
