@@ -377,13 +377,10 @@ impl MediaStreamTrack {
 impl Drop for MediaStreamTrack {
     fn drop(&mut self) {
         let track = self.inner.clone();
-        platform::spawn(
-            async move {
-                let fut = unsafe { media_stream_track::dispose(track.get()) }
-                    .unwrap();
-                unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
-            },
-            18,
-        );
+        platform::spawn(async move {
+            let fut =
+                unsafe { media_stream_track::dispose(track.get()) }.unwrap();
+            unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
+        });
     }
 }

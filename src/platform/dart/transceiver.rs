@@ -326,17 +326,11 @@ impl Drop for Transceiver {
     fn drop(&mut self) {
         if Rc::get_mut(&mut self.0).is_some() {
             let transceiver = Rc::clone(&self.0);
-            platform::spawn(
-                async move {
-                    let fut =
-                        unsafe { transceiver::dispose(transceiver.get()) }
-                            .unwrap();
-                    unsafe { FutureFromDart::execute::<()>(fut) }
-                        .await
-                        .unwrap();
-                },
-                19,
-            );
+            platform::spawn(async move {
+                let fut =
+                    unsafe { transceiver::dispose(transceiver.get()) }.unwrap();
+                unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
+            });
         }
     }
 }

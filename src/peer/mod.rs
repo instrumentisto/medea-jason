@@ -371,23 +371,16 @@ impl PeerConnection {
             peer_events_sender.clone(),
         ));
 
-        platform::spawn(
-            {
-                let peer_events_sender = peer_events_sender.clone();
-                let peer_id = state.id();
+        platform::spawn({
+            let peer_events_sender = peer_events_sender.clone();
+            let peer_id = state.id();
 
-                async move {
-                    while let Some(e) = track_events_rx.next().await {
-                        Self::handle_track_event(
-                            peer_id,
-                            &peer_events_sender,
-                            e,
-                        );
-                    }
+            async move {
+                while let Some(e) = track_events_rx.next().await {
+                    Self::handle_track_event(peer_id, &peer_events_sender, e);
                 }
-            },
-            0,
-        );
+            }
+        });
 
         let peer = Self {
             id: state.id(),
@@ -473,19 +466,16 @@ impl PeerConnection {
             let connection_mode = state.connection_mode();
             self.peer.on_track(Some(move |track, transceiver| {
                 if let Some(c) = media_conns.upgrade() {
-                    platform::spawn(
-                        async move {
-                            if let (Err(mid), ConnectionMode::Mesh) = (
-                                c.add_remote_track(track, transceiver).await,
-                                connection_mode,
-                            ) {
-                                log::error!(
+                    platform::spawn(async move {
+                        if let (Err(mid), ConnectionMode::Mesh) = (
+                            c.add_remote_track(track, transceiver).await,
+                            connection_mode,
+                        ) {
+                            log::error!(
                                 "Cannot add new remote track with mid={mid}",
                             );
-                            };
-                        },
-                        17,
-                    );
+                        };
+                    });
                 }
             }));
         }

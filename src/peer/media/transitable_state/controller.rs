@@ -85,62 +85,52 @@ where
         // at that moment.
         let mut state_changes = self.state.subscribe().skip(1);
         let weak_self = Rc::downgrade(&self);
-        platform::spawn(
-            async move {
-                while let Some(state) = state_changes.next().await {
-                    let (state, _guard) = state.into_parts();
-                    if let Some(this) = weak_self.upgrade() {
-                        if let TransitableState::Transition(_) = state {
-                            let weak_this = Rc::downgrade(&this);
-                            platform::spawn(
-                                async move {
-                                    let mut states =
-                                        this.state.subscribe().skip(1);
-                                    let (timeout, timeout_handle) =
-                                        resettable_delay_for(
-                                            Self::TRANSITION_TIMEOUT,
-                                            this.is_transition_timeout_stopped
-                                                .get(),
-                                        );
-                                    drop(
-                                        this.timeout_handle
-                                            .borrow_mut()
-                                            .replace(timeout_handle),
-                                    );
-                                    match future::select(
-                                        states.next(),
-                                        Box::pin(timeout),
-                                    )
-                                    .await
-                                    {
-                                        Either::Left(_) => (),
-                                        Either::Right(_) => {
-                                            #[expect( // false positive
+        platform::spawn(async move {
+            while let Some(state) = state_changes.next().await {
+                let (state, _guard) = state.into_parts();
+                if let Some(this) = weak_self.upgrade() {
+                    if let TransitableState::Transition(_) = state {
+                        let weak_this = Rc::downgrade(&this);
+                        platform::spawn(async move {
+                            let mut states = this.state.subscribe().skip(1);
+                            let (timeout, timeout_handle) =
+                                resettable_delay_for(
+                                    Self::TRANSITION_TIMEOUT,
+                                    this.is_transition_timeout_stopped.get(),
+                                );
+                            drop(
+                                this.timeout_handle
+                                    .borrow_mut()
+                                    .replace(timeout_handle),
+                            );
+                            match future::select(
+                                states.next(),
+                                Box::pin(timeout),
+                            )
+                            .await
+                            {
+                                Either::Left(_) => (),
+                                Either::Right(_) => {
+                                    #[expect( // false positive
                                         clippy::shadow_unrelated,
                                         reason = "actually related"
                                     )]
-                                            if let Some(this) =
-                                                weak_this.upgrade()
-                                            {
-                                                let stable = this
-                                                    .state
-                                                    .get()
-                                                    .cancel_transition();
-                                                this.state.set(stable);
-                                            }
-                                        }
+                                    if let Some(this) = weak_this.upgrade() {
+                                        let stable = this
+                                            .state
+                                            .get()
+                                            .cancel_transition();
+                                        this.state.set(stable);
                                     }
-                                },
-                                14,
-                            );
-                        }
-                    } else {
-                        break;
+                                }
+                            }
+                        });
                     }
+                } else {
+                    break;
                 }
-            },
-            15,
-        );
+            }
+        });
     }
 
     /// Returns [`Stream`] into which the [`TransitableState::Stable`] updates

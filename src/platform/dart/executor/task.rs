@@ -23,8 +23,6 @@ struct Inner {
     #[debug(skip)]
     future: LocalBoxFuture<'static, ()>,
 
-    id: u64,
-
     /// Handle for waking up this [`Task`].
     waker: Waker,
 }
@@ -50,7 +48,7 @@ impl Task {
     /// Spawns a new [`Task`] that will drive the given [`Future`].
     ///
     /// [`Future`]: std::future::Future
-    pub fn spawn(future: LocalBoxFuture<'static, ()>, id: u64) {
+    pub fn spawn(future: LocalBoxFuture<'static, ()>) {
         let this = Rc::new(Self {
             inner: RefCell::new(None),
             is_scheduled: Cell::new(false),
@@ -58,7 +56,7 @@ impl Task {
 
         let waker =
             unsafe { Waker::from_raw(Self::into_raw_waker(Rc::clone(&this))) };
-        drop(this.inner.borrow_mut().replace(Inner { future, id, waker }));
+        drop(this.inner.borrow_mut().replace(Inner { future, waker }));
 
         Self::wake_by_ref(&this);
     }
@@ -95,17 +93,6 @@ impl Task {
     /// already.
     fn wake_by_ref(this: &Rc<Self>) {
         if !this.is_scheduled.replace(true) {
-            // let id = {
-            //     match this.inner.try_borrow() {
-            //         Ok(v) => match &*v {
-            //             None => String::from("None"),
-            //             Some(i) => i.id.to_string(),
-            //         },
-            //         Err(_) => String::from("BorrowErr"),
-            //     }
-            // };
-            // println!("task_wake {:?}, {id}", std::thread::current().id());
-
             task_wake(Rc::clone(this));
         }
     }

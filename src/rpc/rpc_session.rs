@@ -269,42 +269,39 @@ impl WebSocketRpcSession {
 
         let mut state_updates = self.state.subscribe();
         let weak_this = Rc::downgrade(self);
-        platform::spawn(
-            async move {
-                while let Some(state) = state_updates.next().await {
-                    let this = upgrade_or_break!(weak_this);
-                    match state {
-                        S::Connecting(info) => match Rc::clone(&this.client)
-                            .connect(info.url.clone())
-                            .await
-                        {
-                            Ok(()) => {
-                                this.state.set(S::Authorizing(info));
-                            }
-                            Err(e) => {
-                                this.state.set(S::Lost(
-                                    ConnectionLostReason::ConnectError(e),
-                                    info,
-                                ));
-                            }
-                        },
-                        S::Authorizing(info) => {
-                            this.client.authorize(
-                                info.room_id.clone(),
-                                info.member_id.clone(),
-                                info.credential.clone(),
-                            );
+        platform::spawn(async move {
+            while let Some(state) = state_updates.next().await {
+                let this = upgrade_or_break!(weak_this);
+                match state {
+                    S::Connecting(info) => match Rc::clone(&this.client)
+                        .connect(info.url.clone())
+                        .await
+                    {
+                        Ok(()) => {
+                            this.state.set(S::Authorizing(info));
                         }
-                        S::Uninitialized
-                        | S::Initialized(_)
-                        | S::Lost(..)
-                        | S::Opened(_)
-                        | S::Finished(_) => {}
+                        Err(e) => {
+                            this.state.set(S::Lost(
+                                ConnectionLostReason::ConnectError(e),
+                                info,
+                            ));
+                        }
+                    },
+                    S::Authorizing(info) => {
+                        this.client.authorize(
+                            info.room_id.clone(),
+                            info.member_id.clone(),
+                            info.credential.clone(),
+                        );
                     }
+                    S::Uninitialized
+                    | S::Initialized(_)
+                    | S::Lost(..)
+                    | S::Opened(_)
+                    | S::Finished(_) => {}
                 }
-            },
-            27,
-        );
+            }
+        });
     }
 
     /// Spawns [`WebSocketRpcClient::on_connection_loss`] listener.
@@ -317,66 +314,56 @@ impl WebSocketRpcSession {
 
         let mut client_on_connection_loss = self.client.on_connection_loss();
         let weak_this = Rc::downgrade(self);
-        platform::spawn(
-            async move {
-                while let Some(reason) = client_on_connection_loss.next().await
-                {
-                    let this = upgrade_or_break!(weak_this);
+        platform::spawn(async move {
+            while let Some(reason) = client_on_connection_loss.next().await {
+                let this = upgrade_or_break!(weak_this);
 
-                    let state = this.state.get();
-                    if matches!(state, S::Opened(_)) {
-                        this.can_reconnect.set(true);
-                    }
-                    match state {
-                        S::Connecting(info)
-                        | S::Authorizing(info)
-                        | S::Opened(info) => {
-                            this.state.set(S::Lost(
-                                ConnectionLostReason::Lost(reason),
-                                info,
-                            ));
-                        }
-                        S::Uninitialized
-                        | S::Initialized(_)
-                        | S::Lost(_, _)
-                        | S::Finished(_) => {}
-                    }
+                let state = this.state.get();
+                if matches!(state, S::Opened(_)) {
+                    this.can_reconnect.set(true);
                 }
-            },
-            28,
-        );
+                match state {
+                    S::Connecting(info)
+                    | S::Authorizing(info)
+                    | S::Opened(info) => {
+                        this.state.set(S::Lost(
+                            ConnectionLostReason::Lost(reason),
+                            info,
+                        ));
+                    }
+                    S::Uninitialized
+                    | S::Initialized(_)
+                    | S::Lost(_, _)
+                    | S::Finished(_) => {}
+                }
+            }
+        });
     }
 
     /// Spawns [`WebSocketRpcClient::on_normal_close`] listener.
     fn spawn_close_watcher(self: &Rc<Self>) {
         let on_normal_close = self.client.on_normal_close();
         let weak_this = Rc::downgrade(self);
-        platform::spawn(
-            async move {
-                let reason = on_normal_close.await.unwrap_or_else(|_| {
-                    ClientDisconnect::RpcClientUnexpectedlyDropped.into()
-                });
-                if let Some(this) = weak_this.upgrade() {
-                    this.state.set(SessionState::Finished(reason));
-                }
-            },
-            29,
-        );
+        platform::spawn(async move {
+            let reason = on_normal_close.await.unwrap_or_else(|_| {
+                ClientDisconnect::RpcClientUnexpectedlyDropped.into()
+            });
+            if let Some(this) = weak_this.upgrade() {
+                this.state.set(SessionState::Finished(reason));
+            }
+        });
     }
 
     /// Spawns [`WebSocketRpcClient::subscribe`] listener.
     fn spawn_server_msg_listener(self: &Rc<Self>) {
         let mut server_msg_rx = self.client.subscribe();
         let weak_this = Rc::downgrade(self);
-        platform::spawn(
-            async move {
-                while let Some(msg) = server_msg_rx.next().await {
-                    let this = upgrade_or_break!(weak_this);
-                    msg.dispatch_with(this.as_ref());
-                }
-            },
-            30,
-        );
+        platform::spawn(async move {
+            while let Some(msg) = server_msg_rx.next().await {
+                let this = upgrade_or_break!(weak_this);
+                msg.dispatch_with(this.as_ref());
+            }
+        });
     }
 }
 

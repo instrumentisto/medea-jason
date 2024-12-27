@@ -96,23 +96,20 @@ impl Track {
         });
 
         let mut muted_changes = track.0.muted.subscribe().skip(1).fuse();
-        platform::spawn(
-            {
-                let weak_inner = Rc::downgrade(&track.0);
-                async move {
-                    while let Some(is_muted) = muted_changes.next().await {
-                        if let Some(inner) = weak_inner.upgrade() {
-                            if is_muted {
-                                inner.on_muted.call0();
-                            } else {
-                                inner.on_unmuted.call0();
-                            }
+        platform::spawn({
+            let weak_inner = Rc::downgrade(&track.0);
+            async move {
+                while let Some(is_muted) = muted_changes.next().await {
+                    if let Some(inner) = weak_inner.upgrade() {
+                        if is_muted {
+                            inner.on_muted.call0();
+                        } else {
+                            inner.on_unmuted.call0();
                         }
                     }
                 }
-            },
-            9,
-        );
+            }
+        });
 
         track
     }

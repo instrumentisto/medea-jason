@@ -608,7 +608,7 @@ impl Connection {
                 );
             }
         });
-        platform::spawn(fut.map(drop), 6);
+        platform::spawn(fut.map(drop));
 
         TaskHandle::from(abort)
     }

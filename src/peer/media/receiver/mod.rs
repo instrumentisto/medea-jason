@@ -252,12 +252,9 @@ impl Receiver {
             self.media_direction.get(),
         );
         if let Some(prev_track) = self.track.replace(Some(new_track)) {
-            platform::spawn(
-                async move {
-                    prev_track.stop().await;
-                },
-                1,
-            );
+            platform::spawn(async move {
+                prev_track.stop().await;
+            });
         };
 
         // It's OK to `.clone()` here, as the `Transceiver` represents a pointer
@@ -353,17 +350,14 @@ impl Drop for Receiver {
     fn drop(&mut self) {
         let transceiver = self.transceiver.borrow_mut().take();
         if let Some(transceiver) = transceiver {
-            platform::spawn(
-                async move {
-                    if !transceiver.is_stopped() {
-                        transceiver.set_recv(false).await;
-                    }
-                },
-                11,
-            );
+            platform::spawn(async move {
+                if !transceiver.is_stopped() {
+                    transceiver.set_recv(false).await;
+                }
+            });
         }
         if let Some(recv_track) = self.track.borrow_mut().take() {
-            platform::spawn(recv_track.stop(), 12);
+            platform::spawn(recv_track.stop());
         }
     }
 }

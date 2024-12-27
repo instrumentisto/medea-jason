@@ -182,12 +182,9 @@ impl Repository {
             }
         });
 
-        platform::spawn(
-            async move {
-                _ = fut.await.ok();
-            },
-            16,
-        );
+        platform::spawn(async move {
+            _ = fut.await.ok();
+        });
 
         abort.into()
     }

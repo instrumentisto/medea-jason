@@ -138,12 +138,9 @@ fn spawn_idle_watchdog_task(this: Rc<RefCell<Inner>>) -> TaskHandle {
                 .retain(|sub| sub.unbounded_send(()).is_ok());
         });
 
-    platform::spawn(
-        async move {
-            _ = idle_watchdog_fut.await.ok();
-        },
-        25,
-    );
+    platform::spawn(async move {
+        _ = idle_watchdog_fut.await.ok();
+    });
 
     idle_watchdog_handle.into()
 }
@@ -166,12 +163,9 @@ fn spawn_ping_handle_task(this: Rc<RefCell<Inner>>) -> TaskHandle {
             }
         }
     });
-    platform::spawn(
-        async move {
-            _ = handle_ping_fut.await.ok();
-        },
-        26,
-    );
+    platform::spawn(async move {
+        _ = handle_ping_fut.await.ok();
+    });
     handle_ping_task.into()
 }
 

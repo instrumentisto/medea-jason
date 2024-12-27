@@ -856,54 +856,49 @@ impl Room {
         let room = Rc::new(InnerRoom::new(rpc, media_manager, tx));
         let weak_room = Rc::downgrade(&room);
 
-        platform::spawn(
-            async move {
-                loop {
-                    let event: RoomEvent = futures::select! {
-                        event = rpc_events_stream.select_next_some() => event,
-                        event = peer_events_stream.select_next_some() => event,
-                        event = rpc_connection_lost.select_next_some() => event,
-                        event = rpc_client_reconnected.select_next_some() => event,
-                        complete => break,
-                    };
+        platform::spawn(async move {
+            loop {
+                let event: RoomEvent = futures::select! {
+                    event = rpc_events_stream.select_next_some() => event,
+                    event = peer_events_stream.select_next_some() => event,
+                    event = rpc_connection_lost.select_next_some() => event,
+                    event = rpc_client_reconnected.select_next_some() => event,
+                    complete => break,
+                };
 
-                    if let Some(this_room) = weak_room.upgrade() {
-                        match event {
-                            RoomEvent::RpcEvent(event) => {
-                                if let Err(e) = event
-                                    .dispatch_with(&*this_room)
-                                    .await
-                                    .map_err(
-                                        tracerr::wrap!(=> UnknownPeerIdError),
-                                    )
-                                {
-                                    log::error!("{e}");
-                                };
-                            }
-                            RoomEvent::PeerEvent(event) => {
-                                if let Err(e) =
+                if let Some(this_room) = weak_room.upgrade() {
+                    match event {
+                        RoomEvent::RpcEvent(event) => {
+                            if let Err(e) = event
+                                .dispatch_with(&*this_room)
+                                .await
+                                .map_err(tracerr::wrap!(=> UnknownPeerIdError))
+                            {
+                                log::error!("{e}");
+                            };
+                        }
+                        RoomEvent::PeerEvent(event) => {
+                            if let Err(e) =
                                 event.dispatch_with(&*this_room).await.map_err(
                                     tracerr::wrap!(=> UnknownRemoteMemberError),
                                 )
                             {
                                 log::error!("{e}");
                             };
-                            }
-                            RoomEvent::RpcClientLostConnection => {
-                                this_room.handle_rpc_connection_lost();
-                            }
-                            RoomEvent::RpcClientReconnected => {
-                                this_room.handle_rpc_connection_recovered();
-                            }
                         }
-                    } else {
-                        log::error!("Inner Room dropped unexpectedly");
-                        break;
+                        RoomEvent::RpcClientLostConnection => {
+                            this_room.handle_rpc_connection_lost();
+                        }
+                        RoomEvent::RpcClientReconnected => {
+                            this_room.handle_rpc_connection_recovered();
+                        }
                     }
+                } else {
+                    log::error!("Inner Room dropped unexpectedly");
+                    break;
                 }
-            },
-            22,
-        );
+            }
+        });
 
         Self(room)
     }
@@ -1911,12 +1906,9 @@ impl Drop for InnerRoom {
             // That's why the finalizer is scheduled on the Dart executor, so if
             // the isolate shuts down, the operation won't run.
             let rpc = Rc::clone(&self.rpc);
-            platform::spawn(
-                async move {
-                    rpc.close_with_reason(reason);
-                },
-                23,
-            );
+            platform::spawn(async move {
+                rpc.close_with_reason(reason);
+            });
         };
 
         self.on_close
