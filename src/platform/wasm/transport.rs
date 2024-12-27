@@ -9,7 +9,7 @@ use std::{cell::RefCell, rc::Rc};
 
 use async_trait::async_trait;
 use derive_more::{From, Into};
-use futures::{channel::mpsc, stream::LocalBoxStream, StreamExt};
+use futures::{channel::mpsc, stream::LocalBoxStream, StreamExt as _};
 use medea_client_api_proto::{ClientMsg, ServerMsg};
 use medea_reactive::ObservableCell;
 use tracerr::Traced;

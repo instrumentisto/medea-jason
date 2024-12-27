@@ -42,7 +42,7 @@ use crate::{
         ClientDisconnect, CloseReason, ConnectionInfo,
         ConnectionInfoParseError, ReconnectHandle, RpcSession, SessionError,
     },
-    utils::{AsProtoState, Caused},
+    utils::{AsProtoState as _, Caused},
 };
 
 /// Alias of [`Result`]s related to [`MediaState`] update functions.

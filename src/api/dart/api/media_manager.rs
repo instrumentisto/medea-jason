@@ -16,7 +16,7 @@ use crate::{
         Error as DartError,
     },
     media::{self as core},
-    platform::{self, utils::dart_future::IntoDartFuture},
+    platform::{self, utils::dart_future::IntoDartFuture as _},
 };
 
 /// External handle to a [`MediaManager`].

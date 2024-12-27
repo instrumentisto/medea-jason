@@ -11,7 +11,7 @@ mod tracks_request;
 use std::{
     cell::{Cell, RefCell},
     collections::{hash_map::DefaultHasher, HashMap},
-    hash::{Hash, Hasher},
+    hash::{Hash as _, Hasher as _},
     rc::Rc,
 };
 

@@ -20,21 +20,21 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.81
+RUST_VER := 1.83
 CHROME_VERSION := 128.0
-FIREFOX_VERSION := 130.0-driver0.35.0
+FIREFOX_VERSION := 133.0-driver0.35.0
 
-CARGO_NDK_VER := 3.5.4-ndkr27b-rust$(RUST_VER)
+CARGO_NDK_VER := 3.5.4-ndkr27c-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
                    i686-linux-android \
                    x86_64-linux-android
 ANDROID_SDK_COMPILE_VERSION = $(strip \
-	$(shell grep compileSdkVersion flutter/android/build.gradle \
-	        | awk '{print $$2}'))
+	$(shell grep compileSdk flutter/android/build.gradle \
+	        | awk -F'= ' '{print $$2}' | tr -d ' '))
 ANDROID_SDK_MIN_VERSION = $(strip \
-	$(shell grep minSdkVersion flutter/android/build.gradle \
-	        | awk '{print $$2}'))
+	$(shell grep minSdk flutter/android/build.gradle \
+	        | awk -F'= ' '{print $$2}' | tr -d ' '))
 FLUTTER_RUST_BRIDGE_VER ?= $(strip \
 	$(shell grep -A1 'name = "flutter_rust_bridge"' Cargo.lock \
 	        | grep -v 'flutter_rust_bridge' \
@@ -282,7 +282,7 @@ endif
 else
 ifeq ($(cargo-build-platform),web)
 ifeq ($(pre-install),yes)
-	curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+	cargo install wasm-pack
 endif
 	@rm -rf ./pkg/
 	wasm-pack build -t web ./ $(if $(call eq,$(debug),no),,--dev) $(args)
@@ -442,7 +442,7 @@ endif
 		--no-web \
 		--local
 	cd flutter && \
-	dart pub run build_runner build --delete-conflicting-outputs
+	dart run build_runner build --delete-conflicting-outputs
 
 
 # Lint Rust sources with Clippy.

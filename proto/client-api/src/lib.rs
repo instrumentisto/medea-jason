@@ -29,7 +29,6 @@
     clippy::derive_partial_eq_without_eq,
     clippy::else_if_without_else,
     clippy::empty_drop,
-    clippy::empty_line_after_outer_attr,
     clippy::empty_structs_with_brackets,
     clippy::equatable_if_let,
     clippy::empty_enum_variants_with_brackets,
@@ -38,13 +37,11 @@
     clippy::fallible_impl_from,
     clippy::filetype_is_file,
     clippy::float_cmp_const,
-    clippy::fn_to_numeric_cast,
     clippy::fn_to_numeric_cast_any,
     clippy::format_push_string,
     clippy::get_unwrap,
     clippy::if_then_some_else_none,
     clippy::imprecise_flops,
-    clippy::index_refutable_slice,
     clippy::infinite_loop,
     clippy::iter_on_empty_collections,
     clippy::iter_on_single_items,
@@ -54,7 +51,6 @@
     clippy::large_stack_frames,
     clippy::let_underscore_untyped,
     clippy::lossy_float_literal,
-    clippy::manual_c_str_literals,
     clippy::map_err_ignore,
     clippy::mem_forget,
     clippy::missing_assert_message,
@@ -68,16 +64,17 @@
     clippy::needless_collect,
     clippy::needless_pass_by_ref_mut,
     clippy::needless_raw_strings,
+    clippy::non_zero_suggestions,
     clippy::nonstandard_macro_braces,
     clippy::option_if_let_else,
     clippy::or_fun_call,
     clippy::panic_in_result_fn,
     clippy::partial_pub_fields,
+    clippy::pathbuf_init_then_push,
     clippy::pedantic,
     clippy::print_stderr,
     clippy::print_stdout,
     clippy::pub_without_shorthand,
-    clippy::ref_as_ptr,
     clippy::rc_buffer,
     clippy::rc_mutex,
     clippy::read_zero_byte_vec,
@@ -103,6 +100,7 @@
     clippy::suspicious_xor_used_as_pow,
     clippy::tests_outside_test_module,
     clippy::todo,
+    clippy::too_long_first_doc_paragraph,
     clippy::trailing_empty_array,
     clippy::transmute_undefined_repr,
     clippy::trivial_regex,
@@ -116,6 +114,8 @@
     clippy::unnecessary_struct_initialization,
     clippy::unneeded_field_pattern,
     clippy::unused_peekable,
+    clippy::unused_result_ok,
+    clippy::unused_trait_names,
     clippy::unwrap_in_result,
     clippy::unwrap_used,
     clippy::use_debug,
@@ -153,11 +153,16 @@
 pub mod state;
 pub mod stats;
 
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    hash::{Hash, Hasher},
+};
 
-use derive_more::{Constructor, Display, From};
+use derive_more::{Constructor, Display, From, Into};
 use medea_macro::dispatchable;
-use serde::{Deserialize, Serialize};
+use rand::{distributions::Alphanumeric, Rng as _};
+use secrecy::{ExposeSecret as _, SecretString};
+use serde::{Deserialize, Serialize, Serializer};
 
 use self::stats::RtcStat;
 
@@ -189,15 +194,106 @@ pub struct PeerId(pub u32);
 )]
 pub struct TrackId(pub u32);
 
+/// Secret used for a client authentication on an [`IceServer`].
+#[derive(Clone, Debug, Deserialize, From, Into)]
+pub struct IcePassword(SecretString);
+
+impl IcePassword {
+    /// Length of a randomly generated [`IcePassword`].
+    const RANDOM_LENGTH: usize = 16;
+
+    /// Provides access to the underlying secret [`str`].
+    #[must_use]
+    pub fn expose_str(&self) -> &str {
+        self.0.expose_secret()
+    }
+
+    /// Generates a new random [`IcePassword`].
+    #[must_use]
+    pub fn random() -> Self {
+        Self(
+            rand::thread_rng()
+                .sample_iter(&Alphanumeric)
+                .take(Self::RANDOM_LENGTH)
+                .map(char::from)
+                .collect::<String>()
+                .into(),
+        )
+    }
+}
+impl Serialize for IcePassword {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.0.expose_secret().serialize(serializer)
+    }
+}
+
+impl Eq for IcePassword {}
+
+impl PartialEq for IcePassword {
+    fn eq(&self, other: &Self) -> bool {
+        use subtle::ConstantTimeEq as _;
+
+        self.expose_str()
+            .as_bytes()
+            .ct_eq(other.expose_str().as_bytes())
+            .into()
+    }
+}
+
 /// Credential used for a `Member` authentication.
-#[derive(
-    Clone, Debug, Deserialize, Display, Eq, From, Hash, PartialEq, Serialize,
-)]
-#[from(forward)]
-pub struct Credential(pub String);
+#[derive(Clone, Debug, Deserialize)]
+pub struct Credential(SecretString);
+
+impl Serialize for Credential {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.0.expose_secret().serialize(serializer)
+    }
+}
+
+impl Credential {
+    /// Provides access to the underlying secret [`str`].
+    #[must_use]
+    pub fn expose_str(&self) -> &str {
+        self.0.expose_secret()
+    }
+}
+
+impl<T> From<T> for Credential
+where
+    T: Into<String>,
+{
+    fn from(value: T) -> Self {
+        Self(value.into().into())
+    }
+}
+
+impl Hash for Credential {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.expose_str().hash(state);
+    }
+}
+
+impl Eq for Credential {}
+
+impl PartialEq for Credential {
+    fn eq(&self, other: &Self) -> bool {
+        use subtle::ConstantTimeEq as _;
+
+        self.expose_str()
+            .as_bytes()
+            .ct_eq(other.expose_str().as_bytes())
+            .into()
+    }
+}
 
 #[cfg(feature = "server")]
-/// Value that is able to be incremented by `1`.
+/// Value being able to be increment by `1`.
 pub trait Incrementable {
     /// Returns current value + 1.
     #[must_use]
@@ -223,7 +319,10 @@ impl_incrementable!(TrackId);
 
 /// Message sent by Media Server to Web Client.
 #[cfg_attr(
-    target_family = "wasm",
+    any(
+        target_family = "wasm",
+        all(target_arch = "arm", target_os = "android")
+    ),
     expect(variant_size_differences, reason = "`Event` is the most common")
 )]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -252,7 +351,10 @@ pub enum ServerMsg {
 
 /// Message by Web Client to Media Server.
 #[cfg_attr(
-    target_family = "wasm",
+    any(
+        target_family = "wasm",
+        all(target_arch = "arm", target_os = "android")
+    ),
     expect(variant_size_differences, reason = "`Command` is the most common")
 )]
 #[derive(Clone, Debug, PartialEq)]
@@ -985,7 +1087,7 @@ pub struct IceServer {
 
     /// Optional secret to authenticate on this [`IceServer`] with.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub credential: Option<String>,
+    pub credential: Option<IcePassword>,
 }
 
 /// Possible directions of a [`Track`].

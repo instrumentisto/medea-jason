@@ -7,7 +7,7 @@ use send_wrapper::SendWrapper;
 use crate::room::Room;
 use crate::{
     api::{dart::api::ForeignClass, Error, Error as DartError},
-    platform::utils::dart_future::IntoDartFuture,
+    platform::utils::dart_future::IntoDartFuture as _,
     rpc as core,
 };
 

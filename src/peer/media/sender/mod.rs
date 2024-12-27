@@ -20,7 +20,8 @@ use crate::{
 };
 
 use super::{
-    media_exchange_state, mute_state, MediaConnections, MediaStateControllable,
+    media_exchange_state, mute_state, MediaConnections,
+    MediaStateControllable as _,
 };
 
 #[doc(inline)]

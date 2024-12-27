@@ -68,6 +68,7 @@ impl From<RtcRtpTransceiverDirection> for Direction {
             D::Recvonly => Self::RECV,
             D::Inactive => Self::INACTIVE,
             D::Sendrecv => Self::SEND | Self::RECV,
+            D::Stopped => Self::STOPPED,
             _ => {
                 unreachable!("unexpected transceiver direction")
             }
@@ -87,6 +88,8 @@ impl From<Direction> for RtcRtpTransceiverDirection {
             Self::Recvonly
         } else if direction.contains(D::SEND) {
             Self::Sendonly
+        } else if direction.contains(D::STOPPED) {
+            Self::Stopped
         } else {
             Self::Inactive
         }

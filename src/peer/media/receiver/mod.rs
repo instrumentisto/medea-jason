@@ -11,13 +11,13 @@ use proto::{ConnectionMode, TrackId};
 use crate::{
     media::{track::remote, MediaDirection, RecvConstraints, TrackConstraints},
     peer::{
-        media::media_exchange_state, MediaConnections, MediaStateControllable,
-        PeerEvent, TrackEvent,
+        media::media_exchange_state, MediaConnections,
+        MediaStateControllable as _, PeerEvent, TrackEvent,
     },
     platform, utils,
 };
 
-use super::TransceiverSide;
+use super::TransceiverSide as _;
 
 #[doc(inline)]
 pub use self::component::{Component, State};

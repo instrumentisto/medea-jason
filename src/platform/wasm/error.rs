@@ -4,7 +4,7 @@ use derive_more::Display;
 use wasm_bindgen::{
     convert::{IntoWasmAbi, OptionIntoWasmAbi},
     describe::WasmDescribe,
-    JsCast, JsValue,
+    JsCast as _, JsValue,
 };
 
 /// Wrapper for JS value which returned from JS side as error.

@@ -397,8 +397,8 @@ impl TryFrom<proto::Member> for Member {
                     .pipeline
                     .into_iter()
                     .map(|(id, member_el)| {
-                        member_el.el.map_or(
-                            Err(ProtobufError::NoElementForId(id.into())),
+                        member_el.el.map_or_else(
+                            || Err(ProtobufError::NoElementForId(id.into())),
                             |el| Endpoint::try_from(el).map(|e| (e.id, e.spec)),
                         )
                     })
@@ -498,7 +498,7 @@ impl From<Credentials> for proto::member::Credentials {
     fn from(creds: Credentials) -> Self {
         match creds {
             Credentials::Hash(hash) => Self::Hash(hash.into()),
-            Credentials::Plain(plain) => Self::Plain(plain.into()),
+            Credentials::Plain(plain) => Self::Plain(plain.expose_str().into()),
         }
     }
 }

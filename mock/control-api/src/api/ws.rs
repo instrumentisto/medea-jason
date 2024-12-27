@@ -6,7 +6,8 @@
 use std::{sync::Arc, time::Duration};
 
 use actix::{
-    Actor, ActorContext, AsyncContext, Handler, Message, StreamHandler,
+    Actor, ActorContext as _, AsyncContext as _, Handler, Message,
+    StreamHandler,
 };
 use actix_web::{
     web::{Data, Path, Payload},

@@ -20,10 +20,11 @@ use crate::subscribers_store::{
 };
 
 /// Reactive hash map based on [`HashMap`][1] with additional functionality of
-/// tracking progress made by its subscribers. Its [`HashMap::on_insert()`] and
-/// [`HashMap::on_remove()`] subscriptions return values wrapped in
-/// [`progressable::Guarded`], and implementation tracks all
-/// [`progressable::Guard`]s.
+/// tracking progress made by its subscribers.
+///
+/// Its [`HashMap::on_insert()`] and [`HashMap::on_remove()`] subscriptions
+/// return values wrapped in [`progressable::Guarded`], and implementation
+/// tracks all [`progressable::Guard`]s.
 ///
 /// [1]: std::collections::HashMap
 pub type ProgressableHashMap<K, V> = HashMap<

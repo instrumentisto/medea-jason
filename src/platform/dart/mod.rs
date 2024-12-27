@@ -30,7 +30,7 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::panic;
+use std::{cell::RefCell, panic};
 
 use libc::c_void;
 use medea_client_api_proto as proto;
@@ -67,30 +67,31 @@ pub unsafe extern "C" fn init_jason_dart_api_dl(data: *mut c_void) -> isize {
 /// Dart's functions.
 pub fn set_panic_hook() {
     panic::set_hook(Box::new(|bt| {
-        if let Some(f) = unsafe { PANIC_FN.as_ref() } {
-            f.call1(format!("{bt}"));
-        }
+        PANIC_FN.with_borrow(|f| {
+            if let Some(f) = f {
+                f.call1(format!("{bt}"));
+            }
+        });
     }));
 }
 
-/// [`Function`] being called whenever Rust code [`panic`]s.
-static mut PANIC_FN: Option<Function<String>> = None;
+thread_local! {
+    /// [`Function`] being called whenever Rust code [`panic`]s.
+    static PANIC_FN: RefCell<Option<Function<String>>> = RefCell::default();
+}
 
 /// Sets the provided [`Function`] as a callback to be called whenever Rust code
 /// [`panic`]s.
 ///
 /// [`panic`]: panic!
 pub fn set_panic_callback(cb: Function<String>) {
-    unsafe {
-        PANIC_FN = Some(cb);
-    }
+    PANIC_FN.set(Some(cb));
 }
 
 #[cfg(target_os = "android")]
 /// Initializes [`android_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
-    // TODO: `android_logger::init_once()` should be called only once.
     android_logger::init_once(
         android_logger::Config::default()
             .with_max_level(log::LevelFilter::Debug),
@@ -106,10 +107,18 @@ pub fn init_logger() {
 /// Initializes [`simple_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
-    // TODO: Should be called only once.
-    _ = simple_logger::SimpleLogger::new()
-        .with_level(log::LevelFilter::Debug)
-        .init();
+    use std::cell::LazyCell;
+
+    thread_local! {
+        /// [`LazyCell`] ensuring that a [`simple_logger`] is initialized only
+        /// once.
+        static INITIALIZED: LazyCell<()> = LazyCell::new(|| {
+            _ = simple_logger::SimpleLogger::new()
+                .with_level(log::LevelFilter::Debug)
+                .init();
+        });
+    }
+    INITIALIZED.with(|i| **i);
 }
 
 /// Returns [`proto::Capabilities`] of the current platform.

@@ -1,6 +1,6 @@
 //! [`MediaKind`] + [`MediaSourceKind`] criteria for local stream updates.
 
-use std::ops::BitOrAssign;
+use std::ops::BitOrAssign as _;
 
 use medea_client_api_proto::{Direction, MediaSourceKind, MediaType, Track};
 

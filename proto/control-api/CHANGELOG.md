@@ -6,6 +6,24 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.13.0] · 2024-10-29
+[0.13.0]: /../../tree/medea-control-api-proto-0.13.0/proto/control-api
+
+### BC Breaks
+
+- Made `member::Sid::to_string()` inherent method instead of implementing `fmt::Display`. ([#189])
+- Removed `Ord` and `PartialOrd` implementations from `member::PlainCredentials`. ([#189])
+
+### Upgraded
+
+- Dependencies:
+    - [`medea-client-api-proto`] to `0.7` ([#189]).
+
+[#189]: /../../pull/189
+
+
+
+
 ## [0.12.1] · 2024-08-27
 [0.12.1]: /../../tree/medea-control-api-proto-0.12.1/proto/control-api
 

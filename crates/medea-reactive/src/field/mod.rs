@@ -19,7 +19,7 @@ use futures::{
 };
 
 use crate::subscribers_store::{
-    progressable, progressable::Processed, SubscribersStore,
+    progressable, progressable::Processed, SubscribersStore as _,
 };
 
 #[doc(inline)]

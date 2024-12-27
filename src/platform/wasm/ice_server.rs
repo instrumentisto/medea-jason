@@ -32,7 +32,7 @@ where
             server.set_urls(&urls);
 
             if let Some(credential) = ice_server.credential {
-                server.set_credential(&credential);
+                server.set_credential(credential.expose_str());
             }
             if let Some(username) = ice_server.username {
                 server.set_username(&username);

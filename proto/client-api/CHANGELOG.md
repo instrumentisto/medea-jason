@@ -6,6 +6,24 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.7.0] · 2024-10-29
+[0.7.0]: /../../tree/medea-client-api-proto-0.7.0/proto/client-api
+
+### BC Breaks
+
+- Made interior of `Credential` private. ([#189])
+- Made `IceServer::credential` to `IcePassword` instead of `String`. ([#189], [#190])
+
+### Added
+
+- `IcePassword` type. ([#190])
+
+[#189]: /../../pull/189
+[#190]: /../../pull/190
+
+
+
+
 ## [0.6.1] · 2024-08-27
 [0.6.1]: /../../tree/medea-client-api-proto-0.6.1/proto/client-api
 
@@ -22,7 +40,7 @@ All user visible changes to this project will be documented in this file. This p
 ## [0.6.0] · 2024-08-05
 [0.6.0]: /../../tree/medea-client-api-proto-0.6.0/proto/client-api
 
-## BC Breaks
+### BC Breaks
 
 - Added `PeerMetrics::PeerConnectionError` variant ([#151]).
 - Added `TrackPatchEvent::encoding_parameters` field ([#164]).
@@ -30,7 +48,7 @@ All user visible changes to this project will be documented in this file. This p
 - Fields of `RtcInboundRtpStreamMediaType`, `RtcOutboundRtpStreamMediaType` and `MediaKind` renamed in `camelCase` ([#173]).
 - Converted `frames_per_second` fields to `Float` instead of `u32`/`u64` ([#173]).
 
-## Added
+### Added
 
 - `PeerConnectionError` type ([#151]).
 - `IceCandidateError` type ([#151]).

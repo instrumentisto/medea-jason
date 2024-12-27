@@ -18,7 +18,7 @@ use crate::{
     media::{LocalTracksConstraints, MediaDirection, MediaKind},
     peer::{
         component::SyncState,
-        media::{transitable_state::media_exchange_state, InTransition},
+        media::{transitable_state::media_exchange_state, InTransition as _},
         MediaExchangeState, MediaExchangeStateController,
         MediaStateControllable, MuteStateController, TransceiverSide,
     },

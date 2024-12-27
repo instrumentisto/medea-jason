@@ -24,7 +24,7 @@ use crate::{
     },
     platform, room,
     rpc::{rpc_session::ConnectionLostReason, ReconnectError, SessionError},
-    utils::Caused,
+    utils::Caused as _,
 };
 
 /// Error thrown when the operation wasn't allowed by the current state of the

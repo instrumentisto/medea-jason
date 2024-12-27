@@ -326,7 +326,7 @@ jobs:
           - android
           #- ios # TODO: Re-enable once fixed stability on CI
           - linux
-          - macos
+          #- macos # TODO: Re-enable once `colima start` failing fixed on CI
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
@@ -359,6 +359,13 @@ jobs:
                        ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin  # Temurin is cached on GitHub Actions Runners.
+          java-version: 17
+          cache: gradle
+        if: ${{ matrix.platform == 'android' }}
+
       - name: Parse Android API versions
         id: api-version
         run: |
@@ -370,7 +377,7 @@ jobs:
 
       - name: Start iOS simulator
         id: simulator
-        uses: futureware-tech/simulator-action@v3
+        uses: futureware-tech/simulator-action@v4
         with:
           os_version: '>=13.0'
           os: iOS
@@ -480,6 +487,13 @@ jobs:
           android: false
           swap-storage: false
           tool-cache: false
+        if: ${{ matrix.platform == 'android' }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin  # Temurin is cached on GitHub Actions Runners.
+          java-version: 17
+          cache: gradle
         if: ${{ matrix.platform == 'android' }}
 
       - name: Enable KVM for Android HW acceleration

@@ -20,8 +20,8 @@ use crate::{
     peer::{
         component::SyncState,
         media::{
-            media_exchange_state, mute_state, InTransition, MediaExchangeState,
-            MuteState, ProhibitedStateError,
+            media_exchange_state, mute_state, InTransition as _,
+            MediaExchangeState, MuteState, ProhibitedStateError,
         },
         MediaExchangeStateController, MediaState, MediaStateControllable,
         MuteStateController, TransceiverSide, UpdateLocalStreamError,
