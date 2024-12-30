@@ -192,19 +192,19 @@ impl Callback {
             // some gymnastics to reclaim Rust memory:
             // Dart will call `callback_finalizer` when the object becomes
             // unreachable. Since this callback might be called on a different
-            // thread we can't reclaim Rust side resources there. So
-            // `callback_finalizer` will signal the main thread to do actual
+            // thread we can't reclaim Rust side resources there. So,
+            // `callback_finalizer` will signal the main thread to do the actual
             // memory reclamation.
             let (finalizer_tx, finalizer_rx) = oneshot::channel::<()>();
             unsafe {
                 _ = dart_api::new_finalizable_handle(
                     handle,
                     Box::into_raw(Box::new(finalizer_tx)).cast(),
-                    // 128 is the approximate size of the channel and memory
-                    // reclamation closure as of rustc 1.81 and futures
-                    // v0.3.31. Ideally, it should be revisited occasionally,
-                    // but it is okay for this value to be approximate since it
-                    // works as a hint for the Dart's GC.
+                    // `128` is the approximate size of the channel and memory
+                    // reclamation closure as of Rust 1.81 and `futures` crate
+                    // `0.3.31`. Ideally, it should be revisited occasionally,
+                    // but it's OK for this value to be approximate, since it
+                    // works only as a hint for the Dart's GC.
                     (size_of::<Self>() + 128) as libc::intptr_t,
                     Some(callback_finalizer),
                 );

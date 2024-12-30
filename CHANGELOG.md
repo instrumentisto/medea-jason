@@ -13,7 +13,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Fixed
 
-- Futures executor being called from non-main thread of Dart platforms.  ([#197])
+- Futures executor being called from non-main thread on Dart platforms. ([#197])
 
 ### Upgraded
 

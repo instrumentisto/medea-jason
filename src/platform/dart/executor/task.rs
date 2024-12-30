@@ -49,14 +49,22 @@ pub struct Task {
     /// [`Task`].
     is_scheduled: AtomicBool,
 
-    /// Thread that this task was created on and must be polled on.
-    thread: ThreadId,
+    /// ID of the thread this [`Task`] was created on and must be polled on.
+    thread_id: ThreadId,
 }
 
+/// [`Task`] can be sent across threads safely because it ensures that the
+/// underlying [`Future`] will only be touched from a single thread it was
+/// created on.
+unsafe impl Send for Task {}
+/// [`Task`] can be shared across threads safely because it ensures that the
+/// underlying [`Future`] will only be touched from a single thread it was
+/// created on.
+unsafe impl Sync for Task {}
+
 impl ArcWake for Task {
-    /// Calls the `task_wake()` function by the provided reference if this
-    /// [`Task`] s incomplete and there are no [`Poll::Pending`] awake requests
-    /// already.
+    /// Commands an external Dart executor to poll this [`Task`] if it's
+    /// incomplete and there are no [`Poll::Pending`] awake requests already.
     ///
     /// [`Poll::Pending`]: task::Poll::Pending
     fn wake_by_ref(arc_self: &Arc<Self>) {
@@ -69,14 +77,15 @@ impl ArcWake for Task {
 impl Task {
     /// Spawns a new [`Task`] that will drive the given [`Future`].
     ///
-    /// Must be called on the same thread where [`Task`] will be polled.
+    /// Must be called on the same thread where the [`Task`] will be polled,
+    /// otherwise polling will panic.
     ///
     /// [`Future`]: std::future::Future
     pub fn spawn(future: LocalBoxFuture<'static, ()>) {
         let this = Arc::new(Self {
             inner: RefCell::new(None),
             is_scheduled: AtomicBool::new(false),
-            thread: thread::current().id(),
+            thread_id: thread::current().id(),
         });
 
         let waker = task::waker(Arc::clone(&this));
@@ -91,15 +100,16 @@ impl Task {
     ///
     /// # Panics
     ///
-    /// If called not on the same thread where [`Task`] was originally created.
+    /// If called not on the same thread where this [`Task`] was originally
+    /// created.
     ///
     /// [`Future`]: std::future::Future
     pub fn poll(&self) {
         assert_eq!(
-            self.thread,
+            self.thread_id,
             thread::current().id(),
-            "A Future can only be polled on the same thread where it was \
-             originally created."
+            "`dart::executor::Task` can only be polled on the same thread \
+             where it was originally created",
         );
 
         let mut borrow = self.inner.borrow_mut();
@@ -122,9 +132,3 @@ impl Task {
         }
     }
 }
-
-// `Task` can be sent across threads safely because it ensures that
-// the underlying Future will only be touched from a single thread it
-// was created on.
-unsafe impl Send for Task {}
-unsafe impl Sync for Task {}
