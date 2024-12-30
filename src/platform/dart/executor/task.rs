@@ -2,6 +2,8 @@
 //!
 //! [`platform::dart::executor`]: crate::platform::executor
 
+#[cfg(doc)]
+use std::future::Future;
 use std::{
     cell::RefCell,
     sync::{
