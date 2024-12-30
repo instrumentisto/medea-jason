@@ -9,10 +9,8 @@ use std::{
         Arc,
     },
     task::{Context, Waker},
+    thread::{self, ThreadId},
 };
-
-#[cfg(debug_assertions)]
-use std::thread::{self, ThreadId};
 
 use derive_more::Debug;
 use futures::{
@@ -51,7 +49,6 @@ pub struct Task {
     /// [`Task`].
     is_scheduled: AtomicBool,
 
-    #[cfg(debug_assertions)]
     /// Thread that this task was created on and must be polled on.
     thread: ThreadId,
 }
@@ -72,7 +69,6 @@ impl Task {
         let this = Arc::new(Self {
             inner: RefCell::new(None),
             is_scheduled: AtomicBool::new(false),
-            #[cfg(debug_assertions)]
             thread: thread::current().id(),
         });
 
@@ -88,7 +84,6 @@ impl Task {
     ///
     /// [`Future`]: std::future::Future
     pub fn poll(&self) {
-        #[cfg(debug_assertions)]
         assert_eq!(
             self.thread,
             thread::current().id(),
