@@ -2,19 +2,20 @@
 //!
 //! [`platform::dart::executor`]: crate::platform::executor
 
-use derive_more::Debug;
-use futures::{
-    future::LocalBoxFuture,
-    task::{self, ArcWake},
-};
 use std::{
     cell::RefCell,
     sync::{
         atomic::{AtomicBool, Ordering},
         Arc,
     },
-    task::{Context, Poll, Waker},
+    task::{Context, Waker},
     thread::{self, ThreadId},
+};
+
+use derive_more::Debug;
+use futures::{
+    future::LocalBoxFuture,
+    task::{self, ArcWake},
 };
 
 use crate::platform::dart::executor::task_wake;
@@ -66,8 +67,6 @@ impl ArcWake for Task {
 impl Task {
     /// Spawns a new [`Task`] that will drive the given [`Future`].
     ///
-    /// # Safety
-    ///
     /// Must be called on the same thread where [`Task`] will be polled.
     ///
     /// [`Future`]: std::future::Future
@@ -87,10 +86,6 @@ impl Task {
     /// Polls the underlying [`Future`].
     ///
     /// Polling after [`Future`]'s completion is no-op.
-    ///
-    /// # Safety
-    ///
-    /// Must be called on the same thread where [`Task`] was originally created.
     ///
     /// # Panics
     ///
