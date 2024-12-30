@@ -6,10 +6,10 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [master] · unreleased
-[master]: /../../tree/master/flutter
+## [0.7.1] · 2024-12-30
+[0.7.1]: /../../tree/medea-jason-0.7.1/flutter
 
-See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md).
+See also [`medea-jason` crate 0.7.1 changes](/../../tree/medea-jason-0.7.1/CHANGELOG.md).
 
 ### Fixed
 
