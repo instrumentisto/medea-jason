@@ -22,7 +22,7 @@ const String controlApiAddr = String.fromEnvironment('CONTROL_API_ADDR',
 /// Address a Client API WebSocket endpoint.
 ///
 /// Default: `ws://127.0.0.1:8001/ws`
-const String clientApiAddr = String.fromEnvironment('CONTROL_API_ADDR',
+const String clientApiAddr = String.fromEnvironment('CLIENT_API_ADDR',
     defaultValue: 'ws://$ipTestBase:8001/ws');
 
 /// Host of a [`FileServer`].

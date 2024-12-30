@@ -116,7 +116,8 @@ pub unsafe fn post_c_object(
 /// associated with the handle.
 ///
 /// Once finalizable handle is collected by GC, the provided `callback` is
-/// called.
+/// called. It may be executed on any thread, will have an isolate group, but
+/// won't have the current isolate.
 ///
 /// `peer` argument will be provided to the `callback` on finalize.
 ///

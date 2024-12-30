@@ -5,6 +5,7 @@ use std::{os::raw::c_void, ptr};
 
 use dart_sys::Dart_Handle;
 use derive_more::Debug;
+use futures::channel::oneshot;
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -187,14 +188,34 @@ impl Callback {
         };
 
         if is_finalizable {
+            // Since we transfer callback ownership to Dart side we have to do
+            // some gymnastics to reclaim Rust memory:
+            // Dart will call `callback_finalizer` when the object becomes
+            // unreachable. Since this callback might be called on a different
+            // thread we can't reclaim Rust side resources there. So,
+            // `callback_finalizer` will signal the main thread to do the actual
+            // memory reclamation.
+            let (finalizer_tx, finalizer_rx) = oneshot::channel::<()>();
             unsafe {
                 _ = dart_api::new_finalizable_handle(
                     handle,
-                    f.as_ptr().cast::<c_void>(),
-                    size_of::<Self>() as libc::intptr_t,
+                    Box::into_raw(Box::new(finalizer_tx)).cast(),
+                    // `128` is the approximate size of the channel and memory
+                    // reclamation closure as of Rust 1.81 and `futures` crate
+                    // `0.3.31`. Ideally, it should be revisited occasionally,
+                    // but it's OK for this value to be approximate, since it
+                    // works only as a hint for the Dart's GC.
+                    (size_of::<Self>() + 128) as libc::intptr_t,
                     Some(callback_finalizer),
                 );
             }
+            platform::spawn(async move {
+                _ = finalizer_rx.await;
+
+                unsafe {
+                    drop(Box::<Self>::from_raw(f.as_ptr()));
+                };
+            });
         }
 
         handle
@@ -205,15 +226,8 @@ impl Callback {
 ///
 /// Cleans finalized [`Callback`] memory.
 extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
-    propagate_panic(move || {
-        // A little trick here. Since finalizers might run after isolate has
-        // already been shut down, calling any Dart API functions will cause a
-        // segfault. We schedule finalizer on the Dart executor, so if the
-        // isolate has already shut down, the operation won't run.
-        platform::spawn(async move {
-            drop(unsafe { Box::from_raw(cb.cast::<Callback>()) });
-        });
-    });
+    // Main thread is waiting to do the actual memory reclamation.
+    drop(unsafe { Box::from_raw(cb.cast::<oneshot::Sender<()>>()) });
 }
 
 #[cfg(feature = "mockable")]
