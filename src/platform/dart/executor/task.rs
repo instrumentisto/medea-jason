@@ -54,9 +54,11 @@ pub struct Task {
 }
 
 impl ArcWake for Task {
-    /// Calls the [`task_wake()`] function by the provided reference if this
+    /// Calls the `task_wake()` function by the provided reference if this
     /// [`Task`] s incomplete and there are no [`Poll::Pending`] awake requests
     /// already.
+    ///
+    /// [`Poll::Pending`]: task::Poll::Pending
     fn wake_by_ref(arc_self: &Arc<Self>) {
         if !arc_self.is_scheduled.swap(true, Ordering::AcqRel) {
             task_wake(Arc::clone(arc_self));
