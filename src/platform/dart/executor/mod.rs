@@ -49,7 +49,12 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
 ///
 /// # Safety
 ///
-/// Valid [`Task`] pointer must be provided.
+/// - Valid [`Task`] pointer must be provided;
+/// - Must be called on the same thread where [`Task`] was originally created.
+///
+/// # Panics
+///
+/// If called not on the same thread where [`Task`] was originally created.
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
     propagate_panic(move || unsafe { Arc::from_raw(task.as_ptr()).poll() });
@@ -60,6 +65,10 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// Sends command that contains the provided [`Task`] to the configured
 /// [`WAKE_PORT`]. When received, Dart must poll it by calling the
 /// [`rust_executor_poll_task()`] function.
+///
+/// # Safety
+///
+/// - Dart-driven async [`Task`] executor must be initialized.
 fn task_wake(task: Arc<Task>) {
     let wake_port = WAKE_PORT.load(atomic::Ordering::Acquire);
     debug_assert!(wake_port > 0, "`WAKE_PORT` address must be initialized");

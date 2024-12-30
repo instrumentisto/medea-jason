@@ -2,20 +2,19 @@
 //!
 //! [`platform::dart::executor`]: crate::platform::executor
 
+use derive_more::Debug;
+use futures::{
+    future::LocalBoxFuture,
+    task::{self, ArcWake},
+};
 use std::{
     cell::RefCell,
     sync::{
         atomic::{AtomicBool, Ordering},
         Arc,
     },
-    task::{Context, Waker},
+    task::{Context, Poll, Waker},
     thread::{self, ThreadId},
-};
-
-use derive_more::Debug;
-use futures::{
-    future::LocalBoxFuture,
-    task::{self, ArcWake},
 };
 
 use crate::platform::dart::executor::task_wake;
@@ -54,6 +53,9 @@ pub struct Task {
 }
 
 impl ArcWake for Task {
+    /// Calls the [`task_wake()`] function by the provided reference if this
+    /// [`Task`] s incomplete and there are no [`Poll::Pending`] awake requests
+    /// already.
     fn wake_by_ref(arc_self: &Arc<Self>) {
         if !arc_self.is_scheduled.swap(true, Ordering::AcqRel) {
             task_wake(Arc::clone(arc_self));
@@ -63,6 +65,10 @@ impl ArcWake for Task {
 
 impl Task {
     /// Spawns a new [`Task`] that will drive the given [`Future`].
+    ///
+    /// # Safety
+    ///
+    /// Must be called on the same thread where [`Task`] will be polled.
     ///
     /// [`Future`]: std::future::Future
     pub fn spawn(future: LocalBoxFuture<'static, ()>) {
@@ -82,12 +88,21 @@ impl Task {
     ///
     /// Polling after [`Future`]'s completion is no-op.
     ///
+    /// # Safety
+    ///
+    /// Must be called on the same thread where [`Task`] was originally created.
+    ///
+    /// # Panics
+    ///
+    /// If called not on the same thread where [`Task`] was originally created.
+    ///
     /// [`Future`]: std::future::Future
     pub fn poll(&self) {
         assert_eq!(
             self.thread,
             thread::current().id(),
-            "Future can only be polled on a thread it was created on"
+            "A Future can only be polled on the same thread where it was \
+             originally created."
         );
 
         let mut borrow = self.inner.borrow_mut();
