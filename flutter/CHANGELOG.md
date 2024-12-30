@@ -11,12 +11,17 @@ All user visible changes to this project will be documented in this file. This p
 
 See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md).
 
+### Fixed
+
+- Rust futures executor being called from non-main thread. ([#197])
+
 ### Upgraded
 
 - Dependencies:
     - [`flutter_rust_bridge`] to 2.7.0 version. ([#195])
 
 [#195]: /../../pull/195
+[#197]: /../../pull/197
 
 
 

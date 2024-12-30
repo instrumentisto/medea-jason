@@ -5,8 +5,7 @@ mod task;
 use std::{
     future::Future,
     ptr,
-    rc::Rc,
-    sync::{atomic, atomic::AtomicI64},
+    sync::{atomic, atomic::AtomicI64, Arc},
 };
 
 use dart_sys::{
@@ -51,11 +50,13 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
 /// # Safety
 ///
 /// Valid [`Task`] pointer must be provided.
+///
+/// # Panics
+///
+/// If called not on the same thread where the [`Task`] was originally created.
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
-    propagate_panic(move || {
-        _ = unsafe { Rc::from_raw(task.as_ptr()).poll() };
-    });
+    propagate_panic(move || unsafe { Arc::from_raw(task.as_ptr()).poll() });
 }
 
 /// Commands an external Dart executor to poll the provided [`Task`].
@@ -63,10 +64,14 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// Sends command that contains the provided [`Task`] to the configured
 /// [`WAKE_PORT`]. When received, Dart must poll it by calling the
 /// [`rust_executor_poll_task()`] function.
-fn task_wake(task: Rc<Task>) {
+///
+/// # Panics
+///
+/// If Dart-driven async [`Task`] executor is not initialized.
+fn task_wake(task: Arc<Task>) {
     let wake_port = WAKE_PORT.load(atomic::Ordering::Acquire);
-    debug_assert!(wake_port > 0, "`WAKE_PORT` address must be initialized");
-    let task = Rc::into_raw(task);
+    assert!(wake_port > 0, "`WAKE_PORT` address must be initialized");
+    let task = Arc::into_raw(task);
 
     let mut task_addr = Dart_CObject {
         type_: Dart_CObject_Type_Dart_CObject_kInt64,
@@ -80,7 +85,7 @@ fn task_wake(task: Rc<Task>) {
     if !enqueued {
         log::warn!("Could not send message to Dart's native port");
         unsafe {
-            drop(Rc::from_raw(task));
+            drop(Arc::from_raw(task));
         }
     }
 }

@@ -11,12 +11,17 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.7.0...master)
 
+### Fixed
+
+- Futures executor being called from non-main thread on Dart platforms. ([#197])
+
 ### Upgraded
 
 - Dependencies:
     - [`flutter_rust_bridge`] to 2.7.0 version. ([#195])
 
 [#195]: /../../pull/195
+[#197]: /../../pull/197
 
 
 
