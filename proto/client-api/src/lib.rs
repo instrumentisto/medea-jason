@@ -1382,7 +1382,7 @@ pub struct EncodingParameters {
 /// Client capabilities (e.g. available codecs, platform)
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, Default, PartialEq)]
 pub struct Capabilities {
     /// Codec capabilities of the system for sending audio.
     pub audio_tx: Vec<CodecCapability>,
