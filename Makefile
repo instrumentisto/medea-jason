@@ -20,9 +20,9 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.83
-CHROME_VERSION := 128.0
-FIREFOX_VERSION := 133.0-driver0.35.0
+RUST_VER := 1.84
+CHROME_VERSION := 131.0-chromedriver-131.0
+FIREFOX_VERSION := 134.0-driver0.35.0
 
 CARGO_NDK_VER := 3.5.4-ndkr27c-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
@@ -1140,7 +1140,7 @@ docker-up-e2e-env = RUST_BACKTRACE=1 \
 	COMPOSE_WEBDRIVER_IMAGE_NAME=$(strip \
 		$(if $(call eq,$(browser),firefox),\
 			ghcr.io/instrumentisto/geckodriver ,\
-			selenoid/chrome )) \
+			selenium/standalone-chrome )) \
 	COMPOSE_WEBDRIVER_IMAGE_VER=$(strip \
 		$(if $(call eq,$(browser),firefox),\
 			$(FIREFOX_VERSION) ,\
@@ -1148,7 +1148,7 @@ docker-up-e2e-env = RUST_BACKTRACE=1 \
 	COMPOSE_WEBDRIVER_ENTRYPOINT=$(strip \
 		$(if $(call eq,$(browser),firefox),\
 			"geckodriver --binary=/opt/firefox/firefox" ,\
-			/entrypoint.sh ))
+			"chromedriver --port=4444 --allowed-ips='' --allowed-origins='*'" ))
 
 docker.up.e2e: docker.down.e2e
 ifeq ($(rebuild),yes)
@@ -1208,8 +1208,9 @@ ifeq ($(browser),firefox)
 			--binary=/opt/firefox/firefox
 else
 	docker run --rm -d --network=host --shm-size 512m \
-		--name medea-webdriver-chrome \
-		selenoid/chrome:$(CHROME_VERSION)
+		--name medea-webdriver-chrome --entrypoint chromedriver \
+		selenium/standalone-chrome:$(CHROME_VERSION) \
+			--port=4444 --allowed-ips='' --allowed-origins='*'
 endif
 
 

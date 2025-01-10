@@ -1092,11 +1092,9 @@ impl ConstrainU32 {
         // guarantee that such casts are safe.
         match this {
             None | Some(Self::Ideal(_)) => true,
-            Some(Self::Exact(exact)) => {
-                setting.map_or(false, |val| val == exact)
-            }
+            Some(Self::Exact(exact)) => setting.is_some_and(|val| val == exact),
             Some(Self::Range(start, end)) => {
-                setting.map_or(false, |val| val >= start && val <= end)
+                setting.is_some_and(|val| val >= start && val <= end)
             }
         }
     }
@@ -1139,7 +1137,7 @@ impl<T: AsRef<str>> ConstrainString<T> {
         match this {
             None | Some(Self::Ideal(..)) => true,
             Some(Self::Exact(constrain)) => {
-                setting.map_or(false, |val| val.as_ref() == constrain.as_ref())
+                setting.is_some_and(|val| val.as_ref() == constrain.as_ref())
             }
         }
     }

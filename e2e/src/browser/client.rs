@@ -237,7 +237,7 @@ impl Inner {
 
         // language=JavaScript
         let js = format!(
-            r#"
+            "
             (
                 async () => {{
                     let callback = arguments[arguments.length - 1];
@@ -260,7 +260,7 @@ impl Inner {
                     }}
                 }}
             )();
-            "#,
+            ",
         );
         let res = self.0.execute_async(&js, args).await?;
 

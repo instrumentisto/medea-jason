@@ -99,7 +99,7 @@ impl<T> Object<TracksStore<T>> {
         let kind_js = Statement::new(
             // language=JavaScript
             &format!(
-                r#"
+                "
                 async (store) => {{
                     return {{
                         store: store,
@@ -107,7 +107,7 @@ impl<T> Object<TracksStore<T>> {
                         sourceKind: {source_kind_js}
                     }};
                 }}
-                "#,
+                ",
                 kind = kind.as_js()
             ),
             [],
@@ -152,7 +152,7 @@ impl<T> Object<TracksStore<T>> {
         let kind_js = Statement::new(
             // language=JavaScript
             &format!(
-                r#"
+                "
                 async (store) => {{
                     return {{
                         store: store,
@@ -160,7 +160,7 @@ impl<T> Object<TracksStore<T>> {
                         sourceKind: {source_kind}
                     }};
                 }}
-                "#,
+                ",
                 source_kind = source_kind.as_js(),
                 kind = kind.as_js()
             ),
@@ -215,7 +215,7 @@ impl<T> Object<TracksStore<T>> {
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
-                r#"
+                "
                 async (store) => {{
                     let count = 0;
                     if ({remote}) {{
@@ -244,7 +244,7 @@ impl<T> Object<TracksStore<T>> {
                     }}
                     return count;
                 }}
-                "#,
+                ",
             ),
             [],
         ))

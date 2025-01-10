@@ -135,11 +135,11 @@ impl Statement {
     fn step_js(&self, i: usize) -> String {
         // language=JavaScript
         format!(
-            r#"
+            "
             args = arguments[{i}];
             {objs_js}
             lastResult = await ({expr})(lastResult);
-            "#,
+            ",
             objs_js = self.objects_injection_js(),
             expr = self.expression,
         )

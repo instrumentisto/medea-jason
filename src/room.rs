@@ -936,7 +936,7 @@ impl Room {
         handle
             .0
             .upgrade()
-            .map_or(false, |handle_inner| Rc::ptr_eq(&self.0, &handle_inner))
+            .is_some_and(|handle_inner| Rc::ptr_eq(&self.0, &handle_inner))
     }
 
     /// Downgrades this [`Room`] to a weak reference.

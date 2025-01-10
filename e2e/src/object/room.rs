@@ -130,11 +130,11 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
-                r#"
+                "
                 async (r) => {{
                     {maybe_await} {disable};
                 }}
-                "#,
+                ",
             ),
             [],
         ))
@@ -168,11 +168,11 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
-                r#"
+                "
                 async (r) => {{
                     {maybe_await} {enable};
                 }}
-                "#,
+                ",
             ),
             [],
         ))
@@ -206,11 +206,11 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
-                r#"
+                "
                 async (r) => {{
                     await {disable};
                 }}
-                "#,
+                ",
             ),
             [],
         ))
@@ -244,11 +244,11 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
-                r#"
+                "
                 async (r) => {{
                     await {enable};
                 }}
-                "#,
+                ",
             ),
             [],
         ))
@@ -282,11 +282,11 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
-                r#"
+                "
                 async (r) => {{
                     {maybe_await} {mute};
                 }}
-                "#,
+                ",
             ),
             [],
         ))
@@ -320,11 +320,11 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
-                r#"
+                "
                 async (r) => {{
                     {maybe_await} {unmute};
                 }}
-                "#,
+                ",
             ),
             [],
         ))
