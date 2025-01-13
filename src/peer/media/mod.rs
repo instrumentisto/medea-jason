@@ -427,7 +427,7 @@ impl InnerMediaConnections {
 
                     let transceiver = peer.add_transceiver(kind, init).await;
                     if !target_codecs.is_empty() {
-                        transceiver.set_codec_preferences(target_codecs);
+                        // transceiver.set_codec_preferences(target_codecs);
                     }
                     transceiver
                 }
