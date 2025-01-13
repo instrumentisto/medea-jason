@@ -1148,7 +1148,7 @@ docker-up-e2e-env = RUST_BACKTRACE=1 \
 	COMPOSE_WEBDRIVER_ENTRYPOINT=$(strip \
 		$(if $(call eq,$(browser),firefox),\
 			"geckodriver --binary=/opt/firefox/firefox" ,\
-			"sh -c \"/opt/bin/xvfb-run.sh 2>/dev/null & exec chromedriver --port=4444 --allowed-ips='' --allowed-origins='*'\"" ))
+			"sh -c \"/opt/bin/start-xvfb.sh 2>/dev/null & exec chromedriver --port=4444 --allowed-ips='' --allowed-origins='*'\"" ))
 
 docker.up.e2e: docker.down.e2e
 ifeq ($(rebuild),yes)
@@ -1210,7 +1210,7 @@ else
 	docker run --rm -d --network=host --shm-size 512m \
 		--name medea-webdriver-chrome --entrypoint sh \
 		selenium/standalone-chrome:$(CHROME_VERSION) \
-			-c "/opt/bin/xvfb-run.sh 2>/dev/null & exec chromedriver --port=4444 --allowed-ips='' --allowed-origins='*'"
+			-c "/opt/bin/start-xvfb.sh 2>/dev/null & exec chromedriver --port=4444 --allowed-ips='' --allowed-origins='*'"
 endif
 
 
