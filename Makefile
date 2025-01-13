@@ -1210,7 +1210,7 @@ else
 	docker run --rm -d --network=host --shm-size 512m \
 		--name medea-webdriver-chrome --entrypoint sh \
 		selenium/standalone-chrome:$(CHROME_VERSION) \
-			-c "/opt/bin/xvfb-run.sh 2>/dev/null & exec chromedriver --port=4444 --allowed-ips='' --allowed-origins='*'\""
+			-c "/opt/bin/xvfb-run.sh 2>/dev/null & exec chromedriver --port=4444 --allowed-ips='' --allowed-origins='*'"
 endif
 
 
