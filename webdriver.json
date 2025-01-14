@@ -8,15 +8,15 @@
   },
   "goog:chromeOptions": {
     "args": [
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
       "--disable-browser-side-navigation",
-      "--window-size=1920,1080",
+      "--disable-dev-shm-usage",
       "--disable-extensions",
+      "--disable-gpu",
       "--dns-prefetch-disable",
       "--no-sandbox",
       "--use-fake-device-for-media-stream",
-      "--use-fake-ui-for-media-stream"
+      "--use-fake-ui-for-media-stream",
+      "--window-size=1920,1080"
     ]
   }
 }
