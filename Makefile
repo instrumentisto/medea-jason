@@ -1121,6 +1121,12 @@ docker.up.demo: docker.down.demo
 
 # Run E2E tests environment in Docker Compose.
 #
+# For Chrome WebDriver:
+# `/opt/bin/start-vnc.sh & /opt/bin/start-novnc.sh` could be added after
+# `start-xvfb.sh` script for starting up VNC and web client for it.
+# VNC web client (noVNC) can be accessed on this address:
+# http://localhost:7900/?autoconnect=1&resize=scale&password=secret
+#
 # Usage:
 #	make docker.up.e2e [browser=(chrome|firefox)]
 #                      [rebuild=(no|yes)]
@@ -1148,7 +1154,9 @@ docker-up-e2e-env = RUST_BACKTRACE=1 \
 	COMPOSE_WEBDRIVER_ENTRYPOINT=$(strip \
 		$(if $(call eq,$(browser),firefox),\
 			"geckodriver --binary=/opt/firefox/firefox" ,\
-			"chromedriver --port=4444 --allowed-ips='' --allowed-origins='*'" ))
+			"sh -c \"/opt/bin/start-xvfb.sh 2>/dev/null & \
+			         exec chromedriver --port=4444 --allowed-ips='' \
+			                                       --allowed-origins='*'\"" ))
 
 docker.up.e2e: docker.down.e2e
 ifeq ($(rebuild),yes)
@@ -1195,6 +1203,12 @@ endif
 
 # Run dockerized WebDriver.
 #
+# For Chrome:
+# `/opt/bin/start-vnc.sh & /opt/bin/start-novnc.sh` could be added after
+# `start-xvfb.sh` script for starting up VNC and web client for it.
+# VNC web client (noVNC) can be accessed on this address:
+# http://localhost:7900/?autoconnect=1&resize=scale&password=secret
+#
 # Usage:
 #   make docker.up.webdriver [browser=(chrome|firefox)]
 
@@ -1208,9 +1222,11 @@ ifeq ($(browser),firefox)
 			--binary=/opt/firefox/firefox
 else
 	docker run --rm -d --network=host --shm-size 512m \
-		--name medea-webdriver-chrome --entrypoint chromedriver \
+		--name medea-webdriver-chrome --entrypoint sh \
 		selenium/standalone-chrome:$(CHROME_VERSION) \
-			--port=4444 --allowed-ips='' --allowed-origins='*'
+			-c "/opt/bin/start-xvfb.sh 2>/dev/null & \
+			    exec chromedriver --port=4444 --allowed-ips='' \
+			                                  --allowed-origins='*'"
 endif
 
 
