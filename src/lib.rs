@@ -149,10 +149,6 @@
     unused_results,
     variant_size_differences
 )]
-#![cfg_attr(
-    feature = "mockable",
-    expect(missing_docs, reason = "for testing only")
-)]
 // TODO: Needs refactoring.
 #![expect(
     clippy::module_name_repetitions,
@@ -171,3 +167,9 @@ pub mod peer;
 pub mod platform;
 pub mod room;
 pub mod rpc;
+
+#[cfg(all(test, target_family = "wasm"))]
+mod used_in_integration_tests_only {
+    use instant as _;
+    use wasm_bindgen_test as _;
+}
