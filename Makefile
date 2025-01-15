@@ -1153,7 +1153,7 @@ docker-up-e2e-env = RUST_BACKTRACE=1 \
 			$(CHROME_VERSION) )) \
 	COMPOSE_WEBDRIVER_ENTRYPOINT=$(strip \
 		$(if $(call eq,$(browser),firefox),\
-			"geckodriver --binary=/opt/firefox/firefox" ,\
+			"geckodriver --binary=/opt/firefox/firefox --log=debug" ,\
 			"sh -c \"/opt/bin/start-xvfb.sh 2>/dev/null & \
 			         exec chromedriver --port=4444 --allowed-ips='' \
 			                                       --allowed-origins='*'\"" ))
@@ -1219,7 +1219,7 @@ ifeq ($(browser),firefox)
 	docker run --rm -d --network=host --shm-size 512m \
 		--name medea-webdriver-firefox \
 		ghcr.io/instrumentisto/geckodriver:$(FIREFOX_VERSION) \
-			--binary=/opt/firefox/firefox
+			--binary=/opt/firefox/firefox --log=debug
 else
 	docker run --rm -d --network=host --shm-size 512m \
 		--name medea-webdriver-chrome --entrypoint sh \

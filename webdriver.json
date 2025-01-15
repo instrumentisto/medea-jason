@@ -1,8 +1,12 @@
 {
   "moz:firefoxOptions": {
     "prefs": {
+      "media.navigator.permission.disabled": true,
       "media.navigator.streams.fake": true,
-      "media.navigator.permission.disabled": true
+      "media.autoplay.ask-permission": false,
+      "media.autoplay.default": 0,
+      "media.autoplay.enabled": true,
+      "media.autoplay.enabled.user-gestures-needed": false
     },
     "args": []
   },
@@ -12,6 +16,7 @@
       "--disable-dev-shm-usage",
       "--disable-extensions",
       "--disable-gpu",
+      "--disable-web-security",
       "--dns-prefetch-disable",
       "--no-sandbox",
       "--use-fake-device-for-media-stream",
