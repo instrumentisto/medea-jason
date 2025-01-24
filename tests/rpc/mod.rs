@@ -716,8 +716,8 @@ mod on_connection_loss {
 }
 
 /// Tests for the [`RpcClient::on_reconnected`] function.
-// TODO: this tests should be implemented for the RpcSession!
-#[cfg(feature = "disabled")]
+// TODO: This tests should be implemented for the `RpcSession`!
+#[cfg(disabled)]
 mod on_reconnected {
     use medea_reactive::ObservableCell;
 

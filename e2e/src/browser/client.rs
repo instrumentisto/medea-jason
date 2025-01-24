@@ -18,18 +18,6 @@ use tokio::task;
 
 use super::{js::Statement, Error, Result};
 
-/// Arguments for Chrome browser.
-const CHROME_ARGS: &[&str] = &[
-    "--use-fake-device-for-media-stream",
-    "--use-fake-ui-for-media-stream",
-    "--disable-web-security",
-    "--disable-dev-shm-usage",
-    "--no-sandbox",
-];
-
-/// Arguments for Firefox browser.
-const FIREFOX_ARGS: &[&str] = &[];
-
 /// Result returned from all the JS code executed in a browser.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -237,7 +225,7 @@ impl Inner {
 
         // language=JavaScript
         let js = format!(
-            r#"
+            "
             (
                 async () => {{
                     let callback = arguments[arguments.length - 1];
@@ -260,7 +248,7 @@ impl Inner {
                     }}
                 }}
             )();
-            "#,
+            ",
         );
         let res = self.0.execute_async(&js, args).await?;
 
@@ -337,18 +325,18 @@ pub struct AutoCapabilities {
 impl AutoCapabilities {
     /// Returns `moz:firefoxOptions` for a Firefox browser.
     fn firefox(self) -> serde_json::Value {
-        let mut args = FIREFOX_ARGS.to_vec();
+        let mut args = Vec::new();
         if self.headless_firefox {
             args.push("--headless");
         }
         json!({
             "prefs": {
-                "media.navigator.streams.fake": true,
                 "media.navigator.permission.disabled": true,
-                "media.autoplay.enabled": true,
-                "media.autoplay.enabled.user-gestures-needed ": false,
+                "media.navigator.streams.fake": true,
                 "media.autoplay.ask-permission": false,
                 "media.autoplay.default": 0,
+                "media.autoplay.enabled": true,
+                "media.autoplay.enabled.user-gestures-needed": false,
             },
             "args": args,
         })
@@ -356,11 +344,23 @@ impl AutoCapabilities {
 
     /// Returns `goog:chromeOptions` for a Chrome browser.
     fn chrome(self) -> serde_json::Value {
-        let mut args = CHROME_ARGS.to_vec();
+        let mut args = [
+            "--disable-browser-side-navigation",
+            "--disable-dev-shm-usage",
+            "--disable-extensions",
+            "--disable-gpu",
+            "--disable-web-security",
+            "--dns-prefetch-disable",
+            "--no-sandbox",
+            "--use-fake-device-for-media-stream",
+            "--use-fake-ui-for-media-stream",
+            "--window-size=1920,1080",
+        ]
+        .to_vec();
         if self.headless_chrome {
             args.push("--headless");
         }
-        json!({ "args": args })
+        json!({"args": args})
     }
 }
 

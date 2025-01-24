@@ -120,17 +120,13 @@ impl LocalSdp {
     /// the current SDP equals to the previous SDP.
     #[must_use]
     pub fn is_rollback(&self) -> bool {
-        self.0
-            .current_sdp
-            .borrow()
-            .as_ref()
-            .map_or(false, |current| {
-                self.0
-                    .prev_sdp
-                    .borrow()
-                    .as_ref()
-                    .is_some_and(|prev| prev == current)
-            })
+        self.0.current_sdp.borrow().as_ref().is_some_and(|current| {
+            self.0
+                .prev_sdp
+                .borrow()
+                .as_ref()
+                .is_some_and(|prev| prev == current)
+        })
     }
 
     /// Stops the current SDP rollback task countdown, if any.

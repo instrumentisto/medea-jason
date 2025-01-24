@@ -14,7 +14,7 @@ Client library for integration with [Medea] media server in [Flutter] applicatio
 
 ## License
 
-Copyright © 2021-2024  Instrumentisto Team <https://github.com/instrumentisto>
+Copyright © 2021-2025  Instrumentisto Team <https://github.com/instrumentisto>
 
 This Source Code Form is subject to the terms of the [Mozilla Public License, v. 2.0](https://github.com/instrumentisto/medea-jason/blob/master/flutter/LICENSE). If a copy of the MPL was not distributed with this file, You can obtain one at <http://mozilla.org/MPL/2.0>.
 

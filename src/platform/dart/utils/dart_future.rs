@@ -206,7 +206,11 @@ where
 
 #[cfg(feature = "mockable")]
 pub mod tests {
-    #![expect(clippy::missing_safety_doc, reason = "for testing only")]
+    #![expect( // for testing only
+        clippy::missing_safety_doc,
+        missing_docs,
+        reason = "for testing only"
+    )]
 
     use std::cell::RefCell;
 

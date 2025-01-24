@@ -51,11 +51,13 @@
     clippy::let_underscore_untyped,
     clippy::lossy_float_literal,
     clippy::map_err_ignore,
+    clippy::map_with_unused_argument_over_ranges,
     clippy::mem_forget,
     clippy::missing_assert_message,
     clippy::missing_asserts_for_indexing,
     clippy::missing_const_for_fn,
     clippy::missing_docs_in_private_items,
+    clippy::module_name_repetitions,
     clippy::multiple_inherent_impl,
     clippy::multiple_unsafe_ops_per_block,
     clippy::mutex_atomic,
@@ -603,23 +605,21 @@ pub fn derive_caused(input: TokenStream) -> TokenStream {
 /// // Module name will be used as a prefix for a registration function.
 /// #[dart_bridge]
 /// mod peer_connection {
-///     use std::{os::raw::c_char, ptr};
-///
 ///     use dart_sys::Dart_Handle;
+///
+///     use crate::platform::Error;
 ///
 ///     extern "C" {
 ///         // This documentation will be injected to the generated
 ///         // extern function caller:
 ///
-///         /// Creates a new offer in the provided `PeerConnection`.
-///         ///
-///         /// Returns the created SDP offer.
-///         fn create_offer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///         /// Returns newly created SDP offer of the provided
+///         /// `PeerConnection`.
+///         fn create_offer(peer: Dart_Handle) -> Result<Dart_Handle, Error>;
 ///
-///         /// Creates a new answer in the provided `PeerConnection`.
-///         ///
-///         /// Returns the created SDP answer.
-///         fn create_answer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///         /// Returns a newly created SDP answer of the provided
+///         /// `PeerConnection`.
+///         fn create_answer(peer: Dart_Handle) -> Result<Dart_Handle, Error>;
 ///     }
 /// }
 /// ```
@@ -628,46 +628,100 @@ pub fn derive_caused(input: TokenStream) -> TokenStream {
 ///
 /// ```ignore
 /// mod peer_connection {
-///     use std::{ptr, os::raw::c_char};
-///
 ///     use dart_sys::Dart_Handle;
 ///
+///     use crate::platform::Error;
+///
 ///     type PeerConnectionCreateOfferFunction =
-///         extern "C" fn(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///         extern "C" fn(peer: Dart_Handle) -> Dart_Handle;
 ///     type PeerConnectionCreateAnswerFunction =
-///         extern "C" fn(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///         extern "C" fn(peer: Dart_Handle) -> Dart_Handle;
 ///
-///     static mut PEER_CONNECTION__CREATE_OFFER__FUNCTION:
-///         std::mem::MaybeUninit<
-///             PeerConnectionCreateOfferFunction,
-///         > = std::mem::MaybeUninit::uninit();
+///     static PEER_CONNECTION__CREATE_OFFER__FUNCTION:
+///         ::sync_unsafe_cell::SyncUnsafeCell<
+///             Option<PeerConnectionCreateOfferFunction>,
+///         > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
 ///
-///     static mut PEER_CONNECTION__CREATE_ANSWER__FUNCTION:
-///         std::mem::MaybeUninit<
-///             PeerConnectionCreateAnswerFunction,
-///         > = std::mem::MaybeUninit::uninit();
+///     static PEER_CONNECTION__CREATE_ANSWER__FUNCTION:
+///         ::sync_unsafe_cell::SyncUnsafeCell<
+///             Option<PeerConnectionCreateAnswerFunction>,
+///         > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
+///
+///     ::std::thread_local! {
+///         static PEER_CONNECTION__CREATE_OFFER__ERROR: ::std::cell::RefCell<
+///             Option<Error>
+///         > = ::std::cell::RefCell::new(None);
+///     }
+///
+///     ::std::thread_local! {
+///         static PEER_CONNECTION__CREATE_ANSWER__ERROR: ::std::cell::RefCell<
+///             Option<Error>
+///         > = ::std::cell::RefCell::new(None);
+///     }
 ///
 ///     #[no_mangle]
 ///     pub unsafe extern "C" fn register_peer_connection(
 ///         create_offer: PeerConnectionCreateOfferFunction,
 ///         create_answer: PeerConnectionCreateAnswerFunction,
 ///     ) {
-///         PEER_CONNECTION__CREATE_OFFER__FUNCTION.write(create_offer);
-///         PEER_CONNECTION__CREATE_ANSWER__FUNCTION.write(create_answer);
+///         *::sync_unsafe_cell::SyncUnsafeCell::get(
+///             &PEER_CONNECTION__CREATE_OFFER__FUNCTION,
+///         ) = Some(create_offer);
+///         *::sync_unsafe_cell::SyncUnsafeCell::get(
+///             &PEER_CONNECTION__CREATE_ANSWER__FUNCTION,
+///         ) = Some(create_answer);
 ///     }
 ///
-///     #[doc = " Creates new offer in the provided `PeerConnection`"]
-///     #[doc = ""]
-///     #[doc = " Returns created SDP offer."]
-///     pub unsafe fn create_offer(peer: Dart_Handle) -> ptr::NonNull<c_char> {
-///         (PEER_CONNECTION__CREATE_OFFER__FUNCTION.assume_init_ref())(peer)
+///     /// Error setter for the `create_offer` function.
+///     #[no_mangle]
+///     unsafe extern "C" fn peer_connection__create_offer__set_error(
+///         err: Dart_Handle,
+///     ) {
+///         PEER_CONNECTION__CREATE_OFFER__ERROR.set(
+///             Some(Error::from_handle(err))
+///         );
 ///     }
 ///
-///     #[doc = " Creates new answer in the provided `PeerConnection`"]
-///     #[doc = ""]
-///     #[doc = " Returns created SDP answer."]
-///     pub unsafe fn create_answer(peer: Dart_Handle) -> ptr::NonNull<c_char> {
-///         (PEER_CONNECTION__CREATE_ANSWER__FUNCTION.assume_init_ref())(peer)
+///     /// Error setter for the `create_answer` function.
+///     #[no_mangle]
+///     unsafe extern "C" fn peer_connection__create_answer__set_error(
+///         err: Dart_Handle,
+///     ) {
+///         PEER_CONNECTION__CREATE_ANSWER__ERROR.set(
+///             Some(Error::from_handle(err))
+///         );
+///     }
+///
+///     /// Returns newly created SDP offer of the provided `PeerConnection`.
+///     unsafe fn create_offer(
+///         peer: Dart_Handle,
+///     ) -> Result<Dart_Handle, Error> {
+///         let res = (
+///             *(*PEER_CONNECTION__CREATE_OFFER__FUNCTION.get())
+///                 .as_ref()
+///                 .unwrap()
+///         )(peer);
+///         if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take() {
+///             Err(e)
+///         } else {
+///             Ok(res)
+///         }
+///     }
+///
+///     /// Returns a newly created SDP answer of the provided `PeerConnection`.
+///     unsafe fn create_answer(
+///         peer: Dart_Handle,
+///     ) -> Result<Dart_Handle, Error> {
+///         let res = (
+///             *(*PEER_CONNECTION__CREATE_ANSWER__FUNCTION.get())
+///                 .as_ref()
+///                 .unwrap()
+///         )(peer);
+///         if let Some(e) = PEER_CONNECTION__CREATE_ANSWER__ERROR.take() {
+///             Err(e)
+///         } else {
+///             Ok(res)
+///         }
 ///     }
 /// }
 /// ```
@@ -678,14 +732,33 @@ pub fn derive_caused(input: TokenStream) -> TokenStream {
 /// struct PeerConnection(Dart_Handle);
 ///
 /// impl PeerConnection {
-///     pub fn create_offer(&self) -> String {
-///         c_str_into_string(peer_connection::create_offer(self.0))
+///     pub async fn create_offer(&self) -> RtcPeerConnectionResult<String> {
+///         let fut = unsafe {
+///             peer_connection::create_offer(self.handle.get())
+///         }.unwrap();
+///
+///         unsafe { FutureFromDart::execute(fut) }
+///             .await
+///             .map_err(RtcPeerConnectionError::CreateOfferFailed)
 ///     }
 ///
-///     pub fn create_answer(&self) -> String {
-///         c_str_into_string(peer_connection::create_answer(self.0))
+///     pub async fn create_answer(&self) -> RtcPeerConnectionResult<String> {
+///         let fut = unsafe {
+///             peer_connection::create_offer(self.handle.get())
+///         }.unwrap();
+///
+///         unsafe { FutureFromDart::execute(fut) }
+///             .await
+///             .map_err(RtcPeerConnectionError::CreateAnswerFailed)
 ///     }
 /// }
+///
+/// pub enum RtcPeerConnectionError {
+///     CreateOfferFailed(platform::Error),
+///     CreateAnswerFailed(platform::Error),
+/// }
+///
+/// pub type RtcPeerConnectionResult<T> = Result<T, RtcPeerConnectionError>;
 /// ```
 ///
 /// ## Dart side code
@@ -695,8 +768,8 @@ pub fn derive_caused(input: TokenStream) -> TokenStream {
 /// ```dart
 /// dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
 ///         'register_peer_connection')(
-///     Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createOffer),
-///     Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createAnswer),
+///     createOffer_native,
+///     createAnswer_native,
 /// );
 /// ```
 #[proc_macro_attribute]

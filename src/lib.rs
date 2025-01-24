@@ -50,11 +50,13 @@
     clippy::let_underscore_untyped,
     clippy::lossy_float_literal,
     clippy::map_err_ignore,
+    clippy::map_with_unused_argument_over_ranges,
     clippy::mem_forget,
     clippy::missing_assert_message,
     clippy::missing_asserts_for_indexing,
     clippy::missing_const_for_fn,
     clippy::missing_docs_in_private_items,
+    clippy::module_name_repetitions,
     clippy::multiple_inherent_impl,
     clippy::multiple_unsafe_ops_per_block,
     clippy::mutex_atomic,
@@ -147,10 +149,6 @@
     unused_results,
     variant_size_differences
 )]
-#![cfg_attr(
-    feature = "mockable",
-    expect(missing_docs, reason = "for testing only")
-)]
 // TODO: Needs refactoring.
 #![expect(
     clippy::module_name_repetitions,
@@ -169,3 +167,9 @@ pub mod peer;
 pub mod platform;
 pub mod room;
 pub mod rpc;
+
+#[cfg(all(test, target_family = "wasm"))]
+mod used_in_integration_tests_only {
+    use instant as _;
+    use wasm_bindgen_test as _;
+}

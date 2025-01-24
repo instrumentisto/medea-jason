@@ -232,7 +232,11 @@ extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
 
 #[cfg(feature = "mockable")]
 pub mod tests {
-    #![expect(clippy::missing_safety_doc, reason = "only for testing")]
+    #![expect( // for testing only
+        clippy::missing_safety_doc,
+        missing_docs,
+        reason = "for testing only"
+    )]
 
     use std::cell::RefCell;
 

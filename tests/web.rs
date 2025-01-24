@@ -332,6 +332,7 @@ async fn wait_and_check_test_result(
     };
 }
 
+#[expect(dead_code, reason = "preserved for future tests")]
 async fn get_video_track() -> api::RemoteMediaTrack {
     let manager = MediaManager::default();
     let mut settings = MediaStreamSettings::new();

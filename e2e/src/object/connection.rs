@@ -44,11 +44,11 @@ impl Object<Connection> {
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
-                r#"
+                "
                 async (c) => {{
                     await {enable};
                 }}
-                "#,
+                ",
             ),
             [],
         ))
@@ -72,11 +72,11 @@ impl Object<Connection> {
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
-                r#"
+                "
                 async (c) => {{
                     await {disable};
                 }}
-                "#,
+                ",
             ),
             [],
         ))

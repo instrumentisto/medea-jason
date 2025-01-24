@@ -30,6 +30,9 @@ members = [
 [lib]
 crate-type = ["cdylib", "rlib", "staticlib"]
 
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(disabled)", "cfg(frb_expand)"] }
+
 [profile.release]
 lto = "fat"
 

@@ -318,7 +318,7 @@ impl<D: Clone> OnObservableFieldModification<D>
                         .take()
                         .expect("`UniversalSubscriber::When` used already")
                         .send(())
-                        .map_or(false, |()| false)
+                        .is_ok_and(|()| false)
                 } else {
                     true
                 }

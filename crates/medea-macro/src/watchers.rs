@@ -41,13 +41,12 @@ pub(crate) fn expand(mut input: ItemImpl) -> Result<TokenStream> {
                 .iter()
                 .enumerate()
                 .find_map(|(i, attr)| {
-                    attr.path()
-                        .get_ident()
-                        .map_or(false, |p| *p == "watch")
-                        .then(|| {
+                    attr.path().get_ident().is_some_and(|p| *p == "watch").then(
+                        || {
                             watch_attr_index = Some(i);
                             attr
-                        })
+                        },
+                    )
                 })
                 .ok_or_else(|| {
                     Error::new(

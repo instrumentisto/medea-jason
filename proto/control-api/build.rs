@@ -52,11 +52,13 @@
     clippy::let_underscore_untyped,
     clippy::lossy_float_literal,
     clippy::map_err_ignore,
+    clippy::map_with_unused_argument_over_ranges,
     clippy::mem_forget,
     clippy::missing_assert_message,
     clippy::missing_asserts_for_indexing,
     clippy::missing_const_for_fn,
     clippy::missing_docs_in_private_items,
+    clippy::module_name_repetitions,
     clippy::multiple_inherent_impl,
     clippy::multiple_unsafe_ops_per_block,
     clippy::mutex_atomic,
@@ -223,7 +225,7 @@ mod grpc {
                 .into_iter()
                 .map(|entry| entry.path())
                 .filter(|path| {
-                    path.extension().map_or(false, |ext| {
+                    path.extension().is_some_and(|ext| {
                         path.is_file() && ext.to_string_lossy() == "proto"
                     })
                 })

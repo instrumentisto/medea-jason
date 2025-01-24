@@ -11,7 +11,6 @@ use syn::{parse_quote, punctuated::Punctuated, spanned::Spanned as _, token};
 #[cfg(feature = "dart-codegen")]
 use crate::dart_codegen::{DartCodegen, FnRegistrationBuilder};
 
-// TODO: Refactor to get rid of `static mut` in this macro.
 /// Expands `#[dart_bridge]` attribute placed on a Rust module declaration.
 pub(crate) fn expand(
     args: TokenStream,
@@ -466,7 +465,7 @@ impl FnExpander {
                 .attrs
                 .into_iter()
                 .map(|attr| {
-                    if attr.path().get_ident().map_or(false, |i| i == "doc") {
+                    if attr.path().get_ident().is_some_and(|i| i == "doc") {
                         Ok(attr)
                     } else {
                         Err(syn::Error::new(
@@ -502,7 +501,7 @@ impl FnExpander {
     /// # Example of the generated code
     ///
     /// ```ignore
-    /// SyncUnsafeCell::get(&PEER_CONNECTION__CREATE_OFFER__FUNCTION)
+    /// *SyncUnsafeCell::get(&PEER_CONNECTION__CREATE_OFFER__FUNCTION)
     ///     = Some(create_offer)
     /// ```
     fn gen_register_fn_expr(&self) -> syn::Expr {
@@ -565,13 +564,15 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// pub unsafe fn #name(#args) #ret_ty {
+    /// pub unsafe fn create_offer(
+    ///     peer: Dart_Handle,
+    /// ) -> Result<Dart_Handle, Error> {
     ///     let res = (
-    ///         *(*#fn_storage_ident.get())
+    ///         *(*PEER_CONNECTION__CREATE_OFFER__FUNCTION.get())
     ///             .as_ref()
     ///             .unwrap()
-    ///         )(#( #args_idents ),*);
-    ///     if let Some(e) = #error_slot.take() {
+    ///     )(peer);
+    ///     if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take() {
     ///         Err(e)
     ///     } else {
     ///         Ok(res)
