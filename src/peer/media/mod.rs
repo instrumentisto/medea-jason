@@ -413,22 +413,41 @@ impl InnerMediaConnections {
                 }
                 MediaType::Video(settings) => {
                     let init = TransceiverInit::new(direction);
+                    // let transceiver = peer.add_transceiver(kind, init).await;
+                    // transceiver.send
 
-                    let (target_codecs, target_scalability_mode) =
-                        probe_video_codecs(&settings.svc_settings).await;
+                    // transceiver.set_send_parameters()
+
+
+                    // let (target_codecs, target_scalability_mode) =
+                    //     probe_video_codecs(&settings.svc_settings).await;
+
+                    // let Ok(codecs) =
+                    //     CodecCapability::get_sender_codec_capabilities(MediaKind::Video).await
+                    // else {
+                    //     return (target_codecs, target_scalability_mode);
+                    // };
+                    //
+                    // let mut codecs: HashMap<String, Vec<_>> =
+                    //     codecs.into_iter().fold(HashMap::new(), |mut map, c| {
+                    //         map.entry(c.mime_type()).or_default().push(c);
+                    //         map
+                    //     });
 
                     let encoding_params = get_encodings_params(
                         settings.encoding_parameters,
-                        target_scalability_mode,
+                        Some(ScalabilityMode::L3T3),
                     );
                     if !encoding_params.is_empty() {
                         init.set_send_encodings(encoding_params);
                     }
-
+                    //
                     let transceiver = peer.add_transceiver(kind, init).await;
-                    if !target_codecs.is_empty() {
-                        // transceiver.set_codec_preferences(target_codecs);
-                    }
+                    // if !target_codecs.is_empty() {
+                    //     // transceiver.set_codec_preferences(target_codecs);
+                    // }
+                    // transceiver
+
                     transceiver
                 }
             }

@@ -1163,8 +1163,9 @@ pub struct VideoSettings {
     /// [`EncodingParameters`] of these [`VideoSettings`].
     pub encoding_parameters: Vec<EncodingParameters>,
 
-    /// [`SvcSettings`] of these [`VideoSettings`].
-    pub svc_settings: Vec<SvcSettings>,
+    pub scalability_mode: ScalabilityMode
+    // /// [`SvcSettings`] of these [`VideoSettings`].
+    // pub svc_settings: Vec<SvcSettings>,
 }
 
 /// Possible media sources of a video [`Track`].
