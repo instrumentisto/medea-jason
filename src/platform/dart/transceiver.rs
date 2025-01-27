@@ -294,7 +294,7 @@ impl Transceiver {
         let params = self.get_send_parameters().await;
 
         let encs = params.encodings().await?;
-        for mut enc in encs {
+        for enc in encs {
             let rid = enc.rid();
 
             let Some(encoding) = encodings.iter().find(|e| e.rid == rid) else {
@@ -303,7 +303,7 @@ impl Transceiver {
 
             enc.set_active(encoding.active);
             if let Some(max_bitrate) = encoding.max_bitrate {
-                enc.set_max_bitrate(max_bitrate.into());
+                enc.set_max_bitrate(max_bitrate);
             }
             if let Some(scale_resolution_down_by) =
                 encoding.scale_resolution_down_by
@@ -311,6 +311,9 @@ impl Transceiver {
                 enc.set_scale_resolution_down_by(
                     scale_resolution_down_by.into(),
                 );
+            }
+            if let Some(scalability_mode) = encoding.scalability_mode {
+                enc.set_scalability_mode(scalability_mode);
             }
 
             params.set_encoding(&enc).await;

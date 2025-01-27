@@ -171,6 +171,9 @@ impl Transceiver {
                     scale_resolution_down_by.into(),
                 );
             }
+            if let Some(scalability_mode) = encoding.scalability_mode {
+                enc.set_scalability_mode(&scalability_mode.to_string());
+            }
         }
 
         drop(

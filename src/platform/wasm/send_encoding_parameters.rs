@@ -2,7 +2,7 @@
 //!
 //! [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
 
-use medea_client_api_proto::{EncodingParameters, ScalabilityMode};
+use medea_client_api_proto::ScalabilityMode;
 use web_sys::RtcRtpEncodingParameters;
 
 /// Wrapper around [RTCRtpEncodingParameters][0] providing handy methods for its
@@ -57,27 +57,5 @@ impl SendEncodingParameters {
     /// [1]: https://tinyurl.com/3zuaee45
     pub fn set_scalability_mode(&self, scalability_mode: ScalabilityMode) {
         self.0.set_scalability_mode(&scalability_mode.to_string());
-    }
-}
-
-impl From<EncodingParameters> for SendEncodingParameters {
-    fn from(from: EncodingParameters) -> Self {
-        let EncodingParameters {
-            rid,
-            active,
-            max_bitrate,
-            scale_resolution_down_by,
-        } = from;
-
-        let enc = Self::new(rid, active);
-
-        if let Some(b) = max_bitrate {
-            enc.set_max_bitrate(b);
-        }
-        if let Some(s) = scale_resolution_down_by {
-            enc.set_scale_resolution_down_by(s.into());
-        }
-
-        enc
     }
 }

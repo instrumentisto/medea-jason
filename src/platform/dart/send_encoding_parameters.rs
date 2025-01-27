@@ -3,7 +3,7 @@
 //! [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
 
 use dart_sys::Dart_Handle;
-use medea_client_api_proto::{EncodingParameters, ScalabilityMode};
+use medea_client_api_proto::ScalabilityMode;
 use medea_macro::dart_bridge;
 
 use crate::platform::dart::utils::handle::DartHandle;
@@ -124,7 +124,7 @@ impl SendEncodingParameters {
     /// Sets [activeness][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-active
-    pub fn set_active(&mut self, active: bool) {
+    pub fn set_active(&self, active: bool) {
         let handle = self.0.get();
         unsafe { send_encoding_parameters::set_active(handle, active) }
             .unwrap();
@@ -133,10 +133,13 @@ impl SendEncodingParameters {
     /// Sets [maxBitrate][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
-    pub fn set_max_bitrate(&mut self, max_bitrate: i64) {
+    pub fn set_max_bitrate(&self, max_bitrate: u32) {
         let handle = self.0.get();
         unsafe {
-            send_encoding_parameters::set_max_bitrate(handle, max_bitrate)
+            send_encoding_parameters::set_max_bitrate(
+                handle,
+                max_bitrate.into(),
+            )
         }
         .unwrap();
     }
@@ -144,10 +147,7 @@ impl SendEncodingParameters {
     /// Sets [scaleResolutionDownBy][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/ypzzc75t
-    pub fn set_scale_resolution_down_by(
-        &mut self,
-        scale_resolution_down_by: i64,
-    ) {
+    pub fn set_scale_resolution_down_by(&self, scale_resolution_down_by: i64) {
         let handle = self.0.get();
         unsafe {
             send_encoding_parameters::set_scale_resolution_down_by(
@@ -170,27 +170,5 @@ impl SendEncodingParameters {
             )
         }
         .unwrap();
-    }
-}
-
-impl From<EncodingParameters> for SendEncodingParameters {
-    fn from(from: EncodingParameters) -> Self {
-        let EncodingParameters {
-            rid,
-            active,
-            max_bitrate,
-            scale_resolution_down_by,
-        } = from;
-
-        let mut enc = Self::new(rid, active);
-
-        if let Some(b) = max_bitrate {
-            enc.set_max_bitrate(b.into());
-        }
-        if let Some(s) = scale_resolution_down_by {
-            enc.set_scale_resolution_down_by(s.into());
-        }
-
-        enc
     }
 }

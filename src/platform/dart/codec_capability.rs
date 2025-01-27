@@ -36,30 +36,42 @@ mod codec_capability {
             kind: i64,
         ) -> Result<Dart_Handle, Error>;
 
+        /// Returns [RTCRtpReceiver]'s available [RTCRtpCodecCapability][1]s.
+        ///
+        /// [RTCRtpReceiver]: https://www.w3.org/TR/webrtc/#dom-rtcrtpreceiver
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
         pub fn get_receiver_codec_capabilities(
             kind: i64,
         ) -> Result<Dart_Handle, Error>;
 
-        /// Returns [mimeType][2] of the provided [RTCRtpCodecCapability][1].
+        /// Returns [mimeType][2] of the provided [RTCRtpCodec][1].
         ///
-        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
-        /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+        /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-mimetype
         pub fn mime_type(
             codec_capability: Dart_Handle,
         ) -> Result<ptr::NonNull<c_char>, Error>;
 
+        /// Returns [clockRate][2] of the provided [RTCRtpCodec][1].
+        ///
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+        /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-clockrate
         pub fn clock_rate(
             codec_capability: Dart_Handle,
         ) -> Result<ptr::NonNull<DartValueArg<Option<u32>>>, Error>;
 
+        /// Returns [channels][2] of the provided [RTCRtpCodec][1].
+        ///
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+        /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-channels
         pub fn channels(
             codec_capability: Dart_Handle,
         ) -> Result<ptr::NonNull<DartValueArg<Option<u16>>>, Error>;
 
-        /// Returns [mimeType][2] of the provided [RTCRtpCodecCapability][1].
+        /// Returns [sdpFmtpLine][2] of the provided [RTCRtpCodec][1].
         ///
-        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
-        /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+        /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-sdpfmtpline
         pub fn parameters(
             codec_capability: Dart_Handle,
         ) -> Result<ptr::NonNull<c_char>, Error>;
