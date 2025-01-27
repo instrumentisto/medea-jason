@@ -81,10 +81,11 @@ sync-unsafe-cell = "0.1"
 [target.'cfg(target_family = "wasm")'.dependencies]
 backoff = { version = "0.4", features = ["wasm-bindgen"] }
 console_error_panic_hook = { version = "0.1", optional = true }
+getrandom = { version = "0.3", features = ["wasm_js"] }
 js-sys = "0.3"
 talc = { version = "4.4", features = ["lock_api"], default-features = false, optional = true }
 wasm-bindgen = "0.2.93"
-wasm-bindgen-futures = "0.4.43"
+wasm-bindgen-futures = "0.4.50"
 wasm-logger = "0.2"
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
     version = "0.3.70"
