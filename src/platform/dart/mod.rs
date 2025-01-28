@@ -124,17 +124,16 @@ pub fn init_logger() {
 /// Returns [`proto::Capabilities`] of the current platform.
 #[must_use]
 pub async fn get_capabilities() -> proto::Capabilities {
-    let convert_caps =
-        |caps: Vec<CodecCapability>| -> Vec<proto::CodecCapability> {
-            caps.into_iter()
-                .map(|c| proto::CodecCapability {
-                    mime_type: c.mime_type(),
-                    clock_rate: c.clock_rate().unwrap_or_default(),
-                    channels: c.channels(),
-                    parameters: c.parameters(),
-                })
-                .collect::<Vec<_>>()
-        };
+    let convert_caps = |caps: Vec<CodecCapability>| -> Vec<proto::Codec> {
+        caps.into_iter()
+            .map(|c| proto::Codec {
+                mime_type: c.mime_type(),
+                clock_rate: c.clock_rate().unwrap_or_default(),
+                channels: c.channels(),
+                parameters: c.parameters(),
+            })
+            .collect::<Vec<_>>()
+    };
 
     let audio_tx =
         CodecCapability::get_sender_codec_capabilities(MediaKind::Audio)

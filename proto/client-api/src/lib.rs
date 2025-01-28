@@ -1307,6 +1307,10 @@ pub struct EncodingParameters {
     /// [SSRC]: https://webrtcglossary.com/ssrc
     pub active: bool,
 
+    /// Optional value selecting which codec is used for this encoding's RTP
+    /// stream. If absent, the user agent can chose to use any negotiated codec.
+    pub codec: Option<Codec>,
+
     /// Maximum bitrate that can be used to send this encoding.
     ///
     /// User agent is free to allocate bandwidth between the encodings, as long
@@ -1337,23 +1341,24 @@ pub struct EncodingParameters {
 #[derive(Clone, Debug, Eq, Default, PartialEq)]
 pub struct Capabilities {
     /// Codec capabilities of the system for sending audio.
-    pub audio_tx: Vec<CodecCapability>,
+    pub audio_tx: Vec<Codec>,
 
     /// Codec capabilities of the system for receiving audio.
-    pub audio_rx: Vec<CodecCapability>,
+    pub audio_rx: Vec<Codec>,
 
     /// Codec capabilities of the system for sending video.
-    pub video_tx: Vec<CodecCapability>,
+    pub video_tx: Vec<Codec>,
 
     /// Codec capabilities of the system for receiving video.
-    pub video_rx: Vec<CodecCapability>,
+    pub video_rx: Vec<Codec>,
 }
 
-/// Provides information about codec capabilities. Only capability combinations
-/// that would utilize distinct payload types in a generated SDP offer are
-/// provided.
+/// Provides information about codec objects. Representation of an
+/// [RTCRtpCodec].
+///
+/// [RTCRtpCodec]: https://www.w3.org/TR/webrtc/#dom-rtcrtpcodec
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct CodecCapability {
+pub struct Codec {
     /// The codec MIME media type/subtype. Valid media types and subtypes are
     /// listed in [IANA-RTP-2].
     ///

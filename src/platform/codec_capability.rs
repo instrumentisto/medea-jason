@@ -32,6 +32,7 @@ impl From<EncodingParameters> for SendEncodingParameters {
         let EncodingParameters {
             rid,
             active,
+            codec,
             max_bitrate,
             scale_resolution_down_by,
             scalability_mode,

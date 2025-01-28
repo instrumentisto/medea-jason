@@ -121,34 +121,33 @@ impl Drop for IntervalHandle {
 #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
 #[must_use]
 pub async fn get_capabilities() -> proto::Capabilities {
-    let convert_caps =
-        |caps: RtcRtpCapabilities| -> Vec<proto::CodecCapability> {
-            caps.get_codecs()
-                .into_iter()
-                .map(RtcRtpCodecCapability::from)
-                .map(|c| -> proto::CodecCapability {
-                    let sdp_fmtp = c.get_sdp_fmtp_line().unwrap_or_default();
+    let convert_caps = |caps: RtcRtpCapabilities| -> Vec<proto::Codec> {
+        caps.get_codecs()
+            .into_iter()
+            .map(RtcRtpCodecCapability::from)
+            .map(|c| -> proto::Codec {
+                let sdp_fmtp = c.get_sdp_fmtp_line().unwrap_or_default();
 
-                    let sdp_fmtp_line = sdp_fmtp
-                        .split(';')
-                        .map(|s| s.split('='))
-                        .filter_map(|mut a| match (a.next(), a.next()) {
-                            (Some(k), Some(v)) => {
-                                Some((k.to_owned(), v.to_owned()))
-                            }
-                            _ => None,
-                        })
-                        .collect::<HashMap<String, String>>();
+                let sdp_fmtp_line = sdp_fmtp
+                    .split(';')
+                    .map(|s| s.split('='))
+                    .filter_map(|mut a| match (a.next(), a.next()) {
+                        (Some(k), Some(v)) => {
+                            Some((k.to_owned(), v.to_owned()))
+                        }
+                        _ => None,
+                    })
+                    .collect::<HashMap<String, String>>();
 
-                    proto::CodecCapability {
-                        mime_type: c.get_mime_type(),
-                        clock_rate: c.get_clock_rate(),
-                        channels: c.get_channels(),
-                        parameters: sdp_fmtp_line,
-                    }
-                })
-                .collect::<Vec<_>>()
-        };
+                proto::Codec {
+                    mime_type: c.get_mime_type(),
+                    clock_rate: c.get_clock_rate(),
+                    channels: c.get_channels(),
+                    parameters: sdp_fmtp_line,
+                }
+            })
+            .collect::<Vec<_>>()
+    };
 
     proto::Capabilities {
         audio_tx: web_sys::RtcRtpSender::get_capabilities("audio")
