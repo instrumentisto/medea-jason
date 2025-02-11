@@ -2,7 +2,7 @@
 
 use std::{borrow::Borrow, convert::Infallible, fmt::Display, rc::Rc};
 
-use derive_more::Deref;
+use derive_more::with_trait::Deref;
 use futures::{future, Future, FutureExt as _, Stream, StreamExt as _};
 use medea_reactive::AllProcessed;
 use sealed::sealed;

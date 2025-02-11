@@ -3,7 +3,7 @@
 //! [gRPC]: https://grpc.io
 
 use async_trait::async_trait;
-use derive_more::{Display, Error, From};
+use derive_more::with_trait::{Display, Error, From};
 use tonic::codegen::{Body, Bytes};
 
 use crate::{

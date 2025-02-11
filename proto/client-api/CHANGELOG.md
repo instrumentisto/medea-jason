@@ -6,6 +6,18 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### Upgraded
+
+- Dependencies:
+    - [`derive-more`] to 2.0 version. ([todo])
+
+[todo]: /../../commit/todo
+
+
+
+
 ## [0.7.0] · 2024-10-29
 [0.7.0]: /../../tree/medea-client-api-proto-0.7.0/proto/client-api
 

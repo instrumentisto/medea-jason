@@ -2,7 +2,7 @@
 
 use std::{collections::HashSet, rc::Rc};
 
-use derive_more::{Display, From};
+use derive_more::with_trait::{Display, From};
 use futures::{future, StreamExt as _};
 use medea_client_api_proto::{
     IceCandidate, MemberId, NegotiationRole, TrackId,

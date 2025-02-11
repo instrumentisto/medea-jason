@@ -1,7 +1,7 @@
 //! API for receiving callbacks from a media server.
 
 use async_trait::async_trait;
-use derive_more::From;
+use derive_more::with_trait::From;
 use time::OffsetDateTime as DateTime;
 
 use crate::Fid;

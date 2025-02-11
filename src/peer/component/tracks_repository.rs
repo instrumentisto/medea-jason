@@ -8,7 +8,7 @@ use std::{
     rc::Rc,
 };
 
-use derive_more::From;
+use derive_more::with_trait::From;
 use futures::{
     future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
     TryFutureExt as _,

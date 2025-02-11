@@ -2,7 +2,7 @@
 
 use std::{future::Future, rc::Rc};
 
-use derive_more::From;
+use derive_more::with_trait::From;
 use js_sys::Reflect;
 use medea_client_api_proto::EncodingParameters;
 use wasm_bindgen::JsValue;

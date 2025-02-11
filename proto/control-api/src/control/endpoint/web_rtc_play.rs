@@ -4,7 +4,7 @@
 
 use std::str::FromStr;
 
-use derive_more::{AsRef, Display, Error, From, Into};
+use derive_more::with_trait::{AsRef, Display, Error, From, Into};
 use ref_cast::RefCast;
 #[cfg(feature = "serde")]
 use serde::{de::Error as _, Deserialize, Deserializer, Serialize, Serializer};

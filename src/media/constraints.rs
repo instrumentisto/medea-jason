@@ -2,7 +2,7 @@
 
 use std::{cell::RefCell, rc::Rc};
 
-use derive_more::Display;
+use derive_more::with_trait::Display;
 use futures::stream::LocalBoxStream;
 use medea_client_api_proto::{
     AudioSettings as ProtoAudioConstraints, MediaSourceKind,

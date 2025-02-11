@@ -3,7 +3,7 @@
 #![cfg_attr(feature = "mockable", expect(unused_lifetimes, reason = "codegen"))]
 
 use async_trait::async_trait;
-use derive_more::Display;
+use derive_more::with_trait::Display;
 use futures::stream::LocalBoxStream;
 use medea_client_api_proto::{ClientMsg, ServerMsg};
 use tracerr::Traced;

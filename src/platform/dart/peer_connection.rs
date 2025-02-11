@@ -4,7 +4,7 @@
 
 use std::{future::Future, rc::Rc};
 
-use derive_more::Display;
+use derive_more::with_trait::Display;
 use medea_client_api_proto::{
     stats::RtcStat, IceConnectionState, IceServer, PeerConnectionState,
 };

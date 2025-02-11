@@ -10,7 +10,7 @@ use std::{
     time::{Duration, SystemTime, SystemTimeError},
 };
 
-use derive_more::{Display, From};
+use derive_more::with_trait::{Display, From};
 use serde::{Deserialize, Serialize};
 
 /// Enum with which you can try to deserialize some known enum and if it

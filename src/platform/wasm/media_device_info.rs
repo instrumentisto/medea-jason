@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#device-info
 
-use derive_more::From;
+use derive_more::with_trait::From;
 
 use crate::media::MediaDeviceKind;
 

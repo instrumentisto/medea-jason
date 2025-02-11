@@ -6,7 +6,7 @@ pub mod constraints;
 mod manager;
 pub mod track;
 
-use derive_more::Display;
+use derive_more::with_trait::Display;
 use medea_client_api_proto::MediaType;
 
 #[doc(inline)]

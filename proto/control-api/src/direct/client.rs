@@ -2,7 +2,7 @@
 //! implementations.
 
 use async_trait::async_trait;
-use derive_more::{Display, Error, From};
+use derive_more::with_trait::{Display, Error, From};
 use futures::{
     channel::{mpsc, oneshot},
     StreamExt as _,

@@ -5,7 +5,7 @@
 mod api;
 mod callback;
 
-use derive_more::{Display, Error, From};
+use derive_more::with_trait::{Display, Error, From};
 
 use crate::{
     control::ParseFidError, endpoint::web_rtc_play::LocalSrcUriParseError,

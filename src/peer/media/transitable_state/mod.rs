@@ -2,13 +2,11 @@
 //!
 //! [`MediaStateControllable`]: crate::peer::MediaStateControllable
 
-use derive_more::Display;
-
 mod controller;
 pub mod media_exchange_state;
 pub mod mute_state;
 
-use derive_more::From;
+use derive_more::with_trait::{Display, From};
 use medea_client_api_proto::{TrackId, TrackPatchCommand};
 
 #[doc(inline)]

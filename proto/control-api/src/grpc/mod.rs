@@ -58,7 +58,7 @@ pub mod callback;
 
 use std::str::FromStr;
 
-use derive_more::{Display, Error, From, Into};
+use derive_more::with_trait::{Display, Error, From, Into};
 use url::Url;
 
 #[doc(inline)]

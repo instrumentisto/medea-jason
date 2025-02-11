@@ -10,7 +10,7 @@ use std::{
 
 use async_trait::async_trait;
 use derivative::Derivative;
-use derive_more::{Display, From};
+use derive_more::with_trait::{Display, From};
 use futures::{
     channel::mpsc,
     future::{self, LocalBoxFuture},

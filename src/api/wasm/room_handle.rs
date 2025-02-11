@@ -2,7 +2,7 @@
 //!
 //! [`Room`]: room::Room
 
-use derive_more::{From, Into};
+use derive_more::with_trait::{From, Into};
 use js_sys::Promise;
 use wasm_bindgen::{prelude::*, JsValue};
 use wasm_bindgen_futures::future_to_promise;

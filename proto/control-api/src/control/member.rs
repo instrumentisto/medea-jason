@@ -7,7 +7,7 @@ use std::{
     time::Duration,
 };
 
-use derive_more::{AsRef, Display, Error, From, FromStr, Into};
+use derive_more::with_trait::{AsRef, Display, Error, From, FromStr, Into};
 use ref_cast::RefCast;
 use secrecy::{ExposeSecret as _, SecretString};
 #[cfg(feature = "serde")]

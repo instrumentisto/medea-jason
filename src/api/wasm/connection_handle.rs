@@ -1,6 +1,6 @@
 //! Connection with a specific remote `Member` used on JS side.
 
-use derive_more::From;
+use derive_more::with_trait::From;
 use js_sys::Promise;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;

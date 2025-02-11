@@ -4,7 +4,7 @@
 
 use std::{cell::RefCell, rc::Rc, time::Duration};
 
-use derive_more::{Debug, Display};
+use derive_more::with_trait::{Debug, Display};
 use futures::{
     channel::{mpsc, oneshot},
     future::LocalBoxFuture,

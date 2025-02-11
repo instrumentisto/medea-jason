@@ -10,7 +10,7 @@ use std::{
 };
 
 use actix::{clock::sleep, Recipient};
-use derive_more::{AsRef, From, Into};
+use derive_more::with_trait::{AsRef, From, Into};
 use medea_control_api_proto::grpc::api as proto;
 use proto::control_api_client::ControlApiClient;
 use tonic::{transport::Channel, Status};

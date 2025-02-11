@@ -4,7 +4,7 @@
 use std::{os::raw::c_void, ptr};
 
 use dart_sys::Dart_Handle;
-use derive_more::Debug;
+use derive_more::with_trait::Debug;
 use futures::channel::oneshot;
 use medea_macro::dart_bridge;
 

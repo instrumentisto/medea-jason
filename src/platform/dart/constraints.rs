@@ -5,7 +5,7 @@
 //! [1]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
 
 use dart_sys::Dart_Handle;
-use derive_more::From;
+use derive_more::with_trait::From;
 use medea_macro::dart_bridge;
 
 use crate::{

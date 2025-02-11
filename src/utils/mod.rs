@@ -8,7 +8,7 @@ mod resettable_delay;
 
 use std::future::Future;
 
-use derive_more::From;
+use derive_more::with_trait::From;
 use futures::future::{self, AbortHandle};
 use medea_reactive::Guarded;
 

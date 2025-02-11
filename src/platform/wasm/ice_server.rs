@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/webrtc#rtciceserver-dictionary
 
-use derive_more::Deref;
+use derive_more::with_trait::Deref;
 use js_sys::Array as JsArray;
 use medea_client_api_proto::IceServer;
 use wasm_bindgen::JsValue;

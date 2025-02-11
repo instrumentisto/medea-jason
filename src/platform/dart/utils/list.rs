@@ -3,7 +3,7 @@
 //! [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
 
 use dart_sys::Dart_Handle;
-use derive_more::From;
+use derive_more::with_trait::From;
 use medea_macro::dart_bridge;
 
 use crate::{

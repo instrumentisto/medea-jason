@@ -8,7 +8,7 @@ mod transitable_state;
 
 use std::{cell::RefCell, collections::HashMap, future::Future, rc::Rc};
 
-use derive_more::{Display, From};
+use derive_more::with_trait::{Display, From};
 use futures::{
     channel::mpsc, future, future::LocalBoxFuture, FutureExt as _,
     TryFutureExt as _,

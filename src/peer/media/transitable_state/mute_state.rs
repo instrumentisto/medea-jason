@@ -1,6 +1,6 @@
 //! State of media mute state.
 
-use derive_more::Display;
+use derive_more::with_trait::Display;
 
 use super::{InStable, InTransition};
 

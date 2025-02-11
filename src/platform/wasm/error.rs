@@ -1,6 +1,6 @@
 //! More convenient wrapper for [`js_sys::Error`].
 
-use derive_more::Display;
+use derive_more::with_trait::Display;
 use wasm_bindgen::{
     convert::{IntoWasmAbi, OptionIntoWasmAbi},
     describe::WasmDescribe,

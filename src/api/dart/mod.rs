@@ -23,7 +23,7 @@ use std::{
 };
 
 use dart_sys::{Dart_Handle, _Dart_Handle};
-use derive_more::Display;
+use derive_more::with_trait::Display;
 use libc::c_char;
 
 use crate::{

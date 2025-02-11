@@ -7,7 +7,7 @@
     reason = "makes no sense for `wasm_bindgen`"
 )]
 
-use derive_more::{From, Into};
+use derive_more::with_trait::{From, Into};
 use wasm_bindgen::prelude::*;
 
 use crate::{api::FacingMode, media};

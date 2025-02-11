@@ -160,7 +160,7 @@ use std::{
     hash::{Hash, Hasher},
 };
 
-use derive_more::{Constructor, Display, From, Into};
+use derive_more::with_trait::{Constructor, Display, From, Into};
 use medea_macro::dispatchable;
 use rand::{distr::Alphanumeric, Rng as _};
 use secrecy::{ExposeSecret as _, SecretString};

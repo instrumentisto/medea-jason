@@ -1,6 +1,6 @@
 //! WebRTC display source related representations.
 
-use derive_more::From;
+use derive_more::with_trait::From;
 use medea_macro::dart_bridge;
 
 use crate::platform::dart::utils::handle::DartHandle;

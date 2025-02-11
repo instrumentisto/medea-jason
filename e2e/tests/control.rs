@@ -1,6 +1,6 @@
 //! HTTP client interacting with Medea via its Control API.
 
-use derive_more::{Display, Error as StdError, From};
+use derive_more::with_trait::{Display, Error as StdError, From};
 use medea_control_api_mock::{
     api::Response,
     callback::CallbackItem,
