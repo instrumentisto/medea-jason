@@ -27,6 +27,7 @@ Future<List<RtpCodecCapability>> Function() _getSenderCodecCapabilities(
       .then((res) => res.codecs);
 }
 
+/// Returns available [RtpCodecCapability]s for an [RtpReceiver].
 Future<List<RtpCodecCapability>> Function() _getReceiverCodecCapabilities(
     int kind) {
   return () => RtpReceiver.getCapabilities(MediaKind.values[kind])

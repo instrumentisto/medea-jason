@@ -222,7 +222,8 @@ async fn room_dispose_works() {
             room_id: _,
             command: Command::JoinRoom {
                 member_id: _,
-                credential: _
+                credential: _,
+                capabilities: _
             }
         }
     ));
@@ -232,7 +233,8 @@ async fn room_dispose_works() {
             room_id: _,
             command: Command::JoinRoom {
                 member_id: _,
-                credential: _
+                credential: _,
+                capabilities: _
             }
         }
     ));

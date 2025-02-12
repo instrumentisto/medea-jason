@@ -1,10 +1,14 @@
 //! Platform-agnostic functionality of a [`platform::CodecCapability`].
 
 use derive_more::{Display, From};
-use medea_client_api_proto::EncodingParameters;
+use medea_client_api_proto as proto;
 
 use crate::{
-    platform, platform::send_encoding_parameters::SendEncodingParameters,
+    media::MediaKind,
+    platform,
+    platform::{
+        send_encoding_parameters::SendEncodingParameters, CodecCapability,
+    },
     utils::Caused,
 };
 
@@ -27,15 +31,15 @@ pub enum CodecCapabilityError {
     FailedToGetMimeType,
 }
 
-impl From<EncodingParameters> for SendEncodingParameters {
-    fn from(from: EncodingParameters) -> Self {
-        let EncodingParameters {
+impl From<proto::EncodingParameters> for SendEncodingParameters {
+    fn from(from: proto::EncodingParameters) -> Self {
+        let proto::EncodingParameters {
             rid,
             active,
-            codec,
             max_bitrate,
             scale_resolution_down_by,
             scalability_mode,
+            ..
         } = from;
 
         let enc = Self::new(rid, active);
@@ -47,9 +51,48 @@ impl From<EncodingParameters> for SendEncodingParameters {
             enc.set_scale_resolution_down_by(s.into());
         }
         if let Some(s) = scalability_mode {
-            enc.set_scalability_mode(s);
+            enc.set_scalability_mode(&s.to_string());
         }
 
         enc
+    }
+}
+
+/// Returns [`proto::Capabilities`] of the current platform.
+#[must_use]
+pub async fn get_capabilities() -> proto::Capabilities {
+    let convert_caps = |caps: Vec<CodecCapability>| -> Vec<proto::Codec> {
+        caps.into_iter()
+            .map(|c| proto::Codec {
+                mime_type: c.mime_type(),
+                clock_rate: c.clock_rate(),
+                channels: c.channels(),
+                parameters: c.parameters(),
+            })
+            .collect::<Vec<_>>()
+    };
+
+    let audio_tx =
+        CodecCapability::get_sender_codec_capabilities(MediaKind::Audio)
+            .await
+            .unwrap_or_default();
+    let audio_rx =
+        CodecCapability::get_receiver_codec_capabilities(MediaKind::Audio)
+            .await
+            .unwrap_or_default();
+    let video_tx =
+        CodecCapability::get_sender_codec_capabilities(MediaKind::Video)
+            .await
+            .unwrap_or_default();
+    let video_rx =
+        CodecCapability::get_receiver_codec_capabilities(MediaKind::Video)
+            .await
+            .unwrap_or_default();
+
+    proto::Capabilities {
+        audio_tx: convert_caps(audio_tx),
+        audio_rx: convert_caps(audio_rx),
+        video_tx: convert_caps(video_tx),
+        video_rx: convert_caps(video_rx),
     }
 }

@@ -7,6 +7,9 @@ use crate::{
     utils::Caused,
 };
 
+#[cfg(doc)]
+use platform::Transceiver;
+
 /// Representation of [RTCSdpType].
 ///
 /// [RTCSdpType]: https://w3.org/TR/webrtc#dom-rtcsdptype
@@ -147,4 +150,9 @@ pub enum RtcPeerConnectionError {
     #[display("Failed to set remote SDP description: {_0}")]
     #[from(ignore)]
     SetRemoteDescriptionFailed(platform::Error),
+
+    /// [`Transceiver::update_send_encodings`] error.
+    #[display("Failed to update sender encodings: {_0}")]
+    #[from(ignore)]
+    UpdateSendEncodingsError(platform::transceiver::UpdateSendEncodingError),
 }

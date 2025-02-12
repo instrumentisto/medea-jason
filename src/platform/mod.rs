@@ -23,10 +23,12 @@ use crate::utils::Caused;
 
 pub use self::{
     callback::Callback,
+    codec_capability::get_capabilities,
     peer_connection::{
         IceCandidate, IceCandidateError, RtcPeerConnectionError, SdpType,
     },
     rtc_stats::RtcStatsError,
+    send_encoding_parameters::SendEncodingParameters,
     transceiver::Direction as TransceiverDirection,
     transport::{RpcTransport, TransportError, TransportState},
 };

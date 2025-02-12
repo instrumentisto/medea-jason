@@ -14,8 +14,6 @@ use futures::{
     TryFutureExt as _,
 };
 use medea_client_api_proto as proto;
-#[cfg(doc)]
-use medea_client_api_proto::EncodingParameters;
 #[cfg(feature = "mockable")]
 use medea_client_api_proto::{ConnectionMode, MemberId};
 use proto::{MediaSourceKind, MediaType, TrackId};
@@ -28,7 +26,8 @@ use crate::{
     peer::{LocalStreamUpdateCriteria, PeerEvent},
     platform,
     platform::{
-        send_encoding_parameters::SendEncodingParameters, TransceiverInit,
+        send_encoding_parameters::SendEncodingParameters,
+        transceiver::probe_target_codecs, TransceiverInit,
     },
     utils::{Caused, Component},
 };
@@ -352,7 +351,23 @@ impl InnerMediaConnections {
                             .collect(),
                     );
 
-                    peer.add_transceiver(kind, init).await
+                    let transceiver = peer.add_transceiver(kind, init).await;
+
+                    let target_codecs = probe_target_codecs(
+                        settings
+                            .encoding_parameters
+                            .iter()
+                            .filter_map(|e| e.codec.as_ref()),
+                    )
+                    .await;
+                    // TODO: Switch to negotiationless codec change via
+                    //       RTCRtpSender.setParameters when
+                    //       RTCRtpEncodingParameters.codec is supported on all
+                    //       major UAs.
+                    if let Some(target_codecs) = target_codecs {
+                        transceiver.set_codec_preferences(target_codecs);
+                    }
+                    transceiver
                 }
             }
         }

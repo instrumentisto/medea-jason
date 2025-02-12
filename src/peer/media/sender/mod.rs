@@ -325,6 +325,15 @@ impl Sender {
     pub fn muted(&self) -> bool {
         self.muted.get()
     }
+
+    /// Returns [`Parameters`] of the underlying [RTCRtpSender].
+    ///
+    /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    pub async fn get_send_encodings(
+        &self,
+    ) -> Vec<platform::SendEncodingParameters> {
+        self.transceiver.get_send_encodings().await
+    }
 }
 
 impl Drop for Sender {

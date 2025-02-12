@@ -1290,7 +1290,7 @@ pub enum ScalabilityMode {
 /// Representation of an [RTCRtpEncodingParameters][0].
 ///
 /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct EncodingParameters {
     /// [RTP stream ID (RID)][RID] to be sent using the
     /// [RID header extension][0].
@@ -1308,7 +1308,8 @@ pub struct EncodingParameters {
     pub active: bool,
 
     /// Optional value selecting which codec is used for this encoding's RTP
-    /// stream. If absent, the user agent can chose to use any negotiated codec.
+    /// stream. If absent, the user agent can choose to use any negotiated
+    /// codec.
     pub codec: Option<Codec>,
 
     /// Maximum bitrate that can be used to send this encoding.

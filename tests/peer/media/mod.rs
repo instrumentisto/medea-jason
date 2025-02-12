@@ -161,17 +161,35 @@ async fn new_media_connections_with_disabled_video_tracks() {
 ///
 /// This tests checks that [`TrackPatch`] works as expected.
 mod sender_patch {
+    use super::*;
     use medea_client_api_proto::{
-        AudioSettings, ConnectionMode, MediaDirection, MediaType,
+        AudioSettings, ConnectionMode, EncodingParameters, MediaDirection,
+        MediaSourceKind, MediaType, ScalabilityMode, VideoSettings,
     };
     use medea_jason::{
         peer::{sender, MediaExchangeState},
-        utils::{AsProtoState, SynchronizableState},
+        platform::send_encoding_parameters::SendEncodingParameters,
+        utils::{AsProtoState, SynchronizableState, Updatable},
     };
 
-    use super::*;
+    async fn audio_sender() -> (sender::Component, TrackId, MediaConnections) {
+        build_sender(MediaType::Audio(AudioSettings { required: false })).await
+    }
 
-    async fn get_sender() -> (sender::Component, TrackId, MediaConnections) {
+    async fn video_sender(
+        encoding_parameters: Vec<EncodingParameters>,
+    ) -> (sender::Component, TrackId, MediaConnections) {
+        build_sender(MediaType::Video(VideoSettings {
+            required: false,
+            source_kind: MediaSourceKind::Device,
+            encoding_parameters,
+        }))
+        .await
+    }
+
+    async fn build_sender(
+        kind: MediaType,
+    ) -> (sender::Component, TrackId, MediaConnections) {
         let (tx, rx) = mpsc::unbounded();
         mem::forget(rx);
         let media_connections = MediaConnections::new(
@@ -181,7 +199,7 @@ mod sender_patch {
         let sender = media_connections
             .create_sender(
                 TrackId(0),
-                MediaType::Audio(AudioSettings { required: false }),
+                kind,
                 MediaDirection::SendRecv,
                 false,
                 None,
@@ -197,7 +215,7 @@ mod sender_patch {
 
     #[wasm_bindgen_test]
     async fn wrong_track_id() {
-        let (sender, track_id, _media_connections) = get_sender().await;
+        let (sender, track_id, _media_connections) = audio_sender().await;
         sender.state().update(TrackPatchEvent {
             id: TrackId(track_id.0 + 100),
             receivers: None,
@@ -212,7 +230,7 @@ mod sender_patch {
 
     #[wasm_bindgen_test]
     async fn disable() {
-        let (sender, track_id, _media_connections) = get_sender().await;
+        let (sender, track_id, _media_connections) = audio_sender().await;
         sender.state().update(TrackPatchEvent {
             id: track_id,
             receivers: None,
@@ -227,7 +245,7 @@ mod sender_patch {
 
     #[wasm_bindgen_test]
     async fn enabled_enabled() {
-        let (sender, track_id, _media_connections) = get_sender().await;
+        let (sender, track_id, _media_connections) = audio_sender().await;
         sender.state().update(TrackPatchEvent {
             id: track_id,
             receivers: None,
@@ -242,7 +260,7 @@ mod sender_patch {
 
     #[wasm_bindgen_test]
     async fn disable_disabled() {
-        let (sender, track_id, _media_connections) = get_sender().await;
+        let (sender, track_id, _media_connections) = audio_sender().await;
         sender.state().update(TrackPatchEvent {
             id: track_id,
             receivers: None,
@@ -267,7 +285,7 @@ mod sender_patch {
 
     #[wasm_bindgen_test]
     async fn empty_patch() {
-        let (sender, track_id, _media_connections) = get_sender().await;
+        let (sender, track_id, _media_connections) = audio_sender().await;
         sender.state().update(TrackPatchEvent {
             id: track_id,
             receivers: None,
@@ -280,11 +298,94 @@ mod sender_patch {
         assert!(!sender.general_disabled());
     }
 
+    #[wasm_bindgen_test]
+    async fn add_transceiver_send_encodings() {
+        let (sender, track_id, _media_connections) = video_sender(vec![
+            EncodingParameters {
+                rid: "h".to_owned(),
+                scalability_mode: None,
+                active: true,
+                max_bitrate: None,
+                scale_resolution_down_by: None,
+                codec: None,
+            },
+            EncodingParameters {
+                rid: "l".to_owned(),
+                scalability_mode: Some(ScalabilityMode::L3T3),
+                active: true,
+                max_bitrate: Some(100),
+                scale_resolution_down_by: Some(2),
+                codec: None,
+            },
+        ])
+        .await;
+
+        let mut encs: Vec<_> = sender.get_send_encodings().await.unwrap();
+        assert_eq!(encs.len(), 2);
+
+        assert_eq!(encs[0].rid(), Some("h".to_owned()));
+        assert_eq!(encs[0].active(), true);
+        assert_eq!(encs[0].scale_resolution_down_by(), None);
+        assert_eq!(encs[0].max_bitrate(), None);
+        assert_eq!(encs[0].scalability_mode(), None);
+
+        assert_eq!(encs[1].rid(), Some("l".to_owned()));
+        assert_eq!(encs[1].active(), true);
+        assert_eq!(encs[1].scale_resolution_down_by(), Some(2.0));
+        assert_eq!(encs[1].max_bitrate(), Some(100));
+        assert_eq!(encs[1].scalability_mode(), Some("L3T3".to_owned()));
+    }
+
+    #[wasm_bindgen_test]
+    async fn update_send_encodings() {
+        let (sender, track_id, _media_connections) =
+            video_sender(vec![EncodingParameters {
+                rid: "0".to_owned(),
+                scalability_mode: None,
+                active: true,
+                max_bitrate: None,
+                scale_resolution_down_by: None,
+                codec: None,
+            }])
+            .await;
+
+        sender.state().when_updated().await;
+
+        sender.state().update(TrackPatchEvent {
+            id: track_id,
+            receivers: None,
+            media_direction: None,
+            muted: None,
+            encoding_parameters: Some(vec![EncodingParameters {
+                rid: "asdasd".to_owned(), // does not matter
+                active: false,
+                codec: None,
+                max_bitrate: Some(100),
+                scale_resolution_down_by: Some(2),
+                scalability_mode: Some(ScalabilityMode::L1T2),
+            }]),
+        });
+
+        sender.state().when_updated().await;
+
+        let mut encodings: Vec<_> = sender.get_send_encodings().await.unwrap();
+        assert_eq!(encodings.len(), 1);
+
+        let encoding = encodings.pop().unwrap();
+
+        // Only one encoding so rid is empty
+        assert_eq!(encoding.rid(), None);
+        assert_eq!(encoding.active(), false);
+        assert_eq!(encoding.scale_resolution_down_by(), Some(2.0));
+        assert_eq!(encoding.max_bitrate(), Some(100));
+        assert_eq!(encoding.scalability_mode(), Some("L1T2".to_owned()));
+    }
+
     /// Checks that [`Sender`]'s mute and media exchange states can be changed
     /// by [`SenderState`] update.
     #[wasm_bindgen_test]
     async fn update_by_state() {
-        let (sender, _, _media_connections) = get_sender().await;
+        let (sender, _, _media_connections) = audio_sender().await;
 
         let mut proto_state = sender.state().as_proto();
         proto_state.media_direction = MediaDirection::RecvOnly;
@@ -450,13 +551,14 @@ mod receiver_patch {
 }
 
 mod codec_probing {
-    use medea_client_api_proto::{Codec, ScalabilityMode, SvcSettings};
-    use medea_jason::{
-        media::MediaKind, peer::media::probe_video_codecs,
-        platform::CodecCapability,
-    };
+    use std::collections::HashMap;
 
     use super::*;
+    use medea_client_api_proto::{Codec, ScalabilityMode};
+    use medea_jason::{
+        media::MediaKind,
+        platform::{transceiver::probe_target_codecs, CodecCapability},
+    };
 
     fn target_codecs_mime_types(codecs: &[CodecCapability]) -> Vec<String> {
         let mut mime_types: Vec<_> =
@@ -468,13 +570,15 @@ mod codec_probing {
 
     #[wasm_bindgen_test]
     async fn probes_only_one_codec() {
-        let (target_codecs, svc) = probe_video_codecs(&vec![SvcSettings {
-            codec: Codec::VP8,
-            scalability_mode: ScalabilityMode::L1T1,
+        let target_codecs = probe_target_codecs(&[Codec {
+            mime_type: "video/VP8".to_owned(),
+            clock_rate: 90000,
+            channels: None,
+            parameters: HashMap::new(),
         }])
-        .await;
+        .await
+        .expect("all clients are expected to support VP8");
 
-        assert_eq!(svc, Some(ScalabilityMode::L1T1));
         assert_eq!(
             target_codecs_mime_types(&target_codecs),
             vec!["video/VP8", "video/red", "video/rtx", "video/ulpfec"]
@@ -482,53 +586,101 @@ mod codec_probing {
     }
 
     #[wasm_bindgen_test]
-    async fn probes_first_codec_when_many() {
-        {
-            let (target_codecs, svc) = probe_video_codecs(&vec![
-                SvcSettings {
-                    codec: Codec::VP9,
-                    scalability_mode: ScalabilityMode::L1T2,
-                },
-                SvcSettings {
-                    codec: Codec::VP8,
-                    scalability_mode: ScalabilityMode::L1T1,
-                },
-            ])
-            .await;
+    async fn bad_params() {
+        let data = &[
+            vec![Codec {
+                mime_type: "video/VP8".to_owned(),
+                clock_rate: 90000,
+                channels: None,
+                // non existent param
+                parameters: HashMap::from([(
+                    "unknown_param".to_owned(),
+                    "value".to_owned(),
+                )]),
+            }],
+            vec![Codec {
+                mime_type: "video/VP9".to_owned(),
+                clock_rate: 90000,
+                channels: None,
+                // good param + non existent param
+                parameters: HashMap::from([
+                    ("profile-id".to_owned(), "0".to_owned()),
+                    ("unknown_param".to_owned(), "value".to_owned()),
+                ]),
+            }],
+            vec![Codec {
+                mime_type: "video/H264".to_owned(),
+                clock_rate: 90000,
+                channels: None,
+                // bad param value
+                parameters: HashMap::from([(
+                    "profile-level-id".to_owned(),
+                    "ffffff".to_owned(),
+                )]),
+            }],
+            vec![], // empty target list
+        ];
 
-            assert_eq!(svc, Some(ScalabilityMode::L1T2));
-            assert_eq!(
-                target_codecs_mime_types(&target_codecs),
-                vec!["video/VP9", "video/red", "video/rtx", "video/ulpfec"]
-            );
-        }
-
-        {
-            let (target_codecs, svc) = probe_video_codecs(&vec![
-                SvcSettings {
-                    codec: Codec::VP8,
-                    scalability_mode: ScalabilityMode::L1T1,
-                },
-                SvcSettings {
-                    codec: Codec::VP9,
-                    scalability_mode: ScalabilityMode::L1T2,
-                },
-            ])
-            .await;
-
-            assert_eq!(svc, Some(ScalabilityMode::L1T1));
-            assert_eq!(
-                target_codecs_mime_types(&target_codecs),
-                vec!["video/VP8", "video/red", "video/rtx", "video/ulpfec"]
-            );
+        for bad_target in data {
+            assert!(probe_target_codecs(bad_target).await.is_none());
         }
     }
 
     #[wasm_bindgen_test]
-    async fn empty_codec_probe_when_target_codec_not_found() {
-        let (target_codecs, svc) = probe_video_codecs(&vec![]).await;
-        assert!(target_codecs.is_empty());
-        assert_eq!(svc, None);
+    async fn correct_priority() {
+        let mut target = vec![
+            Codec {
+                mime_type: "video/VP8".to_owned(),
+                clock_rate: 90000,
+                channels: None,
+                parameters: HashMap::new(),
+            },
+            Codec {
+                mime_type: "video/VP9".to_owned(),
+                clock_rate: 90000,
+                channels: None,
+                parameters: HashMap::new(),
+            },
+        ];
+
+        let mut res: Vec<String> = probe_target_codecs(&target)
+            .await
+            .expect("all clients are expected to support VP8 and VP9")
+            .into_iter()
+            .map(|c| c.mime_type())
+            .collect();
+        res.dedup();
+        assert_eq!(
+            res,
+            vec![
+                "video/VP8",
+                "video/VP9",
+                "video/rtx",
+                "video/red",
+                "video/ulpfec"
+            ]
+        );
+
+        // reverse and repeat
+        target.reverse();
+
+        let mut res: Vec<String> = probe_target_codecs(&target)
+            .await
+            .expect("all clients are expected to support VP8 and VP9")
+            .into_iter()
+            .map(|c| c.mime_type())
+            .collect();
+        res.dedup();
+        assert_eq!(
+            res,
+            vec![
+                "video/VP9",
+                "video/VP8",
+                "video/rtx",
+                "video/red",
+                "video/ulpfec"
+            ]
+        );
     }
 
     // This test is necessary to identify changes in the list of available

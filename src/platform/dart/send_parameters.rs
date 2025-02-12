@@ -40,59 +40,47 @@ mod parameters {
     }
 }
 
-/// Representation of [RTCRtpParameters].
+/// Representation of [RTCRtpSendParameters][0].
 ///
-/// [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
+/// [0]: https://w3.org/TR/webrtc/#dom-rtcrtpsendparameters
 #[derive(Clone, Debug)]
-pub struct Parameters(DartHandle);
+pub struct SendParameters(DartHandle);
 
-impl From<DartHandle> for Parameters {
+impl From<DartHandle> for SendParameters {
     fn from(from: DartHandle) -> Self {
         Self(from)
     }
 }
 
-impl Parameters {
-    /// Returns [`SendEncodingParameters`] of these [`Parameters`].
+impl SendParameters {
+    /// Returns [`SendEncodingParameters`] of these [`SendParameters`].
     #[must_use]
-    pub fn encodings(
-        &self,
-    ) -> LocalBoxFuture<'static, Result<Vec<SendEncodingParameters>, Error>>
-    {
-        let handle = self.0.get();
+    pub async fn encodings(&self) -> Vec<SendEncodingParameters> {
+        let fut = unsafe { parameters::encodings(self.0.get()) }.unwrap();
+        let encodings = unsafe { FutureFromDart::execute::<DartHandle>(fut) }
+            .await
+            .unwrap();
 
-        Box::pin(async move {
-            let fut = unsafe { parameters::encodings(handle) }.unwrap();
-            let encodings =
-                unsafe { FutureFromDart::execute::<DartHandle>(fut) }.await?;
+        let encodings = Vec::from(DartList::from(encodings))
+            .into_iter()
+            .map(|encoding: DartHandle| SendEncodingParameters::from(encoding))
+            .collect();
 
-            let encodings = Vec::from(DartList::from(encodings))
-                .into_iter()
-                .map(|encoding: DartHandle| {
-                    SendEncodingParameters::from(encoding)
-                })
-                .collect();
-
-            Ok(encodings)
-        })
+        Ok(encodings)
     }
 
-    /// Sets the provided [`SendEncodingParameters`] into these [`Parameters`].
+    /// Sets the provided [`SendEncodingParameters`] into these
+    /// [`SendParameters`].
     #[must_use]
-    pub fn set_encoding(
-        &self,
-        encoding: &SendEncodingParameters,
-    ) -> LocalBoxFuture<'static, ()> {
-        let handle = self.0.get();
-        let enc_handle = encoding.handle();
-        Box::pin(async move {
-            let fut = unsafe { parameters::set_encoding(handle, enc_handle) }
-                .unwrap();
-            unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
-        })
+    pub async fn set_encodings(&self, encoding: &SendEncodingParameters) {
+        let fut = unsafe {
+            parameters::set_encoding(self.0.get(), encoding.handle())
+        }
+        .unwrap();
+        unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
     }
 
-    /// Returns the underlying [`Dart_Handle`] of these [`Parameters`].
+    /// Returns the underlying [`Dart_Handle`] of these [`SendParameters`].
     #[must_use]
     pub fn handle(&self) -> Dart_Handle {
         self.0.get()

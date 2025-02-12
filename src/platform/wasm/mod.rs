@@ -10,17 +10,17 @@ pub mod media_track;
 pub mod peer_connection;
 pub mod rtc_stats;
 pub mod send_encoding_parameters;
+pub mod send_parameters;
 pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::{collections::HashMap, time::Duration};
+use std::time::Duration;
 
 use futures::Future;
 use js_sys::Promise;
-use medea_client_api_proto as proto;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{RtcRtpCapabilities, RtcRtpCodecCapability, Window};
+use web_sys::Window;
 
 pub use self::{
     codec_capability::CodecCapability,
@@ -114,53 +114,5 @@ impl Drop for IntervalHandle {
     /// Clears interval with provided ID.
     fn drop(&mut self) {
         window().clear_interval_with_handle(self.0);
-    }
-}
-
-/// Returns [`proto::Capabilities`] of the current platform.
-#[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
-#[must_use]
-pub async fn get_capabilities() -> proto::Capabilities {
-    let convert_caps = |caps: RtcRtpCapabilities| -> Vec<proto::Codec> {
-        caps.get_codecs()
-            .into_iter()
-            .map(RtcRtpCodecCapability::from)
-            .map(|c| -> proto::Codec {
-                let sdp_fmtp = c.get_sdp_fmtp_line().unwrap_or_default();
-
-                let sdp_fmtp_line = sdp_fmtp
-                    .split(';')
-                    .map(|s| s.split('='))
-                    .filter_map(|mut a| match (a.next(), a.next()) {
-                        (Some(k), Some(v)) => {
-                            Some((k.to_owned(), v.to_owned()))
-                        }
-                        _ => None,
-                    })
-                    .collect::<HashMap<String, String>>();
-
-                proto::Codec {
-                    mime_type: c.get_mime_type(),
-                    clock_rate: c.get_clock_rate(),
-                    channels: c.get_channels(),
-                    parameters: sdp_fmtp_line,
-                }
-            })
-            .collect::<Vec<_>>()
-    };
-
-    proto::Capabilities {
-        audio_tx: web_sys::RtcRtpSender::get_capabilities("audio")
-            .map(convert_caps)
-            .unwrap_or_default(),
-        audio_rx: web_sys::RtcRtpReceiver::get_capabilities("audio")
-            .map(convert_caps)
-            .unwrap_or_default(),
-        video_tx: web_sys::RtcRtpSender::get_capabilities("video")
-            .map(convert_caps)
-            .unwrap_or_default(),
-        video_rx: web_sys::RtcRtpReceiver::get_capabilities("video")
-            .map(convert_caps)
-            .unwrap_or_default(),
     }
 }

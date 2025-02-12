@@ -58,7 +58,7 @@ mod codec_capability {
         /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-clockrate
         pub fn clock_rate(
             codec_capability: Dart_Handle,
-        ) -> Result<ptr::NonNull<DartValueArg<Option<u32>>>, Error>;
+        ) -> Result<ptr::NonNull<DartValueArg<Option<i32>>>, Error>;
 
         /// Returns [channels][2] of the provided [RTCRtpCodec][1].
         ///
@@ -66,7 +66,7 @@ mod codec_capability {
         /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-channels
         pub fn channels(
             codec_capability: Dart_Handle,
-        ) -> Result<ptr::NonNull<DartValueArg<Option<u16>>>, Error>;
+        ) -> Result<ptr::NonNull<DartValueArg<Option<i32>>>, Error>;
 
         /// Returns [sdpFmtpLine][2] of the provided [RTCRtpCodec][1].
         ///
@@ -118,14 +118,14 @@ impl CodecCapability {
             .collect())
     }
 
-    /// Returns available [RTCRtpSender]'s [`CodecCapability`]s.
+    /// Returns available [RTCRtpReceiver]'s [`CodecCapability`]s.
     ///
     /// # Errors
     ///
     /// With [`Error::FailedToGetCapabilities`] if fails to retrieve
     /// capabilities.
     ///
-    /// [RTCRtpSender]: https://w3.org/TR/webrtc#dom-rtcrtpsender
+    /// [RTCRtpReceiver]: https://w3.org/TR/webrtc#dom-rtcrtpreceiver
     pub async fn get_receiver_codec_capabilities(
         kind: MediaKind,
     ) -> Result<Vec<Self>, Error> {
@@ -145,9 +145,10 @@ impl CodecCapability {
             .collect())
     }
 
-    /// Returns [MIME media type][2] of this [`CodecCapability`].
+    /// Returns [mimeType][2] of the provided [RTCRtpCodec][1].
     ///
-    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-mimetype
     #[must_use]
     pub fn mime_type(&self) -> String {
         let mime_type =
@@ -155,27 +156,40 @@ impl CodecCapability {
         unsafe { dart_string_into_rust(mime_type) }
     }
 
-    /// Returns the codec clock rate expressed in Hertz.
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
-    #[inline]
+    /// Returns [clockRate][2] of the provided [RTCRtpCodec][1].
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-clockrate
     #[must_use]
-    pub fn clock_rate(&self) -> Option<u32> {
+    pub fn clock_rate(&self) -> u32 {
         let clock_rate =
             unsafe { codec_capability::clock_rate(self.0.get()) }.unwrap();
-        Option::try_from(unsafe { clock_rate.unbox() }).unwrap()
+        let clock_rate: Option<i32> =
+            Option::try_from(unsafe { clock_rate.unbox() }).unwrap();
+
+        clock_rate
+            .and_then(|v| u32::try_from(v).ok())
+            .unwrap_or_default()
     }
 
-    /// Returns the maximum number of channels (mono=1, stereo=2).
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
-    #[inline]
+    /// Returns [channels][2] of the provided [RTCRtpCodec][1].
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-channels
     #[must_use]
     pub fn channels(&self) -> Option<u16> {
         let channels =
             unsafe { codec_capability::channels(self.0.get()) }.unwrap();
-        Option::try_from(unsafe { channels.unbox() }).unwrap()
+        let channels: Option<i32> =
+            Option::try_from(unsafe { channels.unbox() }).unwrap();
+
+        channels.and_then(|v| u16::try_from(v).ok())
     }
 
-    /// Returns codec-specific parameters
+    /// Returns [sdpFmtpLine][2] of the provided [RTCRtpCodec][1].
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-sdpfmtpline
     #[must_use]
     pub fn parameters(&self) -> HashMap<String, String> {
         let params_json_ptr =
