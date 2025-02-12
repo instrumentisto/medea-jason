@@ -6,7 +6,7 @@ use std::{
     rc::{Rc, Weak},
 };
 
-use derive_more::{Display, From};
+use derive_more::with_trait::{Display, From};
 use medea_client_api_proto::MediaSourceKind;
 use tracerr::Traced;
 

@@ -6,7 +6,7 @@
 
 use std::rc::Rc;
 
-use derive_more::AsRef;
+use derive_more::with_trait::AsRef;
 use medea_client_api_proto as proto;
 
 use crate::{

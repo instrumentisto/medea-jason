@@ -73,7 +73,7 @@ pub mod join {
 pub mod leave {
     //! `on_leave` callback's related entities and implementations.
 
-    use derive_more::Display;
+    use derive_more::with_trait::Display;
     use medea_control_api_proto::grpc::callback as proto;
     use serde::{Deserialize, Serialize};
 

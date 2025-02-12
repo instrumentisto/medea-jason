@@ -9,7 +9,7 @@ use std::{
 
 use async_recursion::async_recursion;
 use async_trait::async_trait;
-use derive_more::{Debug, Display, From, Into};
+use derive_more::with_trait::{Debug, Display, From, Into};
 use futures::{
     channel::mpsc, future, future::LocalBoxFuture, FutureExt as _,
     StreamExt as _, TryFutureExt as _,

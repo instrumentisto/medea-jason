@@ -9,7 +9,7 @@ pub mod room;
 use std::{collections::HashMap, str::FromStr};
 
 use async_trait::async_trait;
-use derive_more::{Display, Error, From};
+use derive_more::with_trait::{Display, Error, From};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

@@ -160,9 +160,9 @@ use std::{
     hash::{Hash, Hasher},
 };
 
-use derive_more::{Constructor, Display, From, Into};
+use derive_more::with_trait::{Constructor, Display, From, Into};
 use medea_macro::dispatchable;
-use rand::{distributions::Alphanumeric, Rng as _};
+use rand::{distr::Alphanumeric, Rng as _};
 use secrecy::{ExposeSecret as _, SecretString};
 use serde::{Deserialize, Serialize, Serializer};
 
@@ -214,7 +214,7 @@ impl IcePassword {
     #[must_use]
     pub fn random() -> Self {
         Self(
-            rand::thread_rng()
+            rand::rng()
                 .sample_iter(&Alphanumeric)
                 .take(Self::RANDOM_LENGTH)
                 .map(char::from)

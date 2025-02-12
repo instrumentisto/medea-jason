@@ -4,7 +4,7 @@
 
 use std::{collections::HashMap, rc::Rc};
 
-use derive_more::Display;
+use derive_more::with_trait::Display;
 use medea_client_api_proto::{MediaSourceKind, TrackId};
 use tracerr::Traced;
 

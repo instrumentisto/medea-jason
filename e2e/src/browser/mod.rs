@@ -14,7 +14,7 @@ use std::{
     },
 };
 
-use derive_more::{Display, Error as StdError, From};
+use derive_more::with_trait::{Display, Error as StdError, From};
 use fantoccini::wd::WindowHandle;
 use serde_json::Value as Json;
 

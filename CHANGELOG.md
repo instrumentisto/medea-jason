@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.7.1...master)
+
+### Upgraded
+
+- Dependencies:
+    - [`derive-more`] to 2.0 version. ([todo])
+
+[todo]: /../../commit/todo
+
+
+
+
 ## [0.7.1] · 2024-12-30
 [0.7.1]: /../../tree/medea-jason-0.7.1
 

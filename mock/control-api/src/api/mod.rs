@@ -20,7 +20,7 @@ use actix_web::{
     web::{self, Data, Json, Path},
     App, HttpResponse, HttpServer,
 };
-use derive_more::From;
+use derive_more::with_trait::From;
 use medea_control_api_proto::grpc::api as proto;
 use serde::{Deserialize, Serialize};
 

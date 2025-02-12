@@ -17,7 +17,7 @@ mod wasm;
 #[cfg(target_family = "wasm")]
 pub use self::wasm::*;
 
-use derive_more::Display;
+use derive_more::with_trait::Display;
 
 use crate::utils::Caused;
 

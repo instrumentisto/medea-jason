@@ -2,7 +2,7 @@
 
 use std::{rc::Weak, time::Duration};
 
-use derive_more::{Debug, Display, From};
+use derive_more::with_trait::{Debug, Display, From};
 use tracerr::Traced;
 
 use crate::{

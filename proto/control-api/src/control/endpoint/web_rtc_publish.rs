@@ -2,7 +2,7 @@
 //!
 //! [`Endpoint`]: crate::Endpoint
 
-use derive_more::{AsRef, Display, From, Into};
+use derive_more::with_trait::{AsRef, Display, From, Into};
 use ref_cast::RefCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};

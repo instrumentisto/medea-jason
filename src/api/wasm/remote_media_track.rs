@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams/#dom-mediastreamtrack
 
-use derive_more::{From, Into};
+use derive_more::with_trait::{From, Into};
 use wasm_bindgen::prelude::*;
 
 use crate::{

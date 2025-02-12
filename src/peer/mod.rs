@@ -15,7 +15,7 @@ use std::{
     rc::Rc,
 };
 
-use derive_more::{Display, From};
+use derive_more::with_trait::{Display, From};
 use futures::{channel::mpsc, future, StreamExt as _};
 use medea_client_api_proto::{
     stats::StatId, Command, ConnectionMode, IceConnectionState,

@@ -168,7 +168,14 @@ pub mod platform;
 pub mod room;
 pub mod rpc;
 
+#[cfg(target_family = "wasm")]
+#[doc(hidden)]
+mod enable_transitive_features_only {
+    use getrandom as _;
+}
+
 #[cfg(all(test, target_family = "wasm"))]
+#[doc(hidden)]
 mod used_in_integration_tests_only {
     use instant as _;
     use wasm_bindgen_test as _;

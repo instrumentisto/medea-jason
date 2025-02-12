@@ -2,7 +2,7 @@
 
 use std::{cell::RefCell, collections::HashMap, env, time::Duration};
 
-use derive_more::{Debug, Display, Error as StdError, From};
+use derive_more::with_trait::{Debug, Display, Error as StdError, From};
 use medea_e2e::{
     browser::{mock, Statement, Window},
     object::{

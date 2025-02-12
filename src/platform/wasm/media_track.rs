@@ -4,7 +4,7 @@
 
 use std::{cell::RefCell, future::Future, rc::Rc};
 
-use derive_more::AsRef;
+use derive_more::with_trait::AsRef;
 use futures::future;
 
 use crate::{

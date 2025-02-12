@@ -10,7 +10,7 @@ pub mod tracks_store;
 
 use std::{marker::PhantomData, sync::mpsc};
 
-use derive_more::{Display, Error as StdError, From};
+use derive_more::with_trait::{Display, Error as StdError, From};
 use serde_json::Value as Json;
 use tokio::task;
 use uuid::Uuid;

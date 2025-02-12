@@ -3,7 +3,7 @@
 use std::ptr;
 
 use dart_sys::Dart_Handle;
-use derive_more::Into;
+use derive_more::with_trait::Into;
 use flutter_rust_bridge::DartOpaque;
 use medea_macro::dart_bridge;
 

@@ -7,7 +7,7 @@ use std::{
     rc::Rc,
 };
 
-use derive_more::{Display, From};
+use derive_more::with_trait::{Display, From};
 use futures::channel::mpsc;
 use medea_client_api_proto::TrackId;
 use tracerr::Traced;

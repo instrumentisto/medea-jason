@@ -7,7 +7,7 @@ use std::{
     time::Duration,
 };
 
-use derive_more::{AsRef, Display, Error, From, FromStr, Into};
+use derive_more::with_trait::{AsRef, Display, Error, From, FromStr, Into};
 use ref_cast::RefCast;
 use secrecy::{ExposeSecret as _, SecretString};
 #[cfg(feature = "serde")]
@@ -278,10 +278,10 @@ impl Credentials {
     /// Generates new random [`Credentials::Plain`].
     #[must_use]
     pub fn random() -> Self {
-        use rand::{distributions::Alphanumeric, Rng as _};
+        use rand::{distr::Alphanumeric, Rng as _};
 
         Self::Plain(
-            rand::thread_rng()
+            rand::rng()
                 .sample_iter(&Alphanumeric)
                 .take(32)
                 .map(char::from)

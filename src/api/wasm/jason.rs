@@ -1,6 +1,6 @@
 //! General JS side library interface.
 
-use derive_more::From;
+use derive_more::with_trait::From;
 use wasm_bindgen::prelude::*;
 
 use crate::{

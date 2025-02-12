@@ -3,7 +3,7 @@
 //! [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 
 use dart_sys::Dart_Handle;
-use derive_more::From;
+use derive_more::with_trait::From;
 use medea_macro::dart_bridge;
 
 use crate::platform::dart::utils::{dart_string_into_rust, handle::DartHandle};

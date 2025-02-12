@@ -15,7 +15,7 @@ pub mod remote_media_track;
 pub mod room_close_reason;
 pub mod room_handle;
 
-use derive_more::Display;
+use derive_more::with_trait::Display;
 use wasm_bindgen::prelude::*;
 
 use crate::media;

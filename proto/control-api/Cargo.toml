@@ -25,13 +25,13 @@ client-api = ["dep:medea-client-api-proto"]
 
 [dependencies]
 async-trait = "0.1.34"
-derive_more = { version = "1.0", features = ["as_ref", "display", "error", "from", "from_str", "into"] }
+derive_more = { version = "2.0", features = ["as_ref", "display", "error", "from", "from_str", "into"] }
 futures = { version = "0.3.21", optional = true }
 humantime-serde = { version = "1.1", optional = true }
 medea-client-api-proto = { version = "0.7", path = "../client-api", optional = true }
 prost = { version = "0.13", optional = true }
 prost-types = { version = "0.13", optional = true }
-rand = "0.8"
+rand = "0.9"
 ref-cast = "1.0.7"
 secrecy = { version = "0.10", features = ["serde"] }
 serde = { version = "1.0.103", features = ["derive"], optional = true }

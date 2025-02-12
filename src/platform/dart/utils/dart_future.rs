@@ -5,7 +5,7 @@
 use std::{future::Future, marker::PhantomData, ptr};
 
 use dart_sys::Dart_Handle;
-use derive_more::Debug;
+use derive_more::with_trait::Debug;
 use flutter_rust_bridge::DartOpaque;
 use futures::channel::oneshot;
 use medea_macro::dart_bridge;

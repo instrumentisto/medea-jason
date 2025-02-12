@@ -2,7 +2,7 @@
 
 use std::{cell::RefCell, rc::Rc, time::Duration};
 
-use derive_more::{Debug, Mul};
+use derive_more::with_trait::{Debug, Mul};
 use futures::{channel::mpsc, future, stream::LocalBoxStream, StreamExt as _};
 use medea_client_api_proto::{ClientMsg, ServerMsg};
 

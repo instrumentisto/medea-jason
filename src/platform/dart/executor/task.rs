@@ -14,7 +14,7 @@ use std::{
     thread::{self, ThreadId},
 };
 
-use derive_more::Debug;
+use derive_more::with_trait::Debug;
 use futures::{
     future::LocalBoxFuture,
     task::{self, ArcWake},

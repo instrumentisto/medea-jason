@@ -5,7 +5,7 @@ use crate::media::{
     AudioTrackConstraints, DeviceVideoTrackConstraints,
     DisplayVideoTrackConstraints,
 };
-use derive_more::{AsRef, Into};
+use derive_more::with_trait::{AsRef, Into};
 use web_sys::{
     ConstrainBooleanParameters, ConstrainDomStringParameters,
     ConstrainDoubleRange, MediaTrackConstraints,

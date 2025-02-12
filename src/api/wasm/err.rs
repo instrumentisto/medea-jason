@@ -1,7 +1,7 @@
 //! Implementations and definitions of errors which can be returned from API
 //! functions.
 
-use derive_more::{From, Into};
+use derive_more::with_trait::{From, Into};
 use wasm_bindgen::{
     convert::{FromWasmAbi, IntoWasmAbi},
     describe::WasmDescribe,

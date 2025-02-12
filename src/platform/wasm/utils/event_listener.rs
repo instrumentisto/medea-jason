@@ -2,7 +2,7 @@
 
 use std::{ops::Deref, rc::Rc};
 
-use derive_more::{Display, From};
+use derive_more::with_trait::{Display, From};
 use tracerr::Traced;
 use wasm_bindgen::{closure::Closure, convert::FromWasmAbi, JsCast as _};
 
