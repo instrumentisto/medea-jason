@@ -154,15 +154,10 @@ impl MediaDevices {
         .map_err(Error::from)
         .map_err(tracerr::from_and_wrap!())?;
 
-        Ok(js_sys::try_iter(&stream.get_tracks())
-            .unwrap()
-            .unwrap()
-            .map(|tr| {
-                MediaStreamTrack::new(
-                    tr.unwrap(),
-                    Some(MediaSourceKind::Device),
-                )
-            })
+        Ok(stream
+            .get_tracks()
+            .into_iter()
+            .map(|tr| MediaStreamTrack::new(tr, Some(MediaSourceKind::Device)))
             .collect())
     }
 
@@ -205,15 +200,10 @@ impl MediaDevices {
         .map_err(Error::from)
         .map_err(tracerr::wrap!())?;
 
-        Ok(js_sys::try_iter(&stream.get_tracks())
-            .unwrap()
-            .unwrap()
-            .map(|tr| {
-                MediaStreamTrack::new(
-                    tr.unwrap(),
-                    Some(MediaSourceKind::Display),
-                )
-            })
+        Ok(stream
+            .get_tracks()
+            .into_iter()
+            .map(|tr| MediaStreamTrack::new(tr, Some(MediaSourceKind::Display)))
             .collect())
     }
 

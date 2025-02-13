@@ -406,6 +406,9 @@ pub enum Command {
 
         /// [`Credential`] of the `Member` to authenticate with.
         credential: Credential,
+
+        /// Client reports its capabilities (e.g. available codecs, platform).
+        capabilities: Capabilities,
     },
 
     /// Request to leave a `Room`.
@@ -1161,9 +1164,6 @@ pub struct VideoSettings {
 
     /// [`EncodingParameters`] of these [`VideoSettings`].
     pub encoding_parameters: Vec<EncodingParameters>,
-
-    /// [`SvcSettings`] of these [`VideoSettings`].
-    pub svc_settings: Vec<SvcSettings>,
 }
 
 /// Possible media sources of a video [`Track`].
@@ -1174,46 +1174,6 @@ pub enum MediaSourceKind {
 
     /// Media is obtained with screen-capture.
     Display,
-}
-
-/// Supported [codecs][0].
-///
-/// [0]: https://webrtcglossary.com/codec
-#[derive(
-    Clone, Copy, Debug, Deserialize, Display, Eq, PartialEq, Serialize,
-)]
-pub enum Codec {
-    /// [VP8] codec.
-    ///
-    /// [VP8]: https://en.wikipedia.org/wiki/VP8
-    #[display("VP8")]
-    VP8,
-
-    /// [VP9] codec.
-    ///
-    /// [VP9]: https://en.wikipedia.org/wiki/VP9
-    #[display("VP9")]
-    VP9,
-
-    /// [AV1] codec.
-    ///
-    /// [AV1]: https://en.wikipedia.org/wiki/AV1
-    #[display("AV1")]
-    AV1,
-}
-
-impl Codec {
-    /// Returns [MIME "type/subtype"] string of this [`Codec`].
-    ///
-    /// [MIME "type/subtype"]: https://en.wikipedia.org/wiki/Media_type
-    #[must_use]
-    pub const fn mime_type(&self) -> &'static str {
-        match self {
-            Self::VP8 => "video/VP8",
-            Self::VP9 => "video/VP9",
-            Self::AV1 => "video/AV1",
-        }
-    }
 }
 
 /// [Scalability mode] preference for [SVC (Scalable Video Coding)][SVC].
@@ -1327,22 +1287,10 @@ pub enum ScalabilityMode {
     S3T3,
 }
 
-/// Configuration settings for [SVC (Scalable Video Coding)][SVC].
-///
-/// [SVC]: https://webrtcglossary.com/svc
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct SvcSettings {
-    /// [`Codec`] these [`SvcSettings`] are configured for.
-    pub codec: Codec,
-
-    /// Preferred [`ScalabilityMode`].
-    pub scalability_mode: ScalabilityMode,
-}
-
 /// Representation of an [RTCRtpEncodingParameters][0].
 ///
 /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct EncodingParameters {
     /// [RTP stream ID (RID)][RID] to be sent using the
     /// [RID header extension][0].
@@ -1358,6 +1306,11 @@ pub struct EncodingParameters {
     ///
     /// [SSRC]: https://webrtcglossary.com/ssrc
     pub active: bool,
+
+    /// Optional value selecting which codec is used for this encoding's RTP
+    /// stream. If absent, the user agent can choose to use any negotiated
+    /// codec.
+    pub codec: Option<Codec>,
 
     /// Maximum bitrate that can be used to send this encoding.
     ///
@@ -1376,6 +1329,54 @@ pub struct EncodingParameters {
     ///
     /// Must be greater than or equal to `1`.
     pub scale_resolution_down_by: Option<u8>,
+
+    /// [SVC (Scalable Video Coding)][SVC] scalability mode.
+    ///
+    /// [SVC]: https://webrtcglossary.com/svc
+    pub scalability_mode: Option<ScalabilityMode>,
+}
+
+/// Client capabilities (e.g. available codecs, platform)
+#[cfg_attr(feature = "client", derive(Serialize))]
+#[cfg_attr(feature = "server", derive(Deserialize))]
+#[derive(Clone, Debug, Eq, Default, PartialEq)]
+pub struct Capabilities {
+    /// Codec capabilities of the system for sending audio.
+    pub audio_tx: Vec<Codec>,
+
+    /// Codec capabilities of the system for receiving audio.
+    pub audio_rx: Vec<Codec>,
+
+    /// Codec capabilities of the system for sending video.
+    pub video_tx: Vec<Codec>,
+
+    /// Codec capabilities of the system for receiving video.
+    pub video_rx: Vec<Codec>,
+}
+
+/// Provides information about codec objects. Representation of an
+/// [RTCRtpCodec].
+///
+/// [RTCRtpCodec]: https://www.w3.org/TR/webrtc/#dom-rtcrtpcodec
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct Codec {
+    /// The codec MIME media type/subtype. Valid media types and subtypes are
+    /// listed in [IANA-RTP-2].
+    ///
+    /// [IANA-RTP-2]: https://tinyurl.com/IANA-RTP-2
+    pub mime_type: String,
+
+    /// The codec clock rate expressed in Hertz.
+    pub clock_rate: u32,
+
+    /// If present, indicates the maximum number of channels (mono=1,
+    /// stereo=2).
+    pub channels: Option<u16>,
+
+    /// Codec-specific parameters that must be signaled to the remote party.
+    ///
+    /// Corresponds to "a=fmtp" parameters in SDP.
+    pub parameters: HashMap<String, String>,
 }
 
 /// Estimated connection quality.
