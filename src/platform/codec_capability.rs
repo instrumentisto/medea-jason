@@ -51,7 +51,7 @@ impl From<proto::EncodingParameters> for SendEncodingParameters {
             enc.set_scale_resolution_down_by(s.into());
         }
         if let Some(s) = scalability_mode {
-            enc.set_scalability_mode(&s.to_string());
+            enc.set_scalability_mode(s.to_string());
         }
 
         enc

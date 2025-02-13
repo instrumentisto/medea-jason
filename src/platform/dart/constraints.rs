@@ -526,7 +526,8 @@ unsafe fn set_video_constrain_u32(
             )
         }
         .unwrap(),
-        ConstrainU32::Range(min, max) => unsafe {
+        ConstrainU32::Range(min, _) => unsafe {
+            // TODO: Implement range constraints in flutter-webrtc.
             constraints::set_video_constraint_value(
                 mandatory.get(),
                 kind as i64,

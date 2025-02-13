@@ -60,7 +60,7 @@ impl Transceiver {
         updated_encodings: &[proto::EncodingParameters],
     ) -> Result<(), UpdateSendEncodingError> {
         let params = self.get_send_parameters().await;
-        let current_encodings = params.encodings().await;
+        let current_encodings = params.encodings();
 
         if updated_encodings.len() != current_encodings.len() {
             // No encodings can be removed or added via setParameters
@@ -72,7 +72,7 @@ impl Transceiver {
             });
         }
 
-        for (i, enc) in current_encodings.into_iter().enumerate() {
+        for (i, enc) in current_encodings.iter().enumerate() {
             let updated_enc = &updated_encodings[i];
             // Not updating RID cause spec:
             // RID is not modifiable via setParameters. It can only be set or
@@ -91,7 +91,7 @@ impl Transceiver {
                 );
             }
             if let Some(scalability_mode) = updated_enc.scalability_mode {
-                enc.set_scalability_mode(&scalability_mode.to_string());
+                enc.set_scalability_mode(scalability_mode.to_string());
             }
         }
 

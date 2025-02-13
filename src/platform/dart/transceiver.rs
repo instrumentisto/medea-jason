@@ -6,7 +6,6 @@ use std::rc::Rc;
 
 use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
-use medea_client_api_proto::EncodingParameters;
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -228,13 +227,6 @@ impl Transceiver {
             unsafe { FutureFromDart::execute(fut) }.await.unwrap();
 
         SendParameters::from(params)
-    }
-
-    // TODO: featuregate?
-    pub async fn get_send_encodings(
-        &self,
-    ) -> Result<Vec<SendEncodingParameters>, platform::Error> {
-        self.get_send_parameters().await.encodings().await
     }
 
     /// Sets [`SendParameters`] into the underlying [RTCRtpSender].

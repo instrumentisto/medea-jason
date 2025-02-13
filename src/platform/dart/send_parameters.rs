@@ -3,18 +3,16 @@
 //! [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
 
 use dart_sys::Dart_Handle;
-use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
-use crate::platform::{dart::utils::handle::DartHandle, Error};
+use crate::platform::dart::utils::handle::DartHandle;
 
 use super::{
-    send_encoding_parameters::SendEncodingParameters,
-    utils::{dart_future::FutureFromDart, list::DartList},
+    send_encoding_parameters::SendEncodingParameters, utils::list::DartList,
 };
 
-#[dart_bridge("flutter/lib/src/native/platform/parameters.g.dart")]
-mod parameters {
+#[dart_bridge("flutter/lib/src/native/platform/send_parameters.g.dart")]
+mod send_parameters {
     use dart_sys::Dart_Handle;
 
     use crate::platform::Error;
@@ -27,16 +25,6 @@ mod parameters {
         /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
         pub fn encodings(parameters: Dart_Handle)
             -> Result<Dart_Handle, Error>;
-
-        /// Sets the provided [RTCRtpEncodingParameters][1] into the provided
-        /// [RTCRtpParameters].
-        ///
-        /// [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
-        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
-        pub fn set_encoding(
-            parameters: Dart_Handle,
-            encoding: Dart_Handle,
-        ) -> Result<Dart_Handle, Error>;
     }
 }
 
@@ -55,29 +43,19 @@ impl From<DartHandle> for SendParameters {
 impl SendParameters {
     /// Returns [`SendEncodingParameters`] of these [`SendParameters`].
     #[must_use]
-    pub async fn encodings(&self) -> Vec<SendEncodingParameters> {
-        let fut = unsafe { parameters::encodings(self.0.get()) }.unwrap();
-        let encodings = unsafe { FutureFromDart::execute::<DartHandle>(fut) }
-            .await
-            .unwrap();
+    pub fn encodings(&self) -> Box<[SendEncodingParameters]> {
+        let encodings =
+            unsafe { send_parameters::encodings(self.0.get()) }.unwrap();
 
-        let encodings = Vec::from(DartList::from(encodings))
-            .into_iter()
-            .map(|encoding: DartHandle| SendEncodingParameters::from(encoding))
-            .collect();
+        let encodings: Vec<_> =
+            Vec::from(DartList::from(unsafe { DartHandle::new(encodings) }))
+                .into_iter()
+                .map(|encoding: DartHandle| {
+                    SendEncodingParameters::from(encoding)
+                })
+                .collect();
 
-        Ok(encodings)
-    }
-
-    /// Sets the provided [`SendEncodingParameters`] into these
-    /// [`SendParameters`].
-    #[must_use]
-    pub async fn set_encodings(&self, encoding: &SendEncodingParameters) {
-        let fut = unsafe {
-            parameters::set_encoding(self.0.get(), encoding.handle())
-        }
-        .unwrap();
-        unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
+        encodings.into_boxed_slice()
     }
 
     /// Returns the underlying [`Dart_Handle`] of these [`SendParameters`].

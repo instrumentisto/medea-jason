@@ -161,7 +161,6 @@ async fn new_media_connections_with_disabled_video_tracks() {
 ///
 /// This tests checks that [`TrackPatch`] works as expected.
 mod sender_patch {
-    use super::*;
     use medea_client_api_proto::{
         AudioSettings, ConnectionMode, EncodingParameters, MediaDirection,
         MediaSourceKind, MediaType, ScalabilityMode, VideoSettings,
@@ -171,6 +170,8 @@ mod sender_patch {
         platform::send_encoding_parameters::SendEncodingParameters,
         utils::{AsProtoState, SynchronizableState, Updatable},
     };
+
+    use super::*;
 
     async fn audio_sender() -> (sender::Component, TrackId, MediaConnections) {
         build_sender(MediaType::Audio(AudioSettings { required: false })).await
@@ -320,7 +321,7 @@ mod sender_patch {
         ])
         .await;
 
-        let mut encs: Vec<_> = sender.get_send_encodings().await.unwrap();
+        let encs = sender.get_send_encodings().await;
         assert_eq!(encs.len(), 2);
 
         assert_eq!(encs[0].rid(), Some("h".to_owned()));
@@ -368,17 +369,15 @@ mod sender_patch {
 
         sender.state().when_updated().await;
 
-        let mut encodings: Vec<_> = sender.get_send_encodings().await.unwrap();
-        assert_eq!(encodings.len(), 1);
-
-        let encoding = encodings.pop().unwrap();
+        let encs = sender.get_send_encodings().await;
+        assert_eq!(encs.len(), 1);
 
         // Only one encoding so rid is empty
-        assert_eq!(encoding.rid(), None);
-        assert_eq!(encoding.active(), false);
-        assert_eq!(encoding.scale_resolution_down_by(), Some(2.0));
-        assert_eq!(encoding.max_bitrate(), Some(100));
-        assert_eq!(encoding.scalability_mode(), Some("L1T2".to_owned()));
+        assert_eq!(encs[0].rid(), None);
+        assert_eq!(encs[0].active(), false);
+        assert_eq!(encs[0].scale_resolution_down_by(), Some(2.0));
+        assert_eq!(encs[0].max_bitrate(), Some(100));
+        assert_eq!(encs[0].scalability_mode(), Some("L1T2".to_owned()));
     }
 
     /// Checks that [`Sender`]'s mute and media exchange states can be changed

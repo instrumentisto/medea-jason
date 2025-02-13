@@ -87,8 +87,9 @@ impl SendEncodingParameters {
     /// Sets [scalabilityMode][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/3zuaee45
-    pub fn set_scalability_mode(&self, scalability_mode: &str) {
-        self.0.set_scalability_mode(scalability_mode);
+    #[expect(clippy::needless_pass_by_value, reason = "`cfg` code uniformity")]
+    pub fn set_scalability_mode(&self, scalability_mode: String) {
+        self.0.set_scalability_mode(&scalability_mode);
     }
 
     /// Returns [scalabilityMode][1] of these [`SendEncodingParameters`].

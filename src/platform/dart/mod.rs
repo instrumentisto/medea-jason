@@ -7,8 +7,6 @@
     clippy::missing_panics_doc,
     clippy::undocumented_unsafe_blocks,
     clippy::unwrap_used,
-    clippy::needless_pass_by_value,
-    unused_variables,
     reason = "needs refactoring"
 )]
 

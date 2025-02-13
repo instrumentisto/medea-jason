@@ -331,7 +331,7 @@ impl Sender {
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
     pub async fn get_send_encodings(
         &self,
-    ) -> Vec<platform::SendEncodingParameters> {
+    ) -> Box<[platform::SendEncodingParameters]> {
         self.transceiver.get_send_encodings().await
     }
 }

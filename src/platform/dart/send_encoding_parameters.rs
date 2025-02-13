@@ -3,7 +3,6 @@
 //! [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
 
 use dart_sys::Dart_Handle;
-use medea_client_api_proto::ScalabilityMode;
 use medea_macro::dart_bridge;
 
 use crate::platform::dart::utils::{
@@ -150,13 +149,13 @@ impl SendEncodingParameters {
     /// Returns [RID] of these [`SendEncodingParameters`].
     ///
     /// [RID]: https://w3.org/TR/webrtc#dom-rtcrtpcodingparameters-rid
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn rid(&self) -> Option<String> {
-        let rid = unsafe {
-            c_str_into_string(
-                send_encoding_parameters::get_rid(self.0.get()).unwrap(),
-            )
-        };
+        let rid =
+            unsafe { send_encoding_parameters::get_rid(self.0.get()).unwrap() };
+
+        let rid = unsafe { c_str_into_string(rid) };
 
         if rid.is_empty() {
             None
@@ -176,6 +175,7 @@ impl SendEncodingParameters {
     /// Returns [activeness][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-active
+    #[must_use]
     pub fn active(&self) -> bool {
         unsafe { send_encoding_parameters::get_active(self.0.get()) }.unwrap()
     }
@@ -185,10 +185,7 @@ impl SendEncodingParameters {
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
     pub fn set_max_bitrate(&self, max_bitrate: u32) {
         unsafe {
-            send_encoding_parameters::set_max_bitrate(
-                self.0.get(),
-                max_bitrate.into(),
-            )
+            send_encoding_parameters::set_max_bitrate(self.0.get(), max_bitrate)
         }
         .unwrap();
     }
@@ -196,6 +193,8 @@ impl SendEncodingParameters {
     /// Returns [maxBitrate][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
+    #[must_use]
     pub fn max_bitrate(&self) -> Option<u32> {
         let max_bitrate =
             unsafe { send_encoding_parameters::get_max_bitrate(self.0.get()) }
@@ -220,6 +219,8 @@ impl SendEncodingParameters {
     /// Returns [scaleResolutionDownBy][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/ypzzc75t
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
+    #[must_use]
     pub fn scale_resolution_down_by(&self) -> Option<f64> {
         let scale_resolution_down_by = unsafe {
             send_encoding_parameters::get_scale_resolution_down_by(self.0.get())
@@ -236,7 +237,7 @@ impl SendEncodingParameters {
         unsafe {
             send_encoding_parameters::set_scalability_mode(
                 self.0.get(),
-                string_into_c_str(scalability_mode.to_string()),
+                string_into_c_str(scalability_mode),
             )
         }
         .unwrap();
@@ -245,6 +246,8 @@ impl SendEncodingParameters {
     /// Returns [scalabilityMode][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/3zuaee45
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
+    #[must_use]
     pub fn scalability_mode(&self) -> Option<String> {
         let mode = unsafe {
             send_encoding_parameters::get_scalability_mode(self.0.get())

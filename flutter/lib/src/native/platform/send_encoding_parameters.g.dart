@@ -101,7 +101,7 @@ void registerFunction(
   );
   Pointer<NativeFunction<Bool Function(Handle)>> getActive_native =
       Pointer.fromFunction(_getActiveProxy, false);
-  Pointer<NativeFunction<Void Function(Handle, Int64)>> setMaxBitrate_native =
+  Pointer<NativeFunction<Void Function(Handle, Uint32)>> setMaxBitrate_native =
       Pointer.fromFunction(
     _setMaxBitrateProxy,
   );
