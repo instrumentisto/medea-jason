@@ -10,7 +10,7 @@ use send_wrapper::SendWrapper;
 #[cfg(doc)]
 use crate::media::track::local;
 use crate::{
-    api::{api::DART_HANDLER_PORT, dart::api::ForeignClass, Error},
+    api::{dart::api::ForeignClass, Error, DART_HANDLER_PORT},
     media::{track::local as core, MediaKind, MediaSourceKind},
     platform::{self, utils::dart_future::IntoDartFuture as _},
 };

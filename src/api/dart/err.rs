@@ -9,7 +9,6 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{
-        api::DART_HANDLER_PORT,
         box_dart_handle,
         err::{
             EnumerateDevicesException, FormatException, InternalException,
@@ -17,6 +16,7 @@ use crate::{
             MediaSettingsUpdateException, MediaStateTransitionException,
             MicVolumeException, RpcClientException, StateError,
         },
+        DART_HANDLER_PORT,
     },
     platform::{self, utils::string_into_c_str},
 };

@@ -16,9 +16,6 @@ part 'api.freezed.dart';
 // These functions are ignored (category: IgnoreBecauseExplicitAttribute): `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`
 // These functions are ignored (category: IgnoreBecauseNotAllowedOwner): `from_ptr`, `into_ptr`
 
-LocalKeyCellOptionI64 get dartHandlerPort =>
-    RustLib.instance.api.crateApiDartApiDartHandlerPort();
-
 /// Returns the [`Vec<ApiMediaDeviceDetails>`] from the provided
 /// [`ForeignClass`] address.
 List<ApiMediaDeviceDetails> vecMediaDeviceDetailsFromRaw({required int ptr}) =>
@@ -47,9 +44,6 @@ void setDartOpaqueMessagePort({required PlatformInt64 dartHandlerPort}) =>
     RustLib.instance.api.crateApiDartApiSetDartOpaqueMessagePort(
       dartHandlerPort: dartHandlerPort,
     );
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<:: LocalKey < Cell < Option < i64 > > >>>
-abstract class LocalKeyCellOptionI64 implements RustOpaqueInterface {}
 
 abstract class ForeignClass {}
 
