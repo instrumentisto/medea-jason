@@ -25,9 +25,10 @@ class MemberBuilder {
 
   /// Creates a new [Member] out of this [MemberBuilder] configuration.
   Member build(
-      RoomHandle room,
-      HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> sendState,
-      HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> recvState) {
+    RoomHandle room,
+    HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> sendState,
+    HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> recvState,
+  ) {
     return Member(id, isSend, isRecv, false, sendState, recvState, room);
   }
 }
@@ -146,8 +147,15 @@ class Member {
   /// Last [ReconnectHandle].
   ReconnectHandle? reconnectHandle;
 
-  Member(this.id, this.isSend, this.isRecv, this.isJoined, this.sendState,
-      this.recvState, this.room) {
+  Member(
+    this.id,
+    this.isSend,
+    this.isRecv,
+    this.isJoined,
+    this.sendState,
+    this.recvState,
+    this.room,
+  ) {
     room.onConnectionLoss((p0) {
       reconnectHandle = p0;
     });
@@ -174,8 +182,9 @@ class Member {
           connectionStore.remoteTracks[remoteMemberId]![remoteTrackId] =
               List.empty(growable: true);
         }
-        connectionStore.remoteTracks[remoteMemberId]![remoteTrackId]!
-            .add(remoteTrack);
+        connectionStore.remoteTracks[remoteMemberId]![remoteTrackId]!.add(
+          remoteTrack,
+        );
 
         connectionStore.callbackCounter.addAll({
           remoteTrackId: {
@@ -183,8 +192,8 @@ class Member {
             'disabled': 0,
             'muted': 0,
             'unmuted': 0,
-            'stopped': 0
-          }
+            'stopped': 0,
+          },
         });
         connectionStore.onCallbackCounter.addAll({
           remoteTrackId: {
@@ -193,50 +202,67 @@ class Member {
             'muted': (_) => {},
             'unmuted': (_) => {},
             'stopped': (_) => {},
-          }
+          },
         });
 
         remoteTrack.onMuted(() {
-          connectionStore.callbackCounter[remoteTrackId]!
-              .update('muted', (value) => value += 1);
+          connectionStore.callbackCounter[remoteTrackId]!.update(
+            'muted',
+            (value) => value += 1,
+          );
           connectionStore.onCallbackCounter[remoteTrackId]!['muted']!(
-              connectionStore.callbackCounter[remoteTrackId]!['muted']!);
+            connectionStore.callbackCounter[remoteTrackId]!['muted']!,
+          );
         });
 
         remoteTrack.onUnmuted(() {
-          connectionStore.callbackCounter[remoteTrackId]!
-              .update('unmuted', (value) => value += 1);
+          connectionStore.callbackCounter[remoteTrackId]!.update(
+            'unmuted',
+            (value) => value += 1,
+          );
           connectionStore.onCallbackCounter[remoteTrackId]!['unmuted']!(
-              connectionStore.callbackCounter[remoteTrackId]!['unmuted']!);
+            connectionStore.callbackCounter[remoteTrackId]!['unmuted']!,
+          );
         });
 
         remoteTrack.onMediaDirectionChanged((direction) {
           if (direction != TrackMediaDirection.sendRecv) {
-            connectionStore.callbackCounter[remoteTrackId]!
-                .update('disabled', (value) => value += 1);
+            connectionStore.callbackCounter[remoteTrackId]!.update(
+              'disabled',
+              (value) => value += 1,
+            );
 
             connectionStore.onCallbackCounter[remoteTrackId]!['disabled']!(
-                connectionStore.callbackCounter[remoteTrackId]!['disabled']!);
+              connectionStore.callbackCounter[remoteTrackId]!['disabled']!,
+            );
           } else {
-            connectionStore.callbackCounter[remoteTrackId]!
-                .update('enabled', (value) => value += 1);
+            connectionStore.callbackCounter[remoteTrackId]!.update(
+              'enabled',
+              (value) => value += 1,
+            );
             connectionStore.onCallbackCounter[remoteTrackId]!['enabled']!(
-                connectionStore.callbackCounter[remoteTrackId]!['enabled']!);
+              connectionStore.callbackCounter[remoteTrackId]!['enabled']!,
+            );
           }
           var keys = connectionStore.onMediaDirectionChanged.keys;
-          for (var i = 0;
-              i < connectionStore.onMediaDirectionChanged.length;
-              ++i) {
+          for (
+            var i = 0;
+            i < connectionStore.onMediaDirectionChanged.length;
+            ++i
+          ) {
             var cb = connectionStore.onMediaDirectionChanged[keys.elementAt(i)];
             cb!(direction);
           }
         });
 
         remoteTrack.onStopped(() {
-          connectionStore.callbackCounter[remoteTrackId]!
-              .update('stopped', (value) => value + 1);
+          connectionStore.callbackCounter[remoteTrackId]!.update(
+            'stopped',
+            (value) => value + 1,
+          );
           connectionStore.onCallbackCounter[remoteTrackId]!['stopped']!(
-              connectionStore.callbackCounter[remoteTrackId]!['stopped']!);
+            connectionStore.callbackCounter[remoteTrackId]!['stopped']!,
+          );
         });
 
         if (connectionStore.onRemoteTrack[remoteMemberId] != null) {
@@ -290,7 +316,10 @@ class Member {
   /// Waits for a [RemoteMediaTrack] from the [Member] with the provided [id],
   /// based on the provided options.
   Future<RemoteMediaTrack> waitRemoteTrackFrom(
-      String id, MediaSourceKind? source, MediaKind? kind) async {
+    String id,
+    MediaSourceKind? source,
+    MediaKind? kind,
+  ) async {
     bool sourceCheck(MediaSourceKind a, MediaSourceKind? b) {
       if (b == null) {
         return true;
@@ -306,16 +335,20 @@ class Member {
     }
 
     if (connectionStore.remoteTracks[id]!.values.any((element) {
-      var stopped = connectionStore
-              .callbackCounter[element.last.getTrack().id()]!['stopped']! >
+      var stopped =
+          connectionStore.callbackCounter[element.last
+              .getTrack()
+              .id()]!['stopped']! >
           0;
       return sourceCheck(element.last.mediaSourceKind(), source) &&
           kindCheck(element.last.kind(), kind) &&
           !stopped;
     })) {
       return connectionStore.remoteTracks[id]!.values.lastWhere((element) {
-        var stopped = connectionStore
-                .callbackCounter[element.last.getTrack().id()]!['stopped']! >
+        var stopped =
+            connectionStore.callbackCounter[element.last
+                .getTrack()
+                .id()]!['stopped']! >
             0;
         return sourceCheck(element.last.mediaSourceKind(), source) &&
             kindCheck(element.last.kind(), kind) &&
@@ -336,11 +369,17 @@ class Member {
 
   /// Waits for a [LocalMediaTrack], based on the provided options.
   Future<LocalMediaTrack> waitLocalTrack(
-      MediaSourceKind source, MediaKind kind) async {
-    if (connectionStore.localTracks.any((element) =>
-        element.kind() == kind && element.mediaSourceKind() == source)) {
-      return connectionStore.localTracks.firstWhere((element) =>
-          element.kind() == kind && element.mediaSourceKind() == source);
+    MediaSourceKind source,
+    MediaKind kind,
+  ) async {
+    if (connectionStore.localTracks.any(
+      (element) =>
+          element.kind() == kind && element.mediaSourceKind() == source,
+    )) {
+      return connectionStore.localTracks.firstWhere(
+        (element) =>
+            element.kind() == kind && element.mediaSourceKind() == source,
+      );
     } else {
       var trackCompl = Completer<LocalMediaTrack>();
       connectionStore.onLocalTrack = (track) {
@@ -361,7 +400,10 @@ class Member {
 
   /// Updates this [Member.sendState].
   void updateSendMediaState(
-      MediaKind? kind, MediaSourceKind? sourceKind, bool enabled) async {
+    MediaKind? kind,
+    MediaSourceKind? sourceKind,
+    bool enabled,
+  ) async {
     kindsCombinations(kind, sourceKind).forEach((element) {
       sendState[Tuple2(element.item1, element.item2)] = enabled;
     });
@@ -369,7 +411,10 @@ class Member {
 
   /// Updates this [Member.recvState].
   Future<void> updateRecvMediaState(
-      MediaKind? kind, MediaSourceKind? sourceKind, bool enabled) async {
+    MediaKind? kind,
+    MediaSourceKind? sourceKind,
+    bool enabled,
+  ) async {
     kindsCombinations(kind, sourceKind).forEach((element) {
       recvState.addAll({Tuple2(element.item1, element.item2): enabled});
     });
@@ -382,18 +427,23 @@ class Member {
       // All transceivers are always `sendrecv` in SFU mode.
       return const Tuple2<int, int>(3, 3);
     }
-    var sendCount = sendState.entries
-        .where((element) => other.recvState[element.key]! && element.value)
-        .length;
-    var recvCount = recvState.entries
-        .where((element) => other.sendState[element.key]! && element.value)
-        .length;
+    var sendCount =
+        sendState.entries
+            .where((element) => other.recvState[element.key]! && element.value)
+            .length;
+    var recvCount =
+        recvState.entries
+            .where((element) => other.sendState[element.key]! && element.value)
+            .length;
     return Tuple2<int, int>(sendCount, recvCount);
   }
 
   /// Toggles a media state of this [Member]'s [RoomHandle].
   Future<void> toggleMedia(
-      MediaKind? kind, MediaSourceKind? source, bool enabled) async {
+    MediaKind? kind,
+    MediaSourceKind? source,
+    bool enabled,
+  ) async {
     updateSendMediaState(kind, source, enabled);
     if (enabled) {
       if (kind != null) {
@@ -430,7 +480,10 @@ class Member {
 
   /// Toggles a mute state of this [Member]'s [RoomHandle].
   Future<void> toggleMute(
-      MediaKind? kind, MediaSourceKind? source, bool muted) async {
+    MediaKind? kind,
+    MediaSourceKind? source,
+    bool muted,
+  ) async {
     if (!muted) {
       if (kind != null) {
         if (kind == MediaKind.audio) {
@@ -458,7 +511,10 @@ class Member {
 
   /// Toggles a remote media state of this [Member]'s [RoomHandle].
   Future<void> toggleRemoteMedia(
-      MediaKind? kind, MediaSourceKind? source, bool enabled) async {
+    MediaKind? kind,
+    MediaSourceKind? source,
+    bool enabled,
+  ) async {
     await updateRecvMediaState(kind, source, enabled);
     if (enabled) {
       if (kind != null) {
@@ -488,7 +544,9 @@ class Member {
   /// Returns a list of [MediaKind]s and a [MediaSourceKind], based on the
   /// provided options.
   List<Tuple2<MediaKind, MediaSourceKind>> kindsCombinations(
-      MediaKind? kind, MediaSourceKind? sourceKind) {
+    MediaKind? kind,
+    MediaSourceKind? sourceKind,
+  ) {
     var out = List<Tuple2<MediaKind, MediaSourceKind>>.empty(growable: true);
     if (kind != null) {
       if (sourceKind != null) {
@@ -509,7 +567,10 @@ class Member {
   /// Waits for the [RemoteMediaTrack]'s callbacks of `callback_kind` to happen
   /// the provided `count` times.
   Future<void> waitForTrackCbFireCount(
-      String callbackKind, RemoteMediaTrack track, int count) async {
+    String callbackKind,
+    RemoteMediaTrack track,
+    int count,
+  ) async {
     var id = track.getTrack().id();
     if (connectionStore.callbackCounter[id]![callbackKind] != count) {
       var firesFuture = Completer();
@@ -546,7 +607,9 @@ class Member {
   /// Waits for the [RemoteMediaTrack]'s direction change to the provided
   /// [direction].
   Future<void> waitMediaDirectionTrack(
-      TrackMediaDirection direction, RemoteMediaTrack track) async {
+    TrackMediaDirection direction,
+    RemoteMediaTrack track,
+  ) async {
     var id = track.getTrack().id();
     if (track.mediaDirection() != direction) {
       var directionFuture = Completer();
@@ -570,10 +633,14 @@ class Member {
     MockMediaDevices.gum = (constraints) async {
       if (audio) {
         throw webrtc.GetMediaException(
-            webrtc.GetMediaExceptionKind.audio, 'Mock Error');
+          webrtc.GetMediaExceptionKind.audio,
+          'Mock Error',
+        );
       } else if (video) {
         throw webrtc.GetMediaException(
-            webrtc.GetMediaExceptionKind.video, 'Mock Error');
+          webrtc.GetMediaExceptionKind.video,
+          'Mock Error',
+        );
       }
       return webrtc.getUserMedia(constraints);
     };

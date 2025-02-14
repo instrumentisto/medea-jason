@@ -45,6 +45,9 @@ abstract class ReconnectHandle implements SyncPlatformHandle {
   /// Converts the provided [startingDelayMs], [maxDelay] and [maxElapsedTimeMs]
   /// into an `u32`s. Throws an [ArgumentError] if any conversion fails.
   Future<void> reconnectWithBackoff(
-      int startingDelayMs, double multiplier, int maxDelay,
-      [int? maxElapsedTimeMs]);
+    int startingDelayMs,
+    double multiplier,
+    int maxDelay, [
+    int? maxElapsedTimeMs,
+  ]);
 }

@@ -5,13 +5,7 @@ import 'list.g.dart' as bridge;
 
 /// Registers functions allowing Rust to create Dart [List]s.
 void registerFunctions(DynamicLibrary dl) {
-  bridge.registerFunction(
-    dl,
-    get: _get,
-    length: _len,
-    add: _add,
-    init: _init,
-  );
+  bridge.registerFunction(dl, get: _get, length: _len, add: _add, init: _init);
 }
 
 /// Creates a new empty [List].

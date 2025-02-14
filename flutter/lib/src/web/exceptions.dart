@@ -1,5 +1,4 @@
 import 'dart:js_interop';
-import 'dart:js_interop_unsafe';
 
 import '../interface/exceptions.dart';
 import 'jason_wasm.dart' as wasm;
@@ -8,15 +7,15 @@ import 'jason_wasm.dart' as wasm;
 ///
 /// Returns `null` in case if the provided exception is not from Jason.
 String? _getName(dynamic e) {
-  if (e is! JSObject) {
+  if (!e.isA<JSObject>()) {
     return null;
   }
 
   final constructor = e.getProperty('constructor'.toJS);
-  if (constructor is JSObject) {
+  if (constructor.isA<JSObject>()) {
     if (constructor.hasProperty('name'.toJS).toDart) {
       final name = constructor.getProperty('name'.toJS);
-      if (name is JSString) {
+      if (name.isA<JSString>()) {
         return name.toDart;
       }
     }
@@ -48,10 +47,12 @@ dynamic convertException(dynamic e) {
     return WebLocalMediaInitException(e as wasm.LocalMediaInitException);
   } else if (name == 'MediaSettingsUpdateException') {
     return WebMediaSettingsUpdateException(
-        e as wasm.MediaSettingsUpdateException);
+      e as wasm.MediaSettingsUpdateException,
+    );
   } else if (name == 'MediaStateTransitionException') {
     return WebMediaStateTransitionException(
-        e as wasm.MediaStateTransitionException);
+      e as wasm.MediaStateTransitionException,
+    );
   } else if (name == 'RpcClientException') {
     return WebRpcClientException(e as wasm.RpcClientException);
   } else {

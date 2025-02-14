@@ -7,7 +7,11 @@ class DisplayVideoTrackConstraints
   /// Rust `flutter_rust_bridge` API representation.
   frb.ApiDisplayVideoTrackConstraints constraints =
       frb.ApiDisplayVideoTrackConstraints(
-          deviceId: null, height: null, width: null, frameRate: null);
+        deviceId: null,
+        height: null,
+        width: null,
+        frameRate: null,
+      );
 
   @override
   void exactHeight(int height) {

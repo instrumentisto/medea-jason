@@ -21,24 +21,26 @@ void registerFunction(
   _getSenderCodecCapabilities = getSenderCodecCapabilities;
   _mimeType = mimeType;
 
-  _codec_capability__get_sender_codec_capabilities__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'codec_capability__get_sender_codec_capabilities__set_error');
-  _codec_capability__mime_type__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'codec_capability__mime_type__set_error');
+  _codec_capability__get_sender_codec_capabilities__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'codec_capability__get_sender_codec_capabilities__set_error',
+      );
+  _codec_capability__mime_type__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'codec_capability__mime_type__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function(Int64)>>
-      getSenderCodecCapabilities_native = Pointer.fromFunction(
+  getSenderCodecCapabilities_native = Pointer.fromFunction(
     _getSenderCodecCapabilitiesProxy,
   );
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> mimeType_native =
-      Pointer.fromFunction(
-    _mimeTypeProxy,
-  );
+      Pointer.fromFunction(_mimeTypeProxy);
 
-  dl.lookupFunction<Void Function(Pointer, Pointer),
-      void Function(Pointer, Pointer)>('register_codec_capability')(
+  dl.lookupFunction<
+    Void Function(Pointer, Pointer),
+    void Function(Pointer, Pointer)
+  >('register_codec_capability')(
     getSenderCodecCapabilities_native,
     mimeType_native,
   );

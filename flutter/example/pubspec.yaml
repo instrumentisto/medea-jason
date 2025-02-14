@@ -4,8 +4,8 @@ version: 1.0.0
 publish_to: none
 
 environment:
-  flutter: ">=3.24.0"
-  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.29.0"
+  sdk: ">=3.7.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -23,26 +23,25 @@ dependencies:
   faker_dart: ^0.2.2
   freezed_annotation: ^2.4.1
   http: ">=0.13.6 <2.0.0"
-  medea_flutter_webrtc: ^0.12.0
+  medea_flutter_webrtc: 0.12.3-dev+rev.73369ea7f0cee08ebcf7bfcffb7bdad90906b286
   retry: ^3.1.2
 
 dev_dependencies:
   flutter_driver:
     sdk: flutter
   flutter_gherkin: 3.0.0-rc.17
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
   gherkin: ^3.1.0
   integration_test:
     sdk: flutter
-  json_serializable: ^6.7.1
+  json_serializable: ^6.9.0
 
 dependency_overrides:
   # TODO: Remove when `flutter_gherkin` updates.
   analyzer: ^5.13.0
-  # Pinned until gql-dart updates to v4
-  # https://github.com/gql-dart/gql/blob/master/links/gql_websocket_link/pubspec.yaml#L13
+  # TODO: Remove when `flutter_gherkin` updates.
   uuid: ^3.0.7
 
 flutter:

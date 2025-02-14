@@ -4,8 +4,9 @@ import 'ffi/frb/media/constraints.dart';
 
 class AudioTrackConstraints implements base.AudioTrackConstraints {
   /// Rust `flutter_rust_bridge` API representation.
-  final frb.ApiAudioConstraints constraints =
-      frb.ApiAudioConstraints(deviceId: null);
+  final frb.ApiAudioConstraints constraints = frb.ApiAudioConstraints(
+    deviceId: null,
+  );
 
   @override
   void deviceId(String deviceId) {

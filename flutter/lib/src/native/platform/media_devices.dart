@@ -72,7 +72,8 @@ class MockMediaDevices {
 
 /// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
 Future<List<webrtc.MediaStreamTrack>> Function() _getUserMedia(
-    Object constraints) {
+  Object constraints,
+) {
   constraints as webrtc.DeviceConstraints;
   return () => webrtc.getUserMedia(constraints);
 }
@@ -90,7 +91,8 @@ Future<List<webrtc.MediaDisplayInfo>> Function() _enumerateDisplays() {
 /// Starts capturing the contents of a display and returns the created
 /// [webrtc.MediaStreamTrack]s.
 Future<List<webrtc.MediaStreamTrack>> Function() _getDisplayMedia(
-    Object constraints) {
+  Object constraints,
+) {
   constraints as webrtc.DisplayConstraints;
   return () => webrtc.getDisplayMedia(constraints);
 }
