@@ -75,6 +75,8 @@ jobs:
       - run: make rustup.targets only=${{ matrix.platform }}
         if: ${{ matrix.platform != 'workspace' }}
       - uses: Swatinem/rust-cache@v2
+        with:
+          key: "${{ matrix.platform }}"
         if: ${{ env.CACHE == 'true' }}
 
       - uses: actions-rs/install@v0.1
