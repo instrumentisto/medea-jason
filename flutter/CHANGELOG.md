@@ -6,6 +6,22 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [master] · unreleased
+[master]: /../../tree/master/flutter
+
+See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md).
+
+### Upgraded
+
+- [Flutter] to 3.29 version. ([#200])
+- Dependencies:
+  - [`flutter_rust_bridge`] to 2.8.0 version. ([#200])
+
+[#181]: /../../pull/200
+
+
+
+
 ## [0.7.1] · 2024-12-30
 [0.7.1]: /../../tree/medea-jason-0.7.1/flutter
 

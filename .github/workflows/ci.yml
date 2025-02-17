@@ -76,6 +76,8 @@ jobs:
         if: ${{ matrix.platform != 'workspace' }}
       - uses: Swatinem/rust-cache@v2
         with:
+          # TODO: Build scripts cross compilation fails sometimes:
+          # https://github.com/cross-rs/cross/issues/724
           key: "${{ matrix.platform }}"
         if: ${{ env.CACHE == 'true' }}
 

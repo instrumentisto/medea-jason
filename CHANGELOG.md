@@ -13,9 +13,11 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`derive-more`] to 2.0 version. ([todo])
+    - [`derive-more`] to 2.0 version. ([3ed7d2b])
+    - [`flutter_rust_bridge`] crate to [2.8.0][frb-2.8.0] version. ([#200])
 
-[todo]: /../../commit/todo
+[todo]: /../../commit/3ed7d2b
+[#200]: /../../pull/200
 
 
 
