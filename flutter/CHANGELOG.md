@@ -17,7 +17,7 @@ See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md)
 - Dependencies:
   - [`flutter_rust_bridge`] to 2.8.0 version. ([#200])
 
-[#181]: /../../pull/200
+[#200]: /../../pull/200
 
 
 
