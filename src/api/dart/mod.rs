@@ -17,6 +17,7 @@ pub mod api;
 pub mod err;
 
 use std::{
+    cell::Cell,
     ffi::{c_void, CString},
     marker::PhantomData,
     panic, ptr,
@@ -44,6 +45,11 @@ pub use self::{
     },
     err::DartError as Error,
 };
+
+thread_local! {
+    /// Used to create [`flutter_rust_bridge::DartOpaque`]s on the Rust side.
+    pub static DART_HANDLER_PORT: Cell<Option<i64>> = Cell::default();
+}
 
 /// Wraps the provided function to catch all the Rust panics and propagate them
 /// to the Dart side.

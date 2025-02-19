@@ -6,7 +6,11 @@ class DeviceVideoTrackConstraints implements base.DeviceVideoTrackConstraints {
   /// Rust `flutter_rust_bridge` API representation.
   final frb.ApiDeviceVideoTrackConstraints constraints =
       frb.ApiDeviceVideoTrackConstraints(
-          deviceId: null, facingMode: null, height: null, width: null);
+        deviceId: null,
+        facingMode: null,
+        height: null,
+        width: null,
+      );
 
   @override
   void deviceId(String deviceId) {

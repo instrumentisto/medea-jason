@@ -21,27 +21,24 @@ void registerFunction(
   _callTwoArgProxy = callTwoArgProxy;
   _callProxy = callProxy;
 
-  _callback__call_two_arg_proxy__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'callback__call_two_arg_proxy__set_error');
-  _callback__call_proxy__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'callback__call_proxy__set_error');
+  _callback__call_two_arg_proxy__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'callback__call_two_arg_proxy__set_error',
+      );
+  _callback__call_proxy__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'callback__call_proxy__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function(Pointer)>> callTwoArgProxy_native =
-      Pointer.fromFunction(
-    _callTwoArgProxyProxy,
-  );
+      Pointer.fromFunction(_callTwoArgProxyProxy);
   Pointer<NativeFunction<Handle Function(Pointer)>> callProxy_native =
-      Pointer.fromFunction(
-    _callProxyProxy,
-  );
+      Pointer.fromFunction(_callProxyProxy);
 
-  dl.lookupFunction<Void Function(Pointer, Pointer),
-      void Function(Pointer, Pointer)>('register_callback')(
-    callTwoArgProxy_native,
-    callProxy_native,
-  );
+  dl.lookupFunction<
+    Void Function(Pointer, Pointer),
+    void Function(Pointer, Pointer)
+  >('register_callback')(callTwoArgProxy_native, callProxy_native);
 }
 
 Object _callTwoArgProxyProxy(Pointer arg0) {

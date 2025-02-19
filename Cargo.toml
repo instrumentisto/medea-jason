@@ -47,7 +47,7 @@ talc = ["dep:talc"]
 async-recursion = "1.1"
 async-trait = "0.1"
 backoff = { version = "0.4", features = ["futures"] }
-bitflags = "2.6"
+bitflags = "2.8"
 derivative = "2.2"
 derive_more = { version = "2.0", features = ["as_ref", "debug", "deref", "display", "from", "into", "mul"] }
 futures = "0.3"
@@ -70,7 +70,7 @@ simple_logger = "5.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 dart-sys = "4.1"
-flutter_rust_bridge = { version = "=2.7.0", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
+flutter_rust_bridge = { version = "=2.8.0", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
 libc = "0.2"
 send_wrapper = "0.6"
 # TODO: Replace `sync_unsafe_cell` with `std` once the following API is
@@ -84,11 +84,11 @@ console_error_panic_hook = { version = "0.1", optional = true }
 getrandom = { version = "0.3.1", features = ["wasm_js"] }
 js-sys = "0.3"
 talc = { version = "4.4", features = ["lock_api"], default-features = false, optional = true }
-wasm-bindgen = "0.2.93"
+wasm-bindgen = "0.2.100"
 wasm-bindgen-futures = "0.4.50"
 wasm-logger = "0.2"
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
-    version = "0.3.70"
+    version = "0.3.77"
     features = [
         "console",
         "ConstrainBooleanParameters",

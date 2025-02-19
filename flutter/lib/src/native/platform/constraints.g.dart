@@ -49,76 +49,92 @@ void registerFunction(
   _setDisplayVideoConstraint = setDisplayVideoConstraint;
   _setAudioConstraint = setAudioConstraint;
 
-  _constraints__init_device_constraints__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'constraints__init_device_constraints__set_error');
-  _constraints__init_display_constraints__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'constraints__init_display_constraints__set_error');
-  _constraints__new_video_constraints__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'constraints__new_video_constraints__set_error');
-  _constraints__new_audio_constraints__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'constraints__new_audio_constraints__set_error');
-  _constraints__set_video_constraint_value__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'constraints__set_video_constraint_value__set_error');
-  _constraints__set_audio_constraint_value__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'constraints__set_audio_constraint_value__set_error');
-  _constraints__set_video_constraint__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'constraints__set_video_constraint__set_error');
-  _constraints__set_display_video_constraint__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'constraints__set_display_video_constraint__set_error');
-  _constraints__set_audio_constraint__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'constraints__set_audio_constraint__set_error');
+  _constraints__init_device_constraints__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'constraints__init_device_constraints__set_error',
+      );
+  _constraints__init_display_constraints__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'constraints__init_display_constraints__set_error',
+      );
+  _constraints__new_video_constraints__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'constraints__new_video_constraints__set_error',
+      );
+  _constraints__new_audio_constraints__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'constraints__new_audio_constraints__set_error',
+      );
+  _constraints__set_video_constraint_value__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'constraints__set_video_constraint_value__set_error',
+      );
+  _constraints__set_audio_constraint_value__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'constraints__set_audio_constraint_value__set_error',
+      );
+  _constraints__set_video_constraint__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'constraints__set_video_constraint__set_error',
+      );
+  _constraints__set_display_video_constraint__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'constraints__set_display_video_constraint__set_error',
+      );
+  _constraints__set_audio_constraint__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'constraints__set_audio_constraint__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function()>> initDeviceConstraints_native =
-      Pointer.fromFunction(
-    _initDeviceConstraintsProxy,
-  );
+      Pointer.fromFunction(_initDeviceConstraintsProxy);
   Pointer<NativeFunction<Handle Function()>> initDisplayConstraints_native =
-      Pointer.fromFunction(
-    _initDisplayConstraintsProxy,
-  );
+      Pointer.fromFunction(_initDisplayConstraintsProxy);
   Pointer<NativeFunction<Handle Function()>> newVideoConstraints_native =
-      Pointer.fromFunction(
-    _newVideoConstraintsProxy,
-  );
+      Pointer.fromFunction(_newVideoConstraintsProxy);
   Pointer<NativeFunction<Handle Function()>> newAudioConstraints_native =
-      Pointer.fromFunction(
-    _newAudioConstraintsProxy,
-  );
+      Pointer.fromFunction(_newAudioConstraintsProxy);
   Pointer<NativeFunction<Void Function(Handle, Int64, ForeignValue)>>
-      setVideoConstraintValue_native = Pointer.fromFunction(
+  setVideoConstraintValue_native = Pointer.fromFunction(
     _setVideoConstraintValueProxy,
   );
   Pointer<NativeFunction<Void Function(Handle, Int64, ForeignValue)>>
-      setAudioConstraintValue_native = Pointer.fromFunction(
+  setAudioConstraintValue_native = Pointer.fromFunction(
     _setAudioConstraintValueProxy,
   );
   Pointer<NativeFunction<Void Function(Handle, Int64, Handle)>>
-      setVideoConstraint_native = Pointer.fromFunction(
-    _setVideoConstraintProxy,
-  );
+  setVideoConstraint_native = Pointer.fromFunction(_setVideoConstraintProxy);
   Pointer<NativeFunction<Void Function(Handle, Int64, Handle)>>
-      setDisplayVideoConstraint_native = Pointer.fromFunction(
+  setDisplayVideoConstraint_native = Pointer.fromFunction(
     _setDisplayVideoConstraintProxy,
   );
   Pointer<NativeFunction<Void Function(Handle, Int64, Handle)>>
-      setAudioConstraint_native = Pointer.fromFunction(
-    _setAudioConstraintProxy,
-  );
+  setAudioConstraint_native = Pointer.fromFunction(_setAudioConstraintProxy);
 
   dl.lookupFunction<
-      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer),
-      void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer)>('register_constraints')(
+    Void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    ),
+    void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    )
+  >('register_constraints')(
     initDeviceConstraints_native,
     initDisplayConstraints_native,
     newVideoConstraints_native,

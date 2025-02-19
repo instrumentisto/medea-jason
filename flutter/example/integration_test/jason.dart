@@ -46,13 +46,18 @@ void main() {
     expect(await tracks[0].state(), webrtc.MediaStreamTrackState.live);
     expect(await tracks[1].state(), webrtc.MediaStreamTrackState.live);
 
-    expect((devices.first as NativeMediaDeviceDetails),
-        isNot(equals((devices.last as NativeMediaDeviceDetails))));
-    expect((tracks.first as NativeLocalMediaTrack).opaque,
-        isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)));
+    expect(
+      (devices.first as NativeMediaDeviceDetails),
+      isNot(equals((devices.last as NativeMediaDeviceDetails))),
+    );
+    expect(
+      (tracks.first as NativeLocalMediaTrack).opaque,
+      isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)),
+    );
 
-    var videoDevice =
-        devices.firstWhere((d) => d.kind() == MediaDeviceKind.videoInput);
+    var videoDevice = devices.firstWhere(
+      (d) => d.kind() == MediaDeviceKind.videoInput,
+    );
 
     if (!Platform.isAndroid) {
       expect(videoDevice.deviceId(), equals('fake camera id'));
@@ -125,28 +130,40 @@ void main() {
       formatExc = e;
     }
     expect(
-        formatExc,
-        allOf(predicate((e) =>
-            e is FormatException &&
-            e.message.contains('relative URL without a base'))));
+      formatExc,
+      allOf(
+        predicate(
+          (e) =>
+              e is FormatException &&
+              e.message.contains('relative URL without a base'),
+        ),
+      ),
+    );
 
     jason.closeRoom(room);
     jason.free();
     room.free();
   });
 
-  testWidgets('Primitive arguments Callback validation',
-      (WidgetTester widgetTester) async {
-    final intListener = dl.lookupFunction<Handle Function(ForeignValue),
-        Object Function(ForeignValue)>('test_callback_listener_int');
-    final stringListener = dl.lookupFunction<Handle Function(ForeignValue),
-        Object Function(ForeignValue)>('test_callback_listener_string');
-    final optionalIntListener = dl.lookupFunction<Handle Function(ForeignValue),
-        Object Function(ForeignValue)>('test_callback_listener_optional_int');
+  testWidgets('Primitive arguments Callback validation', (
+    WidgetTester widgetTester,
+  ) async {
+    final intListener = dl.lookupFunction<
+      Handle Function(ForeignValue),
+      Object Function(ForeignValue)
+    >('test_callback_listener_int');
+    final stringListener = dl.lookupFunction<
+      Handle Function(ForeignValue),
+      Object Function(ForeignValue)
+    >('test_callback_listener_string');
+    final optionalIntListener = dl.lookupFunction<
+      Handle Function(ForeignValue),
+      Object Function(ForeignValue)
+    >('test_callback_listener_optional_int');
     final optionalStringListener = dl.lookupFunction<
-        Handle Function(ForeignValue),
-        Object Function(
-            ForeignValue)>('test_callback_listener_optional_string');
+      Handle Function(ForeignValue),
+      Object Function(ForeignValue)
+    >('test_callback_listener_optional_string');
 
     var intVal = ForeignValue.fromInt(45);
     var stringVal = ForeignValue.fromString('test string');
@@ -166,14 +183,16 @@ void main() {
     noneVal.free();
   });
 
-  testWidgets('DartHandle argument Callback validation',
-      (WidgetTester widgetTester) async {
+  testWidgets('DartHandle argument Callback validation', (
+    WidgetTester widgetTester,
+  ) async {
     dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-            'register__test__test_callback_handle_function')(
-        Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
-    final dartHandleListener =
-        dl.lookupFunction<Handle Function(), Object Function()>(
-            'test_callback_listener_dart_handle');
+      'register__test__test_callback_handle_function',
+    )(Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
+    final dartHandleListener = dl
+        .lookupFunction<Handle Function(), Object Function()>(
+          'test_callback_listener_dart_handle',
+        );
 
     var obj = TestObj(0);
 
@@ -182,34 +201,48 @@ void main() {
   });
 
   testWidgets('FutureResolver primitives', (WidgetTester widgetTester) async {
-    final intResolver =
-        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'test__future_from_dart__int');
-    final stringResolver =
-        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'test__future_from_dart__string');
+    final intResolver = dl
+        .lookupFunction<Handle Function(Handle), Object Function(Object)>(
+          'test__future_from_dart__int',
+        );
+    final stringResolver = dl
+        .lookupFunction<Handle Function(Handle), Object Function(Object)>(
+          'test__future_from_dart__string',
+        );
 
-    var intVal = await (intResolver(
-        () => Future.delayed(const Duration(milliseconds: 500), () async {
-              return 45;
-            })) as Future);
-    var stringVal = await (stringResolver(
-        () => Future.delayed(const Duration(milliseconds: 500), () async {
-              return 'test string';
-            })) as Future);
+    var intVal =
+        await (intResolver(
+              () => Future.delayed(const Duration(milliseconds: 500), () async {
+                return 45;
+              }),
+            )
+            as Future);
+    var stringVal =
+        await (stringResolver(
+              () => Future.delayed(const Duration(milliseconds: 500), () async {
+                return 'test string';
+              }),
+            )
+            as Future);
 
     expect(intVal as int, equals(45));
     expect(stringVal as String, 'test string');
   });
 
   testWidgets('GetStats() works', (WidgetTester widgetTester) async {
-    final testRtcStatsParse = dl.lookupFunction<Uint64 Function(ForeignValue),
-        int Function(ForeignValue)>('test_rtc_stats_parse');
+    final testRtcStatsParse = dl.lookupFunction<
+      Uint64 Function(ForeignValue),
+      int Function(ForeignValue)
+    >('test_rtc_stats_parse');
 
-    var pc1 =
-        await webrtc.PeerConnection.create(webrtc.IceTransportType.all, []);
-    var pc2 =
-        await webrtc.PeerConnection.create(webrtc.IceTransportType.all, []);
+    var pc1 = await webrtc.PeerConnection.create(
+      webrtc.IceTransportType.all,
+      [],
+    );
+    var pc2 = await webrtc.PeerConnection.create(
+      webrtc.IceTransportType.all,
+      [],
+    );
 
     pc1.onIceCandidate((candidate) async {
       if (!pc2.closed) {
@@ -222,10 +255,14 @@ void main() {
         await pc1.addIceCandidate(candidate);
       }
     });
-    var tVideo = await pc1.addTransceiver(webrtc.MediaKind.video,
-        webrtc.RtpTransceiverInit(webrtc.TransceiverDirection.sendRecv));
-    var tAudio = await pc1.addTransceiver(webrtc.MediaKind.audio,
-        webrtc.RtpTransceiverInit(webrtc.TransceiverDirection.sendRecv));
+    var tVideo = await pc1.addTransceiver(
+      webrtc.MediaKind.video,
+      webrtc.RtpTransceiverInit(webrtc.TransceiverDirection.sendRecv),
+    );
+    var tAudio = await pc1.addTransceiver(
+      webrtc.MediaKind.audio,
+      webrtc.RtpTransceiverInit(webrtc.TransceiverDirection.sendRecv),
+    );
 
     var offer = await pc1.createOffer();
     await pc1.setLocalDescription(offer);
@@ -238,18 +275,24 @@ void main() {
     var senderStats = await pc1.getStats();
     var receiverStats = await pc2.getStats();
 
-    var senderStatsJson =
-        jsonEncode(senderStats.map((stat) => stat.toMap()).toList());
-    var receiverStatsJson =
-        jsonEncode(receiverStats.map((stat) => stat.toMap()).toList());
+    var senderStatsJson = jsonEncode(
+      senderStats.map((stat) => stat.toMap()).toList(),
+    );
+    var receiverStatsJson = jsonEncode(
+      receiverStats.map((stat) => stat.toMap()).toList(),
+    );
 
     var senderStatsString = ForeignValue.fromString(senderStatsJson);
     var receiverStatsString = ForeignValue.fromString(receiverStatsJson);
 
     expect(
-        testRtcStatsParse(senderStatsString.ref), equals(senderStats.length));
-    expect(testRtcStatsParse(receiverStatsString.ref),
-        equals(receiverStats.length));
+      testRtcStatsParse(senderStatsString.ref),
+      equals(senderStats.length),
+    );
+    expect(
+      testRtcStatsParse(receiverStatsString.ref),
+      equals(receiverStats.length),
+    );
 
     await pc1.close();
     await pc2.close();
@@ -260,41 +303,47 @@ void main() {
     receiverStatsString.free();
   });
 
-  testWidgets('DartHandle argument Future validation',
-      (WidgetTester widgetTester) async {
+  testWidgets('DartHandle argument Future validation', (
+    WidgetTester widgetTester,
+  ) async {
     dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-            'register__test__future_from_dart_handle_fn')(
-        Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
+      'register__test__future_from_dart_handle_fn',
+    )(Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
 
-    final handleResolver =
-        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'test__future_from_dart__handle');
+    final handleResolver = dl
+        .lookupFunction<Handle Function(Handle), Object Function(Object)>(
+          'test__future_from_dart__handle',
+        );
 
     var testObj = TestObj(0);
     fut() => Future.delayed(const Duration(milliseconds: 500), () async {
-          return testObj;
-        });
+      return testObj;
+    });
     await (handleResolver(fut) as Future);
     expect(testObj.val, equals(45));
   });
 
-  testWidgets('FutureResolver catches exceptions',
-      (WidgetTester widgetTester) async {
-    final futureCatchesException =
-        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'test__future_from_dart__fails');
+  testWidgets('FutureResolver catches exceptions', (
+    WidgetTester widgetTester,
+  ) async {
+    final futureCatchesException = dl
+        .lookupFunction<Handle Function(Handle), Object Function(Object)>(
+          'test__future_from_dart__fails',
+        );
 
     fut() => Future.delayed(const Duration(milliseconds: 500), () async {
-          throw Exception('Test Exception');
-        });
+      throw Exception('Test Exception');
+    });
     var res = await (futureCatchesException(fut) as Future);
     expect(res as int, equals(1));
   });
 
-  testWidgets('Panic catcher fires callback and frees Handles',
-      (WidgetTester widgetTester) async {
-    final firePanic =
-        dl.lookupFunction<Void Function(), void Function()>('fire_panic');
+  testWidgets('Panic catcher fires callback and frees Handles', (
+    WidgetTester widgetTester,
+  ) async {
+    final firePanic = dl.lookupFunction<Void Function(), void Function()>(
+      'fire_panic',
+    );
     final jason = await Jason.init();
     var completer = Completer();
     onPanic((msg) => completer.complete(msg));

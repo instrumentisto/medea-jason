@@ -12,8 +12,8 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{
-        api::DART_HANDLER_PORT, propagate_panic, DartValue, DartValueArg,
-        Error as DartError,
+        propagate_panic, DartValue, DartValueArg, Error as DartError,
+        DART_HANDLER_PORT,
     },
     platform::{
         dart::{error::Error, utils::Completer},

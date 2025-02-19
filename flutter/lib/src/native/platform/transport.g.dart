@@ -33,45 +33,42 @@ void registerFunction(
   _closeCode = closeCode;
   _closeReason = closeReason;
 
-  _transport__connect__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'transport__connect__set_error');
-  _transport__send__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'transport__send__set_error');
-  _transport__close__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'transport__close__set_error');
-  _transport__close_code__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'transport__close_code__set_error');
-  _transport__close_reason__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'transport__close_reason__set_error');
+  _transport__connect__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'transport__connect__set_error',
+      );
+  _transport__send__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'transport__send__set_error',
+      );
+  _transport__close__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'transport__close__set_error',
+      );
+  _transport__close_code__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'transport__close_code__set_error',
+      );
+  _transport__close_reason__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'transport__close_reason__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function(Pointer<Utf8>, Handle, Handle)>>
-      connect_native = Pointer.fromFunction(
-    _connectProxy,
-  );
+  connect_native = Pointer.fromFunction(_connectProxy);
   Pointer<NativeFunction<Void Function(Handle, Pointer<Utf8>)>> send_native =
-      Pointer.fromFunction(
-    _sendProxy,
-  );
+      Pointer.fromFunction(_sendProxy);
   Pointer<NativeFunction<Void Function(Handle, Int32, Pointer<Utf8>)>>
-      close_native = Pointer.fromFunction(
-    _closeProxy,
-  );
+  close_native = Pointer.fromFunction(_closeProxy);
   Pointer<NativeFunction<Int32 Function(Handle)>> closeCode_native =
       Pointer.fromFunction(_closeCodeProxy, 0);
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> closeReason_native =
-      Pointer.fromFunction(
-    _closeReasonProxy,
-  );
+      Pointer.fromFunction(_closeReasonProxy);
 
   dl.lookupFunction<
-      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
-      void Function(
-          Pointer, Pointer, Pointer, Pointer, Pointer)>('register_transport')(
+    Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
+    void Function(Pointer, Pointer, Pointer, Pointer, Pointer)
+  >('register_transport')(
     connect_native,
     send_native,
     close_native,

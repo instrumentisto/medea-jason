@@ -13,7 +13,7 @@ class NativeRemoteMediaTrack implements RemoteMediaTrack {
   /// Constructs a new [RemoteMediaTrack] backed by the Rust struct behind the
   /// provided [frb.RemoteMediaTrack].
   NativeRemoteMediaTrack(frb.RemoteMediaTrack remoteMediaTrack)
-      : opaque = RustOpaque(remoteMediaTrack) {
+    : opaque = RustOpaque(remoteMediaTrack) {
     RustHandlesStorage().insertHandle(this);
   }
 
@@ -59,8 +59,9 @@ class NativeRemoteMediaTrack implements RemoteMediaTrack {
 
   @override
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
-    opaque.inner
-        .onMediaDirectionChanged(f: (i) => f(TrackMediaDirection.values[i]));
+    opaque.inner.onMediaDirectionChanged(
+      f: (i) => f(TrackMediaDirection.values[i]),
+    );
   }
 
   @moveSemantics

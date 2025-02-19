@@ -26,7 +26,8 @@ class WebMediaManagerHandle implements MediaManagerHandle {
 
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
-      base_settings.MediaStreamSettings caps) async {
+    base_settings.MediaStreamSettings caps,
+  ) async {
     final tracks = await fallibleFuture(
       obj.init_local_tracks((caps as MediaStreamSettings).obj).toDart,
     );

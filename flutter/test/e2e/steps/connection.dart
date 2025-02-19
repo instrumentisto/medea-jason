@@ -24,42 +24,42 @@ StepDefinitionGeneric thenConnectionCloses = then2<String, String, CustomWorld>(
 
 StepDefinitionGeneric thenMemberReceivesConnection =
     then2<String, String, CustomWorld>(
-  r'(\S+) receives connection with (\S+)$',
-  (id, responderId, context) async {
-    var member = context.world.members[id]!;
-    await member.waitForConnect(responderId);
-  },
-);
+      r'(\S+) receives connection with (\S+)$',
+      (id, responderId, context) async {
+        var member = context.world.members[id]!;
+        await member.waitForConnect(responderId);
+      },
+    );
 
 StepDefinitionGeneric thenMemberDoesntReceiveConnection =
     then2<String, String, CustomWorld>(
-  r"(\S+) doesn't receive connection with (\S+)$",
-  (id, responderId, context) async {
-    var member = context.world.members[id]!;
-    expect(member.connectionStore.connections[responderId], null);
-  },
-);
+      r"(\S+) doesn't receive connection with (\S+)$",
+      (id, responderId, context) async {
+        var member = context.world.members[id]!;
+        expect(member.connectionStore.connections[responderId], null);
+      },
+    );
 
 StepDefinitionGeneric whenConnectionChangesRemoteMediaState =
     when4<String, String, String, String, CustomWorld>(
-  r'(\S+) (enables|disables) (audio|video) receiving from (\S+)',
-  (id, action, kind, partnerId, context) async {
-    var member = context.world.members[id]!;
-    var parsedKind = parseMediaKind(kind);
+      r'(\S+) (enables|disables) (audio|video) receiving from (\S+)',
+      (id, action, kind, partnerId, context) async {
+        var member = context.world.members[id]!;
+        var parsedKind = parseMediaKind(kind);
 
-    var connect = member.connectionStore.connections[partnerId]!;
-    if (action == 'enables') {
-      if (parsedKind.item1 == MediaKind.audio) {
-        await connect.enableRemoteAudio();
-      } else {
-        await connect.enableRemoteVideo();
-      }
-    } else {
-      if (parsedKind.item1 == MediaKind.audio) {
-        await connect.disableRemoteAudio();
-      } else {
-        await connect.disableRemoteVideo();
-      }
-    }
-  },
-);
+        var connect = member.connectionStore.connections[partnerId]!;
+        if (action == 'enables') {
+          if (parsedKind.item1 == MediaKind.audio) {
+            await connect.enableRemoteAudio();
+          } else {
+            await connect.enableRemoteVideo();
+          }
+        } else {
+          if (parsedKind.item1 == MediaKind.audio) {
+            await connect.disableRemoteAudio();
+          } else {
+            await connect.disableRemoteVideo();
+          }
+        }
+      },
+    );

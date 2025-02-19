@@ -21,27 +21,24 @@ void registerFunction(
   _encodings = encodings;
   _setEncoding = setEncoding;
 
-  _parameters__encodings__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'parameters__encodings__set_error');
-  _parameters__set_encoding__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'parameters__set_encoding__set_error');
+  _parameters__encodings__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'parameters__encodings__set_error',
+      );
+  _parameters__set_encoding__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'parameters__set_encoding__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function(Handle)>> encodings_native =
-      Pointer.fromFunction(
-    _encodingsProxy,
-  );
+      Pointer.fromFunction(_encodingsProxy);
   Pointer<NativeFunction<Handle Function(Handle, Handle)>> setEncoding_native =
-      Pointer.fromFunction(
-    _setEncodingProxy,
-  );
+      Pointer.fromFunction(_setEncodingProxy);
 
-  dl.lookupFunction<Void Function(Pointer, Pointer),
-      void Function(Pointer, Pointer)>('register_parameters')(
-    encodings_native,
-    setEncoding_native,
-  );
+  dl.lookupFunction<
+    Void Function(Pointer, Pointer),
+    void Function(Pointer, Pointer)
+  >('register_parameters')(encodings_native, setEncoding_native);
 }
 
 Object _encodingsProxy(Object arg0) {

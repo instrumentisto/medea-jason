@@ -75,6 +75,10 @@ jobs:
       - run: make rustup.targets only=${{ matrix.platform }}
         if: ${{ matrix.platform != 'workspace' }}
       - uses: Swatinem/rust-cache@v2
+        with:
+          # TODO: Build scripts cross compilation fails sometimes:
+          # https://github.com/cross-rs/cross/issues/724
+          key: "${{ matrix.platform }}"
         if: ${{ env.CACHE == 'true' }}
 
       - uses: actions-rs/install@v0.1

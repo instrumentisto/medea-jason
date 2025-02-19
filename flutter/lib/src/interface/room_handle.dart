@@ -50,7 +50,10 @@ abstract class RoomHandle implements SyncPlatformHandle {
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
   Future<void> setLocalMediaSettings(
-      MediaStreamSettings settings, bool stopFirst, bool rollbackOnFail);
+    MediaStreamSettings settings,
+    bool stopFirst,
+    bool rollbackOnFail,
+  );
 
   /// Mutes outbound audio in this `Room`.
   ///

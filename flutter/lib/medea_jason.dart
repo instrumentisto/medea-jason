@@ -1,5 +1,3 @@
-library medea_jason;
-
 export 'src/interface/connection_handle.dart';
 export 'src/interface/exceptions.dart';
 export 'src/interface/media_device_details.dart';
