@@ -13,7 +13,7 @@ List<StepDefinitionGeneric> steps() {
     whenJasonObjectDisposes,
     whenRoomClosedByClient,
     whenMemberEnablesViaLocalMediaSettings,
-    whenMemberJoinsRoom
+    whenMemberJoinsRoom,
   ];
 }
 
@@ -63,7 +63,9 @@ StepDefinitionGeneric givenMemberGumWillError =
 
 StepDefinitionGeneric thenRoomFailedLocalStreamFires =
     then2<String, String, CustomWorld>(
-  RegExp(r"(\S+)'s `Room.on_failed_local_stream\(\)` fires {int} time(:?s)?$"),
+  RegExp(
+    r"(\S+)'s `Room.on_failed_local_stream\(\)` fires {int} time(:?s)?$",
+  ),
   (id, times, context) async {
     var member = context.world.members[id]!;
     var timesParse = int.parse(times);
@@ -73,8 +75,10 @@ StepDefinitionGeneric thenRoomFailedLocalStreamFires =
 
 StepDefinitionGeneric whenMemberEnablesViaLocalMediaSettings =
     then2<String, String, CustomWorld>(
-  RegExp(r'(\S+) enables (video|audio|video and audio) in local '
-      r'media settings'),
+  RegExp(
+    r'(\S+) enables (video|audio|video and audio) in local '
+    r'media settings',
+  ),
   (id, kind, context) async {
     var member = context.world.members[id]!;
     var setting = MediaStreamSettings();

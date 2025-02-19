@@ -23,23 +23,20 @@ void registerFunction(
 
   _map__init__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'map__init__set_error');
+    'map__init__set_error',
+  );
   _map__set__set_error = dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-      'map__set__set_error');
+    'map__set__set_error',
+  );
 
   Pointer<NativeFunction<Handle Function()>> init_native = Pointer.fromFunction(
     _initProxy,
   );
   Pointer<NativeFunction<Void Function(Handle, Pointer<Utf8>, ForeignValue)>>
-      set_native = Pointer.fromFunction(
-    _setProxy,
-  );
+      set_native = Pointer.fromFunction(_setProxy);
 
   dl.lookupFunction<Void Function(Pointer, Pointer),
-      void Function(Pointer, Pointer)>('register_map')(
-    init_native,
-    set_native,
-  );
+      void Function(Pointer, Pointer)>('register_map')(init_native, set_native);
 }
 
 Object _initProxy() {

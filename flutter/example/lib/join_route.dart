@@ -18,6 +18,7 @@ class _JoinRouteState extends State<JoinRoute> {
   String _roomId = defaultRoomId;
   String _memberId = defaultMemberId;
 
+  bool isSFUMode = true;
   bool isPublish = true;
   bool publishAudio = true;
   bool publishVideo = true;
@@ -41,6 +42,11 @@ class _JoinRouteState extends State<JoinRoute> {
               initialValue: defaultMemberId,
               onChanged: (text) => setState(() => _memberId = text),
               decoration: const InputDecoration(hintText: 'Member ID'),
+            ),
+            SwitchListTile(
+              title: const Text('SFU mode'),
+              value: isSFUMode,
+              onChanged: (v) => setState(() => isSFUMode = v),
             ),
             SwitchListTile(
               title: const Text('Publish'),
@@ -75,6 +81,7 @@ class _JoinRouteState extends State<JoinRoute> {
                     builder: (context) => CallRoute(
                       _roomId,
                       _memberId,
+                      isSFUMode,
                       isPublish,
                       publishVideo,
                       publishAudio,
@@ -84,7 +91,7 @@ class _JoinRouteState extends State<JoinRoute> {
                 );
               },
               child: const Text('Join Room'),
-            )
+            ),
           ],
         ),
       ),

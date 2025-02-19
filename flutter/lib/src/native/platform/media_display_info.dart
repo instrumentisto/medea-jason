@@ -8,11 +8,7 @@ import 'media_display_info.g.dart' as bridge;
 
 /// Registers functions allowing Rust to operate Dart [MediaDisplayInfo].
 void registerFunctions(DynamicLibrary dl) {
-  bridge.registerFunction(
-    dl,
-    deviceId: _deviceId,
-    title: _title,
-  );
+  bridge.registerFunction(dl, deviceId: _deviceId, title: _title);
 }
 
 /// Returns [MediaDisplayInfo.deviceId] value.

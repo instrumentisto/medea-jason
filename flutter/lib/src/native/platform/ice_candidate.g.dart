@@ -31,33 +31,31 @@ void registerFunction(
 
   _ice_candidate__init__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'ice_candidate__init__set_error');
+    'ice_candidate__init__set_error',
+  );
   _ice_candidate__candidate__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'ice_candidate__candidate__set_error');
+    'ice_candidate__candidate__set_error',
+  );
   _ice_candidate__sdp_m_line_index__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'ice_candidate__sdp_m_line_index__set_error');
+    'ice_candidate__sdp_m_line_index__set_error',
+  );
   _ice_candidate__sdp_mid__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'ice_candidate__sdp_mid__set_error');
+    'ice_candidate__sdp_mid__set_error',
+  );
 
   Pointer<
           NativeFunction<
               Handle Function(ForeignValue, ForeignValue, ForeignValue)>>
-      init_native = Pointer.fromFunction(
-    _initProxy,
-  );
+      init_native = Pointer.fromFunction(_initProxy);
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> candidate_native =
-      Pointer.fromFunction(
-    _candidateProxy,
-  );
+      Pointer.fromFunction(_candidateProxy);
   Pointer<NativeFunction<Uint64 Function(Handle)>> sdpMLineIndex_native =
       Pointer.fromFunction(_sdpMLineIndexProxy, 0);
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> sdpMid_native =
-      Pointer.fromFunction(
-    _sdpMidProxy,
-  );
+      Pointer.fromFunction(_sdpMidProxy);
 
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer),

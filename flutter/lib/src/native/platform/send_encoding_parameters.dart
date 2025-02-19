@@ -26,7 +26,9 @@ void registerFunctions(DynamicLibrary dl) {
 
 /// Creates new [SendEncodingParameters].
 SendEncodingParameters _newSendEncodingParameters(
-    Pointer<Utf8> rid, bool active) {
+  Pointer<Utf8> rid,
+  bool active,
+) {
   return SendEncodingParameters.create(rid.nativeStringToDartString(), active);
 }
 
@@ -83,8 +85,9 @@ Pointer _getScaleResolutionDownBy(Object encoding) {
   encoding as SendEncodingParameters;
 
   if (encoding.scaleResolutionDownBy != null) {
-    return ForeignValue.fromDouble(encoding.scaleResolutionDownBy!)
-        .intoRustOwned();
+    return ForeignValue.fromDouble(
+      encoding.scaleResolutionDownBy!,
+    ).intoRustOwned();
   } else {
     return ForeignValue.none().intoRustOwned();
   }

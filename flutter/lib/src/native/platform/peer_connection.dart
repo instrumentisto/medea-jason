@@ -38,7 +38,10 @@ void registerFunctions(DynamicLibrary dl) {
 ///
 /// Returns [Future] which will be resolved into created [RtpTransceiver].
 Future<RtpTransceiver> Function() _addTransceiver(
-    Object peer, int kind, Object init) {
+  Object peer,
+  int kind,
+  Object init,
+) {
   peer as PeerConnection;
   init as RtpTransceiverInit;
   return () => peer.addTransceiver(MediaKind.values[kind], init);
@@ -47,11 +50,15 @@ Future<RtpTransceiver> Function() _addTransceiver(
 /// Returns a newly created [PeerConnection] with the provided `iceServers`
 /// [List].
 Future<PeerConnection> Function() _newPeer(
-    Object iceServers, bool isForceRelayed) {
+  Object iceServers,
+  bool isForceRelayed,
+) {
   var servers = iceServers as List<dynamic>;
   var iceType = isForceRelayed ? IceTransportType.relay : IceTransportType.all;
   return () => PeerConnection.create(
-      iceType, servers.map((e) => e as IceServer).toList());
+        iceType,
+        servers.map((e) => e as IceServer).toList(),
+      );
 }
 
 /// Sets the provided [f] to the [PeerConnection.onTrack] callback.
@@ -115,7 +122,9 @@ Future<String> Function() _getStats(Object conn) {
 /// Lookups an [RtpTransceiver] in the provided [PeerConnection] by the provided
 /// [mid].
 Future<RtpTransceiver?> Function() _getTransceiverByMid(
-    Object peer, Pointer<Utf8> mid) {
+  Object peer,
+  Pointer<Utf8> mid,
+) {
   peer as PeerConnection;
   return () => peer.getTransceivers().then((transceivers) {
         var mMid = mid.nativeStringToDartString();
@@ -133,7 +142,10 @@ Future<RtpTransceiver?> Function() _getTransceiverByMid(
 
 /// Sets a remote SDP offer in the provided [PeerConnection].
 Future<void> Function() _setRemoteDescription(
-    Object conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
+  Object conn,
+  Pointer<Utf8> type,
+  Pointer<Utf8> sdp,
+) {
   conn as PeerConnection;
   SessionDescriptionType sdpType;
   if (type.nativeStringToDartString() == 'offer') {
@@ -147,7 +159,10 @@ Future<void> Function() _setRemoteDescription(
 
 /// Sets a local SDP offer in the provided [PeerConnection].
 Future<void> Function() _setLocalDescription(
-    Object conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
+  Object conn,
+  Pointer<Utf8> type,
+  Pointer<Utf8> sdp,
+) {
   conn as PeerConnection;
   SessionDescriptionType sdpType;
   if (type.nativeStringToDartString() == 'offer') {
@@ -156,7 +171,8 @@ Future<void> Function() _setLocalDescription(
     sdpType = SessionDescriptionType.answer;
   }
   return () => conn.setLocalDescription(
-      SessionDescription(sdpType, sdp.nativeStringToDartString()));
+        SessionDescription(sdpType, sdp.nativeStringToDartString()),
+      );
 }
 
 /// Creates a new SDP offer for the provided [PeerConnection].
@@ -203,7 +219,8 @@ int _iceConnectionState(Object conn) {
 Future<void> Function() _rollback(Object conn) {
   conn as PeerConnection;
   return () => conn.setLocalDescription(
-      SessionDescription(SessionDescriptionType.rollback, ''));
+        SessionDescription(SessionDescriptionType.rollback, ''),
+      );
 }
 
 /// Returns all the [RtpTransceiver]s of the provided [PeerConnection].

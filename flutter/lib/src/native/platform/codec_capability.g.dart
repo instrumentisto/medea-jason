@@ -40,22 +40,28 @@ void registerFunction(
 
   _codec_capability__get_sender_codec_capabilities__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'codec_capability__get_sender_codec_capabilities__set_error');
+    'codec_capability__get_sender_codec_capabilities__set_error',
+  );
   _codec_capability__get_receiver_codec_capabilities__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'codec_capability__get_receiver_codec_capabilities__set_error');
+    'codec_capability__get_receiver_codec_capabilities__set_error',
+  );
   _codec_capability__mime_type__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'codec_capability__mime_type__set_error');
+    'codec_capability__mime_type__set_error',
+  );
   _codec_capability__clock_rate__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'codec_capability__clock_rate__set_error');
+    'codec_capability__clock_rate__set_error',
+  );
   _codec_capability__channels__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'codec_capability__channels__set_error');
+    'codec_capability__channels__set_error',
+  );
   _codec_capability__parameters__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'codec_capability__parameters__set_error');
+    'codec_capability__parameters__set_error',
+  );
 
   Pointer<NativeFunction<Handle Function(Int64)>>
       getSenderCodecCapabilities_native = Pointer.fromFunction(
@@ -66,21 +72,13 @@ void registerFunction(
     _getReceiverCodecCapabilitiesProxy,
   );
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> mimeType_native =
-      Pointer.fromFunction(
-    _mimeTypeProxy,
-  );
+      Pointer.fromFunction(_mimeTypeProxy);
   Pointer<NativeFunction<Pointer Function(Handle)>> clockRate_native =
-      Pointer.fromFunction(
-    _clockRateProxy,
-  );
+      Pointer.fromFunction(_clockRateProxy);
   Pointer<NativeFunction<Pointer Function(Handle)>> channels_native =
-      Pointer.fromFunction(
-    _channelsProxy,
-  );
+      Pointer.fromFunction(_channelsProxy);
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> parameters_native =
-      Pointer.fromFunction(
-    _parametersProxy,
-  );
+      Pointer.fromFunction(_parametersProxy);
 
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),

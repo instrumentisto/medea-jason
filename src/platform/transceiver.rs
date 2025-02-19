@@ -104,7 +104,7 @@ impl Transceiver {
 /// [`Transceiver::update_send_encodings`] error.
 #[derive(Clone, Debug, Display, From)]
 pub enum UpdateSendEncodingError {
-    /// [`EncodingParameters`] list cannot be modified via
+    /// [`platform::SendEncodingParameters`] list cannot be modified via
     /// [`Transceiver::set_send_parameters`].
     #[display(
         "SendParameters.encodings length can not be changed. Tried to \

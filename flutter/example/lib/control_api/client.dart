@@ -23,19 +23,28 @@ class ControlApi {
 
   /// Creates [WebRtcPlayEndpoint] of member for the specified room.
   Future<void> createPlayEndpoint(
-      String roomId, String memberId, WebRtcPlayEndpoint endpoint) async {
+    String roomId,
+    String memberId,
+    WebRtcPlayEndpoint endpoint,
+  ) async {
     await _client.create('$roomId/$memberId/${endpoint.id}', endpoint);
   }
 
   /// Creates [WebRtcPublishEndpoint] of member for the specified room.
   Future<void> createPublishEndpoint(
-      String roomId, String memberId, WebRtcPublishEndpoint endpoint) async {
+    String roomId,
+    String memberId,
+    WebRtcPublishEndpoint endpoint,
+  ) async {
     await _client.create('$roomId/$memberId/${endpoint.id}', endpoint);
   }
 
   /// Returns URL by the provided endpointId.
   Future<String> getUrlForElement(
-      String roomId, String? memberId, String? endpointId) async {
+    String roomId,
+    String? memberId,
+    String? endpointId,
+  ) async {
     var url = roomId;
 
     if (memberId != null && endpointId != null) {

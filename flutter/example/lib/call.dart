@@ -81,48 +81,62 @@ class Call {
   }
 
   /// Starts a call in the specified room.
-  Future<void> start(String roomId, String memberId, bool isPublish,
-      bool publishVideo, bool publishAudio, bool fakeMedia) async {
+  Future<void> start(
+    String roomId,
+    String memberId,
+    bool isPublish,
+    bool publishVideo,
+    bool publishAudio,
+    bool fakeMedia,
+    bool isSFUMode,
+  ) async {
     if (fakeMedia) {
       await webrtc.initFfiBridge();
       await webrtc.enableFakeMedia();
     }
 
-    var constraints = MediaStreamSettings();
+    if (isPublish) {
+      var constraints = MediaStreamSettings();
 
-    var devices = await _mediaManager.enumerateDevices();
+      var devices = await _mediaManager.enumerateDevices();
 
-    if (publishVideo) {
-      videoDeviceId = devices
-          .firstWhere((element) => element.kind() == MediaDeviceKind.videoInput)
-          .deviceId();
-      constraints.deviceVideo(DeviceVideoTrackConstraints());
+      if (publishVideo) {
+        videoDeviceId = devices
+            .firstWhere(
+              (element) => element.kind() == MediaDeviceKind.videoInput,
+            )
+            .deviceId();
+        constraints.deviceVideo(DeviceVideoTrackConstraints());
+      }
+
+      if (publishAudio) {
+        audioDeviceId = devices
+            .firstWhere(
+              (element) => element.kind() == MediaDeviceKind.audioInput,
+            )
+            .deviceId();
+        constraints.audio(AudioTrackConstraints());
+      }
+
+      var tracks = await _mediaManager.initLocalTracks(constraints);
+      await _room.setLocalMediaSettings(constraints, false, false);
+      _tracks = tracks;
+
+      for (var track in tracks) {
+        if (track.kind() == MediaKind.video) {
+          _onLocalDeviceTrack(track.getTrack());
+        } else if (track.kind() == MediaKind.audio) {
+          _onLocalAudioTrack(track);
+        }
+      }
     }
 
-    if (publishAudio) {
-      audioDeviceId = devices
-          .firstWhere((element) => element.kind() == MediaDeviceKind.audioInput)
-          .deviceId();
-      constraints.audio(AudioTrackConstraints());
-    }
-
-    var tracks = await _mediaManager.initLocalTracks(constraints);
     _room.onFailedLocalMedia((e) {
       _onError('onFailedLocalMedia: $e');
     });
     _room.onConnectionLoss((e) {
       _onError('onConnectionLoss: $e');
     });
-    await _room.setLocalMediaSettings(constraints, false, false);
-    _tracks = tracks;
-
-    for (var track in tracks) {
-      if (track.kind() == MediaKind.video) {
-        _onLocalDeviceTrack(track.getTrack());
-      } else if (track.kind() == MediaKind.audio) {
-        _onLocalAudioTrack(track);
-      }
-    }
 
     _room.onLocalTrack((track) {
       _tracks.add(track);
@@ -139,15 +153,31 @@ class Call {
 
     var getRoom = await client.get(roomId);
     if (getRoom.body == '{}') {
-      await _room.join(await createRoom(
-          roomId, memberId, isPublish, publishVideo, publishAudio));
+      await _room.join(
+        await createRoom(
+          roomId,
+          memberId,
+          isPublish,
+          publishVideo,
+          publishAudio,
+          isSFUMode,
+        ),
+      );
       return;
     }
 
     var getMember = await client.get('$roomId/$memberId');
     if (getMember.body == '{}') {
-      await _room.join(await createMember(
-          roomId, memberId, isPublish, publishVideo, publishAudio));
+      await _room.join(
+        await createMember(
+          roomId,
+          memberId,
+          isPublish,
+          publishVideo,
+          publishAudio,
+          isSFUMode,
+        ),
+      );
       return;
     }
 
@@ -159,8 +189,11 @@ class Call {
   }
 
   /// Sets media tracks according to the passed settings.
-  Future<void> setMedia(DeviceVideoTrackConstraints video,
-      AudioTrackConstraints audio, DisplayVideoTrackConstraints display) async {
+  Future<void> setMedia(
+    DeviceVideoTrackConstraints video,
+    AudioTrackConstraints audio,
+    DisplayVideoTrackConstraints display,
+  ) async {
     for (var t in _tracks) {
       await t.free();
     }
@@ -213,7 +246,8 @@ class Call {
 
   /// Sets the callback for a new video remote track.
   void onNewRemoteStream(
-      Function(RemoteMediaTrack, String, ConnectionHandle) f) {
+    Function(RemoteMediaTrack, String, ConnectionHandle) f,
+  ) {
     _room.onNewConnection((conn) {
       conn.onRemoteTrackAdded((track) async {
         if (track.kind() == MediaKind.audio && !kIsWeb) {
@@ -253,62 +287,101 @@ class Call {
   }
 
   /// Creates a new room. Returns an URL for joining.
-  Future<String> createRoom(String roomId, String memberId, bool isPublish,
-      bool publishAudio, bool publishVideo) async {
+  Future<String> createRoom(
+    String roomId,
+    String memberId,
+    bool isPublish,
+    bool publishAudio,
+    bool publishVideo,
+    bool isSFUMode,
+  ) async {
     var pipeline = HashMap<String, Endpoint>();
 
     if (isPublish) {
-      var end = WebRtcPublishEndpoint('publish', P2pMode.Always);
+      var end = WebRtcPublishEndpoint(
+        'publish',
+        isSFUMode ? P2pMode.Never : P2pMode.Always,
+      );
       end.audio_settings = AudioSettings(
-          publishAudio ? PublishPolicy.Optional : PublishPolicy.Disabled);
+        publishAudio ? PublishPolicy.Optional : PublishPolicy.Disabled,
+      );
       end.video_settings = VideoSettings(
-          publishVideo ? PublishPolicy.Optional : PublishPolicy.Disabled);
+        publishVideo ? PublishPolicy.Optional : PublishPolicy.Disabled,
+      );
       pipeline.addAll({'publish': end});
     }
 
     var resp = await client.create(
-        roomId,
-        Room(roomId, {
-          memberId: Member(memberId, pipeline, Plain('test'),
-              'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099')
-        }));
+      roomId,
+      Room(roomId, {
+        memberId: Member(
+          memberId,
+          pipeline,
+          Plain('test'),
+          'grpc://127.0.0.1:9099',
+          'grpc://127.0.0.1:9099',
+        ),
+      }),
+    );
     return jsonDecode(resp.body)['sids'][memberId];
   }
 
   /// Creates a member for the specified room. Returns an URL for joining.
-  Future<String> createMember(String roomId, String memberId, bool isPublish,
-      bool publishAudio, bool publishVideo) async {
+  Future<String> createMember(
+    String roomId,
+    String memberId,
+    bool isPublish,
+    bool publishAudio,
+    bool publishVideo,
+    bool isSFUMode,
+  ) async {
     var pipeline = HashMap<String, Endpoint>();
 
     if (isPublish) {
-      var end = WebRtcPublishEndpoint('publish', P2pMode.Always);
+      var end = WebRtcPublishEndpoint(
+        'publish',
+        isSFUMode ? P2pMode.Never : P2pMode.Always,
+      );
       end.audio_settings = AudioSettings(
-          publishAudio ? PublishPolicy.Optional : PublishPolicy.Disabled);
+        publishAudio ? PublishPolicy.Optional : PublishPolicy.Disabled,
+      );
       end.video_settings = VideoSettings(
-          publishVideo ? PublishPolicy.Optional : PublishPolicy.Disabled);
+        publishVideo ? PublishPolicy.Optional : PublishPolicy.Disabled,
+      );
       pipeline.addAll({'publish': end});
     }
 
-    var controlRoom =
-        Room.fromJson(jsonDecode((await client.get(roomId)).body)['element']);
+    var controlRoom = Room.fromJson(
+      jsonDecode((await client.get(roomId)).body)['element'],
+    );
     var anotherMembers = controlRoom.pipeline.values;
 
     for (var m in anotherMembers) {
       if (m.pipeline.keys.where((element) => element == 'publish').isNotEmpty) {
         pipeline['play-${m.id}'] = WebRtcPlayEndpoint(
-            'play-${m.id}', 'local://$roomId/${m.id}/publish');
+          'play-${m.id}',
+          'local://$roomId/${m.id}/publish',
+        );
       }
     }
 
     var resp = await client.create(
-        '$roomId/$memberId',
-        Member(memberId, pipeline, Plain('test'), 'grpc://127.0.0.1:9099',
-            'grpc://127.0.0.1:9099'));
+      '$roomId/$memberId',
+      Member(
+        memberId,
+        pipeline,
+        Plain('test'),
+        'grpc://127.0.0.1:9099',
+        'grpc://127.0.0.1:9099',
+      ),
+    );
 
     if (isPublish) {
       for (var m in anotherMembers) {
-        await client.create('$roomId/${m.id}/play-$memberId',
-            WebRtcPlayEndpoint(m.id, 'local://$roomId/$memberId/publish'));
+        await client.create(
+          '$roomId/${m.id}/play-$memberId',
+          WebRtcPlayEndpoint(m.id, 'local://$roomId/$memberId/publish'),
+        );
       }
     }
 

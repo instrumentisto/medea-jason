@@ -163,10 +163,11 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// [`on_failed_local_media`]: RoomHandle::on_failed_local_media
   /// [`PeerConnection`]: crate::peer::PeerConnection
   /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-  Object setLocalMediaSettings(
-      {required ApiMediaStreamSettings settings,
-      required bool stopFirst,
-      required bool rollbackOnFail});
+  Object setLocalMediaSettings({
+    required ApiMediaStreamSettings settings,
+    required bool stopFirst,
+    required bool rollbackOnFail,
+  });
 
   /// Unmutes outbound audio in the provided [`Room`].
   Object unmuteAudio();

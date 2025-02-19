@@ -20,5 +20,4 @@ enum MediaDirection {
 
   /// [`Track`] is disabled on both sides.
   inactive,
-  ;
 }

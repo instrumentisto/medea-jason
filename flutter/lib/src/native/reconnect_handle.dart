@@ -26,11 +26,17 @@ class NativeReconnectHandle implements ReconnectHandle {
 
   @override
   Future<void> reconnectWithBackoff(
-      int startingDelayMs, double multiplier, int maxDelay,
-      [int? maxElapsedTimeMs]) async {
+    int startingDelayMs,
+    double multiplier,
+    int maxDelay, [
+    int? maxElapsedTimeMs,
+  ]) async {
     if (startingDelayMs.isNegative || startingDelayMs.bitLength > 32) {
       throw ArgumentError.value(
-          startingDelayMs, 'startingDelayMs', 'Expected `u32`');
+        startingDelayMs,
+        'startingDelayMs',
+        'Expected `u32`',
+      );
     }
 
     if (maxDelay.isNegative || maxDelay.bitLength > 32) {
@@ -40,15 +46,19 @@ class NativeReconnectHandle implements ReconnectHandle {
     if (maxElapsedTimeMs != null) {
       if (maxElapsedTimeMs.isNegative || maxElapsedTimeMs.bitLength > 32) {
         throw ArgumentError.value(
-            maxElapsedTimeMs, 'maxElapsedTimeMs', 'Expected `u32`');
+          maxElapsedTimeMs,
+          'maxElapsedTimeMs',
+          'Expected `u32`',
+        );
       }
     }
 
     await (opaque.inner.reconnectWithBackoff(
-        startingDelay: startingDelayMs,
-        multiplier: multiplier,
-        maxDelay: maxDelay,
-        maxElapsedTimeMs: maxElapsedTimeMs) as Future);
+      startingDelay: startingDelayMs,
+      multiplier: multiplier,
+      maxDelay: maxDelay,
+      maxElapsedTimeMs: maxElapsedTimeMs,
+    ) as Future);
   }
 
   @moveSemantics

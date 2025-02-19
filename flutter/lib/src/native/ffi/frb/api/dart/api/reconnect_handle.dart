@@ -41,11 +41,12 @@ abstract class ReconnectHandle implements RustOpaqueInterface, ForeignClass {
   /// If the [`Room`] is already reconnecting then new reconnection attempt
   /// won't be performed. Instead, it will wait for the first reconnection
   /// attempt result and use it here.
-  Object reconnectWithBackoff(
-      {required int startingDelay,
-      required double multiplier,
-      required int maxDelay,
-      int? maxElapsedTimeMs});
+  Object reconnectWithBackoff({
+    required int startingDelay,
+    required double multiplier,
+    required int maxDelay,
+    int? maxElapsedTimeMs,
+  });
 
   /// Tries to reconnect a [`Room`] after the provided delay in milliseconds.
   ///

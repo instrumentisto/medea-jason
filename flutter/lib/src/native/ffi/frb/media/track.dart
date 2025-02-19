@@ -14,5 +14,4 @@ enum MediaSourceKind {
 
   /// Media is obtained with screen-capture.
   display,
-  ;
 }

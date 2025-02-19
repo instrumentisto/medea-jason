@@ -48,12 +48,8 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
   /// Initialize flutter_rust_bridge in mock mode.
   /// No libraries for FFI are loaded.
-  static void initMock({
-    required RustLibApi api,
-  }) {
-    instance.initMockImpl(
-      api: api,
-    );
+  static void initMock({required RustLibApi api}) {
+    instance.initMockImpl(api: api);
   }
 
   /// Dispose flutter_rust_bridge
@@ -92,216 +88,308 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Object crateApiDartApiConnectionHandleConnectionHandleDisableRemoteAudio(
-      {required ConnectionHandle that});
+  Object crateApiDartApiConnectionHandleConnectionHandleDisableRemoteAudio({
+    required ConnectionHandle that,
+  });
 
-  Object crateApiDartApiConnectionHandleConnectionHandleDisableRemoteVideo(
-      {required ConnectionHandle that, MediaSourceKind? sourceKind});
+  Object crateApiDartApiConnectionHandleConnectionHandleDisableRemoteVideo({
+    required ConnectionHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
-  Object crateApiDartApiConnectionHandleConnectionHandleEnableRemoteAudio(
-      {required ConnectionHandle that});
+  Object crateApiDartApiConnectionHandleConnectionHandleEnableRemoteAudio({
+    required ConnectionHandle that,
+  });
 
-  Object crateApiDartApiConnectionHandleConnectionHandleEnableRemoteVideo(
-      {required ConnectionHandle that, MediaSourceKind? sourceKind});
+  Object crateApiDartApiConnectionHandleConnectionHandleEnableRemoteVideo({
+    required ConnectionHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
-  ConnectionHandle crateApiDartApiConnectionHandleConnectionHandleFromPtr(
-      {required int ptr});
+  ConnectionHandle crateApiDartApiConnectionHandleConnectionHandleFromPtr({
+    required int ptr,
+  });
 
-  String crateApiDartApiConnectionHandleConnectionHandleGetRemoteMemberId(
-      {required ConnectionHandle that});
+  String crateApiDartApiConnectionHandleConnectionHandleGetRemoteMemberId({
+    required ConnectionHandle that,
+  });
 
-  void crateApiDartApiConnectionHandleConnectionHandleOnClose(
-      {required ConnectionHandle that, required Object f});
+  void crateApiDartApiConnectionHandleConnectionHandleOnClose({
+    required ConnectionHandle that,
+    required Object f,
+  });
 
-  void crateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdate(
-      {required ConnectionHandle that, required Object f});
+  void crateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdate({
+    required ConnectionHandle that,
+    required Object f,
+  });
 
-  void crateApiDartApiConnectionHandleConnectionHandleOnRemoteTrackAdded(
-      {required ConnectionHandle that, required Object f});
+  void crateApiDartApiConnectionHandleConnectionHandleOnRemoteTrackAdded({
+    required ConnectionHandle that,
+    required Object f,
+  });
 
-  void crateApiDartApiJasonJasonJasonCloseRoom(
-      {required Jason that, required RoomHandle roomToDelete});
+  void crateApiDartApiJasonJasonJasonCloseRoom({
+    required Jason that,
+    required RoomHandle roomToDelete,
+  });
 
   void crateApiDartApiJasonJasonJasonDispose({required Jason that});
 
   RoomHandle crateApiDartApiJasonJasonJasonInitRoom({required Jason that});
 
-  MediaManagerHandle crateApiDartApiJasonJasonJasonMediaManager(
-      {required Jason that});
+  MediaManagerHandle crateApiDartApiJasonJasonJasonMediaManager({
+    required Jason that,
+  });
 
   Jason crateApiDartApiJasonJasonNew();
 
-  Object crateApiDartApiLocalMediaTrackLocalMediaTrackFree(
-      {required LocalMediaTrack that});
+  Object crateApiDartApiLocalMediaTrackLocalMediaTrackFree({
+    required LocalMediaTrack that,
+  });
 
-  LocalMediaTrack crateApiDartApiLocalMediaTrackLocalMediaTrackFromPtr(
-      {required int ptr});
+  LocalMediaTrack crateApiDartApiLocalMediaTrackLocalMediaTrackFromPtr({
+    required int ptr,
+  });
 
-  Object crateApiDartApiLocalMediaTrackLocalMediaTrackGetTrack(
-      {required LocalMediaTrack that});
+  Object crateApiDartApiLocalMediaTrackLocalMediaTrackGetTrack({
+    required LocalMediaTrack that,
+  });
 
-  bool crateApiDartApiLocalMediaTrackLocalMediaTrackIsOnAudioLevelAvailable(
-      {required LocalMediaTrack that});
+  bool crateApiDartApiLocalMediaTrackLocalMediaTrackIsOnAudioLevelAvailable({
+    required LocalMediaTrack that,
+  });
 
-  MediaKind crateApiDartApiLocalMediaTrackLocalMediaTrackKind(
-      {required LocalMediaTrack that});
+  MediaKind crateApiDartApiLocalMediaTrackLocalMediaTrackKind({
+    required LocalMediaTrack that,
+  });
 
-  MediaSourceKind crateApiDartApiLocalMediaTrackLocalMediaTrackMediaSourceKind(
-      {required LocalMediaTrack that});
+  MediaSourceKind crateApiDartApiLocalMediaTrackLocalMediaTrackMediaSourceKind({
+    required LocalMediaTrack that,
+  });
 
-  void crateApiDartApiLocalMediaTrackLocalMediaTrackOnAudioLevelChanged(
-      {required LocalMediaTrack that, required Object f});
+  void crateApiDartApiLocalMediaTrackLocalMediaTrackOnAudioLevelChanged({
+    required LocalMediaTrack that,
+    required Object f,
+  });
 
-  void crateApiDartApiLocalMediaTrackLocalMediaTrackOnEnded(
-      {required LocalMediaTrack that, required Object f});
+  void crateApiDartApiLocalMediaTrackLocalMediaTrackOnEnded({
+    required LocalMediaTrack that,
+    required Object f,
+  });
 
-  Object crateApiDartApiLocalMediaTrackLocalMediaTrackState(
-      {required LocalMediaTrack that});
+  Object crateApiDartApiLocalMediaTrackLocalMediaTrackState({
+    required LocalMediaTrack that,
+  });
 
-  Object crateApiDartApiMediaManagerMediaManagerHandleEnumerateDevices(
-      {required MediaManagerHandle that});
+  Object crateApiDartApiMediaManagerMediaManagerHandleEnumerateDevices({
+    required MediaManagerHandle that,
+  });
 
-  Object crateApiDartApiMediaManagerMediaManagerHandleEnumerateDisplays(
-      {required MediaManagerHandle that});
+  Object crateApiDartApiMediaManagerMediaManagerHandleEnumerateDisplays({
+    required MediaManagerHandle that,
+  });
 
-  Object crateApiDartApiMediaManagerMediaManagerHandleInitLocalTracks(
-      {required MediaManagerHandle that, required ApiMediaStreamSettings caps});
+  Object crateApiDartApiMediaManagerMediaManagerHandleInitLocalTracks({
+    required MediaManagerHandle that,
+    required ApiMediaStreamSettings caps,
+  });
 
-  Object crateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolume(
-      {required MediaManagerHandle that});
+  Object crateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolume({
+    required MediaManagerHandle that,
+  });
 
   Object
-      crateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolumeIsAvailable(
-          {required MediaManagerHandle that});
+      crateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolumeIsAvailable({
+    required MediaManagerHandle that,
+  });
 
-  void crateApiDartApiMediaManagerMediaManagerHandleOnDeviceChange(
-      {required MediaManagerHandle that, required Object cb});
+  void crateApiDartApiMediaManagerMediaManagerHandleOnDeviceChange({
+    required MediaManagerHandle that,
+    required Object cb,
+  });
 
-  Object crateApiDartApiMediaManagerMediaManagerHandleSetMicrophoneVolume(
-      {required MediaManagerHandle that, required PlatformInt64 level});
+  Object crateApiDartApiMediaManagerMediaManagerHandleSetMicrophoneVolume({
+    required MediaManagerHandle that,
+    required PlatformInt64 level,
+  });
 
-  Object crateApiDartApiMediaManagerMediaManagerHandleSetOutputAudioId(
-      {required MediaManagerHandle that, required String deviceId});
+  Object crateApiDartApiMediaManagerMediaManagerHandleSetOutputAudioId({
+    required MediaManagerHandle that,
+    required String deviceId,
+  });
 
-  ReconnectHandle crateApiDartApiReconnectHandleReconnectHandleFromPtr(
-      {required int ptr});
+  ReconnectHandle crateApiDartApiReconnectHandleReconnectHandleFromPtr({
+    required int ptr,
+  });
 
-  Object crateApiDartApiReconnectHandleReconnectHandleReconnectWithBackoff(
-      {required ReconnectHandle that,
-      required int startingDelay,
-      required double multiplier,
-      required int maxDelay,
-      int? maxElapsedTimeMs});
+  Object crateApiDartApiReconnectHandleReconnectHandleReconnectWithBackoff({
+    required ReconnectHandle that,
+    required int startingDelay,
+    required double multiplier,
+    required int maxDelay,
+    int? maxElapsedTimeMs,
+  });
 
-  Object crateApiDartApiReconnectHandleReconnectHandleReconnectWithDelay(
-      {required ReconnectHandle that, required int delayMs});
+  Object crateApiDartApiReconnectHandleReconnectHandleReconnectWithDelay({
+    required ReconnectHandle that,
+    required int delayMs,
+  });
 
-  RemoteMediaTrack crateApiDartApiRemoteMediaTrackRemoteMediaTrackFromPtr(
-      {required int ptr});
+  RemoteMediaTrack crateApiDartApiRemoteMediaTrackRemoteMediaTrackFromPtr({
+    required int ptr,
+  });
 
-  Object crateApiDartApiRemoteMediaTrackRemoteMediaTrackGetTrack(
-      {required RemoteMediaTrack that});
+  Object crateApiDartApiRemoteMediaTrackRemoteMediaTrackGetTrack({
+    required RemoteMediaTrack that,
+  });
 
-  MediaKind crateApiDartApiRemoteMediaTrackRemoteMediaTrackKind(
-      {required RemoteMediaTrack that});
+  MediaKind crateApiDartApiRemoteMediaTrackRemoteMediaTrackKind({
+    required RemoteMediaTrack that,
+  });
 
-  MediaDirection crateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaDirection(
-      {required RemoteMediaTrack that});
+  MediaDirection crateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaDirection({
+    required RemoteMediaTrack that,
+  });
 
   MediaSourceKind
-      crateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaSourceKind(
-          {required RemoteMediaTrack that});
+      crateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaSourceKind({
+    required RemoteMediaTrack that,
+  });
 
-  bool crateApiDartApiRemoteMediaTrackRemoteMediaTrackMuted(
-      {required RemoteMediaTrack that});
+  bool crateApiDartApiRemoteMediaTrackRemoteMediaTrackMuted({
+    required RemoteMediaTrack that,
+  });
 
-  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMediaDirectionChanged(
-      {required RemoteMediaTrack that, required Object f});
+  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMediaDirectionChanged({
+    required RemoteMediaTrack that,
+    required Object f,
+  });
 
-  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMuted(
-      {required RemoteMediaTrack that, required Object f});
+  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMuted({
+    required RemoteMediaTrack that,
+    required Object f,
+  });
 
-  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnStopped(
-      {required RemoteMediaTrack that, required Object f});
+  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnStopped({
+    required RemoteMediaTrack that,
+    required Object f,
+  });
 
-  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnUnmuted(
-      {required RemoteMediaTrack that, required Object f});
+  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnUnmuted({
+    required RemoteMediaTrack that,
+    required Object f,
+  });
 
   Object crateApiDartApiRoomRoomHandleDisableAudio({required RoomHandle that});
 
-  Object crateApiDartApiRoomRoomHandleDisableRemoteAudio(
-      {required RoomHandle that});
+  Object crateApiDartApiRoomRoomHandleDisableRemoteAudio({
+    required RoomHandle that,
+  });
 
-  Object crateApiDartApiRoomRoomHandleDisableRemoteVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind});
+  Object crateApiDartApiRoomRoomHandleDisableRemoteVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
-  Object crateApiDartApiRoomRoomHandleDisableVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind});
+  Object crateApiDartApiRoomRoomHandleDisableVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
   Object crateApiDartApiRoomRoomHandleEnableAudio({required RoomHandle that});
 
-  Object crateApiDartApiRoomRoomHandleEnableRemoteAudio(
-      {required RoomHandle that});
+  Object crateApiDartApiRoomRoomHandleEnableRemoteAudio({
+    required RoomHandle that,
+  });
 
-  Object crateApiDartApiRoomRoomHandleEnableRemoteVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind});
+  Object crateApiDartApiRoomRoomHandleEnableRemoteVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
-  Object crateApiDartApiRoomRoomHandleEnableVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind});
+  Object crateApiDartApiRoomRoomHandleEnableVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
-  Object crateApiDartApiRoomRoomHandleJoin(
-      {required RoomHandle that, required String token});
+  Object crateApiDartApiRoomRoomHandleJoin({
+    required RoomHandle that,
+    required String token,
+  });
 
   Object crateApiDartApiRoomRoomHandleMuteAudio({required RoomHandle that});
 
-  Object crateApiDartApiRoomRoomHandleMuteVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind});
+  Object crateApiDartApiRoomRoomHandleMuteVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
-  void crateApiDartApiRoomRoomHandleOnClose(
-      {required RoomHandle that, required Object cb});
+  void crateApiDartApiRoomRoomHandleOnClose({
+    required RoomHandle that,
+    required Object cb,
+  });
 
-  void crateApiDartApiRoomRoomHandleOnConnectionLoss(
-      {required RoomHandle that, required Object cb});
+  void crateApiDartApiRoomRoomHandleOnConnectionLoss({
+    required RoomHandle that,
+    required Object cb,
+  });
 
-  void crateApiDartApiRoomRoomHandleOnFailedLocalMedia(
-      {required RoomHandle that, required Object cb});
+  void crateApiDartApiRoomRoomHandleOnFailedLocalMedia({
+    required RoomHandle that,
+    required Object cb,
+  });
 
-  void crateApiDartApiRoomRoomHandleOnLocalTrack(
-      {required RoomHandle that, required Object cb});
+  void crateApiDartApiRoomRoomHandleOnLocalTrack({
+    required RoomHandle that,
+    required Object cb,
+  });
 
-  void crateApiDartApiRoomRoomHandleOnNewConnection(
-      {required RoomHandle that, required Object cb});
+  void crateApiDartApiRoomRoomHandleOnNewConnection({
+    required RoomHandle that,
+    required Object cb,
+  });
 
-  Object crateApiDartApiRoomRoomHandleSetLocalMediaSettings(
-      {required RoomHandle that,
-      required ApiMediaStreamSettings settings,
-      required bool stopFirst,
-      required bool rollbackOnFail});
+  Object crateApiDartApiRoomRoomHandleSetLocalMediaSettings({
+    required RoomHandle that,
+    required ApiMediaStreamSettings settings,
+    required bool stopFirst,
+    required bool rollbackOnFail,
+  });
 
   Object crateApiDartApiRoomRoomHandleUnmuteAudio({required RoomHandle that});
 
-  Object crateApiDartApiRoomRoomHandleUnmuteVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind});
+  Object crateApiDartApiRoomRoomHandleUnmuteVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
-  void crateApiDartApiLogDartException(
-      {required String message, required String stackTrace});
+  void crateApiDartApiLogDartException({
+    required String message,
+    required String stackTrace,
+  });
 
   void crateApiDartApiOnPanic({required Object cb});
 
-  RoomCloseReason crateApiDartApiRoomCloseReasonRoomCloseReasonFromPtr(
-      {required int ptr});
+  RoomCloseReason crateApiDartApiRoomCloseReasonRoomCloseReasonFromPtr({
+    required int ptr,
+  });
 
-  void crateApiDartApiSetDartOpaqueMessagePort(
-      {required PlatformInt64 dartHandlerPort});
+  void crateApiDartApiSetDartOpaqueMessagePort({
+    required PlatformInt64 dartHandlerPort,
+  });
 
-  List<LocalMediaTrack> crateApiDartApiLocalMediaTrackVecLocalTracksFromRaw(
-      {required int ptr});
+  List<LocalMediaTrack> crateApiDartApiLocalMediaTrackVecLocalTracksFromRaw({
+    required int ptr,
+  });
 
-  List<ApiMediaDeviceDetails> crateApiDartApiVecMediaDeviceDetailsFromRaw(
-      {required int ptr});
+  List<ApiMediaDeviceDetails> crateApiDartApiVecMediaDeviceDetailsFromRaw({
+    required int ptr,
+  });
 
-  List<ApiMediaDisplayDetails> crateApiDartApiVecMediaDisplayDetailsFromRaw(
-      {required int ptr});
+  List<ApiMediaDisplayDetails> crateApiDartApiVecMediaDisplayDetailsFromRaw({
+    required int ptr,
+  });
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_ConnectionHandle;
@@ -372,24 +460,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Object crateApiDartApiConnectionHandleConnectionHandleDisableRemoteAudio(
-      {required ConnectionHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiConnectionHandleConnectionHandleDisableRemoteAudio({
+    required ConnectionHandle that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiConnectionHandleConnectionHandleDisableRemoteAudioConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiConnectionHandleConnectionHandleDisableRemoteAudioConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -400,25 +493,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiConnectionHandleConnectionHandleDisableRemoteVideo(
-      {required ConnectionHandle that, MediaSourceKind? sourceKind}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-            that, serializer);
-        sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiConnectionHandleConnectionHandleDisableRemoteVideo({
+    required ConnectionHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+            that,
+            serializer,
+          );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiConnectionHandleConnectionHandleDisableRemoteVideoConstMeta,
+        argValues: [that, sourceKind],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiConnectionHandleConnectionHandleDisableRemoteVideoConstMeta,
-      argValues: [that, sourceKind],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -429,24 +528,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiConnectionHandleConnectionHandleEnableRemoteAudio(
-      {required ConnectionHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiConnectionHandleConnectionHandleEnableRemoteAudio({
+    required ConnectionHandle that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiConnectionHandleConnectionHandleEnableRemoteAudioConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiConnectionHandleConnectionHandleEnableRemoteAudioConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -457,25 +561,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiConnectionHandleConnectionHandleEnableRemoteVideo(
-      {required ConnectionHandle that, MediaSourceKind? sourceKind}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-            that, serializer);
-        sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiConnectionHandleConnectionHandleEnableRemoteVideo({
+    required ConnectionHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+            that,
+            serializer,
+          );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiConnectionHandleConnectionHandleEnableRemoteVideoConstMeta,
+        argValues: [that, sourceKind],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiConnectionHandleConnectionHandleEnableRemoteVideoConstMeta,
-      argValues: [that, sourceKind],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -486,24 +596,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  ConnectionHandle crateApiDartApiConnectionHandleConnectionHandleFromPtr(
-      {required int ptr}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_CastedPrimitive_usize(ptr, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle,
-        decodeErrorData: null,
+  ConnectionHandle crateApiDartApiConnectionHandleConnectionHandleFromPtr({
+    required int ptr,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_CastedPrimitive_usize(ptr, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiConnectionHandleConnectionHandleFromPtrConstMeta,
+        argValues: [ptr],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiConnectionHandleConnectionHandleFromPtrConstMeta,
-      argValues: [ptr],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -514,24 +627,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  String crateApiDartApiConnectionHandleConnectionHandleGetRemoteMemberId(
-      {required ConnectionHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: sse_decode_DartOpaque,
+  String crateApiDartApiConnectionHandleConnectionHandleGetRemoteMemberId({
+    required ConnectionHandle that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: sse_decode_DartOpaque,
+        ),
+        constMeta:
+            kCrateApiDartApiConnectionHandleConnectionHandleGetRemoteMemberIdConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiConnectionHandleConnectionHandleGetRemoteMemberIdConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -542,25 +660,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiConnectionHandleConnectionHandleOnClose(
-      {required ConnectionHandle that, required Object f}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-            that, serializer);
-        sse_encode_DartOpaque(f, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_DartOpaque,
+  void crateApiDartApiConnectionHandleConnectionHandleOnClose({
+    required ConnectionHandle that,
+    required Object f,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(f, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_DartOpaque,
+        ),
+        constMeta:
+            kCrateApiDartApiConnectionHandleConnectionHandleOnCloseConstMeta,
+        argValues: [that, f],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiConnectionHandleConnectionHandleOnCloseConstMeta,
-      argValues: [that, f],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -571,25 +695,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdate(
-      {required ConnectionHandle that, required Object f}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-            that, serializer);
-        sse_encode_DartOpaque(f, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_DartOpaque,
+  void crateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdate({
+    required ConnectionHandle that,
+    required Object f,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(f, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_DartOpaque,
+        ),
+        constMeta:
+            kCrateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdateConstMeta,
+        argValues: [that, f],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdateConstMeta,
-      argValues: [that, f],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -600,25 +730,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiConnectionHandleConnectionHandleOnRemoteTrackAdded(
-      {required ConnectionHandle that, required Object f}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-            that, serializer);
-        sse_encode_DartOpaque(f, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_DartOpaque,
+  void crateApiDartApiConnectionHandleConnectionHandleOnRemoteTrackAdded({
+    required ConnectionHandle that,
+    required Object f,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(f, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_DartOpaque,
+        ),
+        constMeta:
+            kCrateApiDartApiConnectionHandleConnectionHandleOnRemoteTrackAddedConstMeta,
+        argValues: [that, f],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiConnectionHandleConnectionHandleOnRemoteTrackAddedConstMeta,
-      argValues: [that, f],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -629,25 +765,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiJasonJasonJasonCloseRoom(
-      {required Jason that, required RoomHandle roomToDelete}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-            that, serializer);
-        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            roomToDelete, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
+  void crateApiDartApiJasonJasonJasonCloseRoom({
+    required Jason that,
+    required RoomHandle roomToDelete,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
+            that,
+            serializer,
+          );
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            roomToDelete,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiJasonJasonJasonCloseRoomConstMeta,
+        argValues: [that, roomToDelete],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiJasonJasonJasonCloseRoomConstMeta,
-      argValues: [that, roomToDelete],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiJasonJasonJasonCloseRoomConstMeta =>
@@ -658,47 +802,52 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void crateApiDartApiJasonJasonJasonDispose({required Jason that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiJasonJasonJasonDisposeConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiJasonJasonJasonDisposeConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiJasonJasonJasonDisposeConstMeta =>
-      const TaskConstMeta(
-        debugName: "Jason_jason_dispose",
-        argNames: ["that"],
-      );
+      const TaskConstMeta(debugName: "Jason_jason_dispose", argNames: ["that"]);
 
   @override
   RoomHandle crateApiDartApiJasonJasonJasonInitRoom({required Jason that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle,
-        decodeErrorData: null,
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiJasonJasonJasonInitRoomConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiJasonJasonJasonInitRoomConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiJasonJasonJasonInitRoomConstMeta =>
@@ -708,24 +857,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  MediaManagerHandle crateApiDartApiJasonJasonJasonMediaManager(
-      {required Jason that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle,
-        decodeErrorData: null,
+  MediaManagerHandle crateApiDartApiJasonJasonJasonMediaManager({
+    required Jason that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiJasonJasonJasonMediaManagerConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiJasonJasonJasonMediaManagerConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiJasonJasonJasonMediaManagerConstMeta =>
@@ -736,46 +890,50 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Jason crateApiDartApiJasonJasonNew() {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason,
-        decodeErrorData: null,
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiJasonJasonNewConstMeta,
+        argValues: [],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiJasonJasonNewConstMeta,
-      argValues: [],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiJasonJasonNewConstMeta =>
-      const TaskConstMeta(
-        debugName: "Jason_new",
-        argNames: [],
-      );
+      const TaskConstMeta(debugName: "Jason_new", argNames: []);
 
   @override
-  Object crateApiDartApiLocalMediaTrackLocalMediaTrackFree(
-      {required LocalMediaTrack that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiLocalMediaTrackLocalMediaTrackFree({
+    required LocalMediaTrack that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiLocalMediaTrackLocalMediaTrackFreeConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiLocalMediaTrackLocalMediaTrackFreeConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -786,23 +944,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  LocalMediaTrack crateApiDartApiLocalMediaTrackLocalMediaTrackFromPtr(
-      {required int ptr}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_CastedPrimitive_usize(ptr, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack,
-        decodeErrorData: null,
+  LocalMediaTrack crateApiDartApiLocalMediaTrackLocalMediaTrackFromPtr({
+    required int ptr,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_CastedPrimitive_usize(ptr, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiLocalMediaTrackLocalMediaTrackFromPtrConstMeta,
+        argValues: [ptr],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiLocalMediaTrackLocalMediaTrackFromPtrConstMeta,
-      argValues: [ptr],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -813,24 +975,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiLocalMediaTrackLocalMediaTrackGetTrack(
-      {required LocalMediaTrack that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiLocalMediaTrackLocalMediaTrackGetTrack({
+    required LocalMediaTrack that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiLocalMediaTrackLocalMediaTrackGetTrackConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiLocalMediaTrackLocalMediaTrackGetTrackConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -841,24 +1008,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  bool crateApiDartApiLocalMediaTrackLocalMediaTrackIsOnAudioLevelAvailable(
-      {required LocalMediaTrack that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
+  bool crateApiDartApiLocalMediaTrackLocalMediaTrackIsOnAudioLevelAvailable({
+    required LocalMediaTrack that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiLocalMediaTrackLocalMediaTrackIsOnAudioLevelAvailableConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiLocalMediaTrackLocalMediaTrackIsOnAudioLevelAvailableConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -869,23 +1041,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  MediaKind crateApiDartApiLocalMediaTrackLocalMediaTrackKind(
-      {required LocalMediaTrack that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_media_kind,
-        decodeErrorData: null,
+  MediaKind crateApiDartApiLocalMediaTrackLocalMediaTrackKind({
+    required LocalMediaTrack that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_media_kind,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiLocalMediaTrackLocalMediaTrackKindConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiLocalMediaTrackLocalMediaTrackKindConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -896,24 +1073,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  MediaSourceKind crateApiDartApiLocalMediaTrackLocalMediaTrackMediaSourceKind(
-      {required LocalMediaTrack that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_media_source_kind,
-        decodeErrorData: null,
+  MediaSourceKind crateApiDartApiLocalMediaTrackLocalMediaTrackMediaSourceKind({
+    required LocalMediaTrack that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_media_source_kind,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiLocalMediaTrackLocalMediaTrackMediaSourceKindConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiLocalMediaTrackLocalMediaTrackMediaSourceKindConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -924,25 +1106,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiLocalMediaTrackLocalMediaTrackOnAudioLevelChanged(
-      {required LocalMediaTrack that, required Object f}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-            that, serializer);
-        sse_encode_DartOpaque(f, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
+  void crateApiDartApiLocalMediaTrackLocalMediaTrackOnAudioLevelChanged({
+    required LocalMediaTrack that,
+    required Object f,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(f, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiLocalMediaTrackLocalMediaTrackOnAudioLevelChangedConstMeta,
+        argValues: [that, f],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiLocalMediaTrackLocalMediaTrackOnAudioLevelChangedConstMeta,
-      argValues: [that, f],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -953,24 +1141,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiLocalMediaTrackLocalMediaTrackOnEnded(
-      {required LocalMediaTrack that, required Object f}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-            that, serializer);
-        sse_encode_DartOpaque(f, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
+  void crateApiDartApiLocalMediaTrackLocalMediaTrackOnEnded({
+    required LocalMediaTrack that,
+    required Object f,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(f, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiLocalMediaTrackLocalMediaTrackOnEndedConstMeta,
+        argValues: [that, f],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiLocalMediaTrackLocalMediaTrackOnEndedConstMeta,
-      argValues: [that, f],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -981,23 +1176,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiLocalMediaTrackLocalMediaTrackState(
-      {required LocalMediaTrack that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiLocalMediaTrackLocalMediaTrackState({
+    required LocalMediaTrack that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiLocalMediaTrackLocalMediaTrackStateConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiLocalMediaTrackLocalMediaTrackStateConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1008,24 +1208,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiMediaManagerMediaManagerHandleEnumerateDevices(
-      {required MediaManagerHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiMediaManagerMediaManagerHandleEnumerateDevices({
+    required MediaManagerHandle that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiMediaManagerMediaManagerHandleEnumerateDevicesConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiMediaManagerMediaManagerHandleEnumerateDevicesConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1036,24 +1241,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiMediaManagerMediaManagerHandleEnumerateDisplays(
-      {required MediaManagerHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiMediaManagerMediaManagerHandleEnumerateDisplays({
+    required MediaManagerHandle that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiMediaManagerMediaManagerHandleEnumerateDisplaysConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiMediaManagerMediaManagerHandleEnumerateDisplaysConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1064,26 +1274,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiMediaManagerMediaManagerHandleInitLocalTracks(
-      {required MediaManagerHandle that,
-      required ApiMediaStreamSettings caps}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-            that, serializer);
-        sse_encode_box_autoadd_api_media_stream_settings(caps, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiMediaManagerMediaManagerHandleInitLocalTracks({
+    required MediaManagerHandle that,
+    required ApiMediaStreamSettings caps,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+            that,
+            serializer,
+          );
+          sse_encode_box_autoadd_api_media_stream_settings(caps, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiMediaManagerMediaManagerHandleInitLocalTracksConstMeta,
+        argValues: [that, caps],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiMediaManagerMediaManagerHandleInitLocalTracksConstMeta,
-      argValues: [that, caps],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1094,24 +1309,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolume(
-      {required MediaManagerHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolume({
+    required MediaManagerHandle that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolumeConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolumeConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1123,24 +1343,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Object
-      crateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolumeIsAvailable(
-          {required MediaManagerHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+      crateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolumeIsAvailable({
+    required MediaManagerHandle that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolumeIsAvailableConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiMediaManagerMediaManagerHandleMicrophoneVolumeIsAvailableConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1151,25 +1376,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiMediaManagerMediaManagerHandleOnDeviceChange(
-      {required MediaManagerHandle that, required Object cb}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-            that, serializer);
-        sse_encode_DartOpaque(cb, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_DartOpaque,
+  void crateApiDartApiMediaManagerMediaManagerHandleOnDeviceChange({
+    required MediaManagerHandle that,
+    required Object cb,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(cb, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_DartOpaque,
+        ),
+        constMeta:
+            kCrateApiDartApiMediaManagerMediaManagerHandleOnDeviceChangeConstMeta,
+        argValues: [that, cb],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiMediaManagerMediaManagerHandleOnDeviceChangeConstMeta,
-      argValues: [that, cb],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1180,25 +1411,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiMediaManagerMediaManagerHandleSetMicrophoneVolume(
-      {required MediaManagerHandle that, required PlatformInt64 level}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-            that, serializer);
-        sse_encode_i_64(level, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiMediaManagerMediaManagerHandleSetMicrophoneVolume({
+    required MediaManagerHandle that,
+    required PlatformInt64 level,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+            that,
+            serializer,
+          );
+          sse_encode_i_64(level, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiMediaManagerMediaManagerHandleSetMicrophoneVolumeConstMeta,
+        argValues: [that, level],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiMediaManagerMediaManagerHandleSetMicrophoneVolumeConstMeta,
-      argValues: [that, level],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1209,25 +1446,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiMediaManagerMediaManagerHandleSetOutputAudioId(
-      {required MediaManagerHandle that, required String deviceId}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-            that, serializer);
-        sse_encode_String(deviceId, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiMediaManagerMediaManagerHandleSetOutputAudioId({
+    required MediaManagerHandle that,
+    required String deviceId,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
+            that,
+            serializer,
+          );
+          sse_encode_String(deviceId, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiMediaManagerMediaManagerHandleSetOutputAudioIdConstMeta,
+        argValues: [that, deviceId],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiMediaManagerMediaManagerHandleSetOutputAudioIdConstMeta,
-      argValues: [that, deviceId],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1238,23 +1481,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  ReconnectHandle crateApiDartApiReconnectHandleReconnectHandleFromPtr(
-      {required int ptr}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_CastedPrimitive_usize(ptr, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle,
-        decodeErrorData: null,
+  ReconnectHandle crateApiDartApiReconnectHandleReconnectHandleFromPtr({
+    required int ptr,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_CastedPrimitive_usize(ptr, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiReconnectHandleReconnectHandleFromPtrConstMeta,
+        argValues: [ptr],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiReconnectHandleReconnectHandleFromPtrConstMeta,
-      argValues: [ptr],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1265,32 +1512,43 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiReconnectHandleReconnectHandleReconnectWithBackoff(
-      {required ReconnectHandle that,
-      required int startingDelay,
-      required double multiplier,
-      required int maxDelay,
-      int? maxElapsedTimeMs}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-            that, serializer);
-        sse_encode_u_32(startingDelay, serializer);
-        sse_encode_f_64(multiplier, serializer);
-        sse_encode_u_32(maxDelay, serializer);
-        sse_encode_opt_box_autoadd_u_32(maxElapsedTimeMs, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiReconnectHandleReconnectHandleReconnectWithBackoff({
+    required ReconnectHandle that,
+    required int startingDelay,
+    required double multiplier,
+    required int maxDelay,
+    int? maxElapsedTimeMs,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
+            that,
+            serializer,
+          );
+          sse_encode_u_32(startingDelay, serializer);
+          sse_encode_f_64(multiplier, serializer);
+          sse_encode_u_32(maxDelay, serializer);
+          sse_encode_opt_box_autoadd_u_32(maxElapsedTimeMs, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiReconnectHandleReconnectHandleReconnectWithBackoffConstMeta,
+        argValues: [
+          that,
+          startingDelay,
+          multiplier,
+          maxDelay,
+          maxElapsedTimeMs,
+        ],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiReconnectHandleReconnectHandleReconnectWithBackoffConstMeta,
-      argValues: [that, startingDelay, multiplier, maxDelay, maxElapsedTimeMs],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1302,30 +1560,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
               "startingDelay",
               "multiplier",
               "maxDelay",
-              "maxElapsedTimeMs"
+              "maxElapsedTimeMs",
             ],
           );
 
   @override
-  Object crateApiDartApiReconnectHandleReconnectHandleReconnectWithDelay(
-      {required ReconnectHandle that, required int delayMs}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-            that, serializer);
-        sse_encode_u_32(delayMs, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 34)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiReconnectHandleReconnectHandleReconnectWithDelay({
+    required ReconnectHandle that,
+    required int delayMs,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
+            that,
+            serializer,
+          );
+          sse_encode_u_32(delayMs, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 34)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiReconnectHandleReconnectHandleReconnectWithDelayConstMeta,
+        argValues: [that, delayMs],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiReconnectHandleReconnectHandleReconnectWithDelayConstMeta,
-      argValues: [that, delayMs],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1336,24 +1600,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  RemoteMediaTrack crateApiDartApiRemoteMediaTrackRemoteMediaTrackFromPtr(
-      {required int ptr}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_CastedPrimitive_usize(ptr, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 35)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack,
-        decodeErrorData: null,
+  RemoteMediaTrack crateApiDartApiRemoteMediaTrackRemoteMediaTrackFromPtr({
+    required int ptr,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_CastedPrimitive_usize(ptr, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 35)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackFromPtrConstMeta,
+        argValues: [ptr],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackFromPtrConstMeta,
-      argValues: [ptr],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1364,24 +1631,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  Object crateApiDartApiRemoteMediaTrackRemoteMediaTrackGetTrack(
-      {required RemoteMediaTrack that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiRemoteMediaTrackRemoteMediaTrackGetTrack({
+    required RemoteMediaTrack that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackGetTrackConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackGetTrackConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1392,23 +1664,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  MediaKind crateApiDartApiRemoteMediaTrackRemoteMediaTrackKind(
-      {required RemoteMediaTrack that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 37)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_media_kind,
-        decodeErrorData: null,
+  MediaKind crateApiDartApiRemoteMediaTrackRemoteMediaTrackKind({
+    required RemoteMediaTrack that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 37)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_media_kind,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackKindConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackKindConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1419,24 +1697,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  MediaDirection crateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaDirection(
-      {required RemoteMediaTrack that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 38)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_media_direction,
-        decodeErrorData: null,
+  MediaDirection crateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaDirection({
+    required RemoteMediaTrack that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 38)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_media_direction,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaDirectionConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaDirectionConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1448,24 +1731,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   MediaSourceKind
-      crateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaSourceKind(
-          {required RemoteMediaTrack that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_media_source_kind,
-        decodeErrorData: null,
+      crateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaSourceKind({
+    required RemoteMediaTrack that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_media_source_kind,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaSourceKindConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackMediaSourceKindConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1476,23 +1764,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  bool crateApiDartApiRemoteMediaTrackRemoteMediaTrackMuted(
-      {required RemoteMediaTrack that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
+  bool crateApiDartApiRemoteMediaTrackRemoteMediaTrackMuted({
+    required RemoteMediaTrack that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackMutedConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackMutedConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1503,25 +1797,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMediaDirectionChanged(
-      {required RemoteMediaTrack that, required Object f}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-            that, serializer);
-        sse_encode_DartOpaque(f, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 41)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
+  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMediaDirectionChanged({
+    required RemoteMediaTrack that,
+    required Object f,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(f, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 41)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMediaDirectionChangedConstMeta,
+        argValues: [that, f],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMediaDirectionChangedConstMeta,
-      argValues: [that, f],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1532,25 +1832,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMuted(
-      {required RemoteMediaTrack that, required Object f}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-            that, serializer);
-        sse_encode_DartOpaque(f, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 42)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
+  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMuted({
+    required RemoteMediaTrack that,
+    required Object f,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(f, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 42)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMutedConstMeta,
+        argValues: [that, f],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMutedConstMeta,
-      argValues: [that, f],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1561,25 +1867,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnStopped(
-      {required RemoteMediaTrack that, required Object f}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-            that, serializer);
-        sse_encode_DartOpaque(f, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 43)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
+  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnStopped({
+    required RemoteMediaTrack that,
+    required Object f,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(f, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 43)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackOnStoppedConstMeta,
+        argValues: [that, f],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackOnStoppedConstMeta,
-      argValues: [that, f],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1590,25 +1902,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnUnmuted(
-      {required RemoteMediaTrack that, required Object f}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-            that, serializer);
-        sse_encode_DartOpaque(f, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
+  void crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnUnmuted({
+    required RemoteMediaTrack that,
+    required Object f,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(f, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackOnUnmutedConstMeta,
+        argValues: [that, f],
+        apiImpl: this,
       ),
-      constMeta:
-          kCrateApiDartApiRemoteMediaTrackRemoteMediaTrackOnUnmutedConstMeta,
-      argValues: [that, f],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -1620,21 +1938,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Object crateApiDartApiRoomRoomHandleDisableAudio({required RoomHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleDisableAudioConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleDisableAudioConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleDisableAudioConstMeta =>
@@ -1644,23 +1966,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleDisableRemoteAudio(
-      {required RoomHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiRoomRoomHandleDisableRemoteAudio({
+    required RoomHandle that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleDisableRemoteAudioConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleDisableRemoteAudioConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleDisableRemoteAudioConstMeta =>
@@ -1670,24 +1997,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleDisableRemoteVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 47)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiRoomRoomHandleDisableRemoteVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 47)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleDisableRemoteVideoConstMeta,
+        argValues: [that, sourceKind],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleDisableRemoteVideoConstMeta,
-      argValues: [that, sourceKind],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleDisableRemoteVideoConstMeta =>
@@ -1697,24 +2030,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleDisableVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiRoomRoomHandleDisableVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleDisableVideoConstMeta,
+        argValues: [that, sourceKind],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleDisableVideoConstMeta,
-      argValues: [that, sourceKind],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleDisableVideoConstMeta =>
@@ -1725,21 +2064,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Object crateApiDartApiRoomRoomHandleEnableAudio({required RoomHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 49)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 49)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleEnableAudioConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleEnableAudioConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleEnableAudioConstMeta =>
@@ -1749,23 +2092,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleEnableRemoteAudio(
-      {required RoomHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 50)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiRoomRoomHandleEnableRemoteAudio({
+    required RoomHandle that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 50)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleEnableRemoteAudioConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleEnableRemoteAudioConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleEnableRemoteAudioConstMeta =>
@@ -1775,24 +2123,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleEnableRemoteVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 51)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiRoomRoomHandleEnableRemoteVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 51)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleEnableRemoteVideoConstMeta,
+        argValues: [that, sourceKind],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleEnableRemoteVideoConstMeta,
-      argValues: [that, sourceKind],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleEnableRemoteVideoConstMeta =>
@@ -1802,24 +2156,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleEnableVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiRoomRoomHandleEnableVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleEnableVideoConstMeta,
+        argValues: [that, sourceKind],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleEnableVideoConstMeta,
-      argValues: [that, sourceKind],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleEnableVideoConstMeta =>
@@ -1829,24 +2189,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleJoin(
-      {required RoomHandle that, required String token}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_String(token, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiRoomRoomHandleJoin({
+    required RoomHandle that,
+    required String token,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_String(token, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleJoinConstMeta,
+        argValues: [that, token],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleJoinConstMeta,
-      argValues: [that, token],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleJoinConstMeta =>
@@ -1857,21 +2223,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Object crateApiDartApiRoomRoomHandleMuteAudio({required RoomHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 54)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 54)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleMuteAudioConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleMuteAudioConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleMuteAudioConstMeta =>
@@ -1881,24 +2251,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleMuteVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiRoomRoomHandleMuteVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleMuteVideoConstMeta,
+        argValues: [that, sourceKind],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleMuteVideoConstMeta,
-      argValues: [that, sourceKind],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleMuteVideoConstMeta =>
@@ -1908,24 +2284,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiDartApiRoomRoomHandleOnClose(
-      {required RoomHandle that, required Object cb}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_DartOpaque(cb, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_DartOpaque,
+  void crateApiDartApiRoomRoomHandleOnClose({
+    required RoomHandle that,
+    required Object cb,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(cb, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_DartOpaque,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleOnCloseConstMeta,
+        argValues: [that, cb],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleOnCloseConstMeta,
-      argValues: [that, cb],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleOnCloseConstMeta =>
@@ -1935,24 +2317,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiDartApiRoomRoomHandleOnConnectionLoss(
-      {required RoomHandle that, required Object cb}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_DartOpaque(cb, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_DartOpaque,
+  void crateApiDartApiRoomRoomHandleOnConnectionLoss({
+    required RoomHandle that,
+    required Object cb,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(cb, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_DartOpaque,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleOnConnectionLossConstMeta,
+        argValues: [that, cb],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleOnConnectionLossConstMeta,
-      argValues: [that, cb],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleOnConnectionLossConstMeta =>
@@ -1962,24 +2350,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiDartApiRoomRoomHandleOnFailedLocalMedia(
-      {required RoomHandle that, required Object cb}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_DartOpaque(cb, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 58)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_DartOpaque,
+  void crateApiDartApiRoomRoomHandleOnFailedLocalMedia({
+    required RoomHandle that,
+    required Object cb,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(cb, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 58)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_DartOpaque,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleOnFailedLocalMediaConstMeta,
+        argValues: [that, cb],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleOnFailedLocalMediaConstMeta,
-      argValues: [that, cb],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleOnFailedLocalMediaConstMeta =>
@@ -1989,24 +2383,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiDartApiRoomRoomHandleOnLocalTrack(
-      {required RoomHandle that, required Object cb}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_DartOpaque(cb, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_DartOpaque,
+  void crateApiDartApiRoomRoomHandleOnLocalTrack({
+    required RoomHandle that,
+    required Object cb,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(cb, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_DartOpaque,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleOnLocalTrackConstMeta,
+        argValues: [that, cb],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleOnLocalTrackConstMeta,
-      argValues: [that, cb],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleOnLocalTrackConstMeta =>
@@ -2016,24 +2416,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiDartApiRoomRoomHandleOnNewConnection(
-      {required RoomHandle that, required Object cb}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_DartOpaque(cb, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_DartOpaque,
+  void crateApiDartApiRoomRoomHandleOnNewConnection({
+    required RoomHandle that,
+    required Object cb,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(cb, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_DartOpaque,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleOnNewConnectionConstMeta,
+        argValues: [that, cb],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleOnNewConnectionConstMeta,
-      argValues: [that, cb],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleOnNewConnectionConstMeta =>
@@ -2043,29 +2449,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleSetLocalMediaSettings(
-      {required RoomHandle that,
-      required ApiMediaStreamSettings settings,
-      required bool stopFirst,
-      required bool rollbackOnFail}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_box_autoadd_api_media_stream_settings(settings, serializer);
-        sse_encode_bool(stopFirst, serializer);
-        sse_encode_bool(rollbackOnFail, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiRoomRoomHandleSetLocalMediaSettings({
+    required RoomHandle that,
+    required ApiMediaStreamSettings settings,
+    required bool stopFirst,
+    required bool rollbackOnFail,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_box_autoadd_api_media_stream_settings(
+            settings,
+            serializer,
+          );
+          sse_encode_bool(stopFirst, serializer);
+          sse_encode_bool(rollbackOnFail, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleSetLocalMediaSettingsConstMeta,
+        argValues: [that, settings, stopFirst, rollbackOnFail],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleSetLocalMediaSettingsConstMeta,
-      argValues: [that, settings, stopFirst, rollbackOnFail],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -2077,21 +2491,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Object crateApiDartApiRoomRoomHandleUnmuteAudio({required RoomHandle that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleUnmuteAudioConstMeta,
+        argValues: [that],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleUnmuteAudioConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleUnmuteAudioConstMeta =>
@@ -2101,24 +2519,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleUnmuteVideo(
-      {required RoomHandle that, MediaSourceKind? sourceKind}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that, serializer);
-        sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 63)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_DartOpaque,
-        decodeErrorData: null,
+  Object crateApiDartApiRoomRoomHandleUnmuteVideo({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 63)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleUnmuteVideoConstMeta,
+        argValues: [that, sourceKind],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomRoomHandleUnmuteVideoConstMeta,
-      argValues: [that, sourceKind],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleUnmuteVideoConstMeta =>
@@ -2128,23 +2552,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiDartApiLogDartException(
-      {required String message, required String stackTrace}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(message, serializer);
-        sse_encode_String(stackTrace, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 65)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
+  void crateApiDartApiLogDartException({
+    required String message,
+    required String stackTrace,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(message, serializer);
+          sse_encode_String(stackTrace, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 65)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiLogDartExceptionConstMeta,
+        argValues: [message, stackTrace],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiLogDartExceptionConstMeta,
-      argValues: [message, stackTrace],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiLogDartExceptionConstMeta =>
@@ -2155,44 +2583,48 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void crateApiDartApiOnPanic({required Object cb}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_DartOpaque(cb, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 66)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_DartOpaque(cb, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 66)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiOnPanicConstMeta,
+        argValues: [cb],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiOnPanicConstMeta,
-      argValues: [cb],
-      apiImpl: this,
-    ));
+    );
   }
 
-  TaskConstMeta get kCrateApiDartApiOnPanicConstMeta => const TaskConstMeta(
-        debugName: "on_panic",
-        argNames: ["cb"],
-      );
+  TaskConstMeta get kCrateApiDartApiOnPanicConstMeta =>
+      const TaskConstMeta(debugName: "on_panic", argNames: ["cb"]);
 
   @override
-  RoomCloseReason crateApiDartApiRoomCloseReasonRoomCloseReasonFromPtr(
-      {required int ptr}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_CastedPrimitive_usize(ptr, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 67)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_room_close_reason,
-        decodeErrorData: null,
+  RoomCloseReason crateApiDartApiRoomCloseReasonRoomCloseReasonFromPtr({
+    required int ptr,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_CastedPrimitive_usize(ptr, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 67)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_room_close_reason,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiRoomCloseReasonRoomCloseReasonFromPtrConstMeta,
+        argValues: [ptr],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiRoomCloseReasonRoomCloseReasonFromPtrConstMeta,
-      argValues: [ptr],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -2203,22 +2635,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  void crateApiDartApiSetDartOpaqueMessagePort(
-      {required PlatformInt64 dartHandlerPort}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_i_64(dartHandlerPort, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: null,
+  void crateApiDartApiSetDartOpaqueMessagePort({
+    required PlatformInt64 dartHandlerPort,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_i_64(dartHandlerPort, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiSetDartOpaqueMessagePortConstMeta,
+        argValues: [dartHandlerPort],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiSetDartOpaqueMessagePortConstMeta,
-      argValues: [dartHandlerPort],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiSetDartOpaqueMessagePortConstMeta =>
@@ -2228,23 +2663,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  List<LocalMediaTrack> crateApiDartApiLocalMediaTrackVecLocalTracksFromRaw(
-      {required int ptr}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_CastedPrimitive_usize(ptr, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack,
-        decodeErrorData: null,
+  List<LocalMediaTrack> crateApiDartApiLocalMediaTrackVecLocalTracksFromRaw({
+    required int ptr,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_CastedPrimitive_usize(ptr, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateApiDartApiLocalMediaTrackVecLocalTracksFromRawConstMeta,
+        argValues: [ptr],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiLocalMediaTrackVecLocalTracksFromRawConstMeta,
-      argValues: [ptr],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta
@@ -2255,22 +2694,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  List<ApiMediaDeviceDetails> crateApiDartApiVecMediaDeviceDetailsFromRaw(
-      {required int ptr}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_CastedPrimitive_usize(ptr, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 70)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_list_api_media_device_details,
-        decodeErrorData: null,
+  List<ApiMediaDeviceDetails> crateApiDartApiVecMediaDeviceDetailsFromRaw({
+    required int ptr,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_CastedPrimitive_usize(ptr, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 70)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_api_media_device_details,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiVecMediaDeviceDetailsFromRawConstMeta,
+        argValues: [ptr],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiVecMediaDeviceDetailsFromRawConstMeta,
-      argValues: [ptr],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiVecMediaDeviceDetailsFromRawConstMeta =>
@@ -2280,22 +2722,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  List<ApiMediaDisplayDetails> crateApiDartApiVecMediaDisplayDetailsFromRaw(
-      {required int ptr}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_CastedPrimitive_usize(ptr, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 71)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_list_api_media_display_details,
-        decodeErrorData: null,
+  List<ApiMediaDisplayDetails> crateApiDartApiVecMediaDisplayDetailsFromRaw({
+    required int ptr,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_CastedPrimitive_usize(ptr, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 71)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_api_media_display_details,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiVecMediaDisplayDetailsFromRawConstMeta,
+        argValues: [ptr],
+        apiImpl: this,
       ),
-      constMeta: kCrateApiDartApiVecMediaDisplayDetailsFromRawConstMeta,
-      argValues: [ptr],
-      apiImpl: this,
-    ));
+    );
   }
 
   TaskConstMeta get kCrateApiDartApiVecMediaDisplayDetailsFromRawConstMeta =>
@@ -2361,7 +2806,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ConnectionHandle
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ConnectionHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2369,7 +2815,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   Jason
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return JasonImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2377,7 +2824,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   LocalMediaTrack
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return LocalMediaTrackImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2385,7 +2833,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   MediaManagerHandle
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return MediaManagerHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2393,7 +2842,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ReconnectHandle
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ReconnectHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2401,7 +2851,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   RemoteMediaTrack
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return RemoteMediaTrackImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2409,7 +2860,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   RoomHandle
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return RoomHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2417,7 +2869,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ConnectionHandle
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ConnectionHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2425,7 +2878,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   Jason
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return JasonImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2433,7 +2887,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   LocalMediaTrack
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return LocalMediaTrackImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2441,7 +2896,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   MediaManagerHandle
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return MediaManagerHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2449,7 +2905,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ReconnectHandle
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ReconnectHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2457,7 +2914,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   RemoteMediaTrack
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return RemoteMediaTrackImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2465,7 +2923,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   RoomHandle
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return RoomHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2474,7 +2933,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int dco_decode_CastedPrimitive_usize(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError(
-        'Not implemented in this codec, please use the other one');
+      'Not implemented in this codec, please use the other one',
+    );
   }
 
   @protected
@@ -2486,7 +2946,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ConnectionHandle
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ConnectionHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2494,7 +2955,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   Jason
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return JasonImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2502,7 +2964,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   LocalMediaTrack
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return LocalMediaTrackImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2510,7 +2973,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   MediaManagerHandle
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return MediaManagerHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2518,7 +2982,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ReconnectHandle
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ReconnectHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2526,7 +2991,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   RemoteMediaTrack
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return RemoteMediaTrackImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2534,7 +3000,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   RoomHandle
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return RoomHandleImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
@@ -2568,13 +3035,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return ApiConstrainFacingMode_Exact(
-          dco_decode_facing_mode(raw[1]),
-        );
+        return ApiConstrainFacingMode_Exact(dco_decode_facing_mode(raw[1]));
       case 1:
-        return ApiConstrainFacingMode_Ideal(
-          dco_decode_facing_mode(raw[1]),
-        );
+        return ApiConstrainFacingMode_Ideal(dco_decode_facing_mode(raw[1]));
       default:
         throw Exception("unreachable");
     }
@@ -2582,7 +3045,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ApiDeviceVideoTrackConstraints dco_decode_api_device_video_track_constraints(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 4)
@@ -2649,7 +3113,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dco_decode_opt_box_autoadd_api_device_video_track_constraints(arr[1]),
       displayVideo:
           dco_decode_opt_box_autoadd_api_display_video_track_constraints(
-              arr[2]),
+        arr[2],
+      ),
     );
   }
 
@@ -2661,14 +3126,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ApiAudioConstraints dco_decode_box_autoadd_api_audio_constraints(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_api_audio_constraints(raw);
   }
 
   @protected
   ApiConstrainFacingMode dco_decode_box_autoadd_api_constrain_facing_mode(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_api_constrain_facing_mode(raw);
   }
@@ -2689,7 +3156,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ApiMediaStreamSettings dco_decode_box_autoadd_api_media_stream_settings(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_api_media_stream_settings(raw);
   }
@@ -2723,13 +3191,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return ConstrainBoolean_Exact(
-          dco_decode_bool(raw[1]),
-        );
+        return ConstrainBoolean_Exact(dco_decode_bool(raw[1]));
       case 1:
-        return ConstrainBoolean_Ideal(
-          dco_decode_bool(raw[1]),
-        );
+        return ConstrainBoolean_Ideal(dco_decode_bool(raw[1]));
       default:
         throw Exception("unreachable");
     }
@@ -2740,13 +3204,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return ConstrainU32_Exact(
-          dco_decode_u_32(raw[1]),
-        );
+        return ConstrainU32_Exact(dco_decode_u_32(raw[1]));
       case 1:
-        return ConstrainU32_Ideal(
-          dco_decode_u_32(raw[1]),
-        );
+        return ConstrainU32_Ideal(dco_decode_u_32(raw[1]));
       case 2:
         return ConstrainU32_Range(
           dco_decode_u_32(raw[1]),
@@ -2790,17 +3250,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   List<LocalMediaTrack>
       dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(
-            dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack)
+          dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack,
+        )
         .toList();
   }
 
   @protected
   List<ApiMediaDeviceDetails> dco_decode_list_api_media_device_details(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_api_media_device_details)
@@ -2809,7 +3272,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<ApiMediaDisplayDetails> dco_decode_list_api_media_display_details(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_api_media_display_details)
@@ -2854,7 +3318,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ApiAudioConstraints? dco_decode_opt_box_autoadd_api_audio_constraints(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null
         ? null
@@ -2863,7 +3328,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ApiConstrainFacingMode? dco_decode_opt_box_autoadd_api_constrain_facing_mode(
-      dynamic raw) {
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null
         ? null
@@ -2954,127 +3420,169 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ConnectionHandle
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ConnectionHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   Jason
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return JasonImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   LocalMediaTrack
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return LocalMediaTrackImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   MediaManagerHandle
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return MediaManagerHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   ReconnectHandle
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ReconnectHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   RemoteMediaTrack
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return RemoteMediaTrackImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   RoomHandle
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return RoomHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   ConnectionHandle
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ConnectionHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   Jason
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return JasonImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   LocalMediaTrack
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return LocalMediaTrackImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   MediaManagerHandle
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return MediaManagerHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   ReconnectHandle
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ReconnectHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   RemoteMediaTrack
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return RemoteMediaTrackImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   RoomHandle
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return RoomHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
@@ -3094,64 +3602,85 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ConnectionHandle
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ConnectionHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   Jason
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return JasonImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   LocalMediaTrack
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return LocalMediaTrackImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   MediaManagerHandle
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return MediaManagerHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   ReconnectHandle
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return ReconnectHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   RemoteMediaTrack
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return RemoteMediaTrackImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
   RoomHandle
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return RoomHandleImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
@@ -3163,18 +3692,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ApiAudioConstraints sse_decode_api_audio_constraints(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_deviceId = sse_decode_opt_String(deserializer);
-    var var_autoGainControl =
-        sse_decode_opt_box_autoadd_constrain_boolean(deserializer);
+    var var_autoGainControl = sse_decode_opt_box_autoadd_constrain_boolean(
+      deserializer,
+    );
     return ApiAudioConstraints(
-        deviceId: var_deviceId, autoGainControl: var_autoGainControl);
+      deviceId: var_deviceId,
+      autoGainControl: var_autoGainControl,
+    );
   }
 
   @protected
   ApiConstrainFacingMode sse_decode_api_constrain_facing_mode(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var tag_ = sse_decode_i_32(deserializer);
@@ -3192,18 +3726,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ApiDeviceVideoTrackConstraints sse_decode_api_device_video_track_constraints(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_deviceId = sse_decode_opt_String(deserializer);
-    var var_facingMode =
-        sse_decode_opt_box_autoadd_api_constrain_facing_mode(deserializer);
+    var var_facingMode = sse_decode_opt_box_autoadd_api_constrain_facing_mode(
+      deserializer,
+    );
     var var_height = sse_decode_opt_box_autoadd_constrain_u_32(deserializer);
     var var_width = sse_decode_opt_box_autoadd_constrain_u_32(deserializer);
     return ApiDeviceVideoTrackConstraints(
-        deviceId: var_deviceId,
-        facingMode: var_facingMode,
-        height: var_height,
-        width: var_width);
+      deviceId: var_deviceId,
+      facingMode: var_facingMode,
+      height: var_height,
+      width: var_width,
+    );
   }
 
   @protected
@@ -3216,15 +3753,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_width = sse_decode_opt_box_autoadd_constrain_u_32(deserializer);
     var var_frameRate = sse_decode_opt_box_autoadd_constrain_u_32(deserializer);
     return ApiDisplayVideoTrackConstraints(
-        deviceId: var_deviceId,
-        height: var_height,
-        width: var_width,
-        frameRate: var_frameRate);
+      deviceId: var_deviceId,
+      height: var_height,
+      width: var_width,
+      frameRate: var_frameRate,
+    );
   }
 
   @protected
   ApiMediaDeviceDetails sse_decode_api_media_device_details(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_kind = sse_decode_media_device_kind(deserializer);
     var var_deviceId = sse_decode_String(deserializer);
@@ -3232,16 +3771,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_groupId = sse_decode_opt_String(deserializer);
     var var_isFailed = sse_decode_bool(deserializer);
     return ApiMediaDeviceDetails(
-        kind: var_kind,
-        deviceId: var_deviceId,
-        label: var_label,
-        groupId: var_groupId,
-        isFailed: var_isFailed);
+      kind: var_kind,
+      deviceId: var_deviceId,
+      label: var_label,
+      groupId: var_groupId,
+      isFailed: var_isFailed,
+    );
   }
 
   @protected
   ApiMediaDisplayDetails sse_decode_api_media_display_details(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_deviceId = sse_decode_String(deserializer);
     var var_title = sse_decode_opt_String(deserializer);
@@ -3250,20 +3791,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ApiMediaStreamSettings sse_decode_api_media_stream_settings(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_audio =
-        sse_decode_opt_box_autoadd_api_audio_constraints(deserializer);
+    var var_audio = sse_decode_opt_box_autoadd_api_audio_constraints(
+      deserializer,
+    );
     var var_deviceVideo =
         sse_decode_opt_box_autoadd_api_device_video_track_constraints(
-            deserializer);
+      deserializer,
+    );
     var var_displayVideo =
         sse_decode_opt_box_autoadd_api_display_video_track_constraints(
-            deserializer);
+      deserializer,
+    );
     return ApiMediaStreamSettings(
-        audio: var_audio,
-        deviceVideo: var_deviceVideo,
-        displayVideo: var_displayVideo);
+      audio: var_audio,
+      deviceVideo: var_deviceVideo,
+      displayVideo: var_displayVideo,
+    );
   }
 
   @protected
@@ -3274,14 +3820,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ApiAudioConstraints sse_decode_box_autoadd_api_audio_constraints(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_api_audio_constraints(deserializer));
   }
 
   @protected
   ApiConstrainFacingMode sse_decode_box_autoadd_api_constrain_facing_mode(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_api_constrain_facing_mode(deserializer));
   }
@@ -3289,7 +3837,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ApiDeviceVideoTrackConstraints
       sse_decode_box_autoadd_api_device_video_track_constraints(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_api_device_video_track_constraints(deserializer));
   }
@@ -3297,35 +3846,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ApiDisplayVideoTrackConstraints
       sse_decode_box_autoadd_api_display_video_track_constraints(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_api_display_video_track_constraints(deserializer));
   }
 
   @protected
   ApiMediaStreamSettings sse_decode_box_autoadd_api_media_stream_settings(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_api_media_stream_settings(deserializer));
   }
 
   @protected
   ConstrainBoolean sse_decode_box_autoadd_constrain_boolean(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_constrain_boolean(deserializer));
   }
 
   @protected
   ConstrainU32 sse_decode_box_autoadd_constrain_u_32(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_constrain_u_32(deserializer));
   }
 
   @protected
   MediaSourceKind sse_decode_box_autoadd_media_source_kind(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_media_source_kind(deserializer));
   }
@@ -3408,22 +3962,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   List<LocalMediaTrack>
       sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
     var ans_ = <LocalMediaTrack>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(
-          sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-              deserializer));
+        sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
+          deserializer,
+        ),
+      );
     }
     return ans_;
   }
 
   @protected
   List<ApiMediaDeviceDetails> sse_decode_list_api_media_device_details(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -3436,7 +3994,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<ApiMediaDisplayDetails> sse_decode_list_api_media_display_details(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -3495,7 +4054,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ApiAudioConstraints? sse_decode_opt_box_autoadd_api_audio_constraints(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
@@ -3507,7 +4067,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ApiConstrainFacingMode? sse_decode_opt_box_autoadd_api_constrain_facing_mode(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
@@ -3520,12 +4081,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ApiDeviceVideoTrackConstraints?
       sse_decode_opt_box_autoadd_api_device_video_track_constraints(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_api_device_video_track_constraints(
-          deserializer));
+        deserializer,
+      ));
     } else {
       return null;
     }
@@ -3534,12 +4097,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   ApiDisplayVideoTrackConstraints?
       sse_decode_opt_box_autoadd_api_display_video_track_constraints(
-          SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_api_display_video_track_constraints(
-          deserializer));
+        deserializer,
+      ));
     } else {
       return null;
     }
@@ -3547,7 +4112,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ConstrainBoolean? sse_decode_opt_box_autoadd_constrain_boolean(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
@@ -3559,7 +4125,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   ConstrainU32? sse_decode_opt_box_autoadd_constrain_u_32(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
@@ -3571,7 +4138,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   MediaSourceKind? sse_decode_opt_box_autoadd_media_source_kind(
-      SseDeserializer deserializer) {
+    SseDeserializer deserializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
@@ -3599,9 +4167,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_isClosedByServer = sse_decode_bool(deserializer);
     var var_isErr = sse_decode_bool(deserializer);
     return RoomCloseReason(
-        reason: var_reason,
-        isClosedByServer: var_isClosedByServer,
-        isErr: var_isErr);
+      reason: var_reason,
+      isClosedByServer: var_isClosedByServer,
+      isErr: var_isErr,
+    );
   }
 
   @protected
@@ -3630,137 +4199,183 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          ConnectionHandle self, SseSerializer serializer) {
+    ConnectionHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as ConnectionHandleImpl).frbInternalSseEncode(move: true),
-        serializer);
+      (self as ConnectionHandleImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          Jason self, SseSerializer serializer) {
+    Jason self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as JasonImpl).frbInternalSseEncode(move: true), serializer);
+      (self as JasonImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          LocalMediaTrack self, SseSerializer serializer) {
+    LocalMediaTrack self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as LocalMediaTrackImpl).frbInternalSseEncode(move: true),
-        serializer);
+      (self as LocalMediaTrackImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          MediaManagerHandle self, SseSerializer serializer) {
+    MediaManagerHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as MediaManagerHandleImpl).frbInternalSseEncode(move: true),
-        serializer);
+      (self as MediaManagerHandleImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          ReconnectHandle self, SseSerializer serializer) {
+    ReconnectHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as ReconnectHandleImpl).frbInternalSseEncode(move: true),
-        serializer);
+      (self as ReconnectHandleImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          RemoteMediaTrack self, SseSerializer serializer) {
+    RemoteMediaTrack self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as RemoteMediaTrackImpl).frbInternalSseEncode(move: true),
-        serializer);
+      (self as RemoteMediaTrackImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          RoomHandle self, SseSerializer serializer) {
+    RoomHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as RoomHandleImpl).frbInternalSseEncode(move: true), serializer);
+      (self as RoomHandleImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          ConnectionHandle self, SseSerializer serializer) {
+    ConnectionHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as ConnectionHandleImpl).frbInternalSseEncode(move: false),
-        serializer);
+      (self as ConnectionHandleImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          Jason self, SseSerializer serializer) {
+    Jason self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as JasonImpl).frbInternalSseEncode(move: false), serializer);
+      (self as JasonImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          LocalMediaTrack self, SseSerializer serializer) {
+    LocalMediaTrack self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as LocalMediaTrackImpl).frbInternalSseEncode(move: false),
-        serializer);
+      (self as LocalMediaTrackImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          MediaManagerHandle self, SseSerializer serializer) {
+    MediaManagerHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as MediaManagerHandleImpl).frbInternalSseEncode(move: false),
-        serializer);
+      (self as MediaManagerHandleImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          ReconnectHandle self, SseSerializer serializer) {
+    ReconnectHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as ReconnectHandleImpl).frbInternalSseEncode(move: false),
-        serializer);
+      (self as ReconnectHandleImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          RemoteMediaTrack self, SseSerializer serializer) {
+    RemoteMediaTrack self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as RemoteMediaTrackImpl).frbInternalSseEncode(move: false),
-        serializer);
+      (self as RemoteMediaTrackImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          RoomHandle self, SseSerializer serializer) {
+    RoomHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as RoomHandleImpl).frbInternalSseEncode(move: false), serializer);
+      (self as RoomHandleImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
   }
 
   @protected
@@ -3773,77 +4388,106 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_DartOpaque(Object self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_isize(
-        PlatformPointerUtil.ptrToPlatformInt64(encodeDartOpaque(
-            self, portManager.dartHandlerPort, generalizedFrbRustBinding)),
-        serializer);
+      PlatformPointerUtil.ptrToPlatformInt64(
+        encodeDartOpaque(
+          self,
+          portManager.dartHandlerPort,
+          generalizedFrbRustBinding,
+        ),
+      ),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          ConnectionHandle self, SseSerializer serializer) {
+    ConnectionHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as ConnectionHandleImpl).frbInternalSseEncode(move: null),
-        serializer);
+      (self as ConnectionHandleImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          Jason self, SseSerializer serializer) {
+    Jason self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as JasonImpl).frbInternalSseEncode(move: null), serializer);
+      (self as JasonImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          LocalMediaTrack self, SseSerializer serializer) {
+    LocalMediaTrack self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as LocalMediaTrackImpl).frbInternalSseEncode(move: null),
-        serializer);
+      (self as LocalMediaTrackImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          MediaManagerHandle self, SseSerializer serializer) {
+    MediaManagerHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as MediaManagerHandleImpl).frbInternalSseEncode(move: null),
-        serializer);
+      (self as MediaManagerHandleImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          ReconnectHandle self, SseSerializer serializer) {
+    ReconnectHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as ReconnectHandleImpl).frbInternalSseEncode(move: null),
-        serializer);
+      (self as ReconnectHandleImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          RemoteMediaTrack self, SseSerializer serializer) {
+    RemoteMediaTrack self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as RemoteMediaTrackImpl).frbInternalSseEncode(move: null),
-        serializer);
+      (self as RemoteMediaTrackImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          RoomHandle self, SseSerializer serializer) {
+    RoomHandle self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as RoomHandleImpl).frbInternalSseEncode(move: null), serializer);
+      (self as RoomHandleImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
@@ -3854,16 +4498,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_api_audio_constraints(
-      ApiAudioConstraints self, SseSerializer serializer) {
+    ApiAudioConstraints self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_String(self.deviceId, serializer);
     sse_encode_opt_box_autoadd_constrain_boolean(
-        self.autoGainControl, serializer);
+      self.autoGainControl,
+      serializer,
+    );
   }
 
   @protected
   void sse_encode_api_constrain_facing_mode(
-      ApiConstrainFacingMode self, SseSerializer serializer) {
+    ApiConstrainFacingMode self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
       case ApiConstrainFacingMode_Exact(field0: final field0):
@@ -3877,18 +4527,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_api_device_video_track_constraints(
-      ApiDeviceVideoTrackConstraints self, SseSerializer serializer) {
+    ApiDeviceVideoTrackConstraints self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_String(self.deviceId, serializer);
     sse_encode_opt_box_autoadd_api_constrain_facing_mode(
-        self.facingMode, serializer);
+      self.facingMode,
+      serializer,
+    );
     sse_encode_opt_box_autoadd_constrain_u_32(self.height, serializer);
     sse_encode_opt_box_autoadd_constrain_u_32(self.width, serializer);
   }
 
   @protected
   void sse_encode_api_display_video_track_constraints(
-      ApiDisplayVideoTrackConstraints self, SseSerializer serializer) {
+    ApiDisplayVideoTrackConstraints self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_String(self.deviceId, serializer);
     sse_encode_opt_box_autoadd_constrain_u_32(self.height, serializer);
@@ -3898,7 +4554,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_api_media_device_details(
-      ApiMediaDeviceDetails self, SseSerializer serializer) {
+    ApiMediaDeviceDetails self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_media_device_kind(self.kind, serializer);
     sse_encode_String(self.deviceId, serializer);
@@ -3909,7 +4567,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_api_media_display_details(
-      ApiMediaDisplayDetails self, SseSerializer serializer) {
+    ApiMediaDisplayDetails self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.deviceId, serializer);
     sse_encode_opt_String(self.title, serializer);
@@ -3917,13 +4577,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_api_media_stream_settings(
-      ApiMediaStreamSettings self, SseSerializer serializer) {
+    ApiMediaStreamSettings self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_box_autoadd_api_audio_constraints(self.audio, serializer);
     sse_encode_opt_box_autoadd_api_device_video_track_constraints(
-        self.deviceVideo, serializer);
+      self.deviceVideo,
+      serializer,
+    );
     sse_encode_opt_box_autoadd_api_display_video_track_constraints(
-        self.displayVideo, serializer);
+      self.displayVideo,
+      serializer,
+    );
   }
 
   @protected
@@ -3934,56 +4600,72 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_box_autoadd_api_audio_constraints(
-      ApiAudioConstraints self, SseSerializer serializer) {
+    ApiAudioConstraints self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_api_audio_constraints(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_api_constrain_facing_mode(
-      ApiConstrainFacingMode self, SseSerializer serializer) {
+    ApiConstrainFacingMode self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_api_constrain_facing_mode(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_api_device_video_track_constraints(
-      ApiDeviceVideoTrackConstraints self, SseSerializer serializer) {
+    ApiDeviceVideoTrackConstraints self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_api_device_video_track_constraints(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_api_display_video_track_constraints(
-      ApiDisplayVideoTrackConstraints self, SseSerializer serializer) {
+    ApiDisplayVideoTrackConstraints self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_api_display_video_track_constraints(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_api_media_stream_settings(
-      ApiMediaStreamSettings self, SseSerializer serializer) {
+    ApiMediaStreamSettings self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_api_media_stream_settings(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_constrain_boolean(
-      ConstrainBoolean self, SseSerializer serializer) {
+    ConstrainBoolean self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_constrain_boolean(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_constrain_u_32(
-      ConstrainU32 self, SseSerializer serializer) {
+    ConstrainU32 self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_constrain_u_32(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_media_source_kind(
-      MediaSourceKind self, SseSerializer serializer) {
+    MediaSourceKind self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_media_source_kind(self, serializer);
   }
@@ -3996,7 +4678,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_constrain_boolean(
-      ConstrainBoolean self, SseSerializer serializer) {
+    ConstrainBoolean self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
       case ConstrainBoolean_Exact(field0: final field0):
@@ -4058,18 +4742,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void
       sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          List<LocalMediaTrack> self, SseSerializer serializer) {
+    List<LocalMediaTrack> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          item, serializer);
+        item,
+        serializer,
+      );
     }
   }
 
   @protected
   void sse_encode_list_api_media_device_details(
-      List<ApiMediaDeviceDetails> self, SseSerializer serializer) {
+    List<ApiMediaDeviceDetails> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -4079,7 +4769,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_api_media_display_details(
-      List<ApiMediaDisplayDetails> self, SseSerializer serializer) {
+    List<ApiMediaDisplayDetails> self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -4089,7 +4781,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_list_prim_u_8_strict(
-      Uint8List self, SseSerializer serializer) {
+    Uint8List self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint8List(self);
@@ -4097,14 +4791,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_media_device_kind(
-      MediaDeviceKind self, SseSerializer serializer) {
+    MediaDeviceKind self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
   }
 
   @protected
   void sse_encode_media_direction(
-      MediaDirection self, SseSerializer serializer) {
+    MediaDirection self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
   }
@@ -4117,7 +4815,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_media_source_kind(
-      MediaSourceKind self, SseSerializer serializer) {
+    MediaSourceKind self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
   }
@@ -4134,7 +4834,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_box_autoadd_api_audio_constraints(
-      ApiAudioConstraints? self, SseSerializer serializer) {
+    ApiAudioConstraints? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -4145,7 +4847,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_box_autoadd_api_constrain_facing_mode(
-      ApiConstrainFacingMode? self, SseSerializer serializer) {
+    ApiConstrainFacingMode? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -4156,31 +4860,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_box_autoadd_api_device_video_track_constraints(
-      ApiDeviceVideoTrackConstraints? self, SseSerializer serializer) {
+    ApiDeviceVideoTrackConstraints? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_api_device_video_track_constraints(
-          self, serializer);
+        self,
+        serializer,
+      );
     }
   }
 
   @protected
   void sse_encode_opt_box_autoadd_api_display_video_track_constraints(
-      ApiDisplayVideoTrackConstraints? self, SseSerializer serializer) {
+    ApiDisplayVideoTrackConstraints? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_api_display_video_track_constraints(
-          self, serializer);
+        self,
+        serializer,
+      );
     }
   }
 
   @protected
   void sse_encode_opt_box_autoadd_constrain_boolean(
-      ConstrainBoolean? self, SseSerializer serializer) {
+    ConstrainBoolean? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -4191,7 +4905,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_box_autoadd_constrain_u_32(
-      ConstrainU32? self, SseSerializer serializer) {
+    ConstrainU32? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -4202,7 +4918,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_opt_box_autoadd_media_source_kind(
-      MediaSourceKind? self, SseSerializer serializer) {
+    MediaSourceKind? self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
@@ -4223,7 +4941,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_room_close_reason(
-      RoomCloseReason self, SseSerializer serializer) {
+    RoomCloseReason self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.reason, serializer);
     sse_encode_bool(self.isClosedByServer, serializer);
@@ -4262,8 +4982,9 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
 
   // Not to be used by end users
   ConnectionHandleImpl.frbInternalSseDecode(
-      BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+    BigInt ptr,
+    int externalSizeOnNative,
+  ) : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
@@ -4286,7 +5007,9 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   Object disableRemoteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api
           .crateApiDartApiConnectionHandleConnectionHandleDisableRemoteVideo(
-              that: this, sourceKind: sourceKind);
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Enables inbound audio in the associated [`Connection`].
   Object enableRemoteAudio() => RustLib.instance.api
@@ -4300,7 +5023,9 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   Object enableRemoteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api
           .crateApiDartApiConnectionHandleConnectionHandleEnableRemoteVideo(
-              that: this, sourceKind: sourceKind);
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Returns ID of remote `Member` ID of the associated [`Connection`].
   ///
@@ -4329,8 +5054,10 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   /// If the [`core::ConnectionHandle::on_quality_score_update()`] method
   /// errors.
   void onQualityScoreUpdate({required Object f}) => RustLib.instance.api
-      .crateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdate(
-          that: this, f: f);
+          .crateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdate(
+        that: this,
+        f: f,
+      );
 
   /// Sets a callback to be invoked once a new [`remote::Track`] is added to
   /// the associated [`Connection`].
@@ -4342,8 +5069,10 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   ///
   /// [`remote::Track`]: media::track::remote::Track
   void onRemoteTrackAdded({required Object f}) => RustLib.instance.api
-      .crateApiDartApiConnectionHandleConnectionHandleOnRemoteTrackAdded(
-          that: this, f: f);
+          .crateApiDartApiConnectionHandleConnectionHandleOnRemoteTrackAdded(
+        that: this,
+        f: f,
+      );
 }
 
 @sealed
@@ -4368,25 +5097,21 @@ class JasonImpl extends RustOpaque implements Jason {
   /// Closes the provided [`RoomHandle`].
   void jasonCloseRoom({required RoomHandle roomToDelete}) =>
       RustLib.instance.api.crateApiDartApiJasonJasonJasonCloseRoom(
-          that: this, roomToDelete: roomToDelete);
+        that: this,
+        roomToDelete: roomToDelete,
+      );
 
   /// Closes this [`Jason`].
   void jasonDispose() =>
-      RustLib.instance.api.crateApiDartApiJasonJasonJasonDispose(
-        that: this,
-      );
+      RustLib.instance.api.crateApiDartApiJasonJasonJasonDispose(that: this);
 
   /// Creates a new [`Room`] and returns its [`RoomHandle`].
   RoomHandle jasonInitRoom() =>
-      RustLib.instance.api.crateApiDartApiJasonJasonJasonInitRoom(
-        that: this,
-      );
+      RustLib.instance.api.crateApiDartApiJasonJasonJasonInitRoom(that: this);
 
   /// Returns a [`MediaManagerHandle`].
-  MediaManagerHandle jasonMediaManager() =>
-      RustLib.instance.api.crateApiDartApiJasonJasonJasonMediaManager(
-        that: this,
-      );
+  MediaManagerHandle jasonMediaManager() => RustLib.instance.api
+      .crateApiDartApiJasonJasonJasonMediaManager(that: this);
 }
 
 @sealed
@@ -4409,19 +5134,15 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
   );
 
   /// Frees the data behind the provided opaque local track.
-  Object free() =>
-      RustLib.instance.api.crateApiDartApiLocalMediaTrackLocalMediaTrackFree(
-        that: this,
-      );
+  Object free() => RustLib.instance.api
+      .crateApiDartApiLocalMediaTrackLocalMediaTrackFree(that: this);
 
   /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of the
   /// provided [`LocalMediaTrack`].
   ///
   /// [`MediaStreamTrack`]: platform::MediaStreamTrack
   Object getTrack() => RustLib.instance.api
-          .crateApiDartApiLocalMediaTrackLocalMediaTrackGetTrack(
-        that: this,
-      );
+      .crateApiDartApiLocalMediaTrackLocalMediaTrackGetTrack(that: this);
 
   /// Indicates whether an `OnAudioLevelChangedCallback` is supported for this
   /// [`LocalMediaTrack`].
@@ -4433,10 +5154,8 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
   /// Returns a [`MediaKind::Audio`] if the provided [`LocalMediaTrack`]
   /// represents an audio track, or a [`MediaKind::Video`] if it represents a
   /// video track.
-  MediaKind kind() =>
-      RustLib.instance.api.crateApiDartApiLocalMediaTrackLocalMediaTrackKind(
-        that: this,
-      );
+  MediaKind kind() => RustLib.instance.api
+      .crateApiDartApiLocalMediaTrackLocalMediaTrackKind(that: this);
 
   /// Returns a [`MediaSourceKind::Device`] if the provided
   /// [`LocalMediaTrack`] is sourced from some device
@@ -4445,9 +5164,7 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
   ///
   /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
   MediaSourceKind mediaSourceKind() => RustLib.instance.api
-          .crateApiDartApiLocalMediaTrackLocalMediaTrackMediaSourceKind(
-        that: this,
-      );
+      .crateApiDartApiLocalMediaTrackLocalMediaTrackMediaSourceKind(that: this);
 
   /// Sets the provided `OnAudioLevelChangedCallback` for this
   /// [`LocalMediaTrack`].
@@ -4455,8 +5172,10 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
   /// It's called for live [`LocalMediaTrack`]s once their audio level
   /// changes.
   void onAudioLevelChanged({required Object f}) => RustLib.instance.api
-      .crateApiDartApiLocalMediaTrackLocalMediaTrackOnAudioLevelChanged(
-          that: this, f: f);
+          .crateApiDartApiLocalMediaTrackLocalMediaTrackOnAudioLevelChanged(
+        that: this,
+        f: f,
+      );
 
   /// Sets callback to be invoked once this [`LocalMediaTrack`] is ended.
   void onEnded({required Object f}) => RustLib.instance.api
@@ -4465,10 +5184,8 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
   /// Returns a [`media::MediaStreamTrackState::Live`] if this
   /// [`LocalMediaTrack`] is active, or a
   /// [`media::MediaStreamTrackState::Ended`] if it has ended.
-  Object state() =>
-      RustLib.instance.api.crateApiDartApiLocalMediaTrackLocalMediaTrackState(
-        that: this,
-      );
+  Object state() => RustLib.instance.api
+      .crateApiDartApiLocalMediaTrackLocalMediaTrackState(that: this);
 }
 
 @sealed
@@ -4479,8 +5196,9 @@ class MediaManagerHandleImpl extends RustOpaque implements MediaManagerHandle {
 
   // Not to be used by end users
   MediaManagerHandleImpl.frbInternalSseDecode(
-      BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+    BigInt ptr,
+    int externalSizeOnNative,
+  ) : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
@@ -4511,7 +5229,9 @@ class MediaManagerHandleImpl extends RustOpaque implements MediaManagerHandle {
   Object initLocalTracks({required ApiMediaStreamSettings caps}) =>
       RustLib.instance.api
           .crateApiDartApiMediaManagerMediaManagerHandleInitLocalTracks(
-              that: this, caps: caps);
+        that: this,
+        caps: caps,
+      );
 
   /// Returns the current microphone volume level in percents.
   Object microphoneVolume() => RustLib.instance.api
@@ -4535,20 +5255,26 @@ class MediaManagerHandleImpl extends RustOpaque implements MediaManagerHandle {
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
   void onDeviceChange({required Object cb}) => RustLib.instance.api
-      .crateApiDartApiMediaManagerMediaManagerHandleOnDeviceChange(
-          that: this, cb: cb);
+          .crateApiDartApiMediaManagerMediaManagerHandleOnDeviceChange(
+        that: this,
+        cb: cb,
+      );
 
   /// Sets the microphone volume level in percents.
-  Object setMicrophoneVolume({required PlatformInt64 level}) => RustLib
-      .instance.api
-      .crateApiDartApiMediaManagerMediaManagerHandleSetMicrophoneVolume(
-          that: this, level: level);
+  Object setMicrophoneVolume({required PlatformInt64 level}) =>
+      RustLib.instance.api
+          .crateApiDartApiMediaManagerMediaManagerHandleSetMicrophoneVolume(
+        that: this,
+        level: level,
+      );
 
   /// Switches the current output audio device to the device with the provided
   /// `device_id`.
   Object setOutputAudioId({required String deviceId}) => RustLib.instance.api
-      .crateApiDartApiMediaManagerMediaManagerHandleSetOutputAudioId(
-          that: this, deviceId: deviceId);
+          .crateApiDartApiMediaManagerMediaManagerHandleSetOutputAudioId(
+        that: this,
+        deviceId: deviceId,
+      );
 }
 
 @sealed
@@ -4590,18 +5316,20 @@ class ReconnectHandleImpl extends RustOpaque implements ReconnectHandle {
   /// If the [`Room`] is already reconnecting then new reconnection attempt
   /// won't be performed. Instead, it will wait for the first reconnection
   /// attempt result and use it here.
-  Object reconnectWithBackoff(
-          {required int startingDelay,
-          required double multiplier,
-          required int maxDelay,
-          int? maxElapsedTimeMs}) =>
+  Object reconnectWithBackoff({
+    required int startingDelay,
+    required double multiplier,
+    required int maxDelay,
+    int? maxElapsedTimeMs,
+  }) =>
       RustLib.instance.api
           .crateApiDartApiReconnectHandleReconnectHandleReconnectWithBackoff(
-              that: this,
-              startingDelay: startingDelay,
-              multiplier: multiplier,
-              maxDelay: maxDelay,
-              maxElapsedTimeMs: maxElapsedTimeMs);
+        that: this,
+        startingDelay: startingDelay,
+        multiplier: multiplier,
+        maxDelay: maxDelay,
+        maxElapsedTimeMs: maxElapsedTimeMs,
+      );
 
   /// Tries to reconnect a [`Room`] after the provided delay in milliseconds.
   ///
@@ -4609,8 +5337,10 @@ class ReconnectHandleImpl extends RustOpaque implements ReconnectHandle {
   /// won't be performed. Instead, it will wait for the first reconnection
   /// attempt result and use it here.
   Object reconnectWithDelay({required int delayMs}) => RustLib.instance.api
-      .crateApiDartApiReconnectHandleReconnectHandleReconnectWithDelay(
-          that: this, delayMs: delayMs);
+          .crateApiDartApiReconnectHandleReconnectHandleReconnectWithDelay(
+        that: this,
+        delayMs: delayMs,
+      );
 }
 
 @sealed
@@ -4621,8 +5351,9 @@ class RemoteMediaTrackImpl extends RustOpaque implements RemoteMediaTrack {
 
   // Not to be used by end users
   RemoteMediaTrackImpl.frbInternalSseDecode(
-      BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+    BigInt ptr,
+    int externalSizeOnNative,
+  ) : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
@@ -4638,15 +5369,11 @@ class RemoteMediaTrackImpl extends RustOpaque implements RemoteMediaTrack {
   ///
   /// [`MediaStreamTrack`]: platform::MediaStreamTrack
   Object getTrack() => RustLib.instance.api
-          .crateApiDartApiRemoteMediaTrackRemoteMediaTrackGetTrack(
-        that: this,
-      );
+      .crateApiDartApiRemoteMediaTrackRemoteMediaTrackGetTrack(that: this);
 
   /// Returns this [`RemoteMediaTrack`]'s kind (audio/video).
-  MediaKind kind() =>
-      RustLib.instance.api.crateApiDartApiRemoteMediaTrackRemoteMediaTrackKind(
-        that: this,
-      );
+  MediaKind kind() => RustLib.instance.api
+      .crateApiDartApiRemoteMediaTrackRemoteMediaTrackKind(that: this);
 
   /// Returns the current general [`MediaDirection`] of this
   /// [`RemoteMediaTrack`].
@@ -4662,16 +5389,16 @@ class RemoteMediaTrackImpl extends RustOpaque implements RemoteMediaTrack {
       );
 
   /// Indicate whether this [`RemoteMediaTrack`] is muted.
-  bool muted() =>
-      RustLib.instance.api.crateApiDartApiRemoteMediaTrackRemoteMediaTrackMuted(
-        that: this,
-      );
+  bool muted() => RustLib.instance.api
+      .crateApiDartApiRemoteMediaTrackRemoteMediaTrackMuted(that: this);
 
   /// Sets callback to invoke whenever this [`RemoteMediaTrack`]'s general
   /// [`MediaDirection`] is changed.
   void onMediaDirectionChanged({required Object f}) => RustLib.instance.api
-      .crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMediaDirectionChanged(
-          that: this, f: f);
+          .crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnMediaDirectionChanged(
+        that: this,
+        f: f,
+      );
 
   /// Sets callback to invoke once this [`RemoteMediaTrack`] is muted.
   void onMuted({required Object f}) => RustLib.instance.api
@@ -4679,13 +5406,17 @@ class RemoteMediaTrackImpl extends RustOpaque implements RemoteMediaTrack {
 
   /// Sets callback to invoke once this [`RemoteMediaTrack`] is stopped.
   void onStopped({required Object f}) => RustLib.instance.api
-      .crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnStopped(
-          that: this, f: f);
+          .crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnStopped(
+        that: this,
+        f: f,
+      );
 
   /// Sets callback to invoke once this [`RemoteMediaTrack`] is unmuted.
   void onUnmuted({required Object f}) => RustLib.instance.api
-      .crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnUnmuted(
-          that: this, f: f);
+          .crateApiDartApiRemoteMediaTrackRemoteMediaTrackOnUnmuted(
+        that: this,
+        f: f,
+      );
 }
 
 @sealed
@@ -4708,16 +5439,12 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   );
 
   /// Disables outbound audio in the provided [`Room`].
-  Object disableAudio() =>
-      RustLib.instance.api.crateApiDartApiRoomRoomHandleDisableAudio(
-        that: this,
-      );
+  Object disableAudio() => RustLib.instance.api
+      .crateApiDartApiRoomRoomHandleDisableAudio(that: this);
 
   /// Disables inbound audio in the provided [`Room`].
-  Object disableRemoteAudio() =>
-      RustLib.instance.api.crateApiDartApiRoomRoomHandleDisableRemoteAudio(
-        that: this,
-      );
+  Object disableRemoteAudio() => RustLib.instance.api
+      .crateApiDartApiRoomRoomHandleDisableRemoteAudio(that: this);
 
   /// Disables inbound video in the provided [`Room`].
   ///
@@ -4728,7 +5455,9 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object disableRemoteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleDisableRemoteVideo(
-          that: this, sourceKind: sourceKind);
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Disables outbound video in the provided [`Room`].
   ///
@@ -4739,19 +5468,17 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object disableVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleDisableVideo(
-          that: this, sourceKind: sourceKind);
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Enables outbound audio in the provided [`Room`].
   Object enableAudio() =>
-      RustLib.instance.api.crateApiDartApiRoomRoomHandleEnableAudio(
-        that: this,
-      );
+      RustLib.instance.api.crateApiDartApiRoomRoomHandleEnableAudio(that: this);
 
   /// Enables inbound audio in the provided [`Room`].
-  Object enableRemoteAudio() =>
-      RustLib.instance.api.crateApiDartApiRoomRoomHandleEnableRemoteAudio(
-        that: this,
-      );
+  Object enableRemoteAudio() => RustLib.instance.api
+      .crateApiDartApiRoomRoomHandleEnableRemoteAudio(that: this);
 
   /// Enables inbound video in the provided [`Room`].
   ///
@@ -4762,7 +5489,9 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object enableRemoteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleEnableRemoteVideo(
-          that: this, sourceKind: sourceKind);
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Enables outbound video in the provided [`Room`].
   ///
@@ -4773,7 +5502,9 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object enableVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleEnableVideo(
-          that: this, sourceKind: sourceKind);
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Connects to a media server and joins the [`Room`] with the provided
   /// authorization `token`.
@@ -4786,9 +5517,7 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
 
   /// Mutes outbound audio in the provided [`Room`].
   Object muteAudio() =>
-      RustLib.instance.api.crateApiDartApiRoomRoomHandleMuteAudio(
-        that: this,
-      );
+      RustLib.instance.api.crateApiDartApiRoomRoomHandleMuteAudio(that: this);
 
   /// Mutes outbound video in the provided [`Room`].
   ///
@@ -4799,7 +5528,9 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object muteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleMuteVideo(
-          that: this, sourceKind: sourceKind);
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Sets a callback to be invoked once the provided [`Room`] is closed,
   /// providing a [`RoomCloseReason`].
@@ -4887,21 +5618,21 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   /// [`on_failed_local_media`]: RoomHandle::on_failed_local_media
   /// [`PeerConnection`]: crate::peer::PeerConnection
   /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-  Object setLocalMediaSettings(
-          {required ApiMediaStreamSettings settings,
-          required bool stopFirst,
-          required bool rollbackOnFail}) =>
+  Object setLocalMediaSettings({
+    required ApiMediaStreamSettings settings,
+    required bool stopFirst,
+    required bool rollbackOnFail,
+  }) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleSetLocalMediaSettings(
-          that: this,
-          settings: settings,
-          stopFirst: stopFirst,
-          rollbackOnFail: rollbackOnFail);
+        that: this,
+        settings: settings,
+        stopFirst: stopFirst,
+        rollbackOnFail: rollbackOnFail,
+      );
 
   /// Unmutes outbound audio in the provided [`Room`].
   Object unmuteAudio() =>
-      RustLib.instance.api.crateApiDartApiRoomRoomHandleUnmuteAudio(
-        that: this,
-      );
+      RustLib.instance.api.crateApiDartApiRoomRoomHandleUnmuteAudio(that: this);
 
   /// Unmutes outbound video in the provided [`Room`].
   ///
@@ -4912,5 +5643,7 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   /// If the provided `source_kind` is not a [`MediaSourceKind`] index.
   Object unmuteVideo({MediaSourceKind? sourceKind}) =>
       RustLib.instance.api.crateApiDartApiRoomRoomHandleUnmuteVideo(
-          that: this, sourceKind: sourceKind);
+        that: this,
+        sourceKind: sourceKind,
+      );
 }

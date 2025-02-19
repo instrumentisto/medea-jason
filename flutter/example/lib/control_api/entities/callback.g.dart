@@ -29,9 +29,8 @@ OnJoin _$OnJoinFromJson(Map<String, dynamic> json) => OnJoin();
 
 Map<String, dynamic> _$OnJoinToJson(OnJoin instance) => <String, dynamic>{};
 
-OnLeave _$OnLeaveFromJson(Map<String, dynamic> json) => OnLeave(
-      $enumDecode(_$OnLeaveReasonEnumMap, json['reason']),
-    );
+OnLeave _$OnLeaveFromJson(Map<String, dynamic> json) =>
+    OnLeave($enumDecode(_$OnLeaveReasonEnumMap, json['reason']));
 
 Map<String, dynamic> _$OnLeaveToJson(OnLeave instance) => <String, dynamic>{
       'reason': _$OnLeaveReasonEnumMap[instance.reason]!,

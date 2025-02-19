@@ -51,25 +51,37 @@ class ExitOnFailureHook implements Hook {
 
   @override
   Future<void> onAfterScenario(
-      TestConfiguration config, String scenario, Iterable<Tag> tags,
-      {bool passed = true}) async {
+    TestConfiguration config,
+    String scenario,
+    Iterable<Tag> tags, {
+    bool passed = true,
+  }) async {
     fail = fail || !passed;
   }
 
   @override
   Future<void> onAfterScenarioWorldCreated(
-      World world, String scenario, Iterable<Tag> tags) async {}
+    World world,
+    String scenario,
+    Iterable<Tag> tags,
+  ) async {}
 
   @override
   Future<void> onAfterStep(
-      World world, String step, StepResult stepResult) async {}
+    World world,
+    String step,
+    StepResult stepResult,
+  ) async {}
 
   @override
   Future<void> onBeforeRun(TestConfiguration config) async {}
 
   @override
   Future<void> onBeforeScenario(
-      TestConfiguration config, String scenario, Iterable<Tag> tags) async {}
+    TestConfiguration config,
+    String scenario,
+    Iterable<Tag> tags,
+  ) async {}
 
   @override
   Future<void> onBeforeStep(World world, String step) async {}
@@ -79,43 +91,41 @@ class ExitOnFailureHook implements Hook {
 }
 
 final testConfigs = FlutterTestConfiguration(
-    stepDefinitions: control_api.steps() +
-        connection.steps() +
-        room.steps() +
-        track.steps() +
-        media_state.steps() +
-        websocket.steps() +
-        given.steps(),
-    createWorld: (config) => Future.sync(() async {
-          await clearWorld();
-          if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-            await webrtc.initFfiBridge();
-            await webrtc.enableFakeMedia();
-          }
+  stepDefinitions: control_api.steps() +
+      connection.steps() +
+      room.steps() +
+      track.steps() +
+      media_state.steps() +
+      websocket.steps() +
+      given.steps(),
+  createWorld: (config) => Future.sync(() async {
+    await clearWorld();
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      await webrtc.initFfiBridge();
+      await webrtc.enableFakeMedia();
+    }
 
-          var world = CustomWorld();
-          oldWorld = world;
-          await world.controlClient
-              .create(world.roomId, Room(world.roomId, {}));
-          return world;
-        }),
-    defaultTimeout: const Duration(seconds: 30),
-    tagExpression: 'not @${isSfu ? 'mesh' : 'sfu'}',
-    hooks: [
-      ExitOnFailureHook()
-    ],
-    reporters: [
-      StdoutReporter(MessageLevel.verbose)
-        ..setWriteLineFn(print)
-        ..setWriteFn(print),
-      ProgressReporter()
-        ..setWriteLineFn(print)
-        ..setWriteFn(print),
-      TestRunSummaryReporter()
-        ..setWriteLineFn(print)
-        ..setWriteFn(print),
-      FlutterDriverReporter(logInfoMessages: true),
-    ]);
+    var world = CustomWorld();
+    oldWorld = world;
+    await world.controlClient.create(world.roomId, Room(world.roomId, {}));
+    return world;
+  }),
+  defaultTimeout: const Duration(seconds: 30),
+  tagExpression: 'not @${isSfu ? 'mesh' : 'sfu'}',
+  hooks: [ExitOnFailureHook()],
+  reporters: [
+    StdoutReporter(MessageLevel.verbose)
+      ..setWriteLineFn(print)
+      ..setWriteFn(print),
+    ProgressReporter()
+      ..setWriteLineFn(print)
+      ..setWriteFn(print),
+    TestRunSummaryReporter()
+      ..setWriteLineFn(print)
+      ..setWriteFn(print),
+    FlutterDriverReporter(logInfoMessages: true),
+  ],
+);
 
 @GherkinTestSuite(featurePaths: ['../e2e/tests/features/**'])
 void main() {

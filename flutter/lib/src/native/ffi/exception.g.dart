@@ -74,46 +74,54 @@ void registerFunction(
 
   _exception__new_state_error__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__new_state_error__set_error');
+    'exception__new_state_error__set_error',
+  );
   _exception__new_format_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__new_format_exception__set_error');
+    'exception__new_format_exception__set_error',
+  );
   _exception__new_local_media_init_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__new_local_media_init_exception__set_error');
+    'exception__new_local_media_init_exception__set_error',
+  );
   _exception__new_enumerate_devices_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__new_enumerate_devices_exception__set_error');
+    'exception__new_enumerate_devices_exception__set_error',
+  );
   _exception__new_rpc_client_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__new_rpc_client_exception__set_error');
+    'exception__new_rpc_client_exception__set_error',
+  );
   _exception__new_media_state_transition_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__new_media_state_transition_exception__set_error');
+    'exception__new_media_state_transition_exception__set_error',
+  );
   _exception__new_internal_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__new_internal_exception__set_error');
+    'exception__new_internal_exception__set_error',
+  );
   _exception__new_media_settings_update_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__new_media_settings_update_exception__set_error');
+    'exception__new_media_settings_update_exception__set_error',
+  );
   _exception__new_invalid_output_audio_device_id_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__new_invalid_output_audio_device_id_exception__set_error');
+    'exception__new_invalid_output_audio_device_id_exception__set_error',
+  );
   _exception__new_mic_volume_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__new_mic_volume_exception__set_error');
+    'exception__new_mic_volume_exception__set_error',
+  );
   _exception__new_panic_exception__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'exception__new_panic_exception__set_error');
+    'exception__new_panic_exception__set_error',
+  );
 
   Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>> newStateError_native =
-      Pointer.fromFunction(
-    _newStateErrorProxy,
-  );
+      Pointer.fromFunction(_newStateErrorProxy);
   Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
-      newFormatException_native = Pointer.fromFunction(
-    _newFormatExceptionProxy,
-  );
+      newFormatException_native =
+      Pointer.fromFunction(_newFormatExceptionProxy);
   Pointer<
           NativeFunction<
               Handle Function(
@@ -155,15 +163,35 @@ void registerFunction(
     _newMicVolumeExceptionProxy,
   );
   Pointer<NativeFunction<Handle Function()>> newPanicException_native =
-      Pointer.fromFunction(
-    _newPanicExceptionProxy,
-  );
+      Pointer.fromFunction(_newPanicExceptionProxy);
 
   dl.lookupFunction<
-      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer, Pointer, Pointer),
-      void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer, Pointer, Pointer)>('register_exception')(
+      Void Function(
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+      ),
+      void Function(
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+      )>('register_exception')(
     newStateError_native,
     newFormatException_native,
     newLocalMediaInitException_native,
@@ -197,7 +225,11 @@ Object _newFormatExceptionProxy(Pointer<Utf8> arg0) {
 }
 
 Object _newLocalMediaInitExceptionProxy(
-    int arg0, Pointer<Utf8> arg1, ForeignValue arg2, Pointer<Utf8> arg3) {
+  int arg0,
+  Pointer<Utf8> arg1,
+  ForeignValue arg2,
+  Pointer<Utf8> arg3,
+) {
   try {
     return _newLocalMediaInitException!(arg0, arg1, arg2, arg3);
   } catch (e) {
@@ -207,7 +239,9 @@ Object _newLocalMediaInitExceptionProxy(
 }
 
 Object _newEnumerateDevicesExceptionProxy(
-    Pointer<Handle> arg0, Pointer<Utf8> arg1) {
+  Pointer<Handle> arg0,
+  Pointer<Utf8> arg1,
+) {
   try {
     return _newEnumerateDevicesException!(arg0, arg1);
   } catch (e) {
@@ -217,7 +251,11 @@ Object _newEnumerateDevicesExceptionProxy(
 }
 
 Object _newRpcClientExceptionProxy(
-    int arg0, Pointer<Utf8> arg1, ForeignValue arg2, Pointer<Utf8> arg3) {
+  int arg0,
+  Pointer<Utf8> arg1,
+  ForeignValue arg2,
+  Pointer<Utf8> arg3,
+) {
   try {
     return _newRpcClientException!(arg0, arg1, arg2, arg3);
   } catch (e) {
@@ -227,7 +265,10 @@ Object _newRpcClientExceptionProxy(
 }
 
 Object _newMediaStateTransitionExceptionProxy(
-    Pointer<Utf8> arg0, Pointer<Utf8> arg1, int arg2) {
+  Pointer<Utf8> arg0,
+  Pointer<Utf8> arg1,
+  int arg2,
+) {
   try {
     return _newMediaStateTransitionException!(arg0, arg1, arg2);
   } catch (e) {
@@ -237,7 +278,10 @@ Object _newMediaStateTransitionExceptionProxy(
 }
 
 Object _newInternalExceptionProxy(
-    Pointer<Utf8> arg0, ForeignValue arg1, Pointer<Utf8> arg2) {
+  Pointer<Utf8> arg0,
+  ForeignValue arg1,
+  Pointer<Utf8> arg2,
+) {
   try {
     return _newInternalException!(arg0, arg1, arg2);
   } catch (e) {
@@ -247,7 +291,10 @@ Object _newInternalExceptionProxy(
 }
 
 Object _newMediaSettingsUpdateExceptionProxy(
-    Pointer<Utf8> arg0, Pointer<Handle> arg1, bool arg2) {
+  Pointer<Utf8> arg0,
+  Pointer<Handle> arg1,
+  bool arg2,
+) {
   try {
     return _newMediaSettingsUpdateException!(arg0, arg1, arg2);
   } catch (e) {

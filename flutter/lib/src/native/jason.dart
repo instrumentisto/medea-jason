@@ -112,13 +112,15 @@ class Jason implements base.Jason {
           // ignore: invalid_use_of_internal_member
           ((RustLib.instance.api) as BaseApiImpl).portManager.dartHandlerPort;
 
-      frb.onPanic(cb: (msg) async {
-        msg as String;
-        await RustHandlesStorage().freeAll();
-        if (_onPanicCallback != null) {
-          _onPanicCallback!(msg);
-        }
-      });
+      frb.onPanic(
+        cb: (msg) async {
+          msg as String;
+          await RustHandlesStorage().freeAll();
+          if (_onPanicCallback != null) {
+            _onPanicCallback!(msg);
+          }
+        },
+      );
       frb.setDartOpaqueMessagePort(dartHandlerPort: port);
     }
 

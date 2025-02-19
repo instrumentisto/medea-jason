@@ -61,72 +61,86 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   ConnectionHandle
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   Jason
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   LocalMediaTrack
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   MediaManagerHandle
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   ReconnectHandle
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   RemoteMediaTrack
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   RoomHandle
       dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   ConnectionHandle
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   Jason
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   LocalMediaTrack
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   MediaManagerHandle
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   ReconnectHandle
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   RemoteMediaTrack
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   RoomHandle
       dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   int dco_decode_CastedPrimitive_usize(dynamic raw);
@@ -137,37 +151,44 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   ConnectionHandle
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   Jason
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   LocalMediaTrack
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   MediaManagerHandle
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   ReconnectHandle
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   RemoteMediaTrack
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   RoomHandle
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   String dco_decode_String(dynamic raw);
@@ -183,7 +204,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ApiDeviceVideoTrackConstraints dco_decode_api_device_video_track_constraints(
-      dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   ApiDisplayVideoTrackConstraints
@@ -206,7 +228,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ApiConstrainFacingMode dco_decode_box_autoadd_api_constrain_facing_mode(
-      dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   ApiDeviceVideoTrackConstraints
@@ -218,7 +241,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ApiMediaStreamSettings dco_decode_box_autoadd_api_media_stream_settings(
-      dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   ConstrainBoolean dco_decode_box_autoadd_constrain_boolean(dynamic raw);
@@ -256,15 +280,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<LocalMediaTrack>
       dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   List<ApiMediaDeviceDetails> dco_decode_list_api_media_device_details(
-      dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   List<ApiMediaDisplayDetails> dco_decode_list_api_media_display_details(
-      dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
@@ -286,11 +313,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ApiAudioConstraints? dco_decode_opt_box_autoadd_api_audio_constraints(
-      dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   ApiConstrainFacingMode? dco_decode_opt_box_autoadd_api_constrain_facing_mode(
-      dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   ApiDeviceVideoTrackConstraints?
@@ -332,72 +361,86 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   ConnectionHandle
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   Jason
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   LocalMediaTrack
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   MediaManagerHandle
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ReconnectHandle
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   RemoteMediaTrack
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   RoomHandle
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ConnectionHandle
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   Jason
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   LocalMediaTrack
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   MediaManagerHandle
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ReconnectHandle
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   RemoteMediaTrack
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   RoomHandle
       sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   int sse_decode_CastedPrimitive_usize(SseDeserializer deserializer);
@@ -408,52 +451,62 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   ConnectionHandle
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   Jason
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   LocalMediaTrack
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   MediaManagerHandle
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ReconnectHandle
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   RemoteMediaTrack
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   RoomHandle
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
   ApiAudioConstraints sse_decode_api_audio_constraints(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiConstrainFacingMode sse_decode_api_constrain_facing_mode(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiDeviceVideoTrackConstraints sse_decode_api_device_video_track_constraints(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiDisplayVideoTrackConstraints
@@ -462,52 +515,63 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ApiMediaDeviceDetails sse_decode_api_media_device_details(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiMediaDisplayDetails sse_decode_api_media_display_details(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiMediaStreamSettings sse_decode_api_media_stream_settings(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
   ApiAudioConstraints sse_decode_box_autoadd_api_audio_constraints(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiConstrainFacingMode sse_decode_box_autoadd_api_constrain_facing_mode(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiDeviceVideoTrackConstraints
       sse_decode_box_autoadd_api_device_video_track_constraints(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiDisplayVideoTrackConstraints
       sse_decode_box_autoadd_api_display_video_track_constraints(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiMediaStreamSettings sse_decode_box_autoadd_api_media_stream_settings(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ConstrainBoolean sse_decode_box_autoadd_constrain_boolean(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ConstrainU32 sse_decode_box_autoadd_constrain_u_32(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   MediaSourceKind sse_decode_box_autoadd_media_source_kind(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   int sse_decode_box_autoadd_u_32(SseDeserializer deserializer);
@@ -536,15 +600,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<LocalMediaTrack>
       sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<ApiMediaDeviceDetails> sse_decode_list_api_media_device_details(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<ApiMediaDisplayDetails> sse_decode_list_api_media_display_details(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
@@ -566,33 +633,40 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ApiAudioConstraints? sse_decode_opt_box_autoadd_api_audio_constraints(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiConstrainFacingMode? sse_decode_opt_box_autoadd_api_constrain_facing_mode(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiDeviceVideoTrackConstraints?
       sse_decode_opt_box_autoadd_api_device_video_track_constraints(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ApiDisplayVideoTrackConstraints?
       sse_decode_opt_box_autoadd_api_display_video_track_constraints(
-          SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ConstrainBoolean? sse_decode_opt_box_autoadd_constrain_boolean(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ConstrainU32? sse_decode_opt_box_autoadd_constrain_u_32(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   MediaSourceKind? sse_decode_opt_box_autoadd_media_source_kind(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
@@ -615,72 +689,100 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          ConnectionHandle self, SseSerializer serializer);
+    ConnectionHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          Jason self, SseSerializer serializer);
+    Jason self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          LocalMediaTrack self, SseSerializer serializer);
+    LocalMediaTrack self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          MediaManagerHandle self, SseSerializer serializer);
+    MediaManagerHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          ReconnectHandle self, SseSerializer serializer);
+    ReconnectHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          RemoteMediaTrack self, SseSerializer serializer);
+    RemoteMediaTrack self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          RoomHandle self, SseSerializer serializer);
+    RoomHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          ConnectionHandle self, SseSerializer serializer);
+    ConnectionHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          Jason self, SseSerializer serializer);
+    Jason self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          LocalMediaTrack self, SseSerializer serializer);
+    LocalMediaTrack self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          MediaManagerHandle self, SseSerializer serializer);
+    MediaManagerHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          ReconnectHandle self, SseSerializer serializer);
+    ReconnectHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          RemoteMediaTrack self, SseSerializer serializer);
+    RemoteMediaTrack self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          RoomHandle self, SseSerializer serializer);
+    RoomHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_CastedPrimitive_usize(int self, SseSerializer serializer);
@@ -691,110 +793,156 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle(
-          ConnectionHandle self, SseSerializer serializer);
+    ConnectionHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason(
-          Jason self, SseSerializer serializer);
+    Jason self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          LocalMediaTrack self, SseSerializer serializer);
+    LocalMediaTrack self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle(
-          MediaManagerHandle self, SseSerializer serializer);
+    MediaManagerHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle(
-          ReconnectHandle self, SseSerializer serializer);
+    ReconnectHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack(
-          RemoteMediaTrack self, SseSerializer serializer);
+    RemoteMediaTrack self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-          RoomHandle self, SseSerializer serializer);
+    RoomHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
   void sse_encode_api_audio_constraints(
-      ApiAudioConstraints self, SseSerializer serializer);
+    ApiAudioConstraints self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_api_constrain_facing_mode(
-      ApiConstrainFacingMode self, SseSerializer serializer);
+    ApiConstrainFacingMode self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_api_device_video_track_constraints(
-      ApiDeviceVideoTrackConstraints self, SseSerializer serializer);
+    ApiDeviceVideoTrackConstraints self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_api_display_video_track_constraints(
-      ApiDisplayVideoTrackConstraints self, SseSerializer serializer);
+    ApiDisplayVideoTrackConstraints self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_api_media_device_details(
-      ApiMediaDeviceDetails self, SseSerializer serializer);
+    ApiMediaDeviceDetails self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_api_media_display_details(
-      ApiMediaDisplayDetails self, SseSerializer serializer);
+    ApiMediaDisplayDetails self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_api_media_stream_settings(
-      ApiMediaStreamSettings self, SseSerializer serializer);
+    ApiMediaStreamSettings self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_api_audio_constraints(
-      ApiAudioConstraints self, SseSerializer serializer);
+    ApiAudioConstraints self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_api_constrain_facing_mode(
-      ApiConstrainFacingMode self, SseSerializer serializer);
+    ApiConstrainFacingMode self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_api_device_video_track_constraints(
-      ApiDeviceVideoTrackConstraints self, SseSerializer serializer);
+    ApiDeviceVideoTrackConstraints self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_api_display_video_track_constraints(
-      ApiDisplayVideoTrackConstraints self, SseSerializer serializer);
+    ApiDisplayVideoTrackConstraints self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_api_media_stream_settings(
-      ApiMediaStreamSettings self, SseSerializer serializer);
+    ApiMediaStreamSettings self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_constrain_boolean(
-      ConstrainBoolean self, SseSerializer serializer);
+    ConstrainBoolean self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_constrain_u_32(
-      ConstrainU32 self, SseSerializer serializer);
+    ConstrainU32 self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_media_source_kind(
-      MediaSourceKind self, SseSerializer serializer);
+    MediaSourceKind self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_constrain_boolean(
-      ConstrainBoolean self, SseSerializer serializer);
+    ConstrainBoolean self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_constrain_u_32(ConstrainU32 self, SseSerializer serializer);
@@ -817,72 +965,102 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void
       sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack(
-          List<LocalMediaTrack> self, SseSerializer serializer);
+    List<LocalMediaTrack> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_api_media_device_details(
-      List<ApiMediaDeviceDetails> self, SseSerializer serializer);
+    List<ApiMediaDeviceDetails> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_api_media_display_details(
-      List<ApiMediaDisplayDetails> self, SseSerializer serializer);
+    List<ApiMediaDisplayDetails> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_prim_u_8_strict(
-      Uint8List self, SseSerializer serializer);
+    Uint8List self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_media_device_kind(
-      MediaDeviceKind self, SseSerializer serializer);
+    MediaDeviceKind self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_media_direction(
-      MediaDirection self, SseSerializer serializer);
+    MediaDirection self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_media_kind(MediaKind self, SseSerializer serializer);
 
   @protected
   void sse_encode_media_source_kind(
-      MediaSourceKind self, SseSerializer serializer);
+    MediaSourceKind self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_api_audio_constraints(
-      ApiAudioConstraints? self, SseSerializer serializer);
+    ApiAudioConstraints? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_api_constrain_facing_mode(
-      ApiConstrainFacingMode? self, SseSerializer serializer);
+    ApiConstrainFacingMode? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_api_device_video_track_constraints(
-      ApiDeviceVideoTrackConstraints? self, SseSerializer serializer);
+    ApiDeviceVideoTrackConstraints? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_api_display_video_track_constraints(
-      ApiDisplayVideoTrackConstraints? self, SseSerializer serializer);
+    ApiDisplayVideoTrackConstraints? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_constrain_boolean(
-      ConstrainBoolean? self, SseSerializer serializer);
+    ConstrainBoolean? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_constrain_u_32(
-      ConstrainU32? self, SseSerializer serializer);
+    ConstrainU32? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_media_source_kind(
-      MediaSourceKind? self, SseSerializer serializer);
+    MediaSourceKind? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
 
   @protected
   void sse_encode_room_close_reason(
-      RoomCloseReason self, SseSerializer serializer);
+    RoomCloseReason self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);
@@ -922,7 +1100,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle');
+    'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle',
+  );
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle =
       _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -938,7 +1117,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle');
+    'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle',
+  );
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandle =
       _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConnectionHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -954,7 +1134,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason');
+    'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason',
+  );
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason =
       _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonPtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -970,7 +1151,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason');
+    'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason',
+  );
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJason =
       _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerJasonPtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -986,7 +1168,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrackPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack');
+    'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack',
+  );
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack =
       _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrackPtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -1002,7 +1185,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrackPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack');
+    'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack',
+  );
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrack =
       _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalMediaTrackPtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -1018,7 +1202,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle');
+    'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle',
+  );
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle =
       _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -1034,7 +1219,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle');
+    'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle',
+  );
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandle =
       _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMediaManagerHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -1050,7 +1236,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle');
+    'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle',
+  );
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle =
       _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -1066,7 +1253,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle');
+    'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle',
+  );
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandle =
       _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerReconnectHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -1082,7 +1270,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrackPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack');
+    'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack',
+  );
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack =
       _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrackPtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -1098,7 +1287,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrackPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack');
+    'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack',
+  );
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrack =
       _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteMediaTrackPtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -1114,7 +1304,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle');
+    'frbgen_medea_jason_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle',
+  );
   late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle =
       _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
@@ -1130,7 +1321,8 @@ class RustLibWire implements BaseWire {
 
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandlePtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle');
+    'frbgen_medea_jason_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle',
+  );
   late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle =
       _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandlePtr
           .asFunction<void Function(ffi.Pointer<ffi.Void>)>();

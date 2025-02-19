@@ -16,14 +16,16 @@ List<StepDefinitionGeneric> steps() {
     whenEnablesOrMutes,
     whenMemberEnablesRemoteTrack,
     whenMemberFreesAllLocalTracks,
-    whenMemberSwitchesDeviceWithLatency
+    whenMemberSwitchesDeviceWithLatency,
   ];
 }
 
 StepDefinitionGeneric whenEnablesOrMutes =
     when4<String, String, String, String, CustomWorld>(
-  RegExp(r'(\S+) (enables|disables|mutes|unmutes) (audio|video) and'
-      r' (awaits it completes|awaits it errors|ignores the result)?$'),
+  RegExp(
+    r'(\S+) (enables|disables|mutes|unmutes) (audio|video) and'
+    r' (awaits it completes|awaits it errors|ignores the result)?$',
+  ),
   (id, action, audioOrVideo, String awaits, context) async {
     var kind = parseMediaKind(audioOrVideo);
     var member = context.world.members[id]!;
@@ -58,17 +60,23 @@ StepDefinitionGeneric whenEnablesOrMutes =
         }
       }
     } else {
-      unawaited(future.catchError((e) => {
+      unawaited(
+        future.catchError(
+          (e) => {
             // suppress error
-          }));
+          },
+        ),
+      );
     }
   },
 );
 
 StepDefinitionGeneric whenMemberEnablesRemoteTrack =
     when3<String, String, String, CustomWorld>(
-  RegExp(r'(\S+) (enables|disables) remote '
-      r'(audio|(?:device |display )?video)$'),
+  RegExp(
+    r'(\S+) (enables|disables) remote '
+    r'(audio|(?:device |display )?video)$',
+  ),
   (id, toggle, String kind, context) async {
     var parsedKind = parseMediaKind(kind);
     var member = context.world.members[id]!;
@@ -91,8 +99,10 @@ StepDefinitionGeneric whenMemberEnablesRemoteTrack =
 
 StepDefinitionGeneric thenRemoteMediaDirectionIs =
     then4<String, String, String, String, CustomWorld>(
-  RegExp(r"(\S+)'s (audio|video) from (\S+) has "
-      r'`(SendRecv|SendOnly|RecvOnly|Inactive)` direction$'),
+  RegExp(
+    r"(\S+)'s (audio|video) from (\S+) has "
+    r'`(SendRecv|SendOnly|RecvOnly|Inactive)` direction$',
+  ),
   (id, String kind, remoteId, direction, context) async {
     var member = context.world.members[id]!;
 
@@ -100,10 +110,14 @@ StepDefinitionGeneric thenRemoteMediaDirectionIs =
 
     await member.waitForConnect(remoteId);
     var track = await member.waitRemoteTrackFrom(
-        remoteId, parsedKind.item2, parsedKind.item1);
+      remoteId,
+      parsedKind.item2,
+      parsedKind.item1,
+    );
 
-    var dir = TrackMediaDirection.values
-        .firstWhere((e) => e.name.toLowerCase() == direction.toLowerCase());
+    var dir = TrackMediaDirection.values.firstWhere(
+      (e) => e.name.toLowerCase() == direction.toLowerCase(),
+    );
 
     await member
         .waitMediaDirectionTrack(dir, track)
@@ -113,21 +127,28 @@ StepDefinitionGeneric thenRemoteMediaDirectionIs =
 
 StepDefinitionGeneric thenLocalTrackMuteState =
     then3<String, String, String, CustomWorld>(
-  RegExp(r"(\S+)'s (audio|(?:device|display) video) local track is "
-      r'(not )?muted$'),
+  RegExp(
+    r"(\S+)'s (audio|(?:device|display) video) local track is "
+    r'(not )?muted$',
+  ),
   (id, String kind, notMuted, context) async {
     var member = context.world.members[id]!;
     var parsedKind = parseMediaKind(kind);
 
-    var track = await member.waitLocalTrack(parsedKind.item2, parsedKind.item1);
+    var track = await member.waitLocalTrack(
+      parsedKind.item2,
+      parsedKind.item1,
+    );
     var muted = !notMuted.contains('not');
     expect(!track.getTrack().isEnabled(), muted);
   },
 );
 
 StepDefinitionGeneric thenTrackIsStopped = then2<String, String, CustomWorld>(
-  RegExp(r"(\S+)'s (audio|(?:device|display) video) local track is "
-      r'stopped$'),
+  RegExp(
+    r"(\S+)'s (audio|(?:device|display) video) local track is "
+    r'stopped$',
+  ),
   (id, kind, context) async {
     var member = context.world.members[id]!;
     var parsedKind = parseMediaKind(kind);
@@ -138,23 +159,23 @@ StepDefinitionGeneric thenTrackIsStopped = then2<String, String, CustomWorld>(
 );
 
 StepDefinitionGeneric whenMemberFreesAllLocalTracks =
-    when1<String, CustomWorld>(
-  RegExp(r'(\S+) frees all local tracks$'),
-  (id, context) async {
-    var member = context.world.members[id]!;
-    await member.forgetLocalTracks();
-  },
-);
+    when1<String, CustomWorld>(RegExp(r'(\S+) frees all local tracks$'), (
+  id,
+  context,
+) async {
+  var member = context.world.members[id]!;
+  await member.forgetLocalTracks();
+});
 
 StepDefinitionGeneric whenMemberSwitchesDeviceWithLatency =
-    when1<String, CustomWorld>(
-  RegExp(r'(\S+) switches device with latency$'),
-  (id, context) async {
-    var member = context.world.members[id]!;
-    member.setGumLatency(const Duration(seconds: 3));
-    await member.switchVideoDevice();
-  },
-);
+    when1<String, CustomWorld>(RegExp(r'(\S+) switches device with latency$'), (
+  id,
+  context,
+) async {
+  var member = context.world.members[id]!;
+  member.setGumLatency(const Duration(seconds: 3));
+  await member.switchVideoDevice();
+});
 
 StepDefinitionGeneric givenGumDelay = given1<String, CustomWorld>(
   RegExp(r"(\S+)'s `getUserMedia\(\)` request has added latency$"),

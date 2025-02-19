@@ -29,9 +29,11 @@ class NativeConnectionHandle implements ConnectionHandle {
 
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
-    opaque.inner.onRemoteTrackAdded(f: (t) {
-      f(NativeRemoteMediaTrack(frb.RemoteMediaTrack.fromPtr(ptr: t.address)));
-    });
+    opaque.inner.onRemoteTrackAdded(
+      f: (t) {
+        f(NativeRemoteMediaTrack(frb.RemoteMediaTrack.fromPtr(ptr: t.address)));
+      },
+    );
   }
 
   @override
