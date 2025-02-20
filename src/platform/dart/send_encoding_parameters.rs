@@ -219,15 +219,16 @@ impl SendEncodingParameters {
     /// Returns [scaleResolutionDownBy][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/ypzzc75t
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
-    pub fn scale_resolution_down_by(&self) -> Option<f64> {
+    pub fn scale_resolution_down_by(&self) -> f64 {
         let scale_resolution_down_by = unsafe {
             send_encoding_parameters::get_scale_resolution_down_by(self.0.get())
         }
         .unwrap();
 
-        Option::try_from(unsafe { scale_resolution_down_by.unbox() }).unwrap()
+        Option::try_from(unsafe { scale_resolution_down_by.unbox() })
+            .unwrap()
+            .unwrap_or(1.0)
     }
 
     /// Sets [scalabilityMode][1] of these [`SendEncodingParameters`].

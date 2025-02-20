@@ -80,8 +80,10 @@ impl SendEncodingParameters {
     /// Returns [scaleResolutionDownBy][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/ypzzc75t
-    pub fn scale_resolution_down_by(&self) -> Option<f64> {
-        self.0.get_scale_resolution_down_by().map(Into::into)
+    pub fn scale_resolution_down_by(&self) -> f64 {
+        self.0
+            .get_scale_resolution_down_by()
+            .map_or(1.0, Into::into)
     }
 
     /// Sets [scalabilityMode][1] of these [`SendEncodingParameters`].

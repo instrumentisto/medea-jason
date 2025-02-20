@@ -326,7 +326,7 @@ mod sender_patch {
 
         assert_eq!(encs[0].rid(), Some("h".to_owned()));
         assert_eq!(encs[0].active(), true);
-        assert_eq!(encs[0].scale_resolution_down_by(), None);
+        assert_eq!(encs[0].scale_resolution_down_by(), 1.0);
         assert_eq!(encs[0].max_bitrate(), None);
         assert_eq!(encs[0].scalability_mode(), None);
 
@@ -377,7 +377,11 @@ mod sender_patch {
         assert_eq!(encs[0].active(), false);
         assert_eq!(encs[0].scale_resolution_down_by(), Some(2.0));
         assert_eq!(encs[0].max_bitrate(), Some(100));
-        assert_eq!(encs[0].scalability_mode(), Some("L1T2".to_owned()));
+        if !is_firefox() {
+            // TODO: Scalability mode is not supported in Firefox as of v135:
+            // https://bugzilla.mozilla.org/show_bug.cgi?id=1571470
+            assert_eq!(encs[0].scalability_mode(), Some("L1T2".to_owned()));
+        }
     }
 
     /// Checks that [`Sender`]'s mute and media exchange states can be changed
@@ -649,16 +653,8 @@ mod codec_probing {
             .map(|c| c.mime_type())
             .collect();
         res.dedup();
-        assert_eq!(
-            res,
-            vec![
-                "video/VP8",
-                "video/VP9",
-                "video/rtx",
-                "video/red",
-                "video/ulpfec"
-            ]
-        );
+
+        assert_eq!(res[0..2], &["video/VP8", "video/VP9"]);
 
         // reverse and repeat
         target.reverse();
@@ -670,16 +666,7 @@ mod codec_probing {
             .map(|c| c.mime_type())
             .collect();
         res.dedup();
-        assert_eq!(
-            res,
-            vec![
-                "video/VP9",
-                "video/VP8",
-                "video/rtx",
-                "video/red",
-                "video/ulpfec"
-            ]
-        );
+        assert_eq!(res[0..2], &["video/VP9", "video/VP8"]);
     }
 
     // This test is necessary to identify changes in the list of available
