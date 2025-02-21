@@ -59,8 +59,9 @@ class NativeRemoteMediaTrack implements RemoteMediaTrack {
 
   @override
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
-    opaque.inner
-        .onMediaDirectionChanged(f: (i) => f(TrackMediaDirection.values[i]));
+    opaque.inner.onMediaDirectionChanged(
+      f: (i) => f(TrackMediaDirection.values[i]),
+    );
   }
 
   @moveSemantics

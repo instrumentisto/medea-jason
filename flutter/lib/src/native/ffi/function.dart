@@ -6,10 +6,7 @@ import 'frb/api/dart/api.dart' as frb;
 import 'function.g.dart' as bridge;
 
 void registerFunctions(DynamicLibrary dl) {
-  bridge.registerFunction(
-    dl,
-    caller: _callFn,
-  );
+  bridge.registerFunction(dl, caller: _callFn);
 }
 
 /// Function used by Rust to call closures with a single [ForeignValue]
@@ -21,8 +18,12 @@ void _callFn(Object fn, ForeignValue value) {
       if (fn is dynamic Function(dynamic)) {
         var res = fn(arg);
         if (res is Future<void>) {
-          res.catchError((e, stack) => frb.logDartException(
-              message: e.toString(), stackTrace: stack.toString()));
+          res.catchError(
+            (e, stack) => frb.logDartException(
+              message: e.toString(),
+              stackTrace: stack.toString(),
+            ),
+          );
         }
       } else if (fn is void Function(int)) {
         fn(arg);
@@ -32,8 +33,12 @@ void _callFn(Object fn, ForeignValue value) {
     } else {
       var res = (fn as dynamic Function())();
       if (res is Future<void>) {
-        res.catchError((e, stack) => frb.logDartException(
-            message: e.toString(), stackTrace: stack.toString()));
+        res.catchError(
+          (e, stack) => frb.logDartException(
+            message: e.toString(),
+            stackTrace: stack.toString(),
+          ),
+        );
       }
     }
   } catch (e, stack) {

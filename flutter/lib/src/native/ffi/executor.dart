@@ -31,7 +31,8 @@ class Executor {
             .asFunction(),
         _taskPoll = dylib
             .lookup<NativeFunction<_ExecutorPollTaskC>>(
-                'rust_executor_poll_task')
+              'rust_executor_poll_task',
+            )
             .asFunction() {
     _wakePort = ReceivePort()..listen(_pollTask);
     _loopInit(_wakePort.sendPort.nativePort);

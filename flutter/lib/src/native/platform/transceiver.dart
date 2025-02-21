@@ -105,7 +105,9 @@ Future<RtpParameters> Function() _getSendParameters(Object transceiver) {
 
 /// Sets [RtpParameters] into the provided [RtpTransceiver.sender].
 Future<void> Function() _setSendParameters(
-    Object transceiver, Object parameters) {
+  Object transceiver,
+  Object parameters,
+) {
   transceiver as RtpTransceiver;
   parameters as RtpParameters;
   return () => transceiver.sender.setParameters(parameters);

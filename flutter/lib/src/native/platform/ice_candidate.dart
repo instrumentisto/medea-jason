@@ -38,7 +38,10 @@ Pointer<Utf8> _sdpMid(Object iceCandidate) {
 
 /// Creates a new [IceCandidate] with the provided values.
 webrtc.IceCandidate _new(
-    ForeignValue candidate, ForeignValue sdpMid, ForeignValue sdpMlineIndex) {
+  ForeignValue candidate,
+  ForeignValue sdpMid,
+  ForeignValue sdpMlineIndex,
+) {
   var candidateArg = candidate.toDart();
   var sdpMidArg = sdpMid.toDart();
   var sdpMLineIndexArg = sdpMlineIndex.toDart();

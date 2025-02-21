@@ -23,14 +23,17 @@ List<ApiMediaDeviceDetails> vecMediaDeviceDetailsFromRaw({required int ptr}) =>
 
 /// Returns the [`Vec<RustOpaque<ApiMediaDisplayDetails>>`] from the provided
 /// [`ForeignClass`] address.
-List<ApiMediaDisplayDetails> vecMediaDisplayDetailsFromRaw(
-        {required int ptr}) =>
+List<ApiMediaDisplayDetails> vecMediaDisplayDetailsFromRaw({
+  required int ptr,
+}) =>
     RustLib.instance.api.crateApiDartApiVecMediaDisplayDetailsFromRaw(ptr: ptr);
 
 /// Logs Dart exception.
 void logDartException({required String message, required String stackTrace}) =>
     RustLib.instance.api.crateApiDartApiLogDartException(
-        message: message, stackTrace: stackTrace);
+      message: message,
+      stackTrace: stackTrace,
+    );
 
 /// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
 void onPanic({required Object cb}) =>
@@ -39,7 +42,8 @@ void onPanic({required Object cb}) =>
 /// Sets the provided [`DART_HANDLER_PORT`].
 void setDartOpaqueMessagePort({required PlatformInt64 dartHandlerPort}) =>
     RustLib.instance.api.crateApiDartApiSetDartOpaqueMessagePort(
-        dartHandlerPort: dartHandlerPort);
+      dartHandlerPort: dartHandlerPort,
+    );
 
 abstract class ForeignClass {}
 
@@ -52,10 +56,7 @@ class ApiAudioConstraints {
   /// maintain a steady overall volume level.
   ConstrainBoolean? autoGainControl;
 
-  ApiAudioConstraints({
-    this.deviceId,
-    this.autoGainControl,
-  });
+  ApiAudioConstraints({this.deviceId, this.autoGainControl});
 
   @override
   int get hashCode => deviceId.hashCode ^ autoGainControl.hashCode;
@@ -74,14 +75,12 @@ sealed class ApiConstrainFacingMode with _$ApiConstrainFacingMode {
   const ApiConstrainFacingMode._();
 
   /// Exact value required for this property.
-  const factory ApiConstrainFacingMode.exact(
-    FacingMode field0,
-  ) = ApiConstrainFacingMode_Exact;
+  const factory ApiConstrainFacingMode.exact(FacingMode field0) =
+      ApiConstrainFacingMode_Exact;
 
   /// Ideal (target) value for this property.
-  const factory ApiConstrainFacingMode.ideal(
-    FacingMode field0,
-  ) = ApiConstrainFacingMode_Ideal;
+  const factory ApiConstrainFacingMode.ideal(FacingMode field0) =
+      ApiConstrainFacingMode_Ideal;
 }
 
 /// Constraints applicable to video tracks that are sourced from some media
@@ -235,10 +234,7 @@ class ApiMediaDisplayDetails {
   /// Title describing the represented display.
   final String? title;
 
-  const ApiMediaDisplayDetails({
-    required this.deviceId,
-    this.title,
-  });
+  const ApiMediaDisplayDetails({required this.deviceId, this.title});
 
   @override
   int get hashCode => deviceId.hashCode ^ title.hashCode;
@@ -271,11 +267,7 @@ class ApiMediaStreamSettings {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
   ApiDisplayVideoTrackConstraints? displayVideo;
 
-  ApiMediaStreamSettings({
-    this.audio,
-    this.deviceVideo,
-    this.displayVideo,
-  });
+  ApiMediaStreamSettings({this.audio, this.deviceVideo, this.displayVideo});
 
   @override
   int get hashCode =>

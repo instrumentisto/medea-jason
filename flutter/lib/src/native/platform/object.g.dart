@@ -23,25 +23,21 @@ void registerFunction(
 
   _handle__runtime_type__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'handle__runtime_type__set_error');
+    'handle__runtime_type__set_error',
+  );
   _handle__to_string__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'handle__to_string__set_error');
+    'handle__to_string__set_error',
+  );
 
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> runtimeType_native =
-      Pointer.fromFunction(
-    _runtimeTypeProxy,
-  );
+      Pointer.fromFunction(_runtimeTypeProxy);
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> toString_native =
-      Pointer.fromFunction(
-    _toStringProxy,
-  );
+      Pointer.fromFunction(_toStringProxy);
 
   dl.lookupFunction<Void Function(Pointer, Pointer),
-      void Function(Pointer, Pointer)>('register_handle')(
-    runtimeType_native,
-    toString_native,
-  );
+          void Function(Pointer, Pointer)>('register_handle')(
+      runtimeType_native, toString_native);
 }
 
 Pointer<Utf8> _runtimeTypeProxy(Object arg0) {

@@ -2,11 +2,10 @@
 //!
 //! [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
 
-use std::{future::Future, rc::Rc};
+use std::rc::Rc;
 
 use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
-use medea_client_api_proto::EncodingParameters;
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -21,8 +20,9 @@ use crate::{
 };
 
 use super::{
-    codec_capability::CodecCapability, parameters::Parameters,
+    codec_capability::CodecCapability,
     send_encoding_parameters::SendEncodingParameters,
+    send_parameters::SendParameters,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/transceiver.g.dart")]
@@ -209,32 +209,27 @@ impl Transceiver {
     }
 
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
-    fn direction(&self) -> impl Future<Output = TransceiverDirection> {
-        let handle = self.0.get();
-        async move {
-            let fut = unsafe { transceiver::get_direction(handle) }.unwrap();
-            unsafe { FutureFromDart::execute::<i32>(fut) }
-                .await
-                .unwrap()
-                .into()
-        }
+    async fn direction(&self) -> TransceiverDirection {
+        let fut = unsafe { transceiver::get_direction(self.0.get()) }.unwrap();
+        unsafe { FutureFromDart::execute::<i32>(fut) }
+            .await
+            .unwrap()
+            .into()
     }
 
-    /// Returns [`Parameters`] of the underlying [RTCRtpSender].
+    /// Returns [`SendParameters`] of the underlying [RTCRtpSender].
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-    pub fn get_send_parameters(&self) -> impl Future<Output = Parameters> {
-        let handle = self.0.get();
-        async move {
-            let fut =
-                unsafe { transceiver::get_send_parameters(handle) }.unwrap();
-            let params: DartHandle =
-                unsafe { FutureFromDart::execute(fut) }.await.unwrap();
-            Parameters::from(params)
-        }
+    pub async fn get_send_parameters(&self) -> SendParameters {
+        let fut =
+            unsafe { transceiver::get_send_parameters(self.0.get()) }.unwrap();
+        let params: DartHandle =
+            unsafe { FutureFromDart::execute(fut) }.await.unwrap();
+
+        SendParameters::from(params)
     }
 
-    /// Sets [`Parameters`] into the underlying [RTCRtpSender].
+    /// Sets [`SendParameters`] into the underlying [RTCRtpSender].
     ///
     /// # Errors
     ///
@@ -243,22 +238,19 @@ impl Transceiver {
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-setparameters
-    pub fn set_send_parameters(
+    pub async fn set_send_parameters(
         &self,
-        params: Parameters,
-    ) -> impl Future<Output = Result<(), platform::Error>> {
+        params: SendParameters,
+    ) -> Result<(), platform::Error> {
         let handle = self.0.get();
         let params_handle = params.handle();
-        async move {
-            let fut = unsafe {
-                transceiver::set_send_parameters(handle, params_handle)
-            }
-            .unwrap();
+        let fut =
+            unsafe { transceiver::set_send_parameters(handle, params_handle) }
+                .unwrap();
 
-            unsafe { FutureFromDart::execute::<()>(fut) }.await?;
+        unsafe { FutureFromDart::execute::<()>(fut) }.await?;
 
-            Ok(())
-        }
+        Ok(())
     }
 
     /// Sets preferred [`CodecCapability`] for this [`Transceiver`].
@@ -277,48 +269,19 @@ impl Transceiver {
         }
         .unwrap();
     }
+}
 
-    /// Updates [`EncodingParameters`] for the underlying [RTCRtpSender].
-    ///
-    /// # Errors
-    ///
-    /// With [`platform::Error`] if the underlying [setParameters()][1] call
-    /// fails.
+#[cfg(feature = "mockable")]
+// TODO: Try remove on next Rust version upgrade.
+#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
+#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
+impl Transceiver {
+    /// Returns list of [`SendEncodingParameters`] of this [`Transceiver`]'s
+    /// [RTCRtpSender].
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-setparameters
-    pub async fn update_send_encodings(
-        &self,
-        encodings: Vec<EncodingParameters>,
-    ) -> Result<(), platform::Error> {
-        let params = self.get_send_parameters().await;
-
-        let encs = params.encodings().await?;
-        for mut enc in encs {
-            let rid = enc.rid();
-
-            let Some(encoding) = encodings.iter().find(|e| e.rid == rid) else {
-                continue;
-            };
-
-            enc.set_active(encoding.active);
-            if let Some(max_bitrate) = encoding.max_bitrate {
-                enc.set_max_bitrate(max_bitrate.into());
-            }
-            if let Some(scale_resolution_down_by) =
-                encoding.scale_resolution_down_by
-            {
-                enc.set_scale_resolution_down_by(
-                    scale_resolution_down_by.into(),
-                );
-            }
-
-            params.set_encoding(&enc).await;
-        }
-
-        self.set_send_parameters(params).await?;
-
-        Ok(())
+    pub async fn get_send_encodings(&self) -> Box<[SendEncodingParameters]> {
+        self.get_send_parameters().await.encodings()
     }
 }
 

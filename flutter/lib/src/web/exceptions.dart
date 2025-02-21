@@ -48,10 +48,12 @@ dynamic convertException(dynamic e) {
     return WebLocalMediaInitException(e as wasm.LocalMediaInitException);
   } else if (name == 'MediaSettingsUpdateException') {
     return WebMediaSettingsUpdateException(
-        e as wasm.MediaSettingsUpdateException);
+      e as wasm.MediaSettingsUpdateException,
+    );
   } else if (name == 'MediaStateTransitionException') {
     return WebMediaStateTransitionException(
-        e as wasm.MediaStateTransitionException);
+      e as wasm.MediaStateTransitionException,
+    );
   } else if (name == 'RpcClientException') {
     return WebRpcClientException(e as wasm.RpcClientException);
   } else {

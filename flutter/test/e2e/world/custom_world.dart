@@ -52,39 +52,53 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (builder.isSend) {
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.audio, MediaSourceKind.device): true
+          MediaKind.audio,
+          MediaSourceKind.device,
+        ): true,
       });
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.video, MediaSourceKind.device): true
+          MediaKind.video,
+          MediaSourceKind.device,
+        ): true,
       });
       if (isSfu) {
         sendState.addAll({
           const Tuple2<MediaKind, MediaSourceKind>(
-              MediaKind.video, MediaSourceKind.display): true
+            MediaKind.video,
+            MediaSourceKind.display,
+          ): true,
         });
       }
 
       pipeline.addAll({
         'publish': WebRtcPublishEndpoint(
-            'publish', isSfu ? P2pMode.Never : P2pMode.Always)
+          'publish',
+          isSfu ? P2pMode.Never : P2pMode.Always,
+        ),
       });
     }
 
     if (builder.isRecv) {
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.audio, MediaSourceKind.device): true
+          MediaKind.audio,
+          MediaSourceKind.device,
+        ): true,
       });
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.video, MediaSourceKind.device): true
+          MediaKind.video,
+          MediaSourceKind.device,
+        ): true,
       });
 
       if (isSfu) {
         recvState.addAll({
           const Tuple2<MediaKind, MediaSourceKind>(
-              MediaKind.video, MediaSourceKind.display): true
+            MediaKind.video,
+            MediaSourceKind.display,
+          ): true,
         });
       }
 
@@ -93,15 +107,22 @@ class CustomWorld extends FlutterWidgetTesterWorld {
           var id = value.id;
           var endpointId = 'play-$id';
           pipeline.addAll({
-            endpointId:
-                WebRtcPlayEndpoint(endpointId, 'local://$roomId/$id/publish')
+            endpointId: WebRtcPlayEndpoint(
+              endpointId,
+              'local://$roomId/$id/publish',
+            ),
           });
         }
       });
     }
 
-    var createMember = api.Member(builderId, pipeline, api.Plain('test'),
-        'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099');
+    var createMember = api.Member(
+      builderId,
+      pipeline,
+      api.Plain('test'),
+      'grpc://127.0.0.1:9099',
+      'grpc://127.0.0.1:9099',
+    );
     await controlClient.create('$roomId/$builderId', createMember);
 
     if (builder.isSend) {
@@ -111,7 +132,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         var mId = e.value.id;
         var id = '$roomId/$mId/$endpointId';
         var elem = WebRtcPlayEndpoint(
-            endpointId, 'local://$roomId/$builderId/publish');
+          endpointId,
+          'local://$roomId/$builderId/publish',
+        );
         return Tuple2(id, elem);
       }).toList();
 
@@ -150,8 +173,10 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     while (true) {
       var callbacks = await getCallbacks(memberId);
       var events = callbacks
-          .where((element) =>
-              element.fid.contains(memberId) && element.event is OnLeave)
+          .where(
+            (element) =>
+                element.fid.contains(memberId) && element.event is OnLeave,
+          )
           .map((e) => e.event as OnLeave);
       if (events.isNotEmpty) {
         var ev = events.first;
@@ -180,7 +205,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   /// Deletes a Control API element of the [WebRtcPlayEndpoint] with the
   /// provided ID.
   Future<void> deletePlayEndpoint(
-      String memberId, String partnerMemberId) async {
+    String memberId,
+    String partnerMemberId,
+  ) async {
     var playEndpointId = 'play-$partnerMemberId';
 
     var resp = await controlClient.delete('$roomId/$memberId/$playEndpointId');
@@ -233,10 +260,12 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   /// responders.
   Future<void> waitForInterconnection(String memberId) async {
     var interconnectedMembers = members.entries
-        .where((element) =>
-            element.value.isJoined &&
-            element.value.id != memberId &&
-            (element.value.isRecv || element.value.isSend))
+        .where(
+          (element) =>
+              element.value.isJoined &&
+              element.value.id != memberId &&
+              (element.value.isRecv || element.value.isSend),
+        )
         .toList();
     var member = members[memberId]!;
 
@@ -260,7 +289,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
               .map((e) => e.last)
               .where((element) => element.kind() == MediaKind.audio)) {
             await member.waitMediaDirectionTrack(
-                MediaDirection.recvOnly, track);
+              MediaDirection.recvOnly,
+              track,
+            );
           }
         }
 
@@ -270,7 +301,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
               .map((e) => e.last)
               .where((element) => element.kind() == MediaKind.video)) {
             await member.waitMediaDirectionTrack(
-                MediaDirection.recvOnly, track);
+              MediaDirection.recvOnly,
+              track,
+            );
           }
         }
         if (!member.enabledAudio) {
@@ -279,7 +312,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
               .map((e) => e.last)
               .where((element) => element.kind() == MediaKind.audio)) {
             await otherMember.waitMediaDirectionTrack(
-                MediaDirection.recvOnly, track);
+              MediaDirection.recvOnly,
+              track,
+            );
           }
         }
 
@@ -289,7 +324,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
               .map((e) => e.last)
               .where((element) => element.kind() == MediaKind.video)) {
             await otherMember.waitMediaDirectionTrack(
-                MediaDirection.recvOnly, track);
+              MediaDirection.recvOnly,
+              track,
+            );
           }
         }
       }
@@ -314,11 +351,13 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       }
       try {
         await controlClient.create(
-            '$roomId/${pair.left.id}/publish', publishEndpoint);
+          '$roomId/${pair.left.id}/publish',
+          publishEndpoint,
+        );
       } catch (e) {
-        if (!e
-            .toString()
-            .contains('Endpoint with provided FID already exists')) {
+        if (!e.toString().contains(
+              'Endpoint with provided FID already exists',
+            )) {
           rethrow;
         }
       }
@@ -338,11 +377,13 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
       try {
         await controlClient.create(
-            '$roomId/${pair.right.id}/publish', publishEndpoint);
+          '$roomId/${pair.right.id}/publish',
+          publishEndpoint,
+        );
       } catch (e) {
-        if (!e
-            .toString()
-            .contains('Endpoint with provided FID already exists')) {
+        if (!e.toString().contains(
+              'Endpoint with provided FID already exists',
+            )) {
           rethrow;
         }
       }
@@ -356,7 +397,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       await leftMember.updateRecvMediaState(MediaKind.audio, null, true);
 
       await controlClient.create(
-          '$roomId/${pair.left.id}/${publishEndpoint.id}', publishEndpoint);
+        '$roomId/${pair.left.id}/${publishEndpoint.id}',
+        publishEndpoint,
+      );
     }
 
     if (pair.right.playEndpointFor(roomId, pair.left) != null) {
@@ -367,7 +410,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       await rightMember.updateRecvMediaState(MediaKind.audio, null, true);
 
       await controlClient.create(
-          '$roomId/${pair.right.id}/${publishEndpoint.id}', publishEndpoint);
+        '$roomId/${pair.right.id}/${publishEndpoint.id}',
+        publishEndpoint,
+      );
     }
 
     {
@@ -490,7 +535,9 @@ class PairedMember {
   WebRtcPlayEndpoint? playEndpointFor(String roomId, PairedMember publisher) {
     if (recv) {
       var res = WebRtcPlayEndpoint(
-          'play-${publisher.id}', 'local://$roomId/${publisher.id}/publish');
+        'play-${publisher.id}',
+        'local://$roomId/${publisher.id}/publish',
+      );
       return res;
     }
     return null;

@@ -26,8 +26,10 @@ List<StepDefinitionGeneric> steps() {
 
 StepDefinitionGeneric thenMemberHasRemoteTrack =
     then3<String, String, String, CustomWorld>(
-  RegExp(r'(\S+) has (audio|video|audio and video) remote '
-      r'track(?:s)? from (\S+)'),
+  RegExp(
+    r'(\S+) has (audio|video|audio and video) remote '
+    r'track(?:s)? from (\S+)',
+  ),
   (id, kind, partnerId, context) async {
     var member = context.world.members[id]!;
     await member.waitForConnect(partnerId);
@@ -61,8 +63,10 @@ StepDefinitionGeneric thenMemberHasNRemoteTracksFrom =
 
     // We might have to wait for Rust side for a little bit.
     await retry(() async {
-      var actualCount =
-          member.connectionStore.countTracksByLived(live, remoteId);
+      var actualCount = member.connectionStore.countTracksByLived(
+        live,
+        remoteId,
+      );
       expect(actualCount, expectedCount);
     });
   },
@@ -82,8 +86,10 @@ StepDefinitionGeneric thenMemberHasLocalTracks =
 
 StepDefinitionGeneric thenDoesntHaveRemoteTrack =
     then4<String, String, String, String, CustomWorld>(
-  RegExp(r"(\S+) doesn't have (live )?(audio|(?:device|display) video) "
-      r'remote track from (\S+)$'),
+  RegExp(
+    r"(\S+) doesn't have (live )?(audio|(?:device|display) video) "
+    r'remote track from (\S+)$',
+  ),
   (id, live, kind, partnerId, context) async {
     var member = context.world.members[id]!;
     await member.waitForConnect(partnerId);
@@ -92,18 +98,24 @@ StepDefinitionGeneric thenDoesntHaveRemoteTrack =
     var tracks = member.connectionStore.remoteTracks[partnerId]!.values
         .where((element) => element.isNotEmpty)
         .map((e) => e.last)
-        .where((element) =>
-            element.kind() == parsedKind.item1 &&
-            element.mediaSourceKind() == parsedKind.item2)
+        .where(
+          (element) =>
+              element.kind() == parsedKind.item1 &&
+              element.mediaSourceKind() == parsedKind.item2,
+        )
         .toList();
 
     if (isSfu && live.isNotEmpty) {
       await retry(() async {
         var length = tracks
-            .where((element) =>
-                !member.connectionStore
-                    .remoteTrackIsStopped(partnerId, element.getTrack().id()) &&
-                element.mediaDirection() == MediaDirection.sendRecv)
+            .where(
+              (element) =>
+                  !member.connectionStore.remoteTrackIsStopped(
+                    partnerId,
+                    element.getTrack().id(),
+                  ) &&
+                  element.mediaDirection() == MediaDirection.sendRecv,
+            )
             .length;
         expect(length, 0);
       });
@@ -115,8 +127,10 @@ StepDefinitionGeneric thenDoesntHaveRemoteTrack =
 
 StepDefinitionGeneric thenRemoteMediaTrack =
     then4<String, String, String, String, CustomWorld>(
-  RegExp(r"(\S+)'s (audio|(?:display|device) video) remote track "
-      r'from (\S+) is (enabled|disabled)$'),
+  RegExp(
+    r"(\S+)'s (audio|(?:display|device) video) remote track "
+    r'from (\S+) is (enabled|disabled)$',
+  ),
   (id, kind, partnerId, state, context) async {
     var member = context.world.members[id]!;
     var parsedKind = parseMediaKind(kind);
@@ -124,7 +138,10 @@ StepDefinitionGeneric thenRemoteMediaTrack =
     await member.waitForConnect(partnerId);
 
     var track = await member.waitRemoteTrackFrom(
-        partnerId, parsedKind.item2, parsedKind.item1);
+      partnerId,
+      parsedKind.item2,
+      parsedKind.item1,
+    );
 
     if (state == 'enabled') {
       await member.waitEnabledTrack(track);
@@ -136,30 +153,40 @@ StepDefinitionGeneric thenRemoteMediaTrack =
 
 StepDefinitionGeneric thenRemoteTrackStops =
     then3<String, String, String, CustomWorld>(
-  RegExp(r"(\S+)'s remote (audio|(?:device|display) video) "
-      r'track from (\S+) disables$'),
+  RegExp(
+    r"(\S+)'s remote (audio|(?:device|display) video) "
+    r'track from (\S+) disables$',
+  ),
   (id, kind, remoteId, context) async {
     var member = context.world.members[id]!;
 
     var parsedKind = parseMediaKind(kind);
     var track = await member.waitRemoteTrackFrom(
-        remoteId, parsedKind.item2, parsedKind.item1);
+      remoteId,
+      parsedKind.item2,
+      parsedKind.item1,
+    );
     await member.waitDisabledTrack(track);
   },
 );
 
 StepDefinitionGeneric thenCallbackFiresOnRemoteTrack =
     fixThen5<String, int, String, String, String, CustomWorld>(
-  RegExp(r'`on_(enabled|disabled|muted|unmuted)` callback fires '
-      r"{int} time(?:s)? on (\S+)'s "
-      r'remote (audio|(?:device|display) video) track from (\S+)$'),
+  RegExp(
+    r'`on_(enabled|disabled|muted|unmuted)` callback fires '
+    r"{int} time(?:s)? on (\S+)'s "
+    r'remote (audio|(?:device|display) video) track from (\S+)$',
+  ),
   (callbackKind, int times, id, kind, remoteId, context) async {
     var member = context.world.members[id]!;
     await member.waitForConnect(remoteId);
 
     var parsedKind = parseMediaKind(kind);
     var track = await member.waitRemoteTrackFrom(
-        remoteId, parsedKind.item2, parsedKind.item1);
+      remoteId,
+      parsedKind.item2,
+      parsedKind.item1,
+    );
 
     await member.waitForTrackCbFireCount(callbackKind, track, times);
   },

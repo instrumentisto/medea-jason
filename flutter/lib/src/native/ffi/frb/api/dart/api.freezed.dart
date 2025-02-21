@@ -12,7 +12,8 @@ part of 'api.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 /// @nodoc
 mixin _$ApiConstrainFacingMode {
@@ -65,9 +66,10 @@ mixin _$ApiConstrainFacingMode {
 
 /// @nodoc
 abstract class $ApiConstrainFacingModeCopyWith<$Res> {
-  factory $ApiConstrainFacingModeCopyWith(ApiConstrainFacingMode value,
-          $Res Function(ApiConstrainFacingMode) then) =
-      _$ApiConstrainFacingModeCopyWithImpl<$Res, ApiConstrainFacingMode>;
+  factory $ApiConstrainFacingModeCopyWith(
+    ApiConstrainFacingMode value,
+    $Res Function(ApiConstrainFacingMode) then,
+  ) = _$ApiConstrainFacingModeCopyWithImpl<$Res, ApiConstrainFacingMode>;
   @useResult
   $Res call({FacingMode field0});
 }
@@ -87,15 +89,15 @@ class _$ApiConstrainFacingModeCopyWithImpl<$Res,
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_value.copyWith(
-      field0: null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as FacingMode,
-    ) as $Val);
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _value.copyWith(
+        field0: null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                as FacingMode,
+      ) as $Val,
+    );
   }
 }
 
@@ -103,9 +105,9 @@ class _$ApiConstrainFacingModeCopyWithImpl<$Res,
 abstract class _$$ApiConstrainFacingMode_ExactImplCopyWith<$Res>
     implements $ApiConstrainFacingModeCopyWith<$Res> {
   factory _$$ApiConstrainFacingMode_ExactImplCopyWith(
-          _$ApiConstrainFacingMode_ExactImpl value,
-          $Res Function(_$ApiConstrainFacingMode_ExactImpl) then) =
-      __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>;
+    _$ApiConstrainFacingMode_ExactImpl value,
+    $Res Function(_$ApiConstrainFacingMode_ExactImpl) then,
+  ) = __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({FacingMode field0});
@@ -117,23 +119,23 @@ class __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>
         _$ApiConstrainFacingMode_ExactImpl>
     implements _$$ApiConstrainFacingMode_ExactImplCopyWith<$Res> {
   __$$ApiConstrainFacingMode_ExactImplCopyWithImpl(
-      _$ApiConstrainFacingMode_ExactImpl _value,
-      $Res Function(_$ApiConstrainFacingMode_ExactImpl) _then)
-      : super(_value, _then);
+    _$ApiConstrainFacingMode_ExactImpl _value,
+    $Res Function(_$ApiConstrainFacingMode_ExactImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ApiConstrainFacingMode
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_$ApiConstrainFacingMode_ExactImpl(
-      null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as FacingMode,
-    ));
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _$ApiConstrainFacingMode_ExactImpl(
+        null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                as FacingMode,
+      ),
+    );
   }
 }
 
@@ -255,9 +257,9 @@ abstract class ApiConstrainFacingMode_Exact extends ApiConstrainFacingMode {
 abstract class _$$ApiConstrainFacingMode_IdealImplCopyWith<$Res>
     implements $ApiConstrainFacingModeCopyWith<$Res> {
   factory _$$ApiConstrainFacingMode_IdealImplCopyWith(
-          _$ApiConstrainFacingMode_IdealImpl value,
-          $Res Function(_$ApiConstrainFacingMode_IdealImpl) then) =
-      __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>;
+    _$ApiConstrainFacingMode_IdealImpl value,
+    $Res Function(_$ApiConstrainFacingMode_IdealImpl) then,
+  ) = __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({FacingMode field0});
@@ -269,23 +271,23 @@ class __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>
         _$ApiConstrainFacingMode_IdealImpl>
     implements _$$ApiConstrainFacingMode_IdealImplCopyWith<$Res> {
   __$$ApiConstrainFacingMode_IdealImplCopyWithImpl(
-      _$ApiConstrainFacingMode_IdealImpl _value,
-      $Res Function(_$ApiConstrainFacingMode_IdealImpl) _then)
-      : super(_value, _then);
+    _$ApiConstrainFacingMode_IdealImpl _value,
+    $Res Function(_$ApiConstrainFacingMode_IdealImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ApiConstrainFacingMode
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_$ApiConstrainFacingMode_IdealImpl(
-      null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as FacingMode,
-    ));
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _$ApiConstrainFacingMode_IdealImpl(
+        null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                as FacingMode,
+      ),
+    );
   }
 }
 

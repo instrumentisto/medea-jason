@@ -11,17 +11,14 @@ Credentials _$CredentialsFromJson(Map<String, dynamic> json) => Credentials();
 Map<String, dynamic> _$CredentialsToJson(Credentials instance) =>
     <String, dynamic>{};
 
-Hash _$HashFromJson(Map<String, dynamic> json) => Hash(
-      json['data'] as String,
-    );
+Hash _$HashFromJson(Map<String, dynamic> json) => Hash(json['data'] as String);
 
 Map<String, dynamic> _$HashToJson(Hash instance) => <String, dynamic>{
       'data': instance.data,
     };
 
-Plain _$PlainFromJson(Map<String, dynamic> json) => Plain(
-      json['data'] as String,
-    );
+Plain _$PlainFromJson(Map<String, dynamic> json) =>
+    Plain(json['data'] as String);
 
 Map<String, dynamic> _$PlainToJson(Plain instance) => <String, dynamic>{
       'data': instance.data,

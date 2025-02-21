@@ -19,7 +19,6 @@ enum MediaDeviceKind {
 
   /// Audio output device (for example, a pair of headphones).
   audioOutput,
-  ;
 }
 
 /// [MediaStreamTrack.kind][1] representation.
@@ -31,5 +30,4 @@ enum MediaKind {
 
   /// Video track.
   video,
-  ;
 }

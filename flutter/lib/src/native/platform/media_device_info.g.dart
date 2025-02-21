@@ -35,34 +35,33 @@ void registerFunction(
 
   _media_device_info__device_id__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'media_device_info__device_id__set_error');
+    'media_device_info__device_id__set_error',
+  );
   _media_device_info__kind__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'media_device_info__kind__set_error');
+    'media_device_info__kind__set_error',
+  );
   _media_device_info__label__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'media_device_info__label__set_error');
+    'media_device_info__label__set_error',
+  );
   _media_device_info__group_id__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'media_device_info__group_id__set_error');
+    'media_device_info__group_id__set_error',
+  );
   _media_device_info__is_failed__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'media_device_info__is_failed__set_error');
+    'media_device_info__is_failed__set_error',
+  );
 
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> deviceId_native =
-      Pointer.fromFunction(
-    _deviceIdProxy,
-  );
+      Pointer.fromFunction(_deviceIdProxy);
   Pointer<NativeFunction<Int64 Function(Handle)>> kind_native =
       Pointer.fromFunction(_kindProxy, 0);
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> label_native =
-      Pointer.fromFunction(
-    _labelProxy,
-  );
+      Pointer.fromFunction(_labelProxy);
   Pointer<NativeFunction<Pointer Function(Handle)>> groupId_native =
-      Pointer.fromFunction(
-    _groupIdProxy,
-  );
+      Pointer.fromFunction(_groupIdProxy);
   Pointer<NativeFunction<Bool Function(Handle)>> isFailed_native =
       Pointer.fromFunction(_isFailedProxy, false);
 

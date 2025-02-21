@@ -15,14 +15,10 @@ sealed class ConstrainBoolean with _$ConstrainBoolean {
   const ConstrainBoolean._();
 
   /// Exact value required for this property.
-  const factory ConstrainBoolean.exact(
-    bool field0,
-  ) = ConstrainBoolean_Exact;
+  const factory ConstrainBoolean.exact(bool field0) = ConstrainBoolean_Exact;
 
   /// Ideal (target) value for this property.
-  const factory ConstrainBoolean.ideal(
-    bool field0,
-  ) = ConstrainBoolean_Ideal;
+  const factory ConstrainBoolean.ideal(bool field0) = ConstrainBoolean_Ideal;
 }
 
 @freezed
@@ -30,20 +26,13 @@ sealed class ConstrainU32 with _$ConstrainU32 {
   const ConstrainU32._();
 
   /// Must be the parameter's value.
-  const factory ConstrainU32.exact(
-    int field0,
-  ) = ConstrainU32_Exact;
+  const factory ConstrainU32.exact(int field0) = ConstrainU32_Exact;
 
   /// Should be used if possible.
-  const factory ConstrainU32.ideal(
-    int field0,
-  ) = ConstrainU32_Ideal;
+  const factory ConstrainU32.ideal(int field0) = ConstrainU32_Ideal;
 
   /// Parameter's value must be in this range.
-  const factory ConstrainU32.range(
-    int field0,
-    int field1,
-  ) = ConstrainU32_Range;
+  const factory ConstrainU32.range(int field0, int field1) = ConstrainU32_Range;
 }
 
 /// Describes directions that a camera can face, as seen from a user's
@@ -64,5 +53,4 @@ enum FacingMode {
 
   /// Facing to the right of a user.
   right,
-  ;
 }

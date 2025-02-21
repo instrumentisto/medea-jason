@@ -93,61 +93,80 @@ void registerFunction(
 
   _peer_connection__ice_connection_state__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__ice_connection_state__set_error');
+    'peer_connection__ice_connection_state__set_error',
+  );
   _peer_connection__on_connection_state_change__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__on_connection_state_change__set_error');
+    'peer_connection__on_connection_state_change__set_error',
+  );
   _peer_connection__connection_state__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__connection_state__set_error');
+    'peer_connection__connection_state__set_error',
+  );
   _peer_connection__restart_ice__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__restart_ice__set_error');
+    'peer_connection__restart_ice__set_error',
+  );
   _peer_connection__rollback__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__rollback__set_error');
+    'peer_connection__rollback__set_error',
+  );
   _peer_connection__get_stats__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__get_stats__set_error');
+    'peer_connection__get_stats__set_error',
+  );
   _peer_connection__on_track__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__on_track__set_error');
+    'peer_connection__on_track__set_error',
+  );
   _peer_connection__on_ice_candidate__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__on_ice_candidate__set_error');
+    'peer_connection__on_ice_candidate__set_error',
+  );
   _peer_connection__on_ice_candidate_error__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__on_ice_candidate_error__set_error');
+    'peer_connection__on_ice_candidate_error__set_error',
+  );
   _peer_connection__get_transceiver_by_mid__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__get_transceiver_by_mid__set_error');
+    'peer_connection__get_transceiver_by_mid__set_error',
+  );
   _peer_connection__add_ice_candidate__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__add_ice_candidate__set_error');
+    'peer_connection__add_ice_candidate__set_error',
+  );
   _peer_connection__on_ice_connection_state_change__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__on_ice_connection_state_change__set_error');
+    'peer_connection__on_ice_connection_state_change__set_error',
+  );
   _peer_connection__new_peer__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__new_peer__set_error');
+    'peer_connection__new_peer__set_error',
+  );
   _peer_connection__add_transceiver__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__add_transceiver__set_error');
+    'peer_connection__add_transceiver__set_error',
+  );
   _peer_connection__create_offer__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__create_offer__set_error');
+    'peer_connection__create_offer__set_error',
+  );
   _peer_connection__create_answer__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__create_answer__set_error');
+    'peer_connection__create_answer__set_error',
+  );
   _peer_connection__set_local_description__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__set_local_description__set_error');
+    'peer_connection__set_local_description__set_error',
+  );
   _peer_connection__set_remote_description__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__set_remote_description__set_error');
+    'peer_connection__set_remote_description__set_error',
+  );
   _peer_connection__close__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'peer_connection__close__set_error');
+    'peer_connection__close__set_error',
+  );
 
   Pointer<NativeFunction<Int32 Function(Handle)>> iceConnectionState_native =
       Pointer.fromFunction(_iceConnectionStateProxy, 0);
@@ -158,111 +177,88 @@ void registerFunction(
   Pointer<NativeFunction<Int32 Function(Handle)>> connectionState_native =
       Pointer.fromFunction(_connectionStateProxy, 0);
   Pointer<NativeFunction<Void Function(Handle)>> restartIce_native =
-      Pointer.fromFunction(
-    _restartIceProxy,
-  );
+      Pointer.fromFunction(_restartIceProxy);
   Pointer<NativeFunction<Handle Function(Handle)>> rollback_native =
-      Pointer.fromFunction(
-    _rollbackProxy,
-  );
+      Pointer.fromFunction(_rollbackProxy);
   Pointer<NativeFunction<Handle Function(Handle)>> getStats_native =
-      Pointer.fromFunction(
-    _getStatsProxy,
-  );
+      Pointer.fromFunction(_getStatsProxy);
   Pointer<NativeFunction<Void Function(Handle, Handle)>> onTrack_native =
-      Pointer.fromFunction(
-    _onTrackProxy,
-  );
+      Pointer.fromFunction(_onTrackProxy);
   Pointer<NativeFunction<Void Function(Handle, Handle)>> onIceCandidate_native =
-      Pointer.fromFunction(
-    _onIceCandidateProxy,
-  );
+      Pointer.fromFunction(_onIceCandidateProxy);
   Pointer<NativeFunction<Void Function(Handle, Handle)>>
-      onIceCandidateError_native = Pointer.fromFunction(
-    _onIceCandidateErrorProxy,
-  );
+      onIceCandidateError_native =
+      Pointer.fromFunction(_onIceCandidateErrorProxy);
   Pointer<NativeFunction<Handle Function(Handle, Pointer<Utf8>)>>
-      getTransceiverByMid_native = Pointer.fromFunction(
-    _getTransceiverByMidProxy,
-  );
+      getTransceiverByMid_native =
+      Pointer.fromFunction(_getTransceiverByMidProxy);
   Pointer<NativeFunction<Handle Function(Handle, Handle)>>
-      addIceCandidate_native = Pointer.fromFunction(
-    _addIceCandidateProxy,
-  );
+      addIceCandidate_native = Pointer.fromFunction(_addIceCandidateProxy);
   Pointer<NativeFunction<Void Function(Handle, Handle)>>
       onIceConnectionStateChange_native = Pointer.fromFunction(
     _onIceConnectionStateChangeProxy,
   );
   Pointer<NativeFunction<Handle Function(Handle, Bool)>> newPeer_native =
-      Pointer.fromFunction(
-    _newPeerProxy,
-  );
+      Pointer.fromFunction(_newPeerProxy);
   Pointer<NativeFunction<Handle Function(Handle, Int64, Handle)>>
-      addTransceiver_native = Pointer.fromFunction(
-    _addTransceiverProxy,
-  );
+      addTransceiver_native = Pointer.fromFunction(_addTransceiverProxy);
   Pointer<NativeFunction<Handle Function(Handle)>> createOffer_native =
-      Pointer.fromFunction(
-    _createOfferProxy,
-  );
+      Pointer.fromFunction(_createOfferProxy);
   Pointer<NativeFunction<Handle Function(Handle)>> createAnswer_native =
-      Pointer.fromFunction(
-    _createAnswerProxy,
-  );
+      Pointer.fromFunction(_createAnswerProxy);
   Pointer<NativeFunction<Handle Function(Handle, Pointer<Utf8>, Pointer<Utf8>)>>
-      setLocalDescription_native = Pointer.fromFunction(
-    _setLocalDescriptionProxy,
-  );
+      setLocalDescription_native =
+      Pointer.fromFunction(_setLocalDescriptionProxy);
   Pointer<NativeFunction<Handle Function(Handle, Pointer<Utf8>, Pointer<Utf8>)>>
       setRemoteDescription_native = Pointer.fromFunction(
     _setRemoteDescriptionProxy,
   );
   Pointer<NativeFunction<Void Function(Handle)>> close_native =
-      Pointer.fromFunction(
-    _closeProxy,
-  );
+      Pointer.fromFunction(_closeProxy);
 
   dl.lookupFunction<
       Void Function(
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer),
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+      ),
       void Function(
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer)>('register_peer_connection')(
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+        Pointer,
+      )>('register_peer_connection')(
     iceConnectionState_native,
     onConnectionStateChange_native,
     connectionState_native,
@@ -430,7 +426,10 @@ Object _createAnswerProxy(Object arg0) {
 }
 
 Object _setLocalDescriptionProxy(
-    Object arg0, Pointer<Utf8> arg1, Pointer<Utf8> arg2) {
+  Object arg0,
+  Pointer<Utf8> arg1,
+  Pointer<Utf8> arg2,
+) {
   try {
     return _setLocalDescription!(arg0, arg1, arg2);
   } catch (e) {
@@ -440,7 +439,10 @@ Object _setLocalDescriptionProxy(
 }
 
 Object _setRemoteDescriptionProxy(
-    Object arg0, Pointer<Utf8> arg1, Pointer<Utf8> arg2) {
+  Object arg0,
+  Pointer<Utf8> arg1,
+  Pointer<Utf8> arg2,
+) {
   try {
     return _setRemoteDescription!(arg0, arg1, arg2);
   } catch (e) {

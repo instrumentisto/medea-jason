@@ -21,7 +21,7 @@ List<StepDefinitionGeneric> steps() {
     thenControlApiSendsOnLeave,
     whenControlApiStartsPublishing,
     whenControlApiDeletesPublishEndpoint,
-    whenControlApiDeletesPlayEndpoint
+    whenControlApiDeletesPlayEndpoint,
   ];
 }
 
@@ -87,10 +87,18 @@ StepDefinitionGeneric whenControlApiInterconnectsMembers =
   r'Control API interconnects (\S+) and (\S+)$',
   (id, partnerId, context) async {
     var memberPair = MembersPair(
-      PairedMember(id, AudioSettings(PublishPolicy.Optional),
-          VideoSettings(PublishPolicy.Optional), true),
-      PairedMember(partnerId, AudioSettings(PublishPolicy.Optional),
-          VideoSettings(PublishPolicy.Optional), true),
+      PairedMember(
+        id,
+        AudioSettings(PublishPolicy.Optional),
+        VideoSettings(PublishPolicy.Optional),
+        true,
+      ),
+      PairedMember(
+        partnerId,
+        AudioSettings(PublishPolicy.Optional),
+        VideoSettings(PublishPolicy.Optional),
+        true,
+      ),
     );
 
     await context.world.interconnectMembers(memberPair);
@@ -103,10 +111,18 @@ StepDefinitionGeneric whenControlApiInterconnectsViaApply =
   r'`Apply` method$',
   (id, partnerId, context) async {
     var memberPair = MembersPair(
-      PairedMember(id, AudioSettings(PublishPolicy.Optional),
-          VideoSettings(PublishPolicy.Optional), true),
-      PairedMember(partnerId, AudioSettings(PublishPolicy.Optional),
-          VideoSettings(PublishPolicy.Optional), true),
+      PairedMember(
+        id,
+        AudioSettings(PublishPolicy.Optional),
+        VideoSettings(PublishPolicy.Optional),
+        true,
+      ),
+      PairedMember(
+        partnerId,
+        AudioSettings(PublishPolicy.Optional),
+        VideoSettings(PublishPolicy.Optional),
+        true,
+      ),
     );
 
     await context.world.interconnectMembersViaApply(memberPair);

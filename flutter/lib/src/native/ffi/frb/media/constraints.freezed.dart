@@ -12,7 +12,8 @@ part of 'constraints.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 /// @nodoc
 mixin _$ConstrainBoolean {
@@ -66,8 +67,9 @@ mixin _$ConstrainBoolean {
 /// @nodoc
 abstract class $ConstrainBooleanCopyWith<$Res> {
   factory $ConstrainBooleanCopyWith(
-          ConstrainBoolean value, $Res Function(ConstrainBoolean) then) =
-      _$ConstrainBooleanCopyWithImpl<$Res, ConstrainBoolean>;
+    ConstrainBoolean value,
+    $Res Function(ConstrainBoolean) then,
+  ) = _$ConstrainBooleanCopyWithImpl<$Res, ConstrainBoolean>;
   @useResult
   $Res call({bool field0});
 }
@@ -86,15 +88,15 @@ class _$ConstrainBooleanCopyWithImpl<$Res, $Val extends ConstrainBoolean>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_value.copyWith(
-      field0: null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _value.copyWith(
+        field0: null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                as bool,
+      ) as $Val,
+    );
   }
 }
 
@@ -102,9 +104,9 @@ class _$ConstrainBooleanCopyWithImpl<$Res, $Val extends ConstrainBoolean>
 abstract class _$$ConstrainBoolean_ExactImplCopyWith<$Res>
     implements $ConstrainBooleanCopyWith<$Res> {
   factory _$$ConstrainBoolean_ExactImplCopyWith(
-          _$ConstrainBoolean_ExactImpl value,
-          $Res Function(_$ConstrainBoolean_ExactImpl) then) =
-      __$$ConstrainBoolean_ExactImplCopyWithImpl<$Res>;
+    _$ConstrainBoolean_ExactImpl value,
+    $Res Function(_$ConstrainBoolean_ExactImpl) then,
+  ) = __$$ConstrainBoolean_ExactImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({bool field0});
@@ -115,23 +117,23 @@ class __$$ConstrainBoolean_ExactImplCopyWithImpl<$Res>
     extends _$ConstrainBooleanCopyWithImpl<$Res, _$ConstrainBoolean_ExactImpl>
     implements _$$ConstrainBoolean_ExactImplCopyWith<$Res> {
   __$$ConstrainBoolean_ExactImplCopyWithImpl(
-      _$ConstrainBoolean_ExactImpl _value,
-      $Res Function(_$ConstrainBoolean_ExactImpl) _then)
-      : super(_value, _then);
+    _$ConstrainBoolean_ExactImpl _value,
+    $Res Function(_$ConstrainBoolean_ExactImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ConstrainBoolean
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_$ConstrainBoolean_ExactImpl(
-      null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _$ConstrainBoolean_ExactImpl(
+        null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                as bool,
+      ),
+    );
   }
 }
 
@@ -166,7 +168,10 @@ class _$ConstrainBoolean_ExactImpl extends ConstrainBoolean_Exact {
   @pragma('vm:prefer-inline')
   _$$ConstrainBoolean_ExactImplCopyWith<_$ConstrainBoolean_ExactImpl>
       get copyWith => __$$ConstrainBoolean_ExactImplCopyWithImpl<
-          _$ConstrainBoolean_ExactImpl>(this, _$identity);
+              _$ConstrainBoolean_ExactImpl>(
+            this,
+            _$identity,
+          );
 
   @override
   @optionalTypeArgs
@@ -251,9 +256,9 @@ abstract class ConstrainBoolean_Exact extends ConstrainBoolean {
 abstract class _$$ConstrainBoolean_IdealImplCopyWith<$Res>
     implements $ConstrainBooleanCopyWith<$Res> {
   factory _$$ConstrainBoolean_IdealImplCopyWith(
-          _$ConstrainBoolean_IdealImpl value,
-          $Res Function(_$ConstrainBoolean_IdealImpl) then) =
-      __$$ConstrainBoolean_IdealImplCopyWithImpl<$Res>;
+    _$ConstrainBoolean_IdealImpl value,
+    $Res Function(_$ConstrainBoolean_IdealImpl) then,
+  ) = __$$ConstrainBoolean_IdealImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({bool field0});
@@ -264,23 +269,23 @@ class __$$ConstrainBoolean_IdealImplCopyWithImpl<$Res>
     extends _$ConstrainBooleanCopyWithImpl<$Res, _$ConstrainBoolean_IdealImpl>
     implements _$$ConstrainBoolean_IdealImplCopyWith<$Res> {
   __$$ConstrainBoolean_IdealImplCopyWithImpl(
-      _$ConstrainBoolean_IdealImpl _value,
-      $Res Function(_$ConstrainBoolean_IdealImpl) _then)
-      : super(_value, _then);
+    _$ConstrainBoolean_IdealImpl _value,
+    $Res Function(_$ConstrainBoolean_IdealImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ConstrainBoolean
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_$ConstrainBoolean_IdealImpl(
-      null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _$ConstrainBoolean_IdealImpl(
+        null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                as bool,
+      ),
+    );
   }
 }
 
@@ -315,7 +320,10 @@ class _$ConstrainBoolean_IdealImpl extends ConstrainBoolean_Ideal {
   @pragma('vm:prefer-inline')
   _$$ConstrainBoolean_IdealImplCopyWith<_$ConstrainBoolean_IdealImpl>
       get copyWith => __$$ConstrainBoolean_IdealImplCopyWithImpl<
-          _$ConstrainBoolean_IdealImpl>(this, _$identity);
+              _$ConstrainBoolean_IdealImpl>(
+            this,
+            _$identity,
+          );
 
   @override
   @optionalTypeArgs
@@ -454,8 +462,9 @@ mixin _$ConstrainU32 {
 /// @nodoc
 abstract class $ConstrainU32CopyWith<$Res> {
   factory $ConstrainU32CopyWith(
-          ConstrainU32 value, $Res Function(ConstrainU32) then) =
-      _$ConstrainU32CopyWithImpl<$Res, ConstrainU32>;
+    ConstrainU32 value,
+    $Res Function(ConstrainU32) then,
+  ) = _$ConstrainU32CopyWithImpl<$Res, ConstrainU32>;
   @useResult
   $Res call({int field0});
 }
@@ -474,24 +483,25 @@ class _$ConstrainU32CopyWithImpl<$Res, $Val extends ConstrainU32>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_value.copyWith(
-      field0: null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _value.copyWith(
+        field0: null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                as int,
+      ) as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$ConstrainU32_ExactImplCopyWith<$Res>
     implements $ConstrainU32CopyWith<$Res> {
-  factory _$$ConstrainU32_ExactImplCopyWith(_$ConstrainU32_ExactImpl value,
-          $Res Function(_$ConstrainU32_ExactImpl) then) =
-      __$$ConstrainU32_ExactImplCopyWithImpl<$Res>;
+  factory _$$ConstrainU32_ExactImplCopyWith(
+    _$ConstrainU32_ExactImpl value,
+    $Res Function(_$ConstrainU32_ExactImpl) then,
+  ) = __$$ConstrainU32_ExactImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({int field0});
@@ -501,23 +511,24 @@ abstract class _$$ConstrainU32_ExactImplCopyWith<$Res>
 class __$$ConstrainU32_ExactImplCopyWithImpl<$Res>
     extends _$ConstrainU32CopyWithImpl<$Res, _$ConstrainU32_ExactImpl>
     implements _$$ConstrainU32_ExactImplCopyWith<$Res> {
-  __$$ConstrainU32_ExactImplCopyWithImpl(_$ConstrainU32_ExactImpl _value,
-      $Res Function(_$ConstrainU32_ExactImpl) _then)
-      : super(_value, _then);
+  __$$ConstrainU32_ExactImplCopyWithImpl(
+    _$ConstrainU32_ExactImpl _value,
+    $Res Function(_$ConstrainU32_ExactImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ConstrainU32
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_$ConstrainU32_ExactImpl(
-      null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _$ConstrainU32_ExactImpl(
+        null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                as int,
+      ),
+    );
   }
 }
 
@@ -552,7 +563,9 @@ class _$ConstrainU32_ExactImpl extends ConstrainU32_Exact {
   @pragma('vm:prefer-inline')
   _$$ConstrainU32_ExactImplCopyWith<_$ConstrainU32_ExactImpl> get copyWith =>
       __$$ConstrainU32_ExactImplCopyWithImpl<_$ConstrainU32_ExactImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
@@ -641,9 +654,10 @@ abstract class ConstrainU32_Exact extends ConstrainU32 {
 /// @nodoc
 abstract class _$$ConstrainU32_IdealImplCopyWith<$Res>
     implements $ConstrainU32CopyWith<$Res> {
-  factory _$$ConstrainU32_IdealImplCopyWith(_$ConstrainU32_IdealImpl value,
-          $Res Function(_$ConstrainU32_IdealImpl) then) =
-      __$$ConstrainU32_IdealImplCopyWithImpl<$Res>;
+  factory _$$ConstrainU32_IdealImplCopyWith(
+    _$ConstrainU32_IdealImpl value,
+    $Res Function(_$ConstrainU32_IdealImpl) then,
+  ) = __$$ConstrainU32_IdealImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({int field0});
@@ -653,23 +667,24 @@ abstract class _$$ConstrainU32_IdealImplCopyWith<$Res>
 class __$$ConstrainU32_IdealImplCopyWithImpl<$Res>
     extends _$ConstrainU32CopyWithImpl<$Res, _$ConstrainU32_IdealImpl>
     implements _$$ConstrainU32_IdealImplCopyWith<$Res> {
-  __$$ConstrainU32_IdealImplCopyWithImpl(_$ConstrainU32_IdealImpl _value,
-      $Res Function(_$ConstrainU32_IdealImpl) _then)
-      : super(_value, _then);
+  __$$ConstrainU32_IdealImplCopyWithImpl(
+    _$ConstrainU32_IdealImpl _value,
+    $Res Function(_$ConstrainU32_IdealImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ConstrainU32
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_$ConstrainU32_IdealImpl(
-      null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _$ConstrainU32_IdealImpl(
+        null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                as int,
+      ),
+    );
   }
 }
 
@@ -704,7 +719,9 @@ class _$ConstrainU32_IdealImpl extends ConstrainU32_Ideal {
   @pragma('vm:prefer-inline')
   _$$ConstrainU32_IdealImplCopyWith<_$ConstrainU32_IdealImpl> get copyWith =>
       __$$ConstrainU32_IdealImplCopyWithImpl<_$ConstrainU32_IdealImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
@@ -793,9 +810,10 @@ abstract class ConstrainU32_Ideal extends ConstrainU32 {
 /// @nodoc
 abstract class _$$ConstrainU32_RangeImplCopyWith<$Res>
     implements $ConstrainU32CopyWith<$Res> {
-  factory _$$ConstrainU32_RangeImplCopyWith(_$ConstrainU32_RangeImpl value,
-          $Res Function(_$ConstrainU32_RangeImpl) then) =
-      __$$ConstrainU32_RangeImplCopyWithImpl<$Res>;
+  factory _$$ConstrainU32_RangeImplCopyWith(
+    _$ConstrainU32_RangeImpl value,
+    $Res Function(_$ConstrainU32_RangeImpl) then,
+  ) = __$$ConstrainU32_RangeImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({int field0, int field1});
@@ -805,28 +823,28 @@ abstract class _$$ConstrainU32_RangeImplCopyWith<$Res>
 class __$$ConstrainU32_RangeImplCopyWithImpl<$Res>
     extends _$ConstrainU32CopyWithImpl<$Res, _$ConstrainU32_RangeImpl>
     implements _$$ConstrainU32_RangeImplCopyWith<$Res> {
-  __$$ConstrainU32_RangeImplCopyWithImpl(_$ConstrainU32_RangeImpl _value,
-      $Res Function(_$ConstrainU32_RangeImpl) _then)
-      : super(_value, _then);
+  __$$ConstrainU32_RangeImplCopyWithImpl(
+    _$ConstrainU32_RangeImpl _value,
+    $Res Function(_$ConstrainU32_RangeImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ConstrainU32
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-    Object? field1 = null,
-  }) {
-    return _then(_$ConstrainU32_RangeImpl(
-      null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as int,
-      null == field1
-          ? _value.field1
-          : field1 // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+  $Res call({Object? field0 = null, Object? field1 = null}) {
+    return _then(
+      _$ConstrainU32_RangeImpl(
+        null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                as int,
+        null == field1
+            ? _value.field1
+            : field1 // ignore: cast_nullable_to_non_nullable
+                as int,
+      ),
+    );
   }
 }
 
@@ -864,7 +882,9 @@ class _$ConstrainU32_RangeImpl extends ConstrainU32_Range {
   @pragma('vm:prefer-inline')
   _$$ConstrainU32_RangeImplCopyWith<_$ConstrainU32_RangeImpl> get copyWith =>
       __$$ConstrainU32_RangeImplCopyWithImpl<_$ConstrainU32_RangeImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs

@@ -6,11 +6,7 @@ import 'object.g.dart' as bridge;
 
 /// Registers [Object]-related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
-  bridge.registerFunction(
-    dl,
-    runtimeType: _runtimeType,
-    toString: _toString,
-  );
+  bridge.registerFunction(dl, runtimeType: _runtimeType, toString: _toString);
 }
 
 /// Returns string representation of the [Type] of the provided [Object].

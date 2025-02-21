@@ -35,36 +35,35 @@ void registerFunction(
 
   _ice_candidate_error__address__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'ice_candidate_error__address__set_error');
+    'ice_candidate_error__address__set_error',
+  );
   _ice_candidate_error__port__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'ice_candidate_error__port__set_error');
+    'ice_candidate_error__port__set_error',
+  );
   _ice_candidate_error__url__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'ice_candidate_error__url__set_error');
+    'ice_candidate_error__url__set_error',
+  );
   _ice_candidate_error__error_code__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'ice_candidate_error__error_code__set_error');
+    'ice_candidate_error__error_code__set_error',
+  );
   _ice_candidate_error__error_text__set_error =
       dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'ice_candidate_error__error_text__set_error');
+    'ice_candidate_error__error_text__set_error',
+  );
 
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> address_native =
-      Pointer.fromFunction(
-    _addressProxy,
-  );
+      Pointer.fromFunction(_addressProxy);
   Pointer<NativeFunction<Uint32 Function(Handle)>> port_native =
       Pointer.fromFunction(_portProxy, 0);
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> url_native =
-      Pointer.fromFunction(
-    _urlProxy,
-  );
+      Pointer.fromFunction(_urlProxy);
   Pointer<NativeFunction<Int32 Function(Handle)>> errorCode_native =
       Pointer.fromFunction(_errorCodeProxy, 0);
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> errorText_native =
-      Pointer.fromFunction(
-    _errorTextProxy,
-  );
+      Pointer.fromFunction(_errorTextProxy);
 
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),

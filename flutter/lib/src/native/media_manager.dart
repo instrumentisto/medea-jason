@@ -24,10 +24,12 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
 
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
-      base_settings.MediaStreamSettings caps) async {
+    base_settings.MediaStreamSettings caps,
+  ) async {
     Pointer tracks;
     tracks = await (opaque.inner.initLocalTracks(
-        caps: (caps as MediaStreamSettings).setting) as Future) as Pointer;
+      caps: (caps as MediaStreamSettings).setting,
+    ) as Future) as Pointer;
 
     return frb
         .vecLocalTracksFromRaw(ptr: tracks.address)
@@ -49,7 +51,8 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   Future<List<MediaDisplayDetails>> enumerateDisplays() async {
     if (!(Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
       throw UnsupportedError(
-          'enumerateDisplays() is not supported on ${Platform.operatingSystem}');
+        'enumerateDisplays() is not supported on ${Platform.operatingSystem}',
+      );
     }
 
     Pointer devices;

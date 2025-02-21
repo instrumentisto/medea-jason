@@ -6,22 +6,19 @@ import '../world/member.dart';
 import '../world/more_args.dart';
 
 List<StepDefinitionGeneric> steps() {
-  return [
-    givenTreeMembers,
-    givenTwoMembers,
-    givenOneMember,
-  ];
+  return [givenTreeMembers, givenTwoMembers, givenOneMember];
 }
 
 Future<void> newGivenMember(
-    String joined,
-    firstMemberId,
-    secondMemberId,
-    thirdMemberId,
-    String mediaSettings,
-    disabledMediaType,
-    String disabledDirection,
-    StepContext<CustomWorld> context) async {
+  String joined,
+  firstMemberId,
+  secondMemberId,
+  thirdMemberId,
+  String mediaSettings,
+  disabledMediaType,
+  String disabledDirection,
+  StepContext<CustomWorld> context,
+) async {
   var notEndpointDirection = '';
   if (mediaSettings.contains('publish')) {
     notEndpointDirection = 'publish';
@@ -38,8 +35,11 @@ Future<void> newGivenMember(
   var isRecvDisabled = endpointsDisabled &&
       (allEndpointsDisabled || notEndpointDirection == 'play');
 
-  var memberBuilder =
-      MemberBuilder(firstMemberId, !isSendDisabled, !isRecvDisabled);
+  var memberBuilder = MemberBuilder(
+    firstMemberId,
+    !isSendDisabled,
+    !isRecvDisabled,
+  );
 
   await context.world.createMember(memberBuilder);
 
@@ -87,8 +87,16 @@ Future<void> newGivenMember(
   }
 
   if (secondMemberId != '') {
-    await newGivenMember(joined, secondMemberId, thirdMemberId, '',
-        mediaSettings, disabledMediaType, disabledDirection, context);
+    await newGivenMember(
+      joined,
+      secondMemberId,
+      thirdMemberId,
+      '',
+      mediaSettings,
+      disabledMediaType,
+      disabledDirection,
+      context,
+    );
   }
 }
 
@@ -98,36 +106,77 @@ StepDefinitionGeneric givenOneMember =
   r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
   r'with no play WebRTC endpoints| with disabled| with muted|)'
   r'( media| audio| video|)( publishing| playing|)$',
-  (joined, firstMemberId, endpoints, disabledMediaType, disabledDirection,
-      context) async {
-    await newGivenMember(joined, firstMemberId, '', '', endpoints,
-        disabledMediaType, disabledDirection, context);
+  (
+    joined,
+    firstMemberId,
+    endpoints,
+    disabledMediaType,
+    disabledDirection,
+    context,
+  ) async {
+    await newGivenMember(
+      joined,
+      firstMemberId,
+      '',
+      '',
+      endpoints,
+      disabledMediaType,
+      disabledDirection,
+      context,
+    );
   },
 );
 
 StepDefinitionGeneric givenTwoMembers =
     given6<String, String, String, String, String, String, CustomWorld>(
-  r'(room with joined |room with |joined )member(s) (\S+) and '
-  r'(\S+)( with no WebRTC endpoints| with no publish WebRTC endpoints| '
-  r'with no play WebRTC endpoints| with disabled| with muted|)'
-  r'( media| audio| video|)( publishing| playing|)$',
-  (joined, firstMemberId, secondMemberId, endpoints, disabledMediaType,
-      disabledDirection, context) async {
-    await newGivenMember(joined, firstMemberId, secondMemberId, '', endpoints,
-        disabledMediaType, disabledDirection, context);
-  },
-);
+        r'(room with joined |room with |joined )member(s) (\S+) and '
+        r'(\S+)( with no WebRTC endpoints| with no publish WebRTC endpoints| '
+        r'with no play WebRTC endpoints| with disabled| with muted|)'
+        r'( media| audio| video|)( publishing| playing|)$', (
+  joined,
+  firstMemberId,
+  secondMemberId,
+  endpoints,
+  disabledMediaType,
+  disabledDirection,
+  context,
+) async {
+  await newGivenMember(
+    joined,
+    firstMemberId,
+    secondMemberId,
+    '',
+    endpoints,
+    disabledMediaType,
+    disabledDirection,
+    context,
+  );
+});
 
 StepDefinitionGeneric givenTreeMembers =
     given7<String, String, String, String, String, String, String, CustomWorld>(
-  r'(room with joined |room with |joined )member(s) (\S+) and '
-  r'(\S+) and (\S+)'
-  r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
-  r'with no play WebRTC endpoints| with disabled| with muted|)'
-  r'( media| audio| video|)( publishing| playing|)$',
-  (joined, firstMemberId, secondMemberId, thirdMemberId, endpoints,
-      disabledMediaType, disabledDirection, context) async {
-    await newGivenMember(joined, firstMemberId, secondMemberId, thirdMemberId,
-        endpoints, disabledMediaType, disabledDirection, context);
-  },
-);
+        r'(room with joined |room with |joined )member(s) (\S+) and '
+        r'(\S+) and (\S+)'
+        r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
+        r'with no play WebRTC endpoints| with disabled| with muted|)'
+        r'( media| audio| video|)( publishing| playing|)$', (
+  joined,
+  firstMemberId,
+  secondMemberId,
+  thirdMemberId,
+  endpoints,
+  disabledMediaType,
+  disabledDirection,
+  context,
+) async {
+  await newGivenMember(
+    joined,
+    firstMemberId,
+    secondMemberId,
+    thirdMemberId,
+    endpoints,
+    disabledMediaType,
+    disabledDirection,
+    context,
+  );
+});

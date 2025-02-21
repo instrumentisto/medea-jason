@@ -28,13 +28,15 @@ class WebRemoteMediaTrack implements RemoteMediaTrack {
   @override
   MediaSourceKind mediaSourceKind() {
     return fallibleFunction(
-        () => MediaSourceKind.values[obj.media_source_kind().toInt()]);
+      () => MediaSourceKind.values[obj.media_source_kind().toInt()],
+    );
   }
 
   @override
   TrackMediaDirection mediaDirection() {
     return fallibleFunction(
-        () => TrackMediaDirection.values[obj.media_direction().toInt()]);
+      () => TrackMediaDirection.values[obj.media_direction().toInt()],
+    );
   }
 
   @override
