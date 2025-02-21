@@ -164,7 +164,7 @@ async fn new_media_connections_with_disabled_video_tracks() {
 mod sender_patch {
     use medea_client_api_proto::{
         AudioSettings, ConnectionMode, EncodingParameters, MediaDirection,
-        MediaSourceKind, MediaType, VideoSettings,
+        MediaSourceKind, MediaType, ScalabilityMode, VideoSettings,
     };
     use medea_jason::{
         peer::{sender, MediaExchangeState},
@@ -301,7 +301,7 @@ mod sender_patch {
 
     #[wasm_bindgen_test]
     async fn add_transceiver_send_encodings() {
-        let (sender, track_id, _media_connections) = video_sender(vec![
+        let (sender, _, _media_connections) = video_sender(vec![
             EncodingParameters {
                 rid: "h".to_owned(),
                 scalability_mode: None,
@@ -334,7 +334,11 @@ mod sender_patch {
         assert_eq!(encs[1].active(), true);
         assert_eq!(encs[1].scale_resolution_down_by(), 2.0);
         assert_eq!(encs[1].max_bitrate(), Some(100));
-        assert_eq!(encs[1].scalability_mode(), Some("L3T3".to_owned()));
+        if !is_firefox() {
+            // TODO: Scalability mode is not supported in Firefox as of v135:
+            // https://bugzilla.mozilla.org/show_bug.cgi?id=1571470
+            assert_eq!(encs[1].scalability_mode(), Some("L3T3".to_owned()));
+        }
     }
 
     #[wasm_bindgen_test]
@@ -557,7 +561,7 @@ mod codec_probing {
     use std::collections::HashMap;
 
     use super::*;
-    use medea_client_api_proto::{Codec, ScalabilityMode};
+    use medea_client_api_proto::Codec;
     use medea_jason::{
         media::MediaKind,
         platform::{transceiver::probe_target_codecs, CodecCapability},

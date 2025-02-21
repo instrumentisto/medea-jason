@@ -9,7 +9,7 @@ use std::{
 
 use futures::{future, stream, FutureExt as _, StreamExt as _};
 use medea_client_api_proto::{
-    Capabilities, ClientMsg, CloseReason, Command, Event, ServerMsg,
+    ClientMsg, CloseReason, Command, Event, ServerMsg,
 };
 use medea_jason::{
     platform::{
