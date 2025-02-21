@@ -18,7 +18,8 @@ use medea_jason::{
 use wasm_bindgen_test::*;
 
 use crate::{
-    get_media_stream_settings, get_test_unrequired_tracks, local_constraints,
+    get_media_stream_settings, get_test_unrequired_tracks, is_firefox,
+    local_constraints,
 };
 
 wasm_bindgen_test_configure!(run_in_browser);
@@ -163,11 +164,10 @@ async fn new_media_connections_with_disabled_video_tracks() {
 mod sender_patch {
     use medea_client_api_proto::{
         AudioSettings, ConnectionMode, EncodingParameters, MediaDirection,
-        MediaSourceKind, MediaType, ScalabilityMode, VideoSettings,
+        MediaSourceKind, MediaType, VideoSettings,
     };
     use medea_jason::{
         peer::{sender, MediaExchangeState},
-        platform::send_encoding_parameters::SendEncodingParameters,
         utils::{AsProtoState, SynchronizableState, Updatable},
     };
 
@@ -332,7 +332,7 @@ mod sender_patch {
 
         assert_eq!(encs[1].rid(), Some("l".to_owned()));
         assert_eq!(encs[1].active(), true);
-        assert_eq!(encs[1].scale_resolution_down_by(), Some(2.0));
+        assert_eq!(encs[1].scale_resolution_down_by(), 2.0);
         assert_eq!(encs[1].max_bitrate(), Some(100));
         assert_eq!(encs[1].scalability_mode(), Some("L3T3".to_owned()));
     }
@@ -375,7 +375,7 @@ mod sender_patch {
         // Only one encoding so rid is empty
         assert_eq!(encs[0].rid(), None);
         assert_eq!(encs[0].active(), false);
-        assert_eq!(encs[0].scale_resolution_down_by(), Some(2.0));
+        assert_eq!(encs[0].scale_resolution_down_by(), 2.0);
         assert_eq!(encs[0].max_bitrate(), Some(100));
         if !is_firefox() {
             // TODO: Scalability mode is not supported in Firefox as of v135:
@@ -654,7 +654,7 @@ mod codec_probing {
             .collect();
         res.dedup();
 
-        assert_eq!(res[0..2], &["video/VP8", "video/VP9"]);
+        assert_eq!(res[0..2].to_vec(), &["video/VP8", "video/VP9"]);
 
         // reverse and repeat
         target.reverse();
@@ -666,7 +666,7 @@ mod codec_probing {
             .map(|c| c.mime_type())
             .collect();
         res.dedup();
-        assert_eq!(res[0..2], &["video/VP9", "video/VP8"]);
+        assert_eq!(res[0..2].to_vec(), &["video/VP9", "video/VP8"]);
     }
 
     // This test is necessary to identify changes in the list of available

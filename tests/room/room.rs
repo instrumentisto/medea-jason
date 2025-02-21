@@ -635,7 +635,6 @@ mod disable_send_tracks {
     use medea_jason::{
         media::MediaKind,
         peer::{media_exchange_state, TrackDirection},
-        platform,
     };
 
     use super::*;
