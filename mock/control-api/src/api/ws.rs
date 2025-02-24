@@ -10,8 +10,8 @@ use actix::{
     StreamHandler,
 };
 use actix_web::{
-    web::{Data, Path, Payload},
     Error, HttpRequest, HttpResponse,
+    web::{Data, Path, Payload},
 };
 use actix_web_actors::ws;
 use serde::Serialize;

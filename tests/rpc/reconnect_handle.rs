@@ -5,7 +5,7 @@ use std::{
     str::FromStr,
 };
 
-use futures::{future, stream, StreamExt as _};
+use futures::{StreamExt as _, future, stream};
 use medea_client_api_proto::{Event, ServerMsg};
 use medea_jason::{
     platform::{self, MockRpcTransport, RpcTransport, TransportState},
@@ -17,7 +17,7 @@ use medea_jason::{
 use medea_reactive::ObservableCell;
 use wasm_bindgen_test::*;
 
-use crate::{delay_for, rpc::RPC_SETTINGS, timeout, TEST_ROOM_URL};
+use crate::{TEST_ROOM_URL, delay_for, rpc::RPC_SETTINGS, timeout};
 
 wasm_bindgen_test_configure!(run_in_browser);
 
@@ -61,10 +61,7 @@ async fn reconnect_with_backoff() {
     timeout(100, connect_fut).await.unwrap().unwrap();
 
     transport_state.set(TransportState::Closed(CloseMsg::Abnormal(999)));
-    timeout(100, session.on_connection_loss().next())
-        .await
-        .unwrap()
-        .unwrap();
+    timeout(100, session.on_connection_loss().next()).await.unwrap().unwrap();
     let handle =
         ReconnectHandle::new(Rc::downgrade(&session) as Weak<dyn RpcSession>);
 
@@ -107,10 +104,7 @@ async fn reconnect_with_backoff() {
 
     // Checks that ReconnectError::Detached is fired when session is dropped.
     transport_state.set(TransportState::Closed(CloseMsg::Abnormal(999)));
-    timeout(100, session.on_connection_loss().next())
-        .await
-        .unwrap()
-        .unwrap();
+    timeout(100, session.on_connection_loss().next()).await.unwrap().unwrap();
 
     platform::spawn(async move {
         delay_for(20).await;

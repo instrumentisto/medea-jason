@@ -4,10 +4,10 @@ use std::{cell::RefCell, collections::HashMap, env, time::Duration};
 
 use derive_more::with_trait::{Debug, Display, Error as StdError, From};
 use medea_e2e::{
-    browser::{mock, Statement, Window},
+    browser::{Statement, Window, mock},
     object::{
-        self, connections_store::ConnectionStore, AwaitCompletion, MediaKind,
-        MediaSourceKind, Object, Room,
+        self, AwaitCompletion, MediaKind, MediaSourceKind, Object, Room,
+        connections_store::ConnectionStore,
     },
 };
 
@@ -253,9 +253,7 @@ impl Member {
         self.update_send_media_state(kind, source, enabled);
         if enabled {
             if let Some(kind) = kind {
-                self.room
-                    .enable_media_send(kind, source, maybe_await)
-                    .await?;
+                self.room.enable_media_send(kind, source, maybe_await).await?;
                 match kind {
                     MediaKind::Audio => self.enabled_audio = true,
                     MediaKind::Video => self.enabled_video = true,
@@ -271,9 +269,7 @@ impl Member {
                 self.enabled_video = true;
             }
         } else if let Some(kind) = kind {
-            self.room
-                .disable_media_send(kind, source, maybe_await)
-                .await?;
+            self.room.disable_media_send(kind, source, maybe_await).await?;
             match kind {
                 MediaKind::Audio => self.enabled_audio = false,
                 MediaKind::Video => self.enabled_video = false,
@@ -335,34 +331,22 @@ impl Member {
             if let Some(kind) = kind {
                 self.room.enable_remote_media(kind, source).await?;
             } else {
-                self.room
-                    .enable_remote_media(MediaKind::Audio, source)
-                    .await?;
-                self.room
-                    .enable_remote_media(MediaKind::Video, source)
-                    .await?;
+                self.room.enable_remote_media(MediaKind::Audio, source).await?;
+                self.room.enable_remote_media(MediaKind::Video, source).await?;
             }
         } else if let Some(kind) = kind {
             self.room.disable_remote_media(kind, source).await?;
         } else {
-            self.room
-                .disable_remote_media(MediaKind::Audio, source)
-                .await?;
-            self.room
-                .disable_remote_media(MediaKind::Video, source)
-                .await?;
+            self.room.disable_remote_media(MediaKind::Audio, source).await?;
+            self.room.disable_remote_media(MediaKind::Video, source).await?;
         }
         Ok(())
     }
 
     /// Emulates video device switching.
     pub async fn switch_video_device(&self) -> Result<()> {
-        self.room
-            .set_local_media_settings(false, true, true)
-            .await?;
-        self.room
-            .set_local_media_settings(true, true, false)
-            .await?;
+        self.room.set_local_media_settings(false, true, true).await?;
+        self.room.set_local_media_settings(true, true, false).await?;
         Ok(())
     }
 

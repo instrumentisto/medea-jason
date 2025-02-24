@@ -3,8 +3,8 @@
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-    parse::{Error, Result},
     ExprMethodCall, ImplItem, ItemImpl,
+    parse::{Error, Result},
 };
 
 /// Generates the actual code for `#[watchers]` macro.
@@ -27,13 +27,7 @@ pub(crate) fn expand(mut input: ItemImpl) -> Result<TokenStream> {
     let watchers = input
         .items
         .iter_mut()
-        .filter_map(|i| {
-            if let ImplItem::Fn(m) = i {
-                Some(m)
-            } else {
-                None
-            }
-        })
+        .filter_map(|i| if let ImplItem::Fn(m) = i { Some(m) } else { None })
         .map(|method| {
             let mut watch_attr_index = None;
             let stream_expr = method

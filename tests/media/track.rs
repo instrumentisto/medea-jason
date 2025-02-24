@@ -3,14 +3,14 @@
 use std::rc::{Rc, Weak};
 
 use futures::{
-    channel::{mpsc, oneshot},
     StreamExt as _,
+    channel::{mpsc, oneshot},
 };
 use medea_jason::{
     api::MediaDirection,
     media::{
-        track::remote, DeviceVideoTrackConstraints, MediaManager,
-        MediaStreamSettings,
+        DeviceVideoTrackConstraints, MediaManager, MediaStreamSettings,
+        track::remote,
     },
 };
 use wasm_bindgen::closure::Closure;

@@ -78,8 +78,6 @@ mod completer {
 ///
 /// Panics if the `DELAYED_FUTURE_FUNCTION` isn't set by the Dart side. This
 /// should be an impossible case.
-///
-/// [`Future`]: std::future::Future
 pub async fn delay_for(delay: Duration) {
     #[expect( // overflow is unexpected
         clippy::cast_possible_truncation,
@@ -124,11 +122,7 @@ impl<T, E> Completer<T, E> {
     pub fn new() -> Self {
         let completer = unsafe { completer::init() }.unwrap();
         let handle = unsafe { dart_api::new_persistent_handle(completer) };
-        Self {
-            handle,
-            _success_kind: PhantomData,
-            _error_kind: PhantomData,
-        }
+        Self { handle, _success_kind: PhantomData, _error_kind: PhantomData }
     }
 
     /// Returns a [`Dart_Handle`] to the Dart [Future] controlled by this

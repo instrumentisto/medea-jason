@@ -2,31 +2,14 @@
 //!
 //! [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 
-use std::{future::Future, rc::Rc};
+use std::rc::Rc;
 
 use derive_more::with_trait::Display;
 use medea_client_api_proto::{
-    stats::RtcStat, IceConnectionState, IceServer, PeerConnectionState,
+    IceConnectionState, IceServer, PeerConnectionState, stats::RtcStat,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
-
-use crate::{
-    media::MediaKind,
-    platform::{
-        dart::{
-            ice_server::RtcIceServers,
-            transceiver::Transceiver,
-            utils::{
-                callback::Callback, dart_future::FutureFromDart,
-                handle::DartHandle, ice_connection_from_int,
-                peer_connection_state_from_int,
-            },
-        },
-        IceCandidate, IceCandidateError, RtcPeerConnectionError, RtcStats,
-        RtcStatsError, SdpType,
-    },
-};
 
 use super::{
     ice_candidate::{
@@ -36,6 +19,22 @@ use super::{
     media_track::MediaStreamTrack,
     transceiver::TransceiverInit,
     utils::string_into_c_str,
+};
+use crate::{
+    media::MediaKind,
+    platform::{
+        IceCandidate, IceCandidateError, RtcPeerConnectionError, RtcStats,
+        RtcStatsError, SdpType,
+        dart::{
+            ice_server::RtcIceServers,
+            transceiver::Transceiver,
+            utils::{
+                callback::Callback, dart_future::FutureFromDart,
+                handle::DartHandle, ice_connection_from_int,
+                peer_connection_state_from_int,
+            },
+        },
+    },
 };
 
 type RtcPeerConnectionResult<T> = Result<T, Traced<RtcPeerConnectionError>>;
@@ -388,11 +387,9 @@ impl RtcPeerConnection {
             )
         }
         .unwrap();
-        unsafe { FutureFromDart::execute::<()>(fut) }
-            .await
-            .map_err(|e| {
-                tracerr::new!(RtcPeerConnectionError::AddIceCandidateFailed(e))
-            })?;
+        unsafe { FutureFromDart::execute::<()>(fut) }.await.map_err(|e| {
+            tracerr::new!(RtcPeerConnectionError::AddIceCandidateFailed(e))
+        })?;
         Ok(())
     }
 
@@ -563,7 +560,7 @@ impl RtcPeerConnection {
     pub fn get_transceiver_by_mid(
         &self,
         mid: String,
-    ) -> impl Future<Output = Option<Transceiver>> + 'static {
+    ) -> impl Future<Output = Option<Transceiver>> + 'static + use<> {
         let handle = self.handle.get();
         async move {
             let fut = unsafe {

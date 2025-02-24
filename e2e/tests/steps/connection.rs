@@ -1,6 +1,6 @@
 use cucumber::{then, when};
 
-use crate::{steps::parse_media_kind, World};
+use crate::{World, steps::parse_media_kind};
 
 #[then(regex = r"^(\S+) receives connection with (\S+)$")]
 async fn then_member_receives_connection(
@@ -23,12 +23,7 @@ async fn then_member_doesnt_receive_connection(
     responder_id: String,
 ) {
     let member = world.get_member(&id).unwrap();
-    assert!(member
-        .connections()
-        .get(responder_id)
-        .await
-        .unwrap()
-        .is_none());
+    assert!(member.connections().get(responder_id).await.unwrap().is_none());
 }
 
 #[then(regex = r"^(\S+)'s connection with (\S+) closes$")]

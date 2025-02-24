@@ -9,16 +9,17 @@ use derive_more::with_trait::{Display, Error, From};
 use tonic::codegen::{Body, Bytes};
 
 use crate::{
+    CallbackApi, ControlApi,
     callback::Request as CallbackRequest,
     control::Request as ControlRequest,
     grpc::{
+        CallbackApiClient, ProtobufError,
         api::{
             self as control_proto,
             control_api_server::ControlApi as GrpcControlApiService,
         },
-        callback as callback_proto, CallbackApiClient, ProtobufError,
+        callback as callback_proto,
     },
-    CallbackApi, ControlApi,
 };
 
 /// [`Box`]ed [`Error`] with [`Send`] and [`Sync`].
@@ -37,8 +38,7 @@ where
     ) -> Result<tonic::Response<control_proto::CreateResponse>, tonic::Status>
     {
         let fut = async {
-            self.create(ControlRequest::try_from(request.into_inner())?)
-                .await
+            self.create(ControlRequest::try_from(request.into_inner())?).await
         };
 
         Ok(tonic::Response::new(match fut.await {
@@ -74,9 +74,7 @@ where
 
         Ok(tonic::Response::new(match result {
             Ok(()) => control_proto::Response { error: None },
-            Err(e) => control_proto::Response {
-                error: Some(e.into()),
-            },
+            Err(e) => control_proto::Response { error: Some(e.into()) },
         }))
     }
 

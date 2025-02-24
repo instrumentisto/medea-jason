@@ -3,9 +3,8 @@
 pub mod media_devices;
 pub mod websocket;
 
-use super::Window;
-
 pub use self::{media_devices::MediaDevices, websocket::WebSocket};
+use super::Window;
 
 /// Instantiates all the required mocks in the provided [`Window`].
 pub async fn instantiate_mocks(window: &Window) {

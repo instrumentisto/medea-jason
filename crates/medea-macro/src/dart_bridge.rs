@@ -136,14 +136,10 @@ impl ModExpander {
             self.fn_expanders.iter().map(FnExpander::gen_fn_storages);
 
         let register_fn_name = &self.register_fn_name;
-        let register_fn_inputs = self
-            .fn_expanders
-            .iter()
-            .map(FnExpander::gen_register_fn_input);
-        let register_fn_assigns = self
-            .fn_expanders
-            .iter()
-            .map(FnExpander::gen_register_fn_expr);
+        let register_fn_inputs =
+            self.fn_expanders.iter().map(FnExpander::gen_register_fn_input);
+        let register_fn_assigns =
+            self.fn_expanders.iter().map(FnExpander::gen_register_fn_expr);
 
         let caller_fns =
             self.fn_expanders.iter().map(FnExpander::gen_caller_fn);
@@ -165,7 +161,7 @@ impl ModExpander {
 
                 #( #errors_slots )*
 
-                #[no_mangle]
+                #[unsafe(no_mangle)]
                 pub unsafe extern "C" fn #register_fn_name(
                     #( #register_fn_inputs, )*
                 ) {
@@ -214,11 +210,11 @@ impl ModExpander {
             DartCodegen::new(&self.register_fn_name, registerers)?
                 .generate()
                 .map_err(|e| {
-                    syn::Error::new(
-                        relative_path.span(),
-                        format!("Failed to generate Dart code: {e}"),
-                    )
-                })?;
+                syn::Error::new(
+                    relative_path.span(),
+                    format!("Failed to generate Dart code: {e}"),
+                )
+            })?;
 
         file.write_all(generated_code.as_bytes()).map_err(|e| {
             let msg = format!(
@@ -432,11 +428,8 @@ impl FnExpander {
             let syn::Type::Path(ret_ty_path) = *ret_ty else {
                 return err;
             };
-            let Some(ret_ty_args) = ret_ty_path
-                .path
-                .segments
-                .last()
-                .map(|s| s.arguments.clone())
+            let Some(ret_ty_args) =
+                ret_ty_path.path.segments.last().map(|s| s.arguments.clone())
             else {
                 return err;
             };
@@ -642,7 +635,7 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// #[no_mangle]
+    /// #[unsafe(no_mangle)]
     /// pub unsafe extern "C" fn peer_connection__connection_state__set_error(
     ///     err: Dart_Handle,
     /// ) {
@@ -657,7 +650,7 @@ impl FnExpander {
 
         quote! {
             #[doc = #doc]
-            #[no_mangle]
+            #[unsafe(no_mangle)]
             pub unsafe extern "C" fn #fn_name(err: Dart_Handle) {
                 #error_slot.set(Some(Error::from_handle(err)));
             }

@@ -7,6 +7,7 @@
 use std::time::Duration;
 
 use crate::{
+    Element, Endpoint, Fid, Member, Ping, Pong, Room,
     control::{ParseFidError, Request},
     endpoint::{
         self, web_rtc_play,
@@ -15,9 +16,9 @@ use crate::{
             self, AudioSettings, P2pMode, Policy, VideoSettings, WebRtcPublish,
         },
     },
-    grpc::{api as proto, convert::ProtobufError, CallbackUrlParseError},
+    grpc::{CallbackUrlParseError, api as proto, convert::ProtobufError},
     member::{self, Credentials},
-    room, Element, Endpoint, Fid, Member, Ping, Pong, Room,
+    room,
 };
 
 impl TryFrom<(Fid, Element)> for proto::Element {
@@ -27,28 +28,14 @@ impl TryFrom<(Fid, Element)> for proto::Element {
         use proto::element::El;
 
         let el = match (fid, spec) {
-            (Fid::Room { id }, Element::Room(room)) => Ok(El::Room(
-                Room {
-                    id,
-                    spec: room.spec,
-                }
-                .into(),
-            )),
+            (Fid::Room { id }, Element::Room(room)) => {
+                Ok(El::Room(Room { id, spec: room.spec }.into()))
+            }
             (Fid::Member { id, .. }, Element::Member(member)) => {
-                Ok(El::Member(
-                    Member {
-                        id,
-                        spec: member.spec,
-                    }
-                    .into(),
-                ))
+                Ok(El::Member(Member { id, spec: member.spec }.into()))
             }
             (Fid::Endpoint { id, .. }, Element::Endpoint(endpoint)) => {
-                Ok(Endpoint {
-                    id,
-                    spec: endpoint.spec,
-                }
-                .into())
+                Ok(Endpoint { id, spec: endpoint.spec }.into())
             }
             (id @ Fid::Room { .. }, _) => Err(ProtobufError::ExpectedElement(
                 "Room",
@@ -80,10 +67,8 @@ impl TryFrom<proto::CreateRequest> for Request {
         })?;
 
         if parent_fid.is_empty() {
-            return Room::try_from(el).map(|room| Self::Room {
-                id: room.id,
-                spec: room.spec,
-            });
+            return Room::try_from(el)
+                .map(|room| Self::Room { id: room.id, spec: room.spec });
         }
 
         match parent_fid.parse::<Fid>()? {
@@ -94,15 +79,13 @@ impl TryFrom<proto::CreateRequest> for Request {
                     spec: Box::new(member.spec),
                 })
             }
-            Fid::Member {
-                id: member_id,
-                room_id,
-            } => Endpoint::try_from(el).map(|endpoint| Self::Endpoint {
-                id: endpoint.id,
-                room_id,
-                member_id,
-                spec: endpoint.spec,
-            }),
+            Fid::Member { id: member_id, room_id } => Endpoint::try_from(el)
+                .map(|endpoint| Self::Endpoint {
+                    id: endpoint.id,
+                    room_id,
+                    member_id,
+                    spec: endpoint.spec,
+                }),
             Fid::Endpoint { .. } => Err(ProtobufError::ParseFidErr(
                 ParseFidError::TooManyPaths(parent_fid.into()),
             )),
@@ -120,10 +103,8 @@ impl TryFrom<proto::ApplyRequest> for Request {
         })?;
 
         match parent_fid.parse::<Fid>()? {
-            Fid::Room { .. } => Room::try_from(el).map(|room| Self::Room {
-                id: room.id,
-                spec: room.spec,
-            }),
+            Fid::Room { .. } => Room::try_from(el)
+                .map(|room| Self::Room { id: room.id, spec: room.spec }),
             Fid::Member { room_id, .. } => {
                 Member::try_from(el).map(|member| Self::Member {
                     id: member.id,
@@ -146,25 +127,13 @@ impl From<Request> for proto::CreateRequest {
                 Fid::Room { id: room_id }.to_string(),
                 Member { id, spec: *spec }.into(),
             ),
-            Request::Endpoint {
-                id,
-                room_id,
-                member_id,
-                spec,
-            } => (
-                Fid::Member {
-                    id: member_id,
-                    room_id,
-                }
-                .to_string(),
+            Request::Endpoint { id, room_id, member_id, spec } => (
+                Fid::Member { id: member_id, room_id }.to_string(),
                 Endpoint { id, spec }.into(),
             ),
         };
 
-        Self {
-            parent_fid,
-            el: Some(el),
-        }
+        Self { parent_fid, el: Some(el) }
     }
 }
 
@@ -175,31 +144,16 @@ impl From<Request> for proto::ApplyRequest {
                 (Fid::Room { id: id.clone() }, Room { id, spec }.into())
             }
             Request::Member { id, room_id, spec } => (
-                Fid::Member {
-                    id: id.clone(),
-                    room_id,
-                },
+                Fid::Member { id: id.clone(), room_id },
                 Member { id, spec: *spec }.into(),
             ),
-            Request::Endpoint {
-                id,
-                room_id,
-                member_id,
-                spec,
-            } => (
-                Fid::Endpoint {
-                    id: id.clone(),
-                    room_id,
-                    member_id,
-                },
+            Request::Endpoint { id, room_id, member_id, spec } => (
+                Fid::Endpoint { id: id.clone(), room_id, member_id },
                 Endpoint { id, spec }.into(),
             ),
         };
 
-        Self {
-            parent_fid: parent_fid.to_string(),
-            el: Some(el),
-        }
+        Self { parent_fid: parent_fid.to_string(), el: Some(el) }
     }
 }
 
@@ -477,9 +431,7 @@ impl From<Member> for proto::apply_request::El {
 
 impl From<Member> for proto::room::Element {
     fn from(member: Member) -> Self {
-        Self {
-            el: Some(proto::room::element::El::Member(member.into())),
-        }
+        Self { el: Some(proto::room::element::El::Member(member.into())) }
     }
 }
 
@@ -549,11 +501,8 @@ impl From<Endpoint> for proto::member::Element {
                     .into(),
                 ),
                 endpoint::Spec::WebRtcPlayEndpoint(spec) => El::WebrtcPlay(
-                    WebRtcPlay {
-                        id: String::from(endpoint.id).into(),
-                        spec,
-                    }
-                    .into(),
+                    WebRtcPlay { id: String::from(endpoint.id).into(), spec }
+                        .into(),
                 ),
             }),
         }
@@ -564,18 +513,12 @@ impl From<Endpoint> for proto::element::El {
     fn from(endpoint: Endpoint) -> Self {
         match endpoint.spec {
             endpoint::Spec::WebRtcPublishEndpoint(spec) => Self::WebrtcPub(
-                WebRtcPublish {
-                    id: String::from(endpoint.id).into(),
-                    spec,
-                }
-                .into(),
+                WebRtcPublish { id: String::from(endpoint.id).into(), spec }
+                    .into(),
             ),
             endpoint::Spec::WebRtcPlayEndpoint(spec) => Self::WebrtcPlay(
-                WebRtcPlay {
-                    id: String::from(endpoint.id).into(),
-                    spec,
-                }
-                .into(),
+                WebRtcPlay { id: String::from(endpoint.id).into(), spec }
+                    .into(),
             ),
         }
     }
@@ -585,18 +528,12 @@ impl From<Endpoint> for proto::create_request::El {
     fn from(endpoint: Endpoint) -> Self {
         match endpoint.spec {
             endpoint::Spec::WebRtcPublishEndpoint(spec) => Self::WebrtcPub(
-                WebRtcPublish {
-                    id: String::from(endpoint.id).into(),
-                    spec,
-                }
-                .into(),
+                WebRtcPublish { id: String::from(endpoint.id).into(), spec }
+                    .into(),
             ),
             endpoint::Spec::WebRtcPlayEndpoint(spec) => Self::WebrtcPlay(
-                WebRtcPlay {
-                    id: String::from(endpoint.id).into(),
-                    spec,
-                }
-                .into(),
+                WebRtcPlay { id: String::from(endpoint.id).into(), spec }
+                    .into(),
             ),
         }
     }
@@ -606,18 +543,12 @@ impl From<Endpoint> for proto::apply_request::El {
     fn from(endpoint: Endpoint) -> Self {
         match endpoint.spec {
             endpoint::Spec::WebRtcPublishEndpoint(spec) => Self::WebrtcPub(
-                WebRtcPublish {
-                    id: String::from(endpoint.id).into(),
-                    spec,
-                }
-                .into(),
+                WebRtcPublish { id: String::from(endpoint.id).into(), spec }
+                    .into(),
             ),
             endpoint::Spec::WebRtcPlayEndpoint(spec) => Self::WebrtcPlay(
-                WebRtcPlay {
-                    id: String::from(endpoint.id).into(),
-                    spec,
-                }
-                .into(),
+                WebRtcPlay { id: String::from(endpoint.id).into(), spec }
+                    .into(),
             ),
         }
     }

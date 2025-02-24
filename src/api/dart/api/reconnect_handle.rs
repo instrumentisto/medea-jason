@@ -1,12 +1,12 @@
 //! External handle used to reconnect to a media server when connection is lost.
 
-use flutter_rust_bridge::{frb, DartOpaque};
+use flutter_rust_bridge::{DartOpaque, frb};
 use send_wrapper::SendWrapper;
 
 #[cfg(doc)]
 use crate::room::Room;
 use crate::{
-    api::{dart::api::ForeignClass, Error, Error as DartError},
+    api::{Error, Error as DartError, dart::api::ForeignClass},
     platform::utils::dart_future::IntoDartFuture as _,
     rpc as core,
 };

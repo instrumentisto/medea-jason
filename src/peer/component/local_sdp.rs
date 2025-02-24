@@ -7,16 +7,15 @@ use std::{
 };
 
 use futures::{
-    future,
+    StreamExt as _, future,
     future::{Either, LocalBoxFuture},
     stream::LocalBoxStream,
-    StreamExt as _,
 };
 use medea_reactive::ObservableCell;
 
 use crate::{
     platform,
-    utils::{resettable_delay_for, ResettableDelayHandle},
+    utils::{ResettableDelayHandle, resettable_delay_for},
 };
 
 /// Timeout for a local session description being approved by the Media Server.
@@ -53,8 +52,6 @@ impl LocalSdp {
 
     /// Returns [`Future`] that will be resolved when current SDP offer will be
     /// approved by Media Server.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_approved(&self) -> LocalBoxFuture<'static, ()> {
         let approved = Rc::clone(&self.0.approved);
         Box::pin(async move {

@@ -2,12 +2,11 @@
 
 use std::{borrow::Cow, str::FromStr};
 
+use super::{AwaitCompletion, Error};
 use crate::{
     browser::Statement,
-    object::{connections_store::ConnectionStore, tracks_store, Object},
+    object::{Object, connections_store::ConnectionStore, tracks_store},
 };
-
-use super::{AwaitCompletion, Error};
 
 /// Representation of a `Room` JS object.
 #[derive(Clone, Copy, Debug)]

@@ -7,7 +7,7 @@ use medea_macro::dart_bridge;
 use crate::{
     media::MediaDeviceKind,
     platform::dart::utils::{
-        dart_string_into_rust, handle::DartHandle, NonNullDartValueArgExt as _,
+        NonNullDartValueArgExt as _, dart_string_into_rust, handle::DartHandle,
     },
 };
 
@@ -120,10 +120,7 @@ impl TryFrom<DartHandle> for MediaDeviceInfo {
             .try_into()
             .map_err(|_| NotInput)?;
 
-        Ok(Self {
-            handle: value,
-            kind,
-        })
+        Ok(Self { handle: value, kind })
     }
 }
 

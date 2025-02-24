@@ -7,7 +7,7 @@ use std::str::FromStr;
 use derive_more::with_trait::{AsRef, Display, Error, From, Into};
 use ref_cast::RefCast;
 #[cfg(feature = "serde")]
-use serde::{de::Error as _, Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as _};
 use url::Url;
 
 use crate::control::{
@@ -144,11 +144,7 @@ impl FromStr for LocalSrcUri {
             return Err(LocalSrcUriParseError::TooManyPaths(val.into()));
         }
 
-        Ok(Self {
-            room_id,
-            member_id,
-            endpoint_id,
-        })
+        Ok(Self { room_id, member_id, endpoint_id })
     }
 }
 

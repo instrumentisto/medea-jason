@@ -6,12 +6,11 @@ use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
-use crate::platform::{dart::utils::handle::DartHandle, Error};
-
 use super::{
     send_encoding_parameters::SendEncodingParameters,
     utils::{dart_future::FutureFromDart, list::DartList},
 };
+use crate::platform::{Error, dart::utils::handle::DartHandle};
 
 #[dart_bridge("flutter/lib/src/native/platform/parameters.g.dart")]
 mod parameters {
@@ -26,7 +25,7 @@ mod parameters {
         /// [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
         /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
         pub fn encodings(parameters: Dart_Handle)
-            -> Result<Dart_Handle, Error>;
+        -> Result<Dart_Handle, Error>;
 
         /// Sets the provided [RTCRtpEncodingParameters][1] into the provided
         /// [RTCRtpParameters].

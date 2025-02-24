@@ -8,7 +8,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::DartValue,
-    platform::dart::utils::{handle::DartHandle, NonNullDartValueArgExt as _},
+    platform::dart::utils::{NonNullDartValueArgExt as _, handle::DartHandle},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/list.g.dart")]
@@ -19,7 +19,7 @@ mod list {
 
     use crate::{
         api::{DartValue, DartValueArg},
-        platform::{dart::utils::handle::DartHandle, Error},
+        platform::{Error, dart::utils::handle::DartHandle},
     };
 
     extern "C" {

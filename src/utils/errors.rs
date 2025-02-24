@@ -3,7 +3,6 @@
 use std::rc::Rc;
 
 use derive_more::with_trait::{Display, From};
-
 pub use medea_macro::Caused;
 
 /// Representation of an error caused by FFI side.

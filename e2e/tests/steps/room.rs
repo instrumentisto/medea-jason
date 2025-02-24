@@ -54,11 +54,7 @@ async fn when_member_enables_via_local_media_settings(
     let member = world.get_member(&id).unwrap();
     let video = kind.contains("video");
     let audio = kind.contains("audio");
-    member
-        .room()
-        .set_local_media_settings(video, audio, true)
-        .await
-        .unwrap();
+    member.room().set_local_media_settings(video, audio, true).await.unwrap();
 }
 
 #[then(regex = "^(\\S+)'s `Room.on_failed_local_stream\\(\\)` fires (\\d+) \

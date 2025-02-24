@@ -5,10 +5,9 @@
 
 use std::borrow::Cow;
 
+use tracerr::{Trace, Traced};
 #[cfg(target_family = "wasm")]
 use wasm_bindgen::prelude::wasm_bindgen;
-
-use tracerr::{Trace, Traced};
 
 use crate::{
     api::Error,
@@ -19,11 +18,11 @@ use crate::{
         InvalidOutputAudioDeviceIdError, MicVolumeError,
     },
     peer::{
-        sender::CreateError, InsertLocalTracksError, LocalMediaError,
-        UpdateLocalStreamError,
+        InsertLocalTracksError, LocalMediaError, UpdateLocalStreamError,
+        sender::CreateError,
     },
     platform, room,
-    rpc::{rpc_session::ConnectionLostReason, ReconnectError, SessionError},
+    rpc::{ReconnectError, SessionError, rpc_session::ConnectionLostReason},
     utils::Caused as _,
 };
 
@@ -43,10 +42,7 @@ impl StateError {
     /// Creates a new [`StateError`] with the provided `message` and `trace`.
     #[must_use]
     pub fn new<T: Into<Cow<'static, str>>>(message: T, trace: Trace) -> Self {
-        Self {
-            message: message.into(),
-            trace,
-        }
+        Self { message: message.into(), trace }
     }
 }
 
@@ -128,12 +124,7 @@ impl LocalMediaInitException {
         cause: Option<platform::Error>,
         trace: Trace,
     ) -> Self {
-        Self {
-            kind,
-            message: message.into(),
-            cause,
-            trace,
-        }
+        Self { kind, message: message.into(), cause, trace }
     }
 }
 
@@ -312,12 +303,7 @@ impl RpcClientException {
         cause: Option<platform::Error>,
         trace: Trace,
     ) -> Self {
-        Self {
-            kind,
-            message: message.into(),
-            cause,
-            trace,
-        }
+        Self { kind, message: message.into(), cause, trace }
     }
 }
 
@@ -378,11 +364,7 @@ impl InternalException {
         cause: Option<platform::Error>,
         trace: Trace,
     ) -> Self {
-        Self {
-            message: message.into(),
-            trace,
-            cause,
-        }
+        Self { message: message.into(), trace, cause }
     }
 }
 
@@ -471,11 +453,7 @@ impl MediaStateTransitionException {
         trace: Trace,
         kind: MediaStateTransitionExceptionKind,
     ) -> Self {
-        Self {
-            message: message.into(),
-            trace,
-            kind,
-        }
+        Self { message: message.into(), trace, kind }
     }
 }
 
@@ -531,11 +509,7 @@ impl MediaSettingsUpdateException {
         cause: Traced<room::ChangeMediaStateError>,
         rolled_back: bool,
     ) -> Self {
-        Self {
-            message: message.into(),
-            rolled_back,
-            cause,
-        }
+        Self { message: message.into(), rolled_back, cause }
     }
 }
 
@@ -649,7 +623,7 @@ impl From<Traced<InitLocalTracksError>> for Error {
 
         let (kind, cause) = match err {
             Err::Detached => {
-                return StateError::new(message, stacktrace).into()
+                return StateError::new(message, stacktrace).into();
             }
             Err::GetUserMediaFailed(Gum::PlatformRequestFailed(
                 platform::GetUserMediaError::Audio(cause),

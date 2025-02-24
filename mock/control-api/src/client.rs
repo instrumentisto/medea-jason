@@ -9,14 +9,14 @@ use std::{
     time::Duration,
 };
 
-use actix::{clock::sleep, Recipient};
+use actix::{Recipient, clock::sleep};
 use derive_more::with_trait::{AsRef, From, Into};
 use medea_control_api_proto::grpc::api as proto;
 use proto::control_api_client::ControlApiClient;
-use tonic::{transport::Channel, Status};
+use tonic::{Status, transport::Channel};
 
 use crate::{
-    api::{ws::Notification, Element, Subscribers},
+    api::{Element, Subscribers, ws::Notification},
     log,
 };
 
@@ -110,10 +110,7 @@ impl ControlClient {
             }
         };
 
-        Ok(Self {
-            subscribers,
-            grpc_client,
-        })
+        Ok(Self { subscribers, grpc_client })
     }
 
     /// Returns [`ControlApiClient`] of this [`ControlClient`].
@@ -152,10 +149,7 @@ impl ControlClient {
                 El::WebrtcPub(webrtc_pub.into_proto(id))
             }
         };
-        let req = proto::CreateRequest {
-            parent_fid: fid.into(),
-            el: Some(el),
-        };
+        let req = proto::CreateRequest { parent_fid: fid.into(), el: Some(el) };
 
         let response = self.get_client().create(tonic::Request::new(req)).await;
 
@@ -193,10 +187,7 @@ impl ControlClient {
                 El::WebrtcPub(webrtc_pub.into_proto(id))
             }
         };
-        let req = proto::ApplyRequest {
-            parent_fid: fid.into(),
-            el: Some(el),
-        };
+        let req = proto::ApplyRequest { parent_fid: fid.into(), el: Some(el) };
 
         let response = self.get_client().apply(tonic::Request::new(req)).await;
         response.map(tonic::Response::into_inner)

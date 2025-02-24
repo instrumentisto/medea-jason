@@ -4,8 +4,8 @@
 
 use std::{
     collections::{
-        hash_map::{Iter, Values},
         HashMap as StdHashMap,
+        hash_map::{Iter, Values},
     },
     hash::Hash,
     marker::PhantomData,
@@ -14,9 +14,8 @@ use std::{
 use futures::stream::{self, LocalBoxStream, StreamExt as _};
 
 use crate::subscribers_store::{
-    common, progressable,
+    SubscribersStore, common, progressable,
     progressable::{AllProcessed, Processed},
-    SubscribersStore,
 };
 
 /// Reactive hash map based on [`HashMap`][1] with additional functionality of
@@ -53,18 +52,14 @@ pub type ObservableHashMap<K, V> =
 /// // You can subscribe on insert action:
 /// let mut inserts = map.on_insert();
 /// map.insert("foo", "bar");
-/// let (key, val) = inserts.next()
-///     .await
-///     .unwrap();
+/// let (key, val) = inserts.next().await.unwrap();
 /// assert_eq!(key, "foo");
 /// assert_eq!(val, "bar");
 ///
 /// // Also you can subscribe on remove action:
 /// let mut removals = map.on_remove();
 /// map.remove(&"foo");
-/// let (key, val) = removals.next()
-///     .await
-///     .unwrap();
+/// let (key, val) = removals.next().await.unwrap();
 /// assert_eq!(key, "foo");
 /// assert_eq!(val, "bar");
 ///
@@ -73,9 +68,7 @@ pub type ObservableHashMap<K, V> =
 /// map.insert("foo-1", "bar-1");
 /// map.insert("foo-2", "bar-2");
 /// drop(map);
-/// let removed_items: HashMap<_, _> = removals.take(2)
-///     .collect()
-///     .await;
+/// let removed_items: HashMap<_, _> = removals.take(2).collect().await;
 /// assert_eq!(removed_items["foo-1"], "bar-1");
 /// assert_eq!(removed_items["foo-2"], "bar-2");
 /// # });
@@ -99,6 +92,7 @@ pub type ObservableHashMap<K, V> =
 /// drop(value);
 ///
 /// hash_map.when_insert_processed().await; // will be resolved
+///
 /// # });
 /// ```
 #[derive(Debug, Clone)]
@@ -124,24 +118,18 @@ where
 {
     /// Returns [`Future`] resolving when all insertion updates will be
     /// processed by [`HashMap::on_insert()`] subscribers.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_insert_processed(&self) -> Processed<'static> {
         self.on_insert_subs.when_all_processed()
     }
 
     /// Returns [`Future`] resolving when all remove updates will be processed
     /// by [`HashMap::on_remove()`] subscribers.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_remove_processed(&self) -> Processed<'static> {
         self.on_remove_subs.when_all_processed()
     }
 
     /// Returns [`Future`] resolving when all insert and remove updates will be
     /// processed by subscribers.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_all_processed(&self) -> AllProcessed<'static> {
         crate::when_all_processed(vec![
             self.when_remove_processed().into(),
@@ -259,11 +247,7 @@ where
     pub fn remove_not_present<A>(&mut self, other: &StdHashMap<K, A>) {
         self.iter()
             .filter_map(|(id, _)| {
-                if other.contains_key(id) {
-                    None
-                } else {
-                    Some(id.clone())
-                }
+                if other.contains_key(id) { None } else { Some(id.clone()) }
             })
             .collect::<Vec<_>>()
             .into_iter()
@@ -366,7 +350,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use futures::{poll, task::Poll, FutureExt as _, StreamExt as _};
+    use futures::{FutureExt as _, StreamExt as _, poll, task::Poll};
 
     use crate::collections::ProgressableHashMap;
 
@@ -393,11 +377,8 @@ mod tests {
         let _ = map.insert(1, 2);
         let _ = map.insert(2, 3);
 
-        let inserts: Vec<_> = map
-            .replay_on_insert()
-            .map(|val| val.into_inner())
-            .collect()
-            .await;
+        let inserts: Vec<_> =
+            map.replay_on_insert().map(|val| val.into_inner()).collect().await;
 
         assert_eq!(inserts.len(), 3);
         assert!(inserts.contains(&(0, 0)));

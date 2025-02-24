@@ -1,8 +1,7 @@
 //! `LocalMediaTrack` JS object's representation.
 
-use crate::{browser::Statement, object::Object};
-
 use super::Error;
+use crate::{browser::Statement, object::Object};
 
 /// Representation of a `LocalMediaTrack` object.
 #[derive(Clone, Copy, Debug)]

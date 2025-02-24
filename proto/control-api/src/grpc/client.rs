@@ -7,19 +7,19 @@ use derive_more::with_trait::{Display, Error, From};
 use tonic::codegen::{Body, Bytes};
 
 use crate::{
+    CallbackApi, ControlApi, Elements, Fid, Ping, Pong,
     callback::Request as CallbackRequest,
     control::{ParseFidError, Request as ControlRequest},
     grpc::{
+        ControlApiClient, ProtobufError,
         api::{self as control_proto},
         callback::{
             self as callback_proto,
             callback_server::Callback as GrpcCallbackService,
         },
-        ControlApiClient, ProtobufError,
     },
     member,
     member::ParseSidError,
-    CallbackApi, ControlApi, Elements, Fid, Ping, Pong,
 };
 
 /// [`Box`]ed [`Error`] with [`Send`] and [`Sync`].

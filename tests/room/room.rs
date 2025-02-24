@@ -35,13 +35,14 @@ use medea_jason::{
     utils::Updatable,
 };
 use wasm_bindgen::JsValue;
-use wasm_bindgen_futures::{spawn_local, JsFuture};
+use wasm_bindgen_futures::{JsFuture, spawn_local};
 use wasm_bindgen_test::*;
 
 use crate::{
-    delay_for, get_test_recv_tracks, get_test_required_tracks, get_test_tracks,
-    get_test_unrequired_tracks, jsval_cast, media_stream_settings, timeout,
-    wait_and_check_test_result, yield_now, MockNavigator, TEST_ROOM_URL,
+    MockNavigator, TEST_ROOM_URL, delay_for, get_test_recv_tracks,
+    get_test_required_tracks, get_test_tracks, get_test_unrequired_tracks,
+    jsval_cast, media_stream_settings, timeout, wait_and_check_test_result,
+    yield_now,
 };
 
 wasm_bindgen_test_configure!(run_in_browser);
@@ -59,8 +60,7 @@ fn get_test_room(
     rpc.expect_close_with_reason().return_const(());
     rpc.expect_on_connection_loss()
         .return_once(|| stream::pending().boxed_local());
-    rpc.expect_on_reconnected()
-        .return_once(|| stream::pending().boxed_local());
+    rpc.expect_on_reconnected().return_once(|| stream::pending().boxed_local());
     rpc.expect_send_command().returning(move |command| {
         let _ = tx.unbounded_send(command);
     });
@@ -82,21 +82,16 @@ async fn get_test_room_and_exist_peer(
     let (event_tx, event_rx) = mpsc::unbounded();
     let (command_tx, command_rx) = mpsc::unbounded();
 
-    rpc.expect_subscribe()
-        .return_once(move || Box::pin(event_rx));
+    rpc.expect_subscribe().return_once(move || Box::pin(event_rx));
     rpc.expect_on_connection_loss()
         .return_once(|| stream::pending().boxed_local());
-    rpc.expect_on_reconnected()
-        .return_once(|| stream::pending().boxed_local());
+    rpc.expect_on_reconnected().return_once(|| stream::pending().boxed_local());
     rpc.expect_close_with_reason().return_const(());
     let event_tx_clone = event_tx.clone();
     rpc.expect_send_command().returning(move |cmd| {
         let _ = command_tx.unbounded_send(cmd.clone());
         match cmd {
-            Command::UpdateTracks {
-                peer_id,
-                tracks_patches,
-            } => {
+            Command::UpdateTracks { peer_id, tracks_patches } => {
                 event_tx_clone
                     .unbounded_send(Event::PeerUpdated {
                         peer_id,
@@ -205,9 +200,7 @@ async fn error_join_room_without_on_failed_stream_callback() {
     let (room, _) = get_test_room(stream::pending().boxed());
     let room_handle = api::RoomHandle::from(room.new_handle());
 
-    room_handle
-        .on_connection_loss(js_sys::Function::new_no_args(""))
-        .unwrap();
+    room_handle.on_connection_loss(js_sys::Function::new_no_args("")).unwrap();
 
     let err = jsval_cast::<StateError>(
         JsFuture::from(room_handle.join(String::from(TEST_ROOM_URL)))
@@ -248,10 +241,7 @@ async fn error_join_room_without_on_connection_loss_callback() {
     )
     .unwrap();
 
-    assert_eq!(
-        err.message(),
-        "`Room.on_connection_loss()` callback isn't set",
-    );
+    assert_eq!(err.message(), "`Room.on_connection_loss()` callback isn't set");
     assert!(!err.trace().is_empty());
 }
 
@@ -327,9 +317,7 @@ mod disable_recv_tracks {
         let (room, mut commands_rx) = get_test_room(Box::pin(event_rx));
         let room_handle = api::RoomHandle::from(room.new_handle());
 
-        JsFuture::from(room_handle.disable_remote_audio())
-            .await
-            .unwrap();
+        JsFuture::from(room_handle.disable_remote_audio()).await.unwrap();
 
         event_tx
             .unbounded_send(Event::PeerCreated {
@@ -464,9 +452,8 @@ mod init_track_states {
         peer_state.when_updated().await;
 
         for (i, media_direction) in media_directions.iter().enumerate() {
-            let sender = peer_state
-                .get_sender(TrackId(i.try_into().unwrap()))
-                .unwrap();
+            let sender =
+                peer_state.get_sender(TrackId(i.try_into().unwrap())).unwrap();
             assert_eq!(
                 sender.is_enabled_general(),
                 media_direction.is_enabled_general()
@@ -635,11 +622,10 @@ mod disable_send_tracks {
     };
     use medea_jason::{
         media::MediaKind,
-        peer::{media_exchange_state, TrackDirection},
+        peer::{TrackDirection, media_exchange_state},
     };
 
     use super::*;
-
     use crate::is_firefox;
 
     #[wasm_bindgen_test]
@@ -669,14 +655,10 @@ mod disable_send_tracks {
         .await;
 
         let room_handle = api::RoomHandle::from(room.new_handle());
-        assert!(JsFuture::from(room_handle.disable_video(None))
-            .await
-            .is_ok());
+        assert!(JsFuture::from(room_handle.disable_video(None)).await.is_ok());
         assert!(!peer.is_send_video_enabled(None));
 
-        JsFuture::from(room_handle.enable_video(None))
-            .await
-            .unwrap();
+        JsFuture::from(room_handle.enable_video(None)).await.unwrap();
         assert!(peer.is_send_video_enabled(None));
     }
 
@@ -776,11 +758,13 @@ mod disable_send_tracks {
         }
 
         let room_handle = api::RoomHandle::from(room.new_handle());
-        assert!(JsFuture::from(
-            room_handle.disable_video(Some(api::MediaSourceKind::Display))
-        )
-        .await
-        .is_ok());
+        assert!(
+            JsFuture::from(
+                room_handle.disable_video(Some(api::MediaSourceKind::Display))
+            )
+            .await
+            .is_ok()
+        );
         assert!(!peer.is_send_video_enabled(Some(MediaSourceKind::Display)));
         assert!(peer.is_send_video_enabled(Some(MediaSourceKind::Device)));
 
@@ -1049,10 +1033,7 @@ mod disable_send_tracks {
             .unwrap();
 
         match commands_rx.next().await.unwrap() {
-            Command::UpdateTracks {
-                peer_id,
-                mut tracks_patches,
-            } => {
+            Command::UpdateTracks { peer_id, mut tracks_patches } => {
                 assert_eq!(peer_id, PeerId(1));
                 assert_eq!(
                     tracks_patches.pop().unwrap(),
@@ -1131,10 +1112,7 @@ mod disable_send_tracks {
             .unwrap();
 
         match commands_rx.next().await.unwrap() {
-            Command::UpdateTracks {
-                peer_id,
-                mut tracks_patches,
-            } => {
+            Command::UpdateTracks { peer_id, mut tracks_patches } => {
                 assert_eq!(peer_id, PeerId(1));
                 assert_eq!(
                     tracks_patches.pop().unwrap(),
@@ -1199,9 +1177,7 @@ mod disable_send_tracks {
         .await
         .unwrap();
 
-        JsFuture::from(room_handle.disable_video(None))
-            .await
-            .unwrap();
+        JsFuture::from(room_handle.disable_video(None)).await.unwrap();
 
         let (audio_track, video_track) = get_test_tracks(false, false);
         event_tx
@@ -1216,10 +1192,7 @@ mod disable_send_tracks {
             .unwrap();
 
         match commands_rx.next().await.unwrap() {
-            Command::UpdateTracks {
-                peer_id,
-                mut tracks_patches,
-            } => {
+            Command::UpdateTracks { peer_id, mut tracks_patches } => {
                 assert_eq!(peer_id, PeerId(1));
                 assert_eq!(
                     tracks_patches.pop().unwrap(),
@@ -1274,7 +1247,7 @@ mod disable_send_tracks {
 mod on_close_callback {
     use medea_client_api_proto::CloseReason as CloseByServerReason;
     use medea_jason::rpc::{ClientDisconnect, CloseReason};
-    use wasm_bindgen::{prelude::*, JsValue};
+    use wasm_bindgen::{JsValue, prelude::*};
     use wasm_bindgen_test::*;
 
     use super::*;
@@ -1397,8 +1370,7 @@ mod rpc_close_reason_on_room_drop {
         let mut rpc = MockRpcSession::new();
 
         let (_event_tx, event_rx) = mpsc::unbounded();
-        rpc.expect_subscribe()
-            .return_once(move || Box::pin(event_rx));
+        rpc.expect_subscribe().return_once(move || Box::pin(event_rx));
         rpc.expect_send_command().return_const(());
         rpc.expect_on_connection_loss()
             .return_once(|| stream::pending().boxed_local());
@@ -1474,21 +1446,17 @@ mod patches_generation {
         AudioSettings, Direction, MediaDirection, MediaType, Track, TrackId,
         TrackPatchCommand, VideoSettings,
     };
-    use medea_jason::peer::{media_exchange_state, mute_state, MediaState};
+    use medea_jason::peer::{MediaState, media_exchange_state, mute_state};
     use wasm_bindgen_futures::spawn_local;
 
-    use crate::{is_firefox, timeout};
-
     use super::*;
+    use crate::{is_firefox, timeout};
 
     fn audio_and_device_video_tracks_content() -> Vec<(MediaType, Direction)> {
         vec![
             (
                 MediaType::Audio(AudioSettings { required: false }),
-                Direction::Send {
-                    receivers: Vec::new(),
-                    mid: None,
-                },
+                Direction::Send { receivers: Vec::new(), mid: None },
             ),
             (
                 MediaType::Video(VideoSettings {
@@ -1497,10 +1465,7 @@ mod patches_generation {
                     encoding_parameters: Vec::new(),
                     svc_settings: Vec::new(),
                 }),
-                Direction::Send {
-                    receivers: Vec::new(),
-                    mid: None,
-                },
+                Direction::Send { receivers: Vec::new(), mid: None },
             ),
         ]
     }
@@ -1523,8 +1488,7 @@ mod patches_generation {
         rpc.expect_send_command().returning(move |command| {
             let _ = command_tx.unbounded_send(command);
         });
-        rpc.expect_subscribe()
-            .return_once(move || Box::pin(event_rx));
+        rpc.expect_subscribe().return_once(move || Box::pin(event_rx));
         rpc.expect_close_with_reason().return_once(drop);
         rpc.expect_on_connection_loss()
             .return_once(|| stream::pending().boxed_local());
@@ -1632,9 +1596,7 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.disable_audio())
-                .await
-                .unwrap_err();
+            JsFuture::from(room_handle.disable_audio()).await.unwrap_err();
         });
 
         assert_eq!(
@@ -1674,19 +1636,14 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.disable_audio())
-                .await
-                .unwrap_err();
+            JsFuture::from(room_handle.disable_audio()).await.unwrap_err();
         });
 
         let mut commands = HashMap::new();
         for _ in 0..2i32 {
             let command = command_rx.next().await.unwrap();
             match command {
-                Command::UpdateTracks {
-                    peer_id,
-                    tracks_patches,
-                } => {
+                Command::UpdateTracks { peer_id, tracks_patches } => {
                     commands.insert(peer_id, tracks_patches);
                 }
                 _ => (),
@@ -1759,10 +1716,7 @@ mod patches_generation {
                 encoding_parameters: Vec::new(),
                 svc_settings: Vec::new(),
             }),
-            Direction::Send {
-                mid: None,
-                receivers: vec![],
-            },
+            Direction::Send { mid: None, receivers: vec![] },
         ));
         let (room, command_rx) = get_room_and_commands_receiver(
             2,
@@ -1817,10 +1771,7 @@ mod patches_generation {
                 encoding_parameters: Vec::new(),
                 svc_settings: Vec::new(),
             }),
-            Direction::Send {
-                mid: None,
-                receivers: vec![],
-            },
+            Direction::Send { mid: None, receivers: vec![] },
         ));
         let (room, command_rx) = get_room_and_commands_receiver(
             2,
@@ -1897,9 +1848,7 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.unmute_audio())
-                .await
-                .unwrap_err();
+            JsFuture::from(room_handle.unmute_audio()).await.unwrap_err();
         });
 
         assert_eq!(
@@ -1944,13 +1893,9 @@ async fn remote_disable_enable_audio() {
     .await;
 
     let room_handle = api::RoomHandle::from(room.new_handle());
-    assert!(JsFuture::from(room_handle.disable_remote_audio())
-        .await
-        .is_ok());
+    assert!(JsFuture::from(room_handle.disable_remote_audio()).await.is_ok());
     assert!(!peer.is_recv_audio_enabled());
-    assert!(JsFuture::from(room_handle.enable_remote_audio())
-        .await
-        .is_ok());
+    assert!(JsFuture::from(room_handle.enable_remote_audio()).await.is_ok());
     assert!(peer.is_recv_audio_enabled());
 }
 
@@ -1965,13 +1910,13 @@ async fn remote_disable_enable_video() {
     .await;
 
     let room_handle = api::RoomHandle::from(room.new_handle());
-    assert!(JsFuture::from(room_handle.disable_remote_video(None))
-        .await
-        .is_ok());
+    assert!(
+        JsFuture::from(room_handle.disable_remote_video(None)).await.is_ok()
+    );
     assert!(!peer.is_recv_video_enabled());
-    assert!(JsFuture::from(room_handle.enable_remote_video(None))
-        .await
-        .is_ok());
+    assert!(
+        JsFuture::from(room_handle.enable_remote_video(None)).await.is_ok()
+    );
     assert!(peer.is_recv_video_enabled());
 }
 
@@ -2108,9 +2053,7 @@ async fn only_one_gum_performed_on_enable() {
             })],
         })
         .unwrap();
-    JsFuture::from(room_handle.enable_audio())
-        .await
-        .unwrap_err();
+    JsFuture::from(room_handle.enable_audio()).await.unwrap_err();
 
     assert_eq!(mock.get_user_media_requests_count(), 1);
     mock.stop();
@@ -2135,9 +2078,7 @@ async fn no_updates_sent_if_gum_fails_on_enable() {
     mock.error_get_user_media("gum error".into());
 
     let err = jsval_cast::<LocalMediaInitException>(
-        JsFuture::from(room_handle.enable_audio())
-            .await
-            .unwrap_err(),
+        JsFuture::from(room_handle.enable_audio()).await.unwrap_err(),
         "LocalMediaInitException",
     )
     .unwrap();
@@ -2183,9 +2124,7 @@ async fn set_media_state_return_media_error() {
     mock.error_get_user_media(ERROR_MSG.into());
 
     let err = jsval_cast::<LocalMediaInitException>(
-        JsFuture::from(room_handle.enable_audio())
-            .await
-            .unwrap_err(),
+        JsFuture::from(room_handle.enable_audio()).await.unwrap_err(),
         "LocalMediaInitException",
     )
     .unwrap();
@@ -2264,12 +2203,10 @@ async fn send_enabling_holds_local_tracks() {
     let (audio_track, video_track) = get_test_tracks(false, false);
     let video_track_id = video_track.id;
     let (event_tx, event_rx) = mpsc::unbounded();
-    rpc.expect_subscribe()
-        .return_once(move || Box::pin(event_rx));
+    rpc.expect_subscribe().return_once(move || Box::pin(event_rx));
     rpc.expect_on_connection_loss()
         .return_once(|| stream::pending().boxed_local());
-    rpc.expect_on_reconnected()
-        .return_once(|| stream::pending().boxed_local());
+    rpc.expect_on_reconnected().return_once(|| stream::pending().boxed_local());
     rpc.expect_close_with_reason().return_const(());
     rpc.expect_send_command().returning_st(|c| {
         if matches!(c, Command::UpdateTracks { .. }) {
@@ -2317,9 +2254,7 @@ async fn send_enabling_holds_local_tracks() {
     let mock = MockNavigator::new();
     mock.error_get_user_media("foobar".into());
     let err = jsval_cast::<LocalMediaInitException>(
-        JsFuture::from(room_handle.enable_video(None))
-            .await
-            .unwrap_err(),
+        JsFuture::from(room_handle.enable_video(None)).await.unwrap_err(),
         "LocalMediaInitException",
     )
     .unwrap();
@@ -2334,17 +2269,17 @@ async fn send_enabling_holds_local_tracks() {
 
 /// Tests for [`RoomHandle::set_local_media_settings`].
 mod set_local_media_settings {
-    use super::*;
-
     use medea_jason::api::err::{
         LocalMediaInitException, MediaSettingsUpdateException,
         MediaStateTransitionException,
     };
 
+    use super::*;
+
     /// Sets up connection between two peers in single room with first peer
     /// sending video to second peer.
-    async fn room_with_connected_peers(
-    ) -> (Room, Rc<PeerConnection>, Rc<PeerConnection>) {
+    async fn room_with_connected_peers()
+    -> (Room, Rc<PeerConnection>, Rc<PeerConnection>) {
         let (event_tx, event_rx) = mpsc::unbounded();
         let (room, mut commands_rx) = get_test_room(Box::pin(event_rx));
 
@@ -2445,10 +2380,7 @@ mod set_local_media_settings {
         spawn_local(async move {
             while let Some(command) = commands_rx.next().await {
                 match command {
-                    Command::UpdateTracks {
-                        peer_id,
-                        tracks_patches,
-                    } => {
+                    Command::UpdateTracks { peer_id, tracks_patches } => {
                         event_tx
                             .unbounded_send(Event::PeerUpdated {
                                 peer_id,
@@ -2652,10 +2584,7 @@ mod set_local_media_settings {
                  add_video: {add_video}",
             );
 
-            timeout(1000, test_rx)
-                .await
-                .map(|rx| rx.unwrap())
-                .map_err(drop)
+            timeout(1000, test_rx).await.map(|rx| rx.unwrap()).map_err(drop)
         }
 
         // on_failed_local_media callback does not fire
@@ -2713,10 +2642,8 @@ mod set_local_media_settings {
 
         let mut expected_track_ids = HashSet::from([TrackId(1), TrackId(2)]);
         while let Some(update_tracks_cmd) = commands_rx.next().await {
-            if let Command::UpdateTracks {
-                peer_id,
-                mut tracks_patches,
-            } = update_tracks_cmd
+            if let Command::UpdateTracks { peer_id, mut tracks_patches } =
+                update_tracks_cmd
             {
                 assert_eq!(peer_id, PeerId(1));
                 let track_patch = tracks_patches.pop().unwrap();
@@ -2903,10 +2830,10 @@ mod state_synchronization {
         time::Duration,
     };
 
-    use futures::{channel::mpsc, stream, StreamExt as _};
+    use futures::{StreamExt as _, channel::mpsc, stream};
     use medea_client_api_proto::{
-        state, AudioSettings, Command, ConnectionMode, Event, MediaDirection,
-        MediaType, MemberId, NegotiationRole, PeerId, TrackId,
+        AudioSettings, Command, ConnectionMode, Event, MediaDirection,
+        MediaType, MemberId, NegotiationRole, PeerId, TrackId, state,
     };
     use medea_jason::{
         media::MediaManager, platform::delay_for, room::Room,
@@ -2924,9 +2851,7 @@ mod state_synchronization {
         let (event_tx, event_rx) = mpsc::unbounded();
 
         let mut rpc_session = MockRpcSession::new();
-        rpc_session
-            .expect_subscribe()
-            .return_once(move || Box::pin(event_rx));
+        rpc_session.expect_subscribe().return_once(move || Box::pin(event_rx));
         rpc_session
             .expect_on_connection_loss()
             .return_once(|| Box::pin(stream::pending()));
@@ -3176,11 +3101,7 @@ async fn intentions_are_sent_on_reconnect() {
     });
     timeout(1000, async {
         while let Some(cmd) = commands_rx.next().await {
-            if let Command::UpdateTracks {
-                peer_id,
-                tracks_patches,
-            } = cmd
-            {
+            if let Command::UpdateTracks { peer_id, tracks_patches } = cmd {
                 assert_eq!(peer_id, PeerId(1));
                 assert_eq!(tracks_patches[0].id, audio_track_id);
                 assert_eq!(tracks_patches[0].enabled, Some(false));
@@ -3194,11 +3115,7 @@ async fn intentions_are_sent_on_reconnect() {
     peer_state.synced();
     timeout(1000, async {
         while let Some(cmd) = commands_rx.next().await {
-            if let Command::UpdateTracks {
-                peer_id,
-                tracks_patches,
-            } = cmd
-            {
+            if let Command::UpdateTracks { peer_id, tracks_patches } = cmd {
                 assert_eq!(peer_id, PeerId(1));
                 assert_eq!(tracks_patches[0].id, audio_track_id);
                 assert_eq!(tracks_patches[0].enabled, Some(false));
@@ -3223,9 +3140,8 @@ async fn sender_answerer() {
     .await
     .unwrap();
 
-    let peer = platform::RtcPeerConnection::new(Vec::new(), false)
-        .await
-        .unwrap();
+    let peer =
+        platform::RtcPeerConnection::new(Vec::new(), false).await.unwrap();
 
     let a_tr = peer
         .add_transceiver(
@@ -3290,10 +3206,14 @@ async fn sender_answerer() {
                 transceivers_statuses,
                 ..
             } => {
-                assert!(sdp_answer
-                    .contains(&format!("a=mid:{}", a_tr.mid().unwrap())));
-                assert!(sdp_answer
-                    .contains(&format!("a=mid:{}", v_tr.mid().unwrap())));
+                assert!(
+                    sdp_answer
+                        .contains(&format!("a=mid:{}", a_tr.mid().unwrap()))
+                );
+                assert!(
+                    sdp_answer
+                        .contains(&format!("a=mid:{}", v_tr.mid().unwrap()))
+                );
                 assert_eq!(sdp_answer.match_indices("a=sendonly").count(), 2);
 
                 assert_eq!(transceivers_statuses.get(&TrackId(1)), Some(&true));

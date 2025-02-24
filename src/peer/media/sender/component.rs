@@ -5,7 +5,7 @@ use std::{
     rc::Rc,
 };
 
-use futures::{future::LocalBoxFuture, StreamExt as _};
+use futures::{StreamExt as _, future::LocalBoxFuture};
 use medea_client_api_proto::{
     self as proto, MediaDirection, MediaSourceKind, MediaType, MemberId,
     TrackId, TrackPatchEvent,
@@ -15,21 +15,20 @@ use medea_reactive::{AllProcessed, Guarded, ObservableCell, ProgressableCell};
 use proto::ConnectionMode;
 use tracerr::Traced;
 
+use super::Sender;
 use crate::{
     media::{LocalTracksConstraints, MediaKind, TrackConstraints, VideoSource},
     peer::{
-        component::SyncState,
-        media::{
-            media_exchange_state, mute_state, InTransition as _,
-            MediaExchangeState, MuteState, ProhibitedStateError,
-        },
         MediaExchangeStateController, MediaState, MediaStateControllable,
         MuteStateController, TransceiverSide, UpdateLocalStreamError,
+        component::SyncState,
+        media::{
+            InTransition as _, MediaExchangeState, MuteState,
+            ProhibitedStateError, media_exchange_state, mute_state,
+        },
     },
-    utils::{component, AsProtoState, SynchronizableState, Updatable},
+    utils::{AsProtoState, SynchronizableState, Updatable, component},
 };
-
-use super::Sender;
 
 /// State of a [`Sender`]'s [`local::Track`].
 ///
@@ -226,8 +225,6 @@ impl SynchronizableState for State {
 impl Updatable for State {
     /// Returns [`Future`] resolving once [`media_exchange_state`] and
     /// [`mute_state`] are stabilized.
-    ///
-    /// [`Future`]: std::future::Future
     fn when_stabilized(&self) -> AllProcessed<'static> {
         medea_reactive::when_all_processed(vec![
             Rc::clone(&self.enabled_individual).when_stabilized().into(),
@@ -237,8 +234,6 @@ impl Updatable for State {
 
     /// Returns [`Future`] resolving once a [`State`] update is applied onto the
     /// [`Sender`].
-    ///
-    /// [`Future`]: std::future::Future
     fn when_updated(&self) -> AllProcessed<'static> {
         medea_reactive::when_all_processed(vec![
             self.enabled_individual.when_processed().into(),
@@ -366,7 +361,6 @@ impl State {
     /// [getUserMedia()][1]/[getDisplayMedia()][2] request for this [`State`] is
     /// resolved.
     ///
-    /// [`Future`]: std::future::Future
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
     pub fn local_stream_update_result(
@@ -379,7 +373,7 @@ impl State {
                 match s {
                     LocalTrackState::Stable => return Ok(()),
                     LocalTrackState::Failed(err) => {
-                        return Err(tracerr::new!(err))
+                        return Err(tracerr::new!(err));
                     }
                     LocalTrackState::NeedUpdate => (),
                 }
@@ -396,11 +390,9 @@ impl State {
         }
         if let Some(direction) = track_patch.media_direction {
             self.media_direction.set(direction);
-            self.enabled_general
-                .set((direction.is_enabled_general()).into());
+            self.enabled_general.set((direction.is_enabled_general()).into());
 
-            self.enabled_individual
-                .update(direction.is_send_enabled().into());
+            self.enabled_individual.update(direction.is_send_enabled().into());
         }
         if let Some(muted) = track_patch.muted {
             self.mute_state.update(mute_state::Stable::from(muted));

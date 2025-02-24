@@ -15,27 +15,26 @@ use std::{
 use actix::{Addr, Recipient};
 use actix_cors::Cors;
 use actix_web::{
+    App, HttpResponse, HttpServer,
     error::{Error as HttpError, ErrorInternalServerError as InternalError},
     middleware,
     web::{self, Data, Json, Path},
-    App, HttpResponse, HttpServer,
 };
 use derive_more::with_trait::From;
 use medea_control_api_proto::grpc::api as proto;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    api::ws::Notification,
-    callback::server::{GetCallbackItems, GrpcCallbackServer},
-    client::{ControlClient, Fid},
-    prelude::*,
-    Cli,
-};
-
 use self::{
     endpoint::{WebRtcPlayEndpoint, WebRtcPublishEndpoint},
     member::Member,
     room::Room,
+};
+use crate::{
+    Cli,
+    api::ws::Notification,
+    callback::server::{GetCallbackItems, GrpcCallbackServer},
+    client::{ControlClient, Fid},
+    prelude::*,
 };
 
 /// Map of subscribers to [`Notification`]s.
@@ -134,7 +133,7 @@ macro_rules! gen_request_macro {
         ///
         /// `$uri_tuple` - type of path which will be provided by [`actix_web`].
         macro_rules! request {
-            ($name:tt, $uri_tuple:ty) => {
+            ($name: tt,$uri_tuple: ty) => {
                 pub async fn $name(
                     path: Path<$uri_tuple>,
                     state: Data<AppContext>,
@@ -315,11 +314,7 @@ pub struct ErrorResponse {
 
 impl From<proto::Error> for ErrorResponse {
     fn from(e: proto::Error) -> Self {
-        Self {
-            code: e.code,
-            text: e.text,
-            element: e.element,
-        }
+        Self { code: e.code, text: e.text, element: e.element }
     }
 }
 
@@ -379,24 +374,15 @@ impl_from_for_http_response!(SingleGetResponse);
 
 impl From<proto::Response> for Response {
     fn from(resp: proto::Response) -> Self {
-        Self {
-            error: resp.error.map(Into::into),
-        }
+        Self { error: resp.error.map(Into::into) }
     }
 }
 
 impl From<proto::CreateResponse> for CreateResponse {
     fn from(resp: proto::CreateResponse) -> Self {
-        resp.error.map_or(
-            Self {
-                sids: Some(resp.sid),
-                error: None,
-            },
-            |error| Self {
-                sids: None,
-                error: Some(error.into()),
-            },
-        )
+        resp.error.map_or(Self { sids: Some(resp.sid), error: None }, |error| {
+            Self { sids: None, error: Some(error.into()) }
+        })
     }
 }
 
@@ -495,10 +481,7 @@ impl From<proto::GetResponse> for SingleGetResponse {
                 error: None,
                 element: proto.elements.into_values().map(Element::from).next(),
             },
-            |error| Self {
-                element: None,
-                error: Some(error.into()),
-            },
+            |error| Self { element: None, error: Some(error.into()) },
         )
     }
 }

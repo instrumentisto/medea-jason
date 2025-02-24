@@ -12,10 +12,10 @@ use async_trait::async_trait;
 use derivative::Derivative;
 use derive_more::with_trait::{Display, From};
 use futures::{
+    StreamExt as _,
     channel::mpsc,
     future::{self, LocalBoxFuture},
     stream::LocalBoxStream,
-    StreamExt as _,
 };
 use medea_client_api_proto::{Command, Event, MemberId, RoomId};
 use medea_reactive::ObservableCell;
@@ -24,8 +24,8 @@ use tracerr::Traced;
 use crate::{
     platform,
     rpc::{
-        websocket::RpcEventHandler, ClientDisconnect, CloseReason,
-        ConnectionInfo, RpcClientError, WebSocketRpcClient,
+        ClientDisconnect, CloseReason, ConnectionInfo, RpcClientError,
+        WebSocketRpcClient, websocket::RpcEventHandler,
     },
     utils::Caused,
 };
@@ -128,8 +128,6 @@ pub trait RpcSession {
     ///
     /// This [`Future`] wouldn't be resolved on abnormal closes. On
     /// abnormal close [`RpcSession::on_connection_loss`] will be thrown.
-    ///
-    /// [`Future`]: std::future::Future
     fn on_normal_close(&self) -> LocalBoxFuture<'static, CloseReason>;
 
     /// Sets reason, that will be passed to underlying transport when this
@@ -407,18 +405,14 @@ impl RpcSession for WebSocketRpcSession {
             }
         }
 
-        self.inner_connect()
-            .await
-            .map_err(tracerr::map_from_and_wrap!())?;
+        self.inner_connect().await.map_err(tracerr::map_from_and_wrap!())?;
 
         Ok(())
     }
 
     /// Tries to reconnect this [`WebSocketRpcSession`] to the server.
     async fn reconnect(self: Rc<Self>) -> Result<(), Traced<SessionError>> {
-        self.inner_connect()
-            .await
-            .map_err(tracerr::map_from_and_wrap!())?;
+        self.inner_connect().await.map_err(tracerr::map_from_and_wrap!())?;
 
         Ok(())
     }
@@ -440,13 +434,11 @@ impl RpcSession for WebSocketRpcSession {
     /// Returns [`Future`] which will be resolved when [`SessionState`] will be
     /// transited to the [`SessionState::Finished`] or [`WebSocketRpcSession`]
     /// will be dropped.
-    ///
-    /// [`Future`]: std::future::Future
     fn on_normal_close(&self) -> LocalBoxFuture<'static, CloseReason> {
         let mut state_stream = self
             .state
             .subscribe()
-            .filter_map(|s| async move {
+            .filter_map(async |s| {
                 if let SessionState::Finished(reason) = s {
                     Some(reason)
                 } else {

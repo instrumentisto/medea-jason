@@ -10,11 +10,16 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.7.1...master)
 
+### Changed
+
+- Bumped up [MSRV] to 1.85 because of migration to 2024 edition. ([todo])
+
 ### Upgraded
 
 - Dependencies:
-    - [`derive-more`] to 2.0 version. ([todo])
+    - [`derive-more`] to 2.0 version. ([3ed7d2bf])
 
+[3ed7d2bf]: /../../commit/3ed7d2bf59ed1237d9e55c4b65ea5cad833306fa
 [todo]: /../../commit/todo
 
 

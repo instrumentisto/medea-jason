@@ -5,23 +5,22 @@
 use medea_macro::dart_bridge;
 use tracerr::Traced;
 
-use crate::{
-    media::MediaSourceKind,
-    platform::{
-        dart::utils::{
-            dart_future::FutureFromDart, handle::DartHandle, list::DartList,
-            string_into_c_str,
-        },
-        utils::callback::Callback,
-        Error, GetUserMediaError,
-    },
-};
-
 use super::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     media_device_info::MediaDeviceInfo,
     media_display_info::MediaDisplayInfo,
     media_track::MediaStreamTrack,
+};
+use crate::{
+    media::MediaSourceKind,
+    platform::{
+        Error, GetUserMediaError,
+        dart::utils::{
+            dart_future::FutureFromDart, handle::DartHandle, list::DartList,
+            string_into_c_str,
+        },
+        utils::callback::Callback,
+    },
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/media_devices.g.dart")]
@@ -248,9 +247,8 @@ impl MediaDevices {
     pub async fn microphone_volume_is_available(&self) -> bool {
         let fut =
             unsafe { media_devices::microphone_volume_is_available() }.unwrap();
-        let result = unsafe { FutureFromDart::execute::<i64>(fut) }
-            .await
-            .unwrap();
+        let result =
+            unsafe { FutureFromDart::execute::<i64>(fut) }.await.unwrap();
 
         result == 1
     }

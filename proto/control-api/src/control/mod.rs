@@ -6,14 +6,13 @@ pub mod endpoint;
 pub mod member;
 pub mod room;
 
+pub use std::collections::HashMap as Pipeline;
 use std::{collections::HashMap, str::FromStr};
 
 use async_trait::async_trait;
 use derive_more::with_trait::{Display, Error, From};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-
-pub use std::collections::HashMap as Pipeline;
 
 #[doc(inline)]
 pub use self::{endpoint::Endpoint, member::Member, room::Room};
@@ -292,12 +291,13 @@ pub struct Pong(pub u32);
 #[cfg(all(feature = "serde", test))]
 mod serialization {
     use super::{
+        Room, RootElement,
         endpoint::{
             web_rtc_play::{self, LocalSrcUri},
             web_rtc_publish::{self, AudioSettings, P2pMode, VideoSettings},
         },
         member::{self, Credentials},
-        room, Room, RootElement,
+        room,
     };
 
     // language=YAML

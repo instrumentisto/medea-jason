@@ -10,9 +10,9 @@ use tracerr::Traced;
 
 use crate::{
     media::{
-        track::local, AudioTrackConstraints, DeviceVideoTrackConstraints,
+        AudioTrackConstraints, DeviceVideoTrackConstraints,
         DisplayVideoTrackConstraints, MediaKind, MediaStreamSettings,
-        TrackConstraints, VideoSource,
+        TrackConstraints, VideoSource, track::local,
     },
     platform,
     utils::Caused,
@@ -32,9 +32,7 @@ pub enum TracksRequestError {
     TooManyDeviceVideoTracks,
 
     /// [`TracksRequest`] contains multiple [`DisplayVideoTrackConstraints`].
-    #[display(
-        "only one display video track is allowed in SimpleTracksRequest"
-    )]
+    #[display("only one display video track is allowed in SimpleTracksRequest")]
     TooManyDisplayVideoTracks,
 
     /// [`TracksRequest`] contains no track constraints at all.
@@ -302,11 +300,8 @@ impl TryFrom<TracksRequest> for SimpleTracksRequest {
             return Err(NoTracks);
         }
 
-        let mut req = Self {
-            audio: None,
-            device_video: None,
-            display_video: None,
-        };
+        let mut req =
+            Self { audio: None, device_video: None, display_video: None };
         #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for (id, audio) in value.audio {
             drop(req.audio.replace((id, audio)));

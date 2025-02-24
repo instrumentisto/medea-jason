@@ -43,24 +43,21 @@ pub mod room_close_reason;
 
 use std::{cell::Cell, ptr};
 
-use flutter_rust_bridge::{frb, DartOpaque};
-
-use crate::{
-    media::{
-        self,
-        constraints::{ConstrainBoolean, ConstrainU32},
-        MediaDeviceKind,
-    },
-    platform::{self},
-};
-
 pub use dart_sys::Dart_Handle;
+use flutter_rust_bridge::{DartOpaque, frb};
 
 pub use self::{
     connection_handle::ConnectionHandle, jason::Jason,
     local_media_track::LocalMediaTrack, media_manager::MediaManagerHandle,
     reconnect_handle::ReconnectHandle, remote_media_track::RemoteMediaTrack,
     room::RoomHandle, room_close_reason::RoomCloseReason,
+};
+use crate::{
+    media::{
+        self, MediaDeviceKind,
+        constraints::{ConstrainBoolean, ConstrainU32},
+    },
+    platform::{self},
 };
 
 thread_local! {
@@ -89,7 +86,7 @@ pub trait ForeignClass: Sized {
     #[frb(sync, type_64bit_int)]
     #[must_use]
     fn from_ptr(ptr: usize) -> Self {
-        unsafe { *Box::from_raw(ptr as *mut _) }
+        unsafe { *Box::from_raw(ptr as *mut Self) }
     }
 }
 

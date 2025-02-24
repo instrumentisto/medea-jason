@@ -50,11 +50,7 @@ impl InStable for Stable {
 
 impl From<bool> for Stable {
     fn from(enabled: bool) -> Self {
-        if enabled {
-            Self::Enabled
-        } else {
-            Self::Disabled
-        }
+        if enabled { Self::Enabled } else { Self::Disabled }
     }
 }
 

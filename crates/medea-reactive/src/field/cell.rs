@@ -108,8 +108,6 @@ where
 
     /// Returns [`Future`] which will resolve only on modifications that
     /// the given `assert_fn` returns `true` on.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when<F>(
         &self,
         assert_fn: F,
@@ -144,8 +142,6 @@ where
 {
     /// Returns [`Future`] which will resolve only when data of this
     /// [`ObservableCell`] will become equal to the provided `should_be` value.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_eq(
         &self,
         should_be: D,

@@ -3,17 +3,16 @@
 
 use std::marker::PhantomData;
 
+use super::Error;
 use crate::{
     browser::Statement,
     object::{
+        Object,
         local_track::LocalTrack,
         remote_track::RemoteTrack,
         room::{MediaKind, MediaSourceKind},
-        Object,
     },
 };
-
-use super::Error;
 
 /// Shortcut for a [`TracksStore`] of [`LocalTrack`]s.
 pub type Local = TracksStore<LocalTrack>;

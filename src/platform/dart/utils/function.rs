@@ -15,7 +15,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::DartValue,
-    platform::{utils::dart_api, Callback},
+    platform::{Callback, utils::dart_api},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/function.g.dart")]
@@ -62,10 +62,7 @@ impl<T> Function<T> {
         let ptr = opaque.create_dart_handle();
         let dart_fn = unsafe { dart_api::new_persistent_handle(ptr.cast()) };
 
-        Self {
-            dart_fn,
-            _arg: PhantomData,
-        }
+        Self { dart_fn, _arg: PhantomData }
     }
 }
 

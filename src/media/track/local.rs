@@ -9,12 +9,11 @@ use std::rc::Rc;
 use derive_more::with_trait::AsRef;
 use medea_client_api_proto as proto;
 
+use super::MediaStreamTrackState;
 use crate::{
     media::{MediaKind, MediaSourceKind},
     platform,
 };
-
-use super::MediaStreamTrackState;
 
 /// Wrapper around a [`platform::MediaStreamTrack`] received from a
 /// [getUserMedia()][1]/[getDisplayMedia()][2] request.
@@ -50,11 +49,7 @@ impl Track {
         track: platform::MediaStreamTrack,
         source_kind: proto::MediaSourceKind,
     ) -> Self {
-        Self {
-            track,
-            source_kind,
-            _parent: None,
-        }
+        Self { track, source_kind, _parent: None }
     }
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
@@ -119,11 +114,7 @@ impl Track {
     pub async fn fork(self: &Rc<Self>) -> Self {
         let parent = Rc::clone(self);
         let track = self.track.fork().await;
-        Self {
-            track,
-            source_kind: self.source_kind,
-            _parent: Some(parent),
-        }
+        Self { track, source_kind: self.source_kind, _parent: Some(parent) }
     }
 
     /// [Stops][1] this [`Track`].
@@ -193,8 +184,7 @@ impl LocalMediaTrack {
     /// It's called for live [`LocalMediaTrack`]s when their audio level
     /// changes.
     pub fn on_audio_level_changed(&self, callback: platform::Function<i32>) {
-        self.get_track()
-            .on_audio_level_changed(move |v| callback.call1(v));
+        self.get_track().on_audio_level_changed(move |v| callback.call1(v));
     }
 
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is

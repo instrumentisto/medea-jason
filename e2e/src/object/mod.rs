@@ -15,12 +15,11 @@ use serde_json::Value as Json;
 use tokio::task;
 use uuid::Uuid;
 
-use crate::browser::{self, Statement};
-
 pub use self::{
     jason::Jason,
     room::{MediaKind, MediaSourceKind, Room},
 };
+use crate::browser::{self, Statement};
 
 /// All errors which can happen while working with [`Object`]s.
 #[derive(Debug, Display, From, StdError)]
@@ -98,11 +97,7 @@ impl<T> Object<T> {
     /// Returns a new [`Object`] with the provided ID and [`browser::Window`].
     #[must_use]
     pub const fn new(id: String, window: browser::Window) -> Self {
-        Self {
-            ptr: ObjectPtr(id),
-            window,
-            _type: PhantomData,
-        }
+        Self { ptr: ObjectPtr(id), window, _type: PhantomData }
     }
 
     /// Returns an [`ObjectPtr`] to this [`Object`].

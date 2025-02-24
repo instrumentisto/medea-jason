@@ -1,14 +1,15 @@
 //! Media tracks and streams constraints functionality.
 
-use crate::media::{
-    constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
-    AudioTrackConstraints, DeviceVideoTrackConstraints,
-    DisplayVideoTrackConstraints,
-};
 use derive_more::with_trait::{AsRef, Into};
 use web_sys::{
     ConstrainBooleanParameters, ConstrainDomStringParameters,
     ConstrainDoubleRange, MediaTrackConstraints,
+};
+
+use crate::media::{
+    AudioTrackConstraints, DeviceVideoTrackConstraints,
+    DisplayVideoTrackConstraints,
+    constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
 };
 
 /// [MediaStreamConstraints][1] wrapper.

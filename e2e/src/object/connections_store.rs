@@ -3,7 +3,7 @@
 
 use crate::{
     browser::Statement,
-    object::{connection::Connection, Error, Object},
+    object::{Error, Object, connection::Connection},
 };
 
 /// Storage for [`Connection`]s thrown by `Room.on_new_connection()` callback.

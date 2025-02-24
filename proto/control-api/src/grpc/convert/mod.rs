@@ -7,11 +7,10 @@ mod callback;
 
 use derive_more::with_trait::{Display, Error, From};
 
+use super::CallbackUrlParseError;
 use crate::{
     control::ParseFidError, endpoint::web_rtc_play::LocalSrcUriParseError,
 };
-
-use super::CallbackUrlParseError;
 
 /// Possible errors of deserializing types from [gRPC] spec.
 ///

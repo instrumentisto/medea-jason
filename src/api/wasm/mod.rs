@@ -18,8 +18,6 @@ pub mod room_handle;
 use derive_more::with_trait::Display;
 use wasm_bindgen::prelude::*;
 
-use crate::media;
-
 pub use self::{
     connection_handle::ConnectionHandle,
     err::Error,
@@ -36,6 +34,7 @@ pub use self::{
     room_close_reason::RoomCloseReason,
     room_handle::RoomHandle,
 };
+use crate::media;
 
 /// [MediaStreamTrack.kind][1] representation.
 ///

@@ -33,10 +33,7 @@ thread_local! {
 /// Same as for [`CStr::from_ptr()`].
 #[must_use]
 pub unsafe fn c_str_into_string(string: ptr::NonNull<c_char>) -> String {
-    unsafe { CStr::from_ptr(string.as_ptr()) }
-        .to_str()
-        .unwrap()
-        .to_owned()
+    unsafe { CStr::from_ptr(string.as_ptr()) }.to_str().unwrap().to_owned()
 }
 
 /// Leaks the given [`String`] returning a raw C string that can be passed
@@ -77,7 +74,7 @@ pub unsafe fn dart_string_into_rust(
 /// # Safety
 ///
 /// Same as for [`CString::from_raw()`].
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn String_free(s: ptr::NonNull<c_char>) {
     propagate_panic(move || {
         drop(unsafe { CString::from_raw(s.as_ptr()) });
@@ -90,7 +87,7 @@ pub unsafe extern "C" fn String_free(s: ptr::NonNull<c_char>) {
 /// # Safety
 ///
 /// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn register_free_dart_native_string(
     f: FreeDartNativeStringFunction,
 ) {

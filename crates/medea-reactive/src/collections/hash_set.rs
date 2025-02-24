@@ -1,7 +1,7 @@
 //! Reactive hash set based on [`HashSet`].
 
 use std::{
-    collections::{hash_set::Iter, HashSet as StdHashSet},
+    collections::{HashSet as StdHashSet, hash_set::Iter},
     hash::Hash,
     marker::PhantomData,
 };
@@ -9,9 +9,8 @@ use std::{
 use futures::stream::{self, LocalBoxStream};
 
 use crate::subscribers_store::{
-    common, progressable,
+    SubscribersStore, common, progressable,
     progressable::{AllProcessed, Processed},
-    SubscribersStore,
 };
 
 /// Reactive hash set based on [`HashSet`] with an ability to recognize when all
@@ -39,9 +38,7 @@ pub type ObservableHashSet<T> = HashSet<T, common::SubStore<T>, T>;
 ///
 /// set.insert("foo");
 ///
-/// let item = inserts.next()
-///     .await
-///     .unwrap();
+/// let item = inserts.next().await.unwrap();
 /// assert_eq!(item, "foo");
 ///
 /// // Also you can subscribe on remove action:
@@ -49,9 +46,7 @@ pub type ObservableHashSet<T> = HashSet<T, common::SubStore<T>, T>;
 ///
 /// set.remove(&"foo");
 ///
-/// let removed_item = removals.next()
-///     .await
-///     .unwrap();
+/// let removed_item = removals.next().await.unwrap();
 /// assert_eq!(removed_item, "foo");
 ///
 /// // When you update HashSet by another HashSet all events will
@@ -65,13 +60,8 @@ pub type ObservableHashSet<T> = HashSet<T, common::SubStore<T>, T>;
 /// set_for_update.insert("foo-4");
 /// set.update(set_for_update);
 ///
-/// let removed_items: HashSet<_> = removals.take(2)
-///     .collect()
-///     .await;
-/// let inserted_item = inserts.skip(3)
-///     .next()
-///     .await
-///     .unwrap();
+/// let removed_items: HashSet<_> = removals.take(2).collect().await;
+/// let inserted_item = inserts.skip(3).next().await.unwrap();
 /// assert!(removed_items.contains("foo-2"));
 /// assert!(removed_items.contains("foo-3"));
 /// assert_eq!(inserted_item, "foo-4");
@@ -98,6 +88,7 @@ pub type ObservableHashSet<T> = HashSet<T, common::SubStore<T>, T>;
 /// drop(value);
 ///
 /// hash_set.when_insert_processed().await; // will be resolved
+///
 /// # });
 /// ```
 #[derive(Debug)]
@@ -122,24 +113,18 @@ where
 {
     /// Returns [`Future`] resolving when all push updates will be processed by
     /// [`HashSet::on_insert()`] subscribers.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_insert_processed(&self) -> Processed<'static> {
         self.on_insert_subs.when_all_processed()
     }
 
     /// Returns [`Future`] resolving when all remove updates will be processed
     /// by [`HashSet::on_remove()`] subscribers.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_remove_processed(&self) -> Processed<'static> {
         self.on_remove_subs.when_all_processed()
     }
 
     /// Returns [`Future`] resolving when all insert and remove updates will be
     /// processed by subscribers.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_all_processed(&self) -> AllProcessed<'static> {
         crate::when_all_processed(vec![
             self.when_remove_processed().into(),

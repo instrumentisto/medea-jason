@@ -3,10 +3,11 @@
 use inflector::Inflector as _;
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2, TokenTree};
-use quote::{quote, ToTokens as _};
+use quote::{ToTokens as _, quote};
 use syn::{
+    FnArg, ItemEnum, Pat, PatIdent, Token,
     parse::{Parse, ParseStream, Result},
-    parse_quote, token, FnArg, ItemEnum, Pat, PatIdent, Token,
+    parse_quote, token,
 };
 
 /// Additional keywords to be parsed by [`syn`].
@@ -110,10 +111,7 @@ impl Parse for Item {
             &format!("{}Handler", orig_enum.ident),
             Span::call_site(),
         );
-        Ok(Self {
-            orig_enum,
-            handler_trait_ident,
-        })
+        Ok(Self { orig_enum, handler_trait_ident })
     }
 }
 
@@ -309,10 +307,7 @@ impl Default for Args {
             FnArg::Receiver(rcv) => rcv,
             FnArg::Typed(_) => unreachable!(),
         };
-        Self {
-            self_kind,
-            async_trait: None,
-        }
+        Self { self_kind, async_trait: None }
     }
 }
 
@@ -413,21 +408,16 @@ mod to_handler_fn_name_spec {
 
         #[test]
         fn self_rc() {
-            let args = Args::parse
-                .parse2(quote! {self: std::rc::Rc<Self>})
-                .unwrap();
+            let args =
+                Args::parse.parse2(quote! {self: std::rc::Rc<Self>}).unwrap();
             assert_eq!(
                 args.dispatch_with_handler_arg(),
-                FnArg::parse
-                    .parse2(quote! {handler: std::rc::Rc<T>})
-                    .unwrap(),
+                FnArg::parse.parse2(quote! {handler: std::rc::Rc<T>}).unwrap(),
             );
             assert!(args.async_trait.is_none());
             assert_eq!(
                 FnArg::Receiver(args.self_kind),
-                FnArg::parse
-                    .parse2(quote! {self: std::rc::Rc<Self>})
-                    .unwrap(),
+                FnArg::parse.parse2(quote! {self: std::rc::Rc<Self>}).unwrap(),
             );
         }
 

@@ -10,20 +10,19 @@ use std::{
 
 use derive_more::with_trait::From;
 use futures::{
-    future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
-    TryFutureExt as _,
+    FutureExt as _, TryFutureExt as _, future, future::LocalBoxFuture,
+    stream::LocalBoxStream,
 };
 use medea_client_api_proto::TrackId;
 use medea_reactive::{AllProcessed, Guarded, ProgressableHashMap};
 use tracerr::Traced;
 
+use super::sender;
 use crate::{
     media::LocalTracksConstraints,
     peer::UpdateLocalStreamError,
     utils::{AsProtoState, SynchronizableState, Updatable},
 };
-
-use super::sender;
 
 /// Repository of all the [`sender::State`]s/[`receiver::State`]s of a
 /// [`Component`].
@@ -43,8 +42,6 @@ impl<S> TracksRepository<S> {
     }
 
     /// Returns [`Future`] resolving once all inserts/removes are processed.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_all_processed(&self) -> AllProcessed<'static> {
         self.0.borrow().when_all_processed()
     }
@@ -114,7 +111,6 @@ impl TracksRepository<sender::State> {
     /// [`Result`], if currently no such requests are running for the provided
     /// [`TrackId`]s.
     ///
-    /// [`Future`]: std::future::Future
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
     pub fn local_stream_update_result(
@@ -182,8 +178,6 @@ where
     /// Returns [`Future`] resolving once all tracks from this
     /// [`TracksRepository`] will be stabilized meaning that all track's
     /// components won't contain any pending state change transitions.
-    ///
-    /// [`Future`]: std::future::Future
     fn when_stabilized(&self) -> AllProcessed<'static> {
         let when_futs: Vec<_> = self
             .0
@@ -195,15 +189,9 @@ where
     }
 
     /// Returns [`Future`] resolving once all tracks updates are applied.
-    ///
-    /// [`Future`]: std::future::Future
     fn when_updated(&self) -> AllProcessed<'static> {
-        let when_futs: Vec<_> = self
-            .0
-            .borrow()
-            .values()
-            .map(|s| s.when_updated().into())
-            .collect();
+        let when_futs: Vec<_> =
+            self.0.borrow().values().map(|s| s.when_updated().into()).collect();
         medea_reactive::when_all_processed(when_futs)
     }
 
@@ -214,10 +202,7 @@ where
 
     /// Notifies all the tracks about RPC connection recovering.
     fn connection_recovered(&self) {
-        self.0
-            .borrow()
-            .values()
-            .for_each(|s| s.connection_recovered());
+        self.0.borrow().values().for_each(|s| s.connection_recovered());
     }
 }
 
@@ -228,11 +213,7 @@ where
     type Output = HashMap<TrackId, S::Output>;
 
     fn as_proto(&self) -> Self::Output {
-        self.0
-            .borrow()
-            .iter()
-            .map(|(id, s)| (*id, s.as_proto()))
-            .collect()
+        self.0.borrow().iter().map(|(id, s)| (*id, s.as_proto())).collect()
     }
 }
 

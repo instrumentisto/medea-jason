@@ -6,6 +6,17 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### Changed
+
+- Bumped up [MSRV] to 1.85 because of migration to 2024 edition. ([todo])
+
+[todo]: /../../commit/todo
+
+
+
+
 ## [0.3.0] · 2023-06-09
 [0.3.0]: /../../tree/medea-macro-0.3.0/crates/medea-macro
 

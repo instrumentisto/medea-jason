@@ -68,10 +68,7 @@ impl ClientDisconnect {
 
 impl From<ClientDisconnect> for CloseReason {
     fn from(v: ClientDisconnect) -> Self {
-        Self::ByClient {
-            is_err: v.is_err(),
-            reason: v,
-        }
+        Self::ByClient { is_err: v.is_err(), reason: v }
     }
 }
 
@@ -221,13 +218,7 @@ impl WebSocketRpcClient {
         member_id: MemberId,
         credential: Credential,
     ) {
-        self.send_command(
-            room_id,
-            Command::JoinRoom {
-                member_id,
-                credential,
-            },
-        );
+        self.send_command(room_id, Command::JoinRoom { member_id, credential });
     }
 
     /// Leaves `Room` with a provided [`RoomId`].
@@ -379,7 +370,7 @@ impl WebSocketRpcClient {
         self.0.borrow_mut().url = Some(url.clone());
         self.0.borrow().state.set(ClientState::Connecting);
 
-        // wait for transport open
+        // Wait for transport opening.
         let transport = (self.0.borrow().rpc_transport_factory)();
         let mut on_message = transport.on_message();
         transport.connect(url).await.map_err(|e| {
@@ -392,7 +383,7 @@ impl WebSocketRpcClient {
             ))
         })?;
 
-        // wait for ServerMsg::RpcSettings
+        // Wait for `ServerMsg::RpcSettings`.
         if let Some(msg) = on_message.next().await {
             if let ServerMsg::RpcSettings(rpc_settings) = msg {
                 Rc::clone(&self)
@@ -417,7 +408,7 @@ impl WebSocketRpcClient {
             )));
         }
 
-        // subscribe to transport close
+        // Subscribe to transport closing.
         {
             let mut transport_state_changes = transport.on_state_change();
             let weak_this = Rc::downgrade(&self);
@@ -432,7 +423,7 @@ impl WebSocketRpcClient {
             });
         }
 
-        // subscribe to transport message received
+        // Subscribe to transport message receiving.
         {
             let weak_this = Rc::downgrade(&self);
             let mut on_socket_message = transport.on_message();
@@ -455,8 +446,6 @@ impl WebSocketRpcClient {
     /// [`ClientState::Connecting`] will be changed to something else, then this
     /// [`Future`] will be resolved and based on new [`ClientState`] [`Result`]
     /// will be returned.
-    ///
-    /// [`Future`]: std::future::Future
     async fn connecting_result(&self) -> Result<(), Traced<RpcClientError>> {
         let mut state_changes = self.0.borrow().state.subscribe();
         while let Some(state) = state_changes.next().await {
@@ -539,8 +528,6 @@ impl WebSocketRpcClient {
     ///
     /// This [`Future`] wouldn't be resolved on abnormal closes.
     /// An [`WebSocketRpcClient::on_connection_loss`] will be thrown instead.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn on_normal_close(
         &self,
     ) -> LocalBoxFuture<'static, Result<CloseReason, oneshot::Canceled>> {

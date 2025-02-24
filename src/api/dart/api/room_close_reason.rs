@@ -1,9 +1,8 @@
 //! Reason of a [`Room`] closing.
 
-use crate::{api::dart::api::ForeignClass, room as core};
-
 #[cfg(doc)]
 use crate::room::Room;
+use crate::{api::dart::api::ForeignClass, room as core};
 
 /// Reason of why a [`Room`] is closed.
 #[derive(Debug)]

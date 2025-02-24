@@ -11,9 +11,9 @@ use medea_macro::dart_bridge;
 use crate::{
     api::DartValue,
     media::{
-        constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
         AudioTrackConstraints, DeviceVideoTrackConstraints,
         DisplayVideoTrackConstraints,
+        constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
     },
     platform::dart::utils::handle::DartHandle,
 };
@@ -330,10 +330,7 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
             }
         }
 
-        Self {
-            optional,
-            mandatory,
-        }
+        Self { optional, mandatory }
     }
 }
 
@@ -402,10 +399,7 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
             }
         }
 
-        Self {
-            optional,
-            mandatory,
-        }
+        Self { optional, mandatory }
     }
 }
 
@@ -464,10 +458,7 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
             }
         }
 
-        Self {
-            optional,
-            mandatory,
-        }
+        Self { optional, mandatory }
     }
 }
 

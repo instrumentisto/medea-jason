@@ -1,11 +1,10 @@
 //! `Jason` JS object's representation.
 
+use super::Error;
 use crate::{
     browser::Statement,
-    object::{room::Room, Builder, Object},
+    object::{Builder, Object, room::Room},
 };
-
-use super::Error;
 
 /// Representation of a `Jason` JS object.
 #[derive(Clone, Copy, Debug)]

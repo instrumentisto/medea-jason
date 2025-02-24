@@ -28,9 +28,8 @@ mod exception {
     use dart_sys::Dart_Handle;
     use libc::c_char;
 
-    use crate::{api::DartValue, platform::Error};
-
     use super::DartError;
+    use crate::{api::DartValue, platform::Error};
 
     /// Invokes other Dart closures that accept a [`DartValue`] argument.
     extern "C" {

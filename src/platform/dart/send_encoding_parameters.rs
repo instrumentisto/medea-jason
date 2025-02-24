@@ -6,9 +6,8 @@ use dart_sys::Dart_Handle;
 use medea_client_api_proto::{EncodingParameters, ScalabilityMode};
 use medea_macro::dart_bridge;
 
-use crate::platform::dart::utils::handle::DartHandle;
-
 use super::utils::{c_str_into_string, string_into_c_str};
+use crate::platform::dart::utils::handle::DartHandle;
 
 #[dart_bridge(
     "flutter/lib/src/native/platform/send_encoding_parameters.g.dart"
