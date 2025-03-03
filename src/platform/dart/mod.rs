@@ -30,7 +30,7 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::{cell::RefCell, panic};
+use std::{cell::RefCell, mem::ManuallyDrop, panic};
 
 use libc::c_void;
 
@@ -74,8 +74,12 @@ pub fn set_panic_hook() {
 }
 
 thread_local! {
+    // Note: Wrapped with ManuallyDrop cause platform::Function calls DartVM
+    //       API on drop, which will be unaccessible when thread local data is
+    //       dropped.
     /// [`Function`] being called whenever Rust code [`panic`]s.
-    static PANIC_FN: RefCell<Option<Function<String>>> = RefCell::default();
+    static PANIC_FN: RefCell<Option<ManuallyDrop<Function<String>>>> =
+        RefCell::default();
 }
 
 /// Sets the provided [`Function`] as a callback to be called whenever Rust code
@@ -83,7 +87,9 @@ thread_local! {
 ///
 /// [`panic`]: panic!
 pub fn set_panic_callback(cb: Function<String>) {
-    PANIC_FN.set(Some(cb));
+    if let Some(mut old_cb) = PANIC_FN.replace(Some(ManuallyDrop::new(cb))) {
+        unsafe { ManuallyDrop::drop(&mut old_cb) };
+    }
 }
 
 #[cfg(target_os = "android")]
