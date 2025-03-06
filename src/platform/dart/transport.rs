@@ -12,11 +12,11 @@ use tracerr::Traced;
 
 use crate::{
     platform::{
+        RpcTransport, TransportError, TransportState,
         dart::utils::{
             callback::Callback, dart_future::FutureFromDart,
             dart_string_into_rust, handle::DartHandle, string_into_c_str,
         },
-        RpcTransport, TransportError, TransportState,
     },
     rpc::{ApiUrl, ClientDisconnect, CloseMsg},
 };

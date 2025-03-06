@@ -17,10 +17,7 @@ pub struct Guarded<T> {
 impl<T> Guarded<T> {
     /// Wraps the `value` into a new [`Guarded`] basing on the `counter`.
     pub(super) fn wrap(value: T, counter: Rc<ObservableCell<u32>>) -> Self {
-        Self {
-            value,
-            guard: Guard::new(counter),
-        }
+        Self { value, guard: Guard::new(counter) }
     }
 
     /// Unwraps this [`Guarded`] into its inner value and its [`Guard`].

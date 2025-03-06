@@ -9,7 +9,7 @@ use js_sys::{Object, Reflect};
 ///
 /// __Use it only in [`js_callback`]'s closures.__
 macro_rules! cb_assert_eq {
-    ($a:expr, $b:expr$(,)?) => {
+    ($a:expr, $b:expr $(,)?) => {
         if $a != $b {
             return Err(format!("{:?} != {:?}", $a, $b));
         }
@@ -83,7 +83,7 @@ mod room;
 mod rpc;
 mod utils;
 
-use futures::{channel::oneshot, future::Either, Future};
+use futures::{channel::oneshot, future::Either};
 use js_sys::Promise;
 use medea_client_api_proto::{
     AudioSettings, Direction, MediaSourceKind, MediaType, MemberId, Track,
@@ -92,9 +92,9 @@ use medea_client_api_proto::{
 use medea_jason::{
     api,
     media::{
-        track::remote, AudioTrackConstraints, DeviceVideoTrackConstraints,
+        AudioTrackConstraints, DeviceVideoTrackConstraints,
         LocalTracksConstraints, MediaDirection, MediaKind, MediaManager,
-        MediaStreamSettings,
+        MediaStreamSettings, track::remote,
     },
     peer::media_exchange_state,
     rpc::ApiUrl,

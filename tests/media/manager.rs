@@ -1,10 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
 use js_sys::Array as JsArray;
-use wasm_bindgen_futures::JsFuture;
-use wasm_bindgen_test::*;
-use web_sys as sys;
-
 use medea_jason::{
     api,
     api::err::{
@@ -17,8 +13,11 @@ use medea_jason::{
         MediaKind, MediaManager, MediaStreamSettings,
     },
 };
+use wasm_bindgen_futures::JsFuture;
+use wasm_bindgen_test::*;
+use web_sys as sys;
 
-use crate::{is_firefox, jsval_cast, MockNavigator};
+use crate::{MockNavigator, is_firefox, jsval_cast};
 
 wasm_bindgen_test_configure!(run_in_browser);
 
@@ -57,7 +56,7 @@ async fn failed_get_media_devices_info() {
             )
             .unwrap();
 
-            assert_eq!(err.cause().message(), "failed_get_media_devices_info",);
+            assert_eq!(err.cause().message(), "failed_get_media_devices_info");
             assert!(&err.trace().contains("at src"));
         }
     }

@@ -10,16 +10,15 @@ use tracerr::Traced;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Event, MediaDevices as SysMediaDevices};
 
+use super::window;
 use crate::{
     media::{InvalidOutputAudioDeviceIdError, MediaSourceKind, MicVolumeError},
     platform::{
-        utils::EventListener, DisplayMediaStreamConstraints, Error,
-        GetUserMediaError, MediaDeviceInfo, MediaDisplayInfo,
-        MediaStreamConstraints, MediaStreamTrack,
+        DisplayMediaStreamConstraints, Error, GetUserMediaError,
+        MediaDeviceInfo, MediaDisplayInfo, MediaStreamConstraints,
+        MediaStreamTrack, utils::EventListener,
     },
 };
-
-use super::window;
 
 impl From<Error> for GetUserMediaError {
     fn from(err: Error) -> Self {

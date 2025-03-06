@@ -16,7 +16,7 @@ use medea_control_api_proto::grpc::callback::{
 };
 use tonic::transport::Server;
 
-use crate::{callback::CallbackItem, prelude::*, Cli};
+use crate::{Cli, callback::CallbackItem, prelude::*};
 
 /// Type which used in [`GrpcCallbackServer`] for [`CallbackItem`] storing.
 type CallbackItems = Arc<Mutex<Vec<CallbackItem>>>;
@@ -58,10 +58,7 @@ impl CallbackService for GrpcCallbackService {
         request: tonic::Request<proto::Request>,
     ) -> Result<tonic::Response<proto::Response>, tonic::Status> {
         info!("Callback request received: [{request:?}]");
-        self.events
-            .lock()
-            .unwrap()
-            .push(request.into_inner().into());
+        self.events.lock().unwrap().push(request.into_inner().into());
         Ok(tonic::Response::new(proto::Response {}))
     }
 }
@@ -100,11 +97,7 @@ pub fn run(opts: &Cli) -> Addr<GrpcCallbackServer> {
         .unwrap();
 
     _ = Arbiter::current().spawn(async move {
-        Server::builder()
-            .add_service(service)
-            .serve(addr)
-            .await
-            .unwrap();
+        Server::builder().add_service(service).serve(addr).await.unwrap();
     });
 
     debug!("gRPC callback server started.");

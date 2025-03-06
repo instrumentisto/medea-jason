@@ -8,7 +8,7 @@ use medea_reactive::ObservableCell;
 
 use crate::{
     api,
-    media::{track::MediaStreamTrackState, MediaKind, MediaSourceKind},
+    media::{MediaKind, MediaSourceKind, track::MediaStreamTrackState},
     platform,
 };
 

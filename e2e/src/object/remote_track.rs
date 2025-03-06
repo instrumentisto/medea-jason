@@ -1,8 +1,7 @@
 //! `RemoteMediaTrack` JS object's representation.
 
-use crate::{browser::Statement, object::Object};
-
 use super::Error;
+use crate::{browser::Statement, object::Object};
 
 /// Media exchange direction of a `RemoteMediaTrack`.
 #[derive(Clone, Copy, Debug)]

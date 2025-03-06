@@ -48,8 +48,7 @@ impl SendEncodingParameters {
     ///
     /// [1]: https://tinyurl.com/ypzzc75t
     pub fn set_scale_resolution_down_by(&self, scale_resolution_down_by: f32) {
-        self.0
-            .set_scale_resolution_down_by(scale_resolution_down_by);
+        self.0.set_scale_resolution_down_by(scale_resolution_down_by);
     }
 
     /// Sets [scalabilityMode][1] of these [`SendEncodingParameters`].

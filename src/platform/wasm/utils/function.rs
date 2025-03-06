@@ -43,9 +43,6 @@ impl<T: Into<JsValue>> Function<T> {
 
 impl<T> From<js_sys::Function> for Function<T> {
     fn from(func: js_sys::Function) -> Self {
-        Self {
-            inner: func,
-            _arg: PhantomData,
-        }
+        Self { inner: func, _arg: PhantomData }
     }
 }

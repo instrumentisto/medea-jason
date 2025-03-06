@@ -5,26 +5,26 @@ mod media;
 use std::{pin::Pin, rc::Rc};
 
 use futures::{
+    Stream, StreamExt as _,
     channel::mpsc,
     future::{self, FutureExt as _},
-    Stream, StreamExt as _,
 };
 use medea_client_api_proto::{
+    AudioSettings, ConnectionMode, Direction, IceConnectionState,
+    MediaDirection, MediaSourceKind, MediaType, MemberId, NegotiationRole,
+    PeerId, Track, TrackId, TrackPatchEvent, VideoSettings,
     stats::{
         HighResTimeStamp, KnownIceCandidatePairState, NonExhaustive,
         RtcInboundRtpStreamMediaType, RtcOutboundRtpStreamMediaType, RtcStat,
         RtcStatsType, StatId, TrackStats, TrackStatsKind,
     },
-    AudioSettings, ConnectionMode, Direction, IceConnectionState,
-    MediaDirection, MediaSourceKind, MediaType, MemberId, NegotiationRole,
-    PeerId, Track, TrackId, TrackPatchEvent, VideoSettings,
 };
 use medea_jason::{
     connection::Connections,
     media::{LocalTracksConstraints, MediaKind, MediaManager, RecvConstraints},
     peer::{
-        self, media_exchange_state, MediaStateControllable, PeerEvent,
-        TrackDirection,
+        self, MediaStateControllable, PeerEvent, TrackDirection,
+        media_exchange_state,
     },
     platform::RtcStats,
     utils::Updatable,
@@ -84,10 +84,8 @@ async fn disable_enable_audio() {
         Rc::new(peer_state),
     );
 
-    peer.state()
-        .insert_track(&audio_track, send_constraints.clone());
-    peer.state()
-        .insert_track(&video_track, send_constraints.clone());
+    peer.state().insert_track(&audio_track, send_constraints.clone());
+    peer.state().insert_track(&video_track, send_constraints.clone());
     peer.state().when_local_sdp_updated().await.unwrap();
     assert!(peer.is_send_audio_enabled());
     assert!(peer.is_send_video_enabled(None));
@@ -135,10 +133,8 @@ async fn disable_enable_video() {
         .unwrap(),
         Rc::new(peer_state),
     );
-    peer.state()
-        .insert_track(&audio_track, send_constraints.clone());
-    peer.state()
-        .insert_track(&video_track, send_constraints.clone());
+    peer.state().insert_track(&audio_track, send_constraints.clone());
+    peer.state().insert_track(&video_track, send_constraints.clone());
     peer.state().when_local_sdp_updated().await.unwrap();
 
     assert!(peer.is_send_audio_enabled());
@@ -221,10 +217,8 @@ async fn new_with_disable_video() {
         .unwrap(),
         Rc::new(peer_state),
     );
-    peer.state()
-        .insert_track(&audio_track, send_constraints.clone());
-    peer.state()
-        .insert_track(&video_track, send_constraints.clone());
+    peer.state().insert_track(&audio_track, send_constraints.clone());
+    peer.state().insert_track(&video_track, send_constraints.clone());
     peer.state().when_all_updated().await;
 
     assert!(peer.is_send_audio_enabled());
@@ -259,10 +253,8 @@ async fn add_candidates_to_answerer_before_offer() {
         .unwrap(),
         Rc::new(pc1_state),
     );
-    pc1.state()
-        .insert_track(&audio_track, LocalTracksConstraints::default());
-    pc1.state()
-        .insert_track(&video_track, LocalTracksConstraints::default());
+    pc1.state().insert_track(&audio_track, LocalTracksConstraints::default());
+    pc1.state().insert_track(&video_track, LocalTracksConstraints::default());
     let pc1_offer = pc1.state().when_local_sdp_updated().await.unwrap();
 
     let pc2_state = peer::State::new(
@@ -325,10 +317,8 @@ async fn add_candidates_to_offerer_before_answer() {
         .unwrap(),
         Rc::new(pc1_state),
     );
-    pc1.state()
-        .insert_track(&audio_track, LocalTracksConstraints::default());
-    pc1.state()
-        .insert_track(&video_track, LocalTracksConstraints::default());
+    pc1.state().insert_track(&audio_track, LocalTracksConstraints::default());
+    pc1.state().insert_track(&video_track, LocalTracksConstraints::default());
 
     let pc2_state = peer::State::new(
         PeerId(2),
@@ -353,9 +343,7 @@ async fn add_candidates_to_offerer_before_answer() {
     );
 
     let offer = pc1.state().when_local_sdp_updated().await.unwrap();
-    pc2.state()
-        .set_negotiation_role(NegotiationRole::Answerer(offer))
-        .await;
+    pc2.state().set_negotiation_role(NegotiationRole::Answerer(offer)).await;
     let answer = pc2.state().when_local_sdp_updated().await.unwrap();
 
     handle_ice_candidates(rx2, &pc1, 1).await;
@@ -397,10 +385,8 @@ async fn normal_exchange_of_candidates() {
         .unwrap(),
         Rc::new(pc1_state),
     );
-    pc1.state()
-        .insert_track(&audio_track, LocalTracksConstraints::default());
-    pc1.state()
-        .insert_track(&video_track, LocalTracksConstraints::default());
+    pc1.state().insert_track(&audio_track, LocalTracksConstraints::default());
+    pc1.state().insert_track(&video_track, LocalTracksConstraints::default());
 
     let pc2_state = peer::State::new(
         PeerId(2),
@@ -425,9 +411,7 @@ async fn normal_exchange_of_candidates() {
     );
 
     let offer = pc1.state().when_local_sdp_updated().await.unwrap();
-    pc2.state()
-        .set_negotiation_role(NegotiationRole::Answerer(offer))
-        .await;
+    pc2.state().set_negotiation_role(NegotiationRole::Answerer(offer)).await;
     let answer = pc2.state().when_local_sdp_updated().await.unwrap();
     pc1.state().set_remote_sdp(answer);
     pc1.state().when_remote_sdp_processed().await;
@@ -539,10 +523,8 @@ async fn ice_connection_state_changed_is_emitted() {
         .unwrap(),
         Rc::new(pc1_state),
     );
-    pc1.state()
-        .insert_track(&audio_track, LocalTracksConstraints::default());
-    pc1.state()
-        .insert_track(&video_track, LocalTracksConstraints::default());
+    pc1.state().insert_track(&audio_track, LocalTracksConstraints::default());
+    pc1.state().insert_track(&video_track, LocalTracksConstraints::default());
     let pc1_offer = pc1.state().when_local_sdp_updated().await.unwrap();
 
     let pc2_state = peer::State::new(
@@ -1255,12 +1237,8 @@ async fn new_remote_track() {
         );
 
         let (audio_track, video_track) = get_test_unrequired_tracks();
-        sender_peer
-            .state()
-            .insert_track(&audio_track, tx_caps.clone());
-        sender_peer
-            .state()
-            .insert_track(&video_track, tx_caps.clone());
+        sender_peer.state().insert_track(&audio_track, tx_caps.clone());
+        sender_peer.state().insert_track(&video_track, tx_caps.clone());
         sender_peer
             .state()
             .set_negotiation_role(NegotiationRole::Offerer)
@@ -1340,10 +1318,7 @@ async fn new_remote_track() {
         sender_peer.state().set_remote_sdp(answer);
         sender_peer.state().when_remote_sdp_processed().await;
 
-        let mut result = FinalTrack {
-            has_audio: false,
-            has_video: false,
-        };
+        let mut result = FinalTrack { has_audio: false, has_video: false };
         loop {
             match timeout(300, rx2.next()).await {
                 Ok(Some(event)) => {
@@ -1444,12 +1419,8 @@ mod ice_restart {
             .state()
             .set_negotiation_role(NegotiationRole::Offerer)
             .await;
-        let sdp_offer_before = peers
-            .first_peer
-            .state()
-            .when_local_sdp_updated()
-            .await
-            .unwrap();
+        let sdp_offer_before =
+            peers.first_peer.state().when_local_sdp_updated().await.unwrap();
         let ice_pwds_before = get_ice_pwds(&sdp_offer_before);
         let ice_ufrags_before = get_ice_ufrags(&sdp_offer_before);
         peers.first_peer.state().reset_negotiation_role();
@@ -1460,12 +1431,8 @@ mod ice_restart {
             .state()
             .set_negotiation_role(NegotiationRole::Offerer)
             .await;
-        let sdp_offer_after = peers
-            .first_peer
-            .state()
-            .when_local_sdp_updated()
-            .await
-            .unwrap();
+        let sdp_offer_after =
+            peers.first_peer.state().when_local_sdp_updated().await.unwrap();
         let ice_pwds_after = get_ice_pwds(&sdp_offer_after);
         let ice_ufrags_after = get_ice_ufrags(&sdp_offer_after);
 
@@ -1488,19 +1455,12 @@ mod ice_restart {
             .state()
             .set_negotiation_role(NegotiationRole::Offerer)
             .await;
-        let sdp_offer_before = peers
-            .first_peer
-            .state()
-            .when_local_sdp_updated()
-            .await
-            .unwrap();
+        let sdp_offer_before =
+            peers.first_peer.state().when_local_sdp_updated().await.unwrap();
         let ice_pwds_before = get_ice_pwds(&sdp_offer_before);
         let ice_ufrags_before = get_ice_ufrags(&sdp_offer_before);
 
-        peers
-            .first_peer
-            .state()
-            .apply_local_sdp(sdp_offer_before.clone());
+        peers.first_peer.state().apply_local_sdp(sdp_offer_before.clone());
         peers.first_peer.state().reset_negotiation_role();
         delay_for(100).await;
         let mut proto_state = peers.first_peer.state().as_proto();
@@ -1515,12 +1475,8 @@ mod ice_restart {
             .state()
             .set_negotiation_role(NegotiationRole::Offerer)
             .await;
-        let sdp_offer_after = peers
-            .first_peer
-            .state()
-            .when_local_sdp_updated()
-            .await
-            .unwrap();
+        let sdp_offer_after =
+            peers.first_peer.state().when_local_sdp_updated().await.unwrap();
         let ice_pwds_after = get_ice_pwds(&sdp_offer_after);
         let ice_ufrags_after = get_ice_ufrags(&sdp_offer_after);
 
@@ -1581,9 +1537,7 @@ async fn disable_and_enable_all_tracks() {
     assert!(!audio_track.general_disabled());
     assert!(!video_track.general_disabled());
 
-    audio_track_state
-        .media_state_transition_to(Disabled.into())
-        .unwrap();
+    audio_track_state.media_state_transition_to(Disabled.into()).unwrap();
     pc.state()
         .patch_track(TrackPatchEvent {
             id: audio_track_id,
@@ -1597,9 +1551,7 @@ async fn disable_and_enable_all_tracks() {
     assert!(audio_track.general_disabled());
     assert!(!video_track.general_disabled());
 
-    video_track_state
-        .media_state_transition_to(Disabled.into())
-        .unwrap();
+    video_track_state.media_state_transition_to(Disabled.into()).unwrap();
     pc.state()
         .patch_track(TrackPatchEvent {
             id: video_track_id,
@@ -1613,9 +1565,7 @@ async fn disable_and_enable_all_tracks() {
     assert!(audio_track.general_disabled());
     assert!(video_track.general_disabled());
 
-    audio_track_state
-        .media_state_transition_to(Enabled.into())
-        .unwrap();
+    audio_track_state.media_state_transition_to(Enabled.into()).unwrap();
     pc.state()
         .patch_track(TrackPatchEvent {
             id: audio_track_id,
@@ -1629,9 +1579,7 @@ async fn disable_and_enable_all_tracks() {
     assert!(!audio_track.general_disabled());
     assert!(video_track.general_disabled());
 
-    video_track_state
-        .media_state_transition_to(Enabled.into())
-        .unwrap();
+    video_track_state.media_state_transition_to(Enabled.into()).unwrap();
     pc.state()
         .patch_track(TrackPatchEvent {
             id: video_track_id,

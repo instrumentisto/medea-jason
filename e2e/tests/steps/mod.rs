@@ -10,10 +10,10 @@ use std::{convert::Infallible, str::FromStr};
 use async_recursion::async_recursion;
 use cucumber::given;
 use medea_e2e::object::{
-    room::ParsingFailedError, AwaitCompletion, MediaKind, MediaSourceKind,
+    AwaitCompletion, MediaKind, MediaSourceKind, room::ParsingFailedError,
 };
 
-use crate::world::{member::Builder as MemberBuilder, World};
+use crate::world::{World, member::Builder as MemberBuilder};
 
 #[allow(clippy::too_many_arguments, clippy::too_many_lines)]
 #[given(regex = "^(?:room with )?(joined )?member(?:s)? (\\S+)\
@@ -115,10 +115,7 @@ async fn new_given_member(
 
     if joined.0 {
         world.join_room(&first_member_id).await.unwrap();
-        world
-            .wait_for_interconnection(&first_member_id)
-            .await
-            .unwrap();
+        world.wait_for_interconnection(&first_member_id).await.unwrap();
     }
 
     let member = world.get_member(&first_member_id).unwrap();

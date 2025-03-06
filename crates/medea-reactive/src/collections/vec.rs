@@ -5,9 +5,8 @@ use std::{marker::PhantomData, mem, slice::Iter, vec::Vec as StdVec};
 use futures::stream::{self, LocalBoxStream};
 
 use crate::subscribers_store::{
-    common, progressable,
-    progressable::{processed::AllProcessed, Processed},
-    SubscribersStore,
+    SubscribersStore, common, progressable,
+    progressable::{Processed, processed::AllProcessed},
 };
 
 /// Reactive vector based on [`Vec`] with additional functionality of tracking
@@ -53,9 +52,7 @@ pub type ObservableVec<T> = Vec<T, common::SubStore<T>, T>;
 /// vec.push("foo-1");
 /// vec.push("foo-2");
 /// drop(vec);
-/// let removed_items: Vec<_> = removals.take(2)
-///     .collect()
-///     .await;
+/// let removed_items: Vec<_> = removals.take(2).collect().await;
 /// assert_eq!(removed_items[0], "foo-1");
 /// assert_eq!(removed_items[1], "foo-2");
 /// # });
@@ -79,6 +76,7 @@ pub type ObservableVec<T> = Vec<T, common::SubStore<T>, T>;
 /// drop(value);
 ///
 /// vec.when_push_processed().await; // will be resolved
+///
 /// # });
 /// ```
 #[derive(Debug)]
@@ -102,24 +100,18 @@ where
 {
     /// Returns [`Future`] resolving when all push updates will be processed by
     /// [`Vec::on_push()`] subscribers.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_push_processed(&self) -> Processed<'static> {
         self.on_push_subs.when_all_processed()
     }
 
     /// Returns [`Future`] resolving when all remove updates will be processed
     /// by [`Vec::on_remove()`] subscribers.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_remove_processed(&self) -> Processed<'static> {
         self.on_remove_subs.when_all_processed()
     }
 
     /// Returns [`Future`] resolving when all push and remove updates will be
     /// processed by subscribers.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_all_processed(&self) -> AllProcessed<'static> {
         crate::when_all_processed(vec![
             self.when_remove_processed().into(),
@@ -260,7 +252,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use futures::{poll, task::Poll, StreamExt as _};
+    use futures::{StreamExt as _, poll, task::Poll};
 
     use super::ProgressableVec;
 
@@ -293,12 +285,12 @@ mod tests {
     #[tokio::test]
     async fn when_push_processed() {
         let mut vec = ProgressableVec::new();
-        let _ = vec.push(0);
+        vec.push(0);
 
         let mut on_push = vec.on_push();
 
         assert_eq!(poll!(vec.when_push_processed()), Poll::Ready(()));
-        let _ = vec.push(1);
+        vec.push(1);
         assert_eq!(poll!(vec.when_push_processed()), Poll::Pending);
         //
         let (val, guard) = on_push.next().await.unwrap().into_parts();
@@ -312,7 +304,7 @@ mod tests {
     #[tokio::test]
     async fn multiple_when_push_processed_subs() {
         let mut vec = ProgressableVec::new();
-        let _ = vec.push(0);
+        vec.push(0);
 
         let mut on_push1 = vec.on_push();
         let mut on_push2 = vec.on_push();
@@ -331,7 +323,7 @@ mod tests {
     #[tokio::test]
     async fn when_remove_processed() {
         let mut vec = ProgressableVec::new();
-        let _ = vec.push(10);
+        vec.push(10);
 
         let mut on_remove = vec.on_remove();
 
@@ -350,7 +342,7 @@ mod tests {
     #[tokio::test]
     async fn multiple_when_remove_processed_subs() {
         let mut vec = ProgressableVec::new();
-        let _ = vec.push(10);
+        vec.push(10);
 
         let mut on_remove1 = vec.on_remove();
         let mut on_remove2 = vec.on_remove();

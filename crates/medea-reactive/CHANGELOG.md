@@ -6,6 +6,17 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### Changed
+
+- Bumped up [MSRV] to 1.85 because of migration to 2024 edition. ([todo])
+
+[todo]: /../../commit/todo
+
+
+
+
 ## [0.1.2] · 2023-06-09
 [0.1.2]: /../../tree/medea-macro-0.1.2/crates/medea-macro
 
@@ -62,5 +73,5 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-
+[MSRV]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
 [Semantic Versioning 2.0.0]: https://semver.org

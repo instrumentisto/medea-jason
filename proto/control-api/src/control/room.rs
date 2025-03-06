@@ -5,7 +5,7 @@ use ref_cast::RefCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use super::{member, Pipeline};
+use super::{Pipeline, member};
 
 /// Media [`Element`] representing a single space where multiple [`Member`]s can
 /// interact with each other.

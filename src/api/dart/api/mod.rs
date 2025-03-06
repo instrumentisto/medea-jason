@@ -43,25 +43,21 @@ pub mod room_close_reason;
 
 use std::ptr;
 
-use flutter_rust_bridge::{frb, DartOpaque};
-
-use crate::{
-    api::DART_HANDLER_PORT,
-    media::{
-        self,
-        constraints::{ConstrainBoolean, ConstrainU32},
-        MediaDeviceKind,
-    },
-    platform,
-};
-
 pub use dart_sys::Dart_Handle;
+use flutter_rust_bridge::{DartOpaque, frb};
 
 pub use self::{
     connection_handle::ConnectionHandle, jason::Jason,
     local_media_track::LocalMediaTrack, media_manager::MediaManagerHandle,
     reconnect_handle::ReconnectHandle, remote_media_track::RemoteMediaTrack,
     room::RoomHandle, room_close_reason::RoomCloseReason,
+};
+use crate::{
+    media::{
+        self, MediaDeviceKind,
+        constraints::{ConstrainBoolean, ConstrainU32},
+    },
+    platform::{self},
 };
 
 /// Rust structure having wrapper class in Dart.
@@ -85,7 +81,7 @@ pub trait ForeignClass: Sized {
     #[frb(sync, type_64bit_int)]
     #[must_use]
     fn from_ptr(ptr: usize) -> Self {
-        unsafe { *Box::from_raw(ptr as *mut _) }
+        unsafe { *Box::from_raw(ptr as *mut Self) }
     }
 }
 

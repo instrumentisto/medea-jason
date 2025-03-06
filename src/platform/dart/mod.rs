@@ -34,8 +34,6 @@ use std::{cell::RefCell, panic};
 
 use libc::c_void;
 
-use crate::platform::utils::dart_api;
-
 pub use self::{
     codec_capability::CodecCapability,
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
@@ -49,15 +47,16 @@ pub use self::{
     rtc_stats::RtcStats,
     transceiver::{Transceiver, TransceiverInit},
     transport::WebSocketRpcTransport,
-    utils::{completer::delay_for, Function},
+    utils::{Function, completer::delay_for},
 };
+use crate::platform::utils::dart_api;
 
 /// Function to initialize `dart_api_dl` functions.
 ///
 /// # Safety
 ///
 /// This function should never be called manually.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn init_jason_dart_api_dl(data: *mut c_void) -> isize {
     unsafe { dart_api::initialize_api(data) }
 }

@@ -3,19 +3,17 @@
 mod task;
 
 use std::{
-    future::Future,
     ptr,
-    sync::{atomic, atomic::AtomicI64, Arc},
+    sync::{Arc, atomic, atomic::AtomicI64},
 };
 
 use dart_sys::{
-    Dart_CObject, Dart_CObject_Type_Dart_CObject_kInt64, Dart_Port,
-    _Dart_CObject__bindgen_ty_1,
+    _Dart_CObject__bindgen_ty_1, Dart_CObject,
+    Dart_CObject_Type_Dart_CObject_kInt64, Dart_Port,
 };
 
-use crate::{api::propagate_panic, platform::utils::dart_api};
-
 pub use self::task::Task;
+use crate::{api::propagate_panic, platform::utils::dart_api};
 
 /// Runs a Rust [`Future`] on the current thread.
 pub fn spawn(fut: impl Future<Output = ()> + 'static) {
@@ -40,7 +38,7 @@ static WAKE_PORT: AtomicDartPort = AtomicI64::new(0);
 /// # Safety
 ///
 /// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
     WAKE_PORT.store(wake_port, atomic::Ordering::Release);
 }
@@ -54,7 +52,7 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
 /// # Panics
 ///
 /// If called not on the same thread where the [`Task`] was originally created.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
     propagate_panic(move || unsafe { Arc::from_raw(task.as_ptr()).poll() });
 }
@@ -75,9 +73,7 @@ fn task_wake(task: Arc<Task>) {
 
     let mut task_addr = Dart_CObject {
         type_: Dart_CObject_Type_Dart_CObject_kInt64,
-        value: _Dart_CObject__bindgen_ty_1 {
-            as_int64: task as i64,
-        },
+        value: _Dart_CObject__bindgen_ty_1 { as_int64: task as i64 },
     };
 
     let enqueued =

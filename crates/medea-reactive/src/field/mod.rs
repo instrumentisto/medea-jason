@@ -18,12 +18,11 @@ use futures::{
     stream::{self, LocalBoxStream, StreamExt as _},
 };
 
-use crate::subscribers_store::{
-    progressable, progressable::Processed, SubscribersStore as _,
-};
-
 #[doc(inline)]
 pub use self::{cell::ObservableCell, progressable_cell::ProgressableCell};
+use crate::subscribers_store::{
+    SubscribersStore as _, progressable, progressable::Processed,
+};
 
 /// Default type of [`ObservableField`] subscribers.
 type DefaultSubscribers<D> = RefCell<Vec<UniversalSubscriber<D>>>;
@@ -48,8 +47,6 @@ pub type Progressable<D> = ObservableField<D, progressable::SubStore<D>>;
 /// If you want to get [`Future`] which will resolved only when an underlying
 /// data of this field will become equal to some value, you can use
 /// [`ObservableField::when`] or [`ObservableField::when_eq`] methods.
-///
-/// [`Future`]: std::future::Future
 #[derive(Debug)]
 pub struct ObservableField<D, S> {
     /// Data which is stored by this [`ObservableField`].
@@ -69,10 +66,7 @@ where
     /// [`ObservableField::when`] and [`ObservableField::when_eq`] methods.
     #[must_use]
     pub const fn new(data: D) -> Self {
-        Self {
-            data,
-            subs: RefCell::new(Vec::new()),
-        }
+        Self { data, subs: RefCell::new(Vec::new()) }
     }
 }
 
@@ -83,8 +77,6 @@ where
 {
     /// Returns [`Future`] which will resolve only on modifications that
     /// the given `assert_fn` returns `true` on.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when<F>(
         &self,
         assert_fn: F,
@@ -109,10 +101,7 @@ impl<D: 'static> Progressable<D> {
     /// [`ObservableField::when_all_processed()`].
     #[must_use]
     pub fn new(data: D) -> Self {
-        Self {
-            data,
-            subs: progressable::SubStore::default(),
-        }
+        Self { data, subs: progressable::SubStore::default() }
     }
 }
 
@@ -133,8 +122,6 @@ where
 
     /// Returns [`Future`] resolving when all data updates will be processed by
     /// subscribers.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_all_processed(&self) -> Processed<'static> {
         self.subs.when_all_processed()
     }
@@ -150,9 +137,7 @@ where
     pub fn subscribe(&self) -> LocalBoxStream<'static, D> {
         let data = self.data.clone();
         let (tx, rx) = mpsc::unbounded();
-        self.subs
-            .borrow_mut()
-            .push(UniversalSubscriber::Subscribe(tx));
+        self.subs.borrow_mut().push(UniversalSubscriber::Subscribe(tx));
 
         Box::pin(stream::once(async move { data }).chain(Box::pin(rx)))
     }
@@ -166,8 +151,6 @@ where
     /// Returns [`Future`] which will resolve only when an underlying data of
     /// this [`ObservableField`] will become equal to the provided `should_be`
     /// value.
-    ///
-    /// [`Future`]: std::future::Future
     // TODO: This is kinda broken.
     //       See https://github.com/instrumentisto/medea/issues/163 issue.
     pub fn when_eq(
@@ -212,7 +195,6 @@ pub trait OnObservableFieldModification<D> {
     /// [`OnObservableFieldModification`]) should send an update to [`Stream`]
     /// or resolve [`Future`].
     ///
-    /// [`Future`]: std::future::Future
     /// [`Stream`]: futures::Stream
     fn on_modify(&mut self, data: &D);
 }
@@ -225,14 +207,10 @@ pub enum UniversalSubscriber<D> {
     When {
         /// [`oneshot::Sender`] with which [`Whenable::when`]'s [`Future`] will
         /// resolve.
-        ///
-        /// [`Future`]: std::future::Future
         sender: RefCell<Option<oneshot::Sender<()>>>,
 
         /// Function with which will be checked that [`Whenable::when`]'s
         /// [`Future`] should resolve.
-        ///
-        /// [`Future`]: std::future::Future
         assert_fn: Box<dyn Fn(&D) -> bool>,
     },
 
@@ -407,7 +385,7 @@ where
 mod tests {
     use std::{cell::RefCell, time::Duration};
 
-    use futures::{poll, task::Poll, StreamExt as _};
+    use futures::{StreamExt as _, poll, task::Poll};
     use tokio::time::timeout;
 
     use crate::{Observable, Progressable};

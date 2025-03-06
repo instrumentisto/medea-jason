@@ -31,11 +31,7 @@ impl Stable {
 
 impl From<bool> for Stable {
     fn from(muted: bool) -> Self {
-        if muted {
-            Self::Muted
-        } else {
-            Self::Unmuted
-        }
+        if muted { Self::Muted } else { Self::Unmuted }
     }
 }
 

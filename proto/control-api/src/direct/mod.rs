@@ -9,11 +9,6 @@ mod server;
 
 use futures::channel::{mpsc, oneshot};
 
-use crate::{
-    callback, control, member, CallbackApi, ControlApi, Elements, Fid, Ping,
-    Pong,
-};
-
 #[cfg(feature = "client")]
 #[doc(inline)]
 pub use self::client::{
@@ -24,26 +19,23 @@ pub use self::client::{
 pub use self::server::{
     CallbackApiClient, CallbackApiClientError, ControlApiServer,
 };
+use crate::{
+    CallbackApi, ControlApi, Elements, Fid, Ping, Pong, callback, control,
+    member,
+};
 
 #[cfg(all(feature = "client", feature = "server"))]
 /// Creates pair of a [`ControlApiClient`] and a [`ControlApiServer`].
-pub fn control_api<T: ControlApi>() -> (
-    ControlApiClient<T::Error>,
-    impl FnOnce(T) -> ControlApiServer<T>,
-) {
+pub fn control_api<T: ControlApi>()
+-> (ControlApiClient<T::Error>, impl FnOnce(T) -> ControlApiServer<T>) {
     let (sender, receiver) = mpsc::unbounded();
-    (ControlApiClient { sender }, move |api| ControlApiServer {
-        api,
-        receiver,
-    })
+    (ControlApiClient { sender }, move |api| ControlApiServer { api, receiver })
 }
 
 #[cfg(all(feature = "client", feature = "server"))]
 /// Creates a pair of a [`CallbackApiClient`] and a [`CallbackApiServer`].
-pub fn callback_api<T: CallbackApi>() -> (
-    CallbackApiClient<T::Error>,
-    impl FnOnce(T) -> CallbackApiServer<T>,
-) {
+pub fn callback_api<T: CallbackApi>()
+-> (CallbackApiClient<T::Error>, impl FnOnce(T) -> CallbackApiServer<T>) {
     let (sender, receiver) = mpsc::unbounded();
     (CallbackApiClient { sender }, move |api| CallbackApiServer {
         api,

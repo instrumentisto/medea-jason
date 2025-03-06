@@ -16,8 +16,6 @@ use medea_client_api_proto::{
 use tracerr::Traced;
 use url::Url;
 
-use crate::{platform, utils::Caused};
-
 #[cfg(feature = "mockable")]
 pub use self::rpc_session::MockRpcSession;
 #[doc(inline)]
@@ -30,6 +28,7 @@ pub use self::{
     },
     websocket::{ClientDisconnect, RpcEvent, WebSocketRpcClient},
 };
+use crate::{platform, utils::Caused};
 
 /// [`Url`] to which transport layer will connect.
 #[derive(AsRef, Clone, Debug, Eq, From, PartialEq)]
@@ -136,12 +135,7 @@ impl FromStr for ConnectionInfo {
             _ = s.pop().pop();
         }
 
-        Ok(Self {
-            url: url.into(),
-            room_id,
-            member_id,
-            credential,
-        })
+        Ok(Self { url: url.into(), room_id, member_id, credential })
     }
 }
 

@@ -2,20 +2,18 @@
 //!
 //! [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
-use std::future::Future;
-
 use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
 use crate::{
     media::{
-        track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
+        FacingMode, MediaKind, MediaSourceKind, track::MediaStreamTrackState,
     },
     platform::{
         self,
         dart::utils::{
-            callback::Callback, dart_string_into_rust, handle::DartHandle,
-            NonNullDartValueArgExt as _,
+            NonNullDartValueArgExt as _, callback::Callback,
+            dart_string_into_rust, handle::DartHandle,
         },
         utils::dart_future::FutureFromDart,
     },
@@ -271,9 +269,8 @@ impl MediaStreamTrack {
     pub async fn ready_state(&self) -> MediaStreamTrackState {
         let handle = self.inner.get();
         let state = unsafe { media_stream_track::ready_state(handle) }.unwrap();
-        let state = unsafe { FutureFromDart::execute::<i64>(state) }
-            .await
-            .unwrap();
+        let state =
+            unsafe { FutureFromDart::execute::<i64>(state) }.await.unwrap();
 
         match state {
             0 => MediaStreamTrackState::Live,
@@ -286,7 +283,7 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
     #[inline]
-    pub fn stop(&self) -> impl Future<Output = ()> + 'static {
+    pub fn stop(&self) -> impl Future<Output = ()> + 'static + use<> {
         let inner = self.inner.clone();
         async move {
             let fut = unsafe { media_stream_track::stop(inner.get()) }.unwrap();
@@ -316,7 +313,7 @@ impl MediaStreamTrack {
     /// not interfere with [`Clone`] trait.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
-    pub fn fork(&self) -> impl Future<Output = Self> + 'static {
+    pub fn fork(&self) -> impl Future<Output = Self> + 'static + use<> {
         let handle = self.inner.get();
         let source_kind = self.source_kind;
         async move {

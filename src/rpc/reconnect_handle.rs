@@ -98,7 +98,7 @@ impl ReconnectHandle {
             Duration::from_millis(max_delay.into()),
             max_elapsed_time_ms.map(|val| Duration::from_millis(val.into())),
         )
-        .retry(|| async {
+        .retry(async || {
             self.0
                 .upgrade()
                 .ok_or_else(|| {

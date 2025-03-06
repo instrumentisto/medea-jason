@@ -7,12 +7,11 @@ use std::{cell::RefCell, rc::Rc};
 
 use futures::{channel::mpsc, stream::LocalBoxStream};
 
-use crate::{subscribers_store::SubscribersStore, ObservableCell};
-
 pub use self::{
     guarded::{Guard, Guarded},
     processed::{AllProcessed, Processed},
 };
+use crate::{ObservableCell, subscribers_store::SubscribersStore};
 
 /// [`SubscribersStore`] for progressable collections/field.
 ///
@@ -45,8 +44,6 @@ impl<T> Default for SubStore<T> {
 
 impl<T> SubStore<T> {
     /// Returns [`Future`] resolving when all subscribers processes update.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_all_processed(&self) -> Processed<'static> {
         let counter = Rc::clone(&self.counter);
         Processed::new(Box::new(move || {

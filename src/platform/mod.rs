@@ -14,13 +14,12 @@ pub use self::dart::*;
 
 #[cfg(target_family = "wasm")]
 mod wasm;
-#[cfg(target_family = "wasm")]
-pub use self::wasm::*;
-
 use derive_more::with_trait::Display;
 
-use crate::utils::Caused;
-
+#[cfg(feature = "mockable")]
+pub use self::transport::MockRpcTransport;
+#[cfg(target_family = "wasm")]
+pub use self::wasm::*;
 pub use self::{
     callback::Callback,
     peer_connection::{
@@ -30,9 +29,7 @@ pub use self::{
     transceiver::Direction as TransceiverDirection,
     transport::{RpcTransport, TransportError, TransportState},
 };
-
-#[cfg(feature = "mockable")]
-pub use self::transport::MockRpcTransport;
+use crate::utils::Caused;
 
 /// [`Error`] appeared on [getUserMedia()][1] request, differentiated by its
 /// cause.

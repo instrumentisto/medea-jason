@@ -12,7 +12,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
   MEDEA_TAG: edge
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
@@ -74,12 +73,6 @@ jobs:
           components: clippy
       - run: make rustup.targets only=${{ matrix.platform }}
         if: ${{ matrix.platform != 'workspace' }}
-      - uses: Swatinem/rust-cache@v2
-        with:
-          # TODO: Build scripts cross compilation fails sometimes:
-          # https://github.com/cross-rs/cross/issues/724
-          key: "${{ matrix.platform }}"
-        if: ${{ env.CACHE == 'true' }}
 
       - uses: actions-rs/install@v0.1
         with:
@@ -208,9 +201,6 @@ jobs:
       - run: rustup target add wasm32-unknown-unknown
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.crate == 'medea-jason' }}
-      - uses: Swatinem/rust-cache@v2
-        if: ${{ steps.skip.outputs.no == 'true'
-             && env.CACHE == 'true' }}
       - uses: arduino/setup-protoc@v3
         with:
           version: ${{ env.PROTOC_VER }}
@@ -261,15 +251,6 @@ jobs:
         with:
           version: ${{ env.PROTOC_VER }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: Swatinem/rust-cache@v2
-        if: ${{ env.CACHE == 'true' }}
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        with:
-          key: test-e2e-browser-{hash}
-          restore-keys: test-e2e-browser-
-        continue-on-error: true
-        if: ${{ env.CACHE == 'true' }}
 
       - uses: actions-rs/install@v0.1
         with:
@@ -482,9 +463,6 @@ jobs:
         with:
           toolchain: stable
       - run: make rustup.targets only=${{ matrix.platform }}
-      - uses: Swatinem/rust-cache@v2
-        if: ${{ env.CACHE == 'true'
-             && matrix.platform != 'windows' }}
 
       - uses: jlumbroso/free-disk-space@v1.3.1
         with:
@@ -590,8 +568,6 @@ jobs:
         with:
           toolchain: stable
       - run: make rustup.targets only=${{ matrix.platform }}
-      - uses: Swatinem/rust-cache@v2
-        if: ${{ env.CACHE == 'true' }}
 
       - uses: actions-rs/install@v0.1
         with:
@@ -635,8 +611,6 @@ jobs:
           toolchain: stable
       # Container doesn't pick `~` (tilde) in `PATH`.
       - run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      - uses: Swatinem/rust-cache@v2
-        if: ${{ env.CACHE == 'true' }}
 
       - run: make cargo.build.jason platform=linux
                                     dockerized=no debug=no
@@ -700,8 +674,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
-      - uses: Swatinem/rust-cache@v2
-        if: ${{ env.CACHE == 'true' }}
       - uses: arduino/setup-protoc@v3
         with:
           version: ${{ env.PROTOC_VER }}

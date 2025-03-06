@@ -2,9 +2,9 @@
 
 use derive_more::with_trait::Display;
 use wasm_bindgen::{
+    JsCast as _, JsValue,
     convert::{IntoWasmAbi, OptionIntoWasmAbi},
     describe::WasmDescribe,
-    JsCast as _, JsValue,
 };
 
 /// Wrapper for JS value which returned from JS side as error.

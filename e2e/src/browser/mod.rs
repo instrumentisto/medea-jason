@@ -9,8 +9,8 @@ pub mod mock;
 use std::{
     io,
     sync::{
-        atomic::{AtomicUsize, Ordering},
         Arc,
+        atomic::{AtomicUsize, Ordering},
     },
 };
 
@@ -19,7 +19,6 @@ use fantoccini::wd::WindowHandle;
 use serde_json::Value as Json;
 
 pub use self::client::{WebDriverClient, WebDriverClientBuilder};
-
 #[doc(inline)]
 pub use self::js::Statement;
 
@@ -107,11 +106,7 @@ impl Window {
     async fn new(client: WebDriverClient) -> Self {
         let window = client.new_window().await.unwrap();
 
-        let this = Self {
-            client,
-            window,
-            rc: Arc::new(AtomicUsize::new(1)),
-        };
+        let this = Self { client, window, rc: Arc::new(AtomicUsize::new(1)) };
         mock::instantiate_mocks(&this).await;
         this
     }

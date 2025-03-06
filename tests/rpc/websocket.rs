@@ -13,10 +13,7 @@ async fn could_not_init_socket_err() {
     use TransportError::*;
 
     let ws = WebSocketRpcTransport::new();
-    match ws
-        .connect(Url::parse("ws://0.0.0.0:60000").unwrap().into())
-        .await
-    {
+    match ws.connect(Url::parse("ws://0.0.0.0:60000").unwrap().into()).await {
         Ok(_) => unreachable!(),
         Err(e) => match e.into_inner() {
             InitSocket => {}

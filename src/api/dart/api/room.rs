@@ -1,11 +1,11 @@
 //! External handle to a [`Room`].
 
-use flutter_rust_bridge::{frb, DartOpaque};
+use flutter_rust_bridge::{DartOpaque, frb};
 use send_wrapper::SendWrapper;
 use tracerr::Traced;
 
 use crate::{
-    api::{api::ApiMediaStreamSettings, Error as DartError},
+    api::{Error as DartError, api::ApiMediaStreamSettings},
     media::MediaSourceKind,
     platform::{self, utils::dart_future::IntoDartFuture as _},
     room as core,

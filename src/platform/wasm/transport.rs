@@ -9,7 +9,7 @@ use std::{cell::RefCell, rc::Rc};
 
 use async_trait::async_trait;
 use derive_more::with_trait::{From, Into};
-use futures::{channel::mpsc, stream::LocalBoxStream, StreamExt as _};
+use futures::{StreamExt as _, channel::mpsc, stream::LocalBoxStream};
 use medea_client_api_proto::{ClientMsg, ServerMsg};
 use medea_reactive::ObservableCell;
 use tracerr::Traced;
@@ -20,7 +20,7 @@ use crate::{
         transport::{RpcTransport, TransportError, TransportState},
         wasm::utils::EventListener,
     },
-    rpc::{websocket::ClientDisconnect, ApiUrl, CloseMsg},
+    rpc::{ApiUrl, CloseMsg, websocket::ClientDisconnect},
 };
 
 /// Wrapper for help to get [`ServerMsg`] from Websocket [MessageEvent][1].

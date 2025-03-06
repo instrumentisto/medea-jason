@@ -2,12 +2,12 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
 
-use flutter_rust_bridge::{frb, DartOpaque};
+use flutter_rust_bridge::{DartOpaque, frb};
 use send_wrapper::SendWrapper;
 
 use crate::{
-    api::{api::DART_HANDLER_PORT, dart::api::ForeignClass, MediaDirection},
-    media::{track::remote as core, MediaKind, MediaSourceKind},
+    api::{MediaDirection, api::DART_HANDLER_PORT, dart::api::ForeignClass},
+    media::{MediaKind, MediaSourceKind, track::remote as core},
     platform,
 };
 

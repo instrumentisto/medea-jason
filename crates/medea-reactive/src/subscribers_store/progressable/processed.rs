@@ -4,12 +4,12 @@
 use std::{
     fmt,
     pin::Pin,
-    task::{ready, Context, Poll},
+    task::{Context, Poll, ready},
 };
 
 use futures::{
-    future::{self, Future, LocalBoxFuture},
     FutureExt as _,
+    future::{self, LocalBoxFuture},
 };
 
 /// Factory producing a [`Future`] in [`when_all_processed()`] function.
@@ -44,10 +44,7 @@ pub struct Processed<'a, T = ()> {
 impl<'a, T> Processed<'a, T> {
     /// Creates new [`Processed`] from the provided [`Factory`].
     pub fn new(factory: Factory<'a, T>) -> Self {
-        Self {
-            fut: factory(),
-            factory,
-        }
+        Self { fut: factory(), factory }
     }
 }
 
@@ -100,10 +97,7 @@ impl<'a, T> From<AllProcessed<'a, T>> for Factory<'a, T> {
 impl<'a, T> AllProcessed<'a, T> {
     /// Creates new [`AllProcessed`] from provided [`Factory`].
     fn new(factory: Factory<'a, T>) -> Self {
-        Self {
-            fut: factory(),
-            factory,
-        }
+        Self { fut: factory(), factory }
     }
 }
 
@@ -137,15 +131,14 @@ impl<T> Future for AllProcessed<'_, T> {
 mod tests {
     use std::{rc::Rc, time::Duration};
 
-    use futures::{task::Poll, StreamExt};
+    use futures::{StreamExt, task::Poll};
     use tokio::{
-        task::{spawn_local, LocalSet},
+        task::{LocalSet, spawn_local},
         time,
     };
 
-    use crate::ProgressableCell;
-
     use super::*;
+    use crate::ProgressableCell;
 
     /// Checks whether two joined [`ProgressableCell::when_all_processed()`]s
     /// will be resolved only if they both processed at the end.
@@ -159,7 +152,7 @@ mod tests {
                 const DELAYED_PROCESSED_UPDATE: u8 = 2;
 
                 let updatable_cell = Rc::new(ProgressableCell::new(0));
-                let _ = spawn_local({
+                drop(spawn_local({
                     let updatable_cell = Rc::clone(&updatable_cell);
                     let mut updatable_cell_rx =
                         updatable_cell.subscribe().skip(1).fuse();
@@ -183,7 +176,7 @@ mod tests {
                                 .into_inner(),
                         );
                     }
-                });
+                }));
 
                 when_all_processed(vec![
                     updatable_cell.when_all_processed().into(),

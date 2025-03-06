@@ -11,9 +11,9 @@ use medea_client_api_proto::{
 use medea_reactive::ObservableCell;
 
 use crate::{
-    media::{track::MediaStreamTrackState, MediaKind},
+    media::{MediaKind, track::MediaStreamTrackState},
     peer::{
-        media_exchange_state, mute_state, LocalStreamUpdateCriteria, MediaState,
+        LocalStreamUpdateCriteria, MediaState, media_exchange_state, mute_state,
     },
     platform,
 };
@@ -194,9 +194,7 @@ impl LocalTracksConstraints {
         kind: MediaKind,
         source_kind: Option<MediaSourceKind>,
     ) {
-        self.0
-            .borrow_mut()
-            .set_track_media_state(state, kind, source_kind);
+        self.0.borrow_mut().set_track_media_state(state, kind, source_kind);
     }
 
     /// Enables/disables provided [`LocalStreamUpdateCriteria`] based on
@@ -206,9 +204,7 @@ impl LocalTracksConstraints {
         state: media_exchange_state::Stable,
         kinds: LocalStreamUpdateCriteria,
     ) {
-        self.0
-            .borrow_mut()
-            .set_media_exchange_state_by_kinds(state, kinds);
+        self.0.borrow_mut().set_media_exchange_state_by_kinds(state, kinds);
     }
 
     /// Indicates whether provided [`MediaType`] is enabled in the underlying
@@ -233,9 +229,7 @@ impl LocalTracksConstraints {
         kind: MediaKind,
         source: Option<MediaSourceKind>,
     ) -> bool {
-        self.0
-            .borrow()
-            .is_track_enabled_and_constrained(kind, source)
+        self.0.borrow().is_track_enabled_and_constrained(kind, source)
     }
 
     /// Indicates whether the provided [`MediaKind`] and [`MediaSourceKind`] are
@@ -313,11 +307,7 @@ pub struct VideoTrackConstraints<C> {
 
 impl<C: Default> Default for VideoTrackConstraints<C> {
     fn default() -> Self {
-        Self {
-            constraints: Some(C::default()),
-            enabled: true,
-            muted: false,
-        }
+        Self { constraints: Some(C::default()), enabled: true, muted: false }
     }
 }
 

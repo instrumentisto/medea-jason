@@ -28,11 +28,8 @@ async fn then_member_has_remote_track(
     remote_id: String,
 ) {
     let member = world.get_member(&id).unwrap();
-    let connection = member
-        .connections()
-        .wait_for_connection(remote_id)
-        .await
-        .unwrap();
+    let connection =
+        member.connections().wait_for_connection(remote_id).await.unwrap();
     let tracks_store = connection.tracks_store().await.unwrap();
 
     if kind.contains("audio") {
@@ -146,19 +143,14 @@ async fn then_remote_media_track(
     state: String,
 ) {
     let member = world.get_member(&id).unwrap();
-    let partner_connection = member
-        .connections()
-        .wait_for_connection(partner_id)
-        .await
-        .unwrap();
+    let partner_connection =
+        member.connections().wait_for_connection(partner_id).await.unwrap();
     let tracks_with_partner = partner_connection.tracks_store().await.unwrap();
 
     sleep(Duration::from_millis(500)).await;
     let (media_kind, source_kind) = parse_media_kinds(&kind).unwrap();
-    let track = tracks_with_partner
-        .get_track(media_kind, source_kind)
-        .await
-        .unwrap();
+    let track =
+        tracks_with_partner.get_track(media_kind, source_kind).await.unwrap();
     sleep(Duration::from_millis(500)).await;
 
     match state.as_str() {
@@ -180,11 +172,8 @@ async fn then_doesnt_have_remote_track(
     let should_not_be_live = env::var("SFU").is_ok() && !live.is_empty();
 
     let member = world.get_member(&id).unwrap();
-    let partner_connection = member
-        .connections()
-        .wait_for_connection(partner_id)
-        .await
-        .unwrap();
+    let partner_connection =
+        member.connections().wait_for_connection(partner_id).await.unwrap();
     let tracks_with_partner = partner_connection.tracks_store().await.unwrap();
     let (media_kind, source_kind) = parse_media_kinds(&kind).unwrap();
 
@@ -224,11 +213,8 @@ async fn then_member_doesnt_have_remote_tracks_with(
     partner_id: String,
 ) {
     let member = world.get_member(&id).unwrap();
-    let connection = member
-        .connections()
-        .wait_for_connection(partner_id)
-        .await
-        .unwrap();
+    let connection =
+        member.connections().wait_for_connection(partner_id).await.unwrap();
     let tracks_store = connection.tracks_store().await.unwrap();
     let tracks_count = tracks_store.count().await.unwrap();
     assert_eq!(tracks_count, 0);
@@ -241,10 +227,7 @@ async fn then_member_doesnt_have_live_local_tracks(
 ) {
     let member = world.get_member(&id).unwrap();
     let local_tracks = member.room().local_tracks().await.unwrap();
-    let count = local_tracks
-        .count_tracks_by_live(true, false)
-        .await
-        .unwrap();
+    let count = local_tracks.count_tracks_by_live(true, false).await.unwrap();
     assert_eq!(count, 0);
 }
 
@@ -257,11 +240,8 @@ async fn then_member_has_n_remote_tracks_from(
     remote_id: String,
 ) {
     let member = world.get_member(&id).unwrap();
-    let connection = member
-        .connections()
-        .wait_for_connection(remote_id)
-        .await
-        .unwrap();
+    let connection =
+        member.connections().wait_for_connection(remote_id).await.unwrap();
     let tracks_store = connection.tracks_store().await.unwrap();
     let live = live_or_stopped == "live";
 

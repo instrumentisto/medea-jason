@@ -5,11 +5,10 @@ mod local_sdp;
 mod tracks_repository;
 mod watchers;
 
-#[cfg(feature = "mockable")]
-use std::future::Future;
 use std::{cell::Cell, collections::HashSet, rc::Rc};
 
-use futures::{future::LocalBoxFuture, StreamExt as _, TryFutureExt as _};
+use futures::{StreamExt as _, TryFutureExt as _, future::LocalBoxFuture};
+pub use local_sdp::DESCRIPTION_APPROVE_TIMEOUT;
 use medea_client_api_proto::{
     self as proto, IceCandidate, IceServer, NegotiationRole, PeerId as Id,
     TrackId,
@@ -18,21 +17,18 @@ use medea_reactive::{AllProcessed, ObservableCell, ProgressableCell};
 use proto::{ConnectionMode, MemberId};
 use tracerr::Traced;
 
-use crate::{
-    media::LocalTracksConstraints,
-    peer::{
-        media::{receiver, sender},
-        LocalStreamUpdateCriteria, PeerConnection, UpdateLocalStreamError,
-    },
-    utils::{component, AsProtoState, SynchronizableState, Updatable},
-};
-
 use self::{
     ice_candidates::IceCandidates, local_sdp::LocalSdp,
     tracks_repository::TracksRepository,
 };
-
-pub use local_sdp::DESCRIPTION_APPROVE_TIMEOUT;
+use crate::{
+    media::LocalTracksConstraints,
+    peer::{
+        LocalStreamUpdateCriteria, PeerConnection, UpdateLocalStreamError,
+        media::{receiver, sender},
+    },
+    utils::{AsProtoState, SynchronizableState, Updatable, component},
+};
 
 /// Synchronization state of a [`Component`].
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -253,7 +249,7 @@ impl State {
         _ = self
             .negotiation_role
             .subscribe()
-            .any(|val| async move { val.is_none() })
+            .any(async |val| val.is_none())
             .await;
         self.negotiation_role.set(Some(negotiation_role));
     }
@@ -311,7 +307,6 @@ impl State {
     /// [`Result`], if currently no such requests are running for the provided
     /// [`TrackId`]s.
     ///
-    /// [`Future`]: std::future::Future
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
     pub fn local_stream_update_result(
@@ -328,8 +323,6 @@ impl State {
 
     /// Returns [`Future`] resolving when all [`sender::State`]'s and
     /// [`receiver::State`]'s updates will be applied.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_all_updated(&self) -> AllProcessed<'static> {
         medea_reactive::when_all_processed(vec![
             self.senders.when_updated().into(),
@@ -406,16 +399,12 @@ impl State {
 
     /// Returns [`Future`] resolving once all senders inserts and removes are
     /// processed.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_all_senders_processed(&self) -> AllProcessed<'static> {
         self.senders.when_all_processed()
     }
 
     /// Returns [`Future`] resolving once all [`State::receivers`]' inserts and
     /// removes are processed.
-    ///
-    /// [`Future`]: std::future::Future
     fn when_all_receivers_processed(&self) -> AllProcessed<'static> {
         self.receivers.when_all_processed()
     }
@@ -589,7 +578,9 @@ impl State {
     }
 
     /// Returns a [`Future`] resolving once local SDP approve is needed.
-    pub fn when_local_sdp_approve_needed(&self) -> impl Future<Output = ()> {
+    pub fn when_local_sdp_approve_needed(
+        &self,
+    ) -> impl Future<Output = ()> + use<> {
         use futures::FutureExt as _;
 
         self.negotiation_state

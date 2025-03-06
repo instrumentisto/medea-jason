@@ -4,13 +4,12 @@
 use async_trait::async_trait;
 use derive_more::with_trait::{Display, Error, From};
 use futures::{
-    channel::{mpsc, oneshot},
     StreamExt as _,
+    channel::{mpsc, oneshot},
 };
 
-use crate::{callback, CallbackApi, ControlApi};
-
 use super::{CallbackApiRequest, ControlApiRequest};
+use crate::{CallbackApi, ControlApi, callback};
 
 /// Direct in-process [`ControlApi`] server.
 #[derive(Debug)]
@@ -35,7 +34,7 @@ impl<T: ControlApi> ControlApiServer<T> {
     /// [`ControlApiClient`]: super::ControlApiClient
     pub async fn run(self, limit: impl Into<Option<usize>>) {
         self.receiver
-            .for_each_concurrent(limit, |req| async {
+            .for_each_concurrent(limit, async |req| {
                 _ = match req {
                     ControlApiRequest::Create { request, sender } => {
                         sender.send(self.api.create(request).await).ok()
@@ -72,9 +71,7 @@ pub struct CallbackApiClient<Error> {
 // `#[derive(Clone)]`.
 impl<Error> Clone for CallbackApiClient<Error> {
     fn clone(&self) -> Self {
-        Self {
-            sender: self.sender.clone(),
-        }
+        Self { sender: self.sender.clone() }
     }
 }
 

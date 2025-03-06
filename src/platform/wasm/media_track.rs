@@ -2,14 +2,14 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
-use std::{cell::RefCell, future::Future, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 use derive_more::with_trait::AsRef;
 use futures::future;
 
 use crate::{
     media::{
-        track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
+        FacingMode, MediaKind, MediaSourceKind, track::MediaStreamTrackState,
     },
     platform::wasm::utils::EventListener,
 };
@@ -178,7 +178,7 @@ impl MediaStreamTrack {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-    pub fn stop(&self) -> impl Future<Output = ()> + 'static {
+    pub fn stop(&self) -> impl Future<Output = ()> + 'static + use<> {
         self.sys_track.stop();
         // For platform code uniformity.
         future::ready(())
@@ -212,7 +212,7 @@ impl MediaStreamTrack {
     /// callbacks.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
-    pub fn fork(&self) -> impl Future<Output = Self> + 'static {
+    pub fn fork(&self) -> impl Future<Output = Self> + 'static + use<> {
         future::ready(Self {
             sys_track: Rc::new(web_sys::MediaStreamTrack::clone(
                 &self.sys_track,

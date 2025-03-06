@@ -10,13 +10,18 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.7.1...master)
 
+### Changed
+
+- Bumped up [MSRV] to 1.85 because of migration to 2024 edition. ([todo])
+
 ### Upgraded
 
 - Dependencies:
-    - [`derive_more`] to 2.0 version. ([3ed7d2b])
+    - [`derive-more`] to 2.0 version. ([3ed7d2bf])
     - [`flutter_rust_bridge`] crate to [2.8.0][frb-2.8.0] version. ([#200])
 
-[3ed7d2b]: /../../commit/3ed7d2b
+[3ed7d2bf]: /../../commit/3ed7d2bf59ed1237d9e55c4b65ea5cad833306fa
+[todo]: /../../commit/todo
 [#200]: /../../pull/200
 
 
@@ -94,7 +99,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`derive_more`] to 1.0 version. ([#181])
+    - [`derive-more`] to 1.0 version. ([#181])
     - [`flutter_rust_bridge`] to 2.2.0 version. ([#182])
 
 [#180]: /../../pull/180
@@ -468,4 +473,3 @@ All user visible changes to this project will be documented in this file. This p
 [`flutter_rust_bridge`]: https://docs.rs/flutter_rust_bridge
 [`talc`]: https://docs.rs/talc
 [`wee_alloc`]: https://docs.rs/wee_alloc
-

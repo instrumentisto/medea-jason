@@ -3,7 +3,6 @@
 use std::{
     cell::RefCell,
     collections::{HashMap, HashSet},
-    future::Future,
     rc::{Rc, Weak},
 };
 
@@ -11,8 +10,8 @@ use async_recursion::async_recursion;
 use async_trait::async_trait;
 use derive_more::with_trait::{Debug, Display, From, Into};
 use futures::{
-    channel::mpsc, future, future::LocalBoxFuture, FutureExt as _,
-    StreamExt as _, TryFutureExt as _,
+    FutureExt as _, StreamExt as _, TryFutureExt as _, channel::mpsc, future,
+    future::LocalBoxFuture,
 };
 use medea_client_api_proto::{
     self as proto, Command, ConnectionQualityScore, Event as RpcEvent,
@@ -27,15 +26,16 @@ use crate::{
     api,
     connection::Connections,
     media::{
-        track::{local, remote},
         InitLocalTracksError, LocalTracksConstraints, MediaKind, MediaManager,
         MediaSourceKind, MediaStreamSettings, RecvConstraints,
+        track::{local, remote},
     },
     peer::{
-        self, media::ProhibitedStateError, media_exchange_state, mute_state,
-        InsertLocalTracksError, LocalMediaError, LocalStreamUpdateCriteria,
-        MediaState, PeerConnection, PeerEvent, PeerEventHandler,
-        TrackDirection, TracksRequestError, UpdateLocalStreamError,
+        self, InsertLocalTracksError, LocalMediaError,
+        LocalStreamUpdateCriteria, MediaState, PeerConnection, PeerEvent,
+        PeerEventHandler, TrackDirection, TracksRequestError,
+        UpdateLocalStreamError, media::ProhibitedStateError,
+        media_exchange_state, mute_state,
     },
     platform,
     rpc::{
@@ -81,10 +81,7 @@ impl RoomCloseReason {
                 is_closed_by_server: true,
                 is_err: false,
             },
-            CloseReason::ByClient {
-                reason: rsn,
-                is_err,
-            } => Self {
+            CloseReason::ByClient { reason: rsn, is_err } => Self {
                 reason: rsn.to_string(),
                 is_closed_by_server: false,
                 is_err,
@@ -217,8 +214,7 @@ pub enum GetLocalTracksError {
 /// [`HandleDetachedError`] otherwise.
 macro_rules! upgrade_inner {
     ($v:expr) => {
-        $v.upgrade()
-            .ok_or_else(|| tracerr::new!(HandleDetachedError))
+        $v.upgrade().ok_or_else(|| tracerr::new!(HandleDetachedError))
     };
 }
 
@@ -516,7 +512,7 @@ impl RoomHandle {
     /// didn't approve this state transition.
     pub fn mute_audio(
         &self,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             mute_state::Stable::Muted,
             MediaKind::Audio,
@@ -538,7 +534,7 @@ impl RoomHandle {
     /// didn't approve this state transition.
     pub fn unmute_audio(
         &self,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             mute_state::Stable::Unmuted,
             MediaKind::Audio,
@@ -561,7 +557,7 @@ impl RoomHandle {
     pub fn mute_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             mute_state::Stable::Muted,
             MediaKind::Video,
@@ -584,7 +580,7 @@ impl RoomHandle {
     pub fn unmute_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             mute_state::Stable::Unmuted,
             MediaKind::Video,
@@ -609,7 +605,7 @@ impl RoomHandle {
     /// server didn't approve this state transition.
     pub fn disable_audio(
         &self,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Audio,
@@ -634,7 +630,7 @@ impl RoomHandle {
     /// acquisition request failed.
     pub fn enable_audio(
         &self,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Audio,
@@ -662,7 +658,7 @@ impl RoomHandle {
     pub fn disable_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Video,
@@ -690,7 +686,7 @@ impl RoomHandle {
     pub fn enable_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Video,
@@ -712,7 +708,7 @@ impl RoomHandle {
     /// media server didn't approve this state transition.
     pub fn disable_remote_audio(
         &self,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Audio,
@@ -737,7 +733,7 @@ impl RoomHandle {
     pub fn disable_remote_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Video,
@@ -759,7 +755,7 @@ impl RoomHandle {
     /// media server didn't approve this state transition.
     pub fn enable_remote_audio(
         &self,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Audio,
@@ -784,7 +780,7 @@ impl RoomHandle {
     pub fn enable_remote_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Video,
@@ -1045,11 +1041,7 @@ impl ConstraintsUpdateError {
     /// has failed.
     #[must_use]
     pub fn recover_fail_reasons(&self) -> Vec<Traced<ChangeMediaStateError>> {
-        if let Self::RecoverFailed {
-            recover_fail_reasons,
-            ..
-        } = self
-        {
+        if let Self::RecoverFailed { recover_fail_reasons, .. } = self {
             recover_fail_reasons.clone()
         } else {
             Vec::new()
@@ -1060,11 +1052,7 @@ impl ConstraintsUpdateError {
     /// represents an `ErroredException`.
     #[must_use]
     pub fn error(&self) -> Option<Traced<ChangeMediaStateError>> {
-        if let Self::Errored(err) = self {
-            Some(err.clone())
-        } else {
-            None
-        }
+        if let Self::Errored(err) = self { Some(err.clone()) } else { None }
     }
 
     /// Returns a new [`ConstraintsUpdateError::Recovered`].
@@ -1154,14 +1142,13 @@ impl InnerRoom {
         direction: TrackDirection,
         source_kind: Option<proto::MediaSourceKind>,
     ) {
-        use media_exchange_state::Stable::Enabled;
         use MediaState::{MediaExchange, Mute};
         use TrackDirection::{Recv, Send};
+        use media_exchange_state::Stable::Enabled;
 
         match (direction, state) {
             (Send, _) => {
-                self.send_constraints
-                    .set_media_state(state, kind, source_kind);
+                self.send_constraints.set_media_state(state, kind, source_kind);
             }
             (Recv, MediaExchange(exchange)) => {
                 self.recv_constraints.set_enabled(
@@ -1430,9 +1417,8 @@ impl InnerRoom {
 
         let current_settings = self.send_constraints.inner();
         self.send_constraints.constrain(new_settings);
-        let criteria_kinds_diff = self
-            .send_constraints
-            .calculate_kinds_diff(&current_settings);
+        let criteria_kinds_diff =
+            self.send_constraints.calculate_kinds_diff(&current_settings);
         let peers = self.peers.get_all();
 
         if stop_first {
@@ -1732,11 +1718,7 @@ impl PeerEventHandler for InnerRoom {
     ) -> Self::Output {
         self.rpc.send_command(Command::SetIceCandidate {
             peer_id,
-            candidate: IceCandidate {
-                candidate,
-                sdp_m_line_index,
-                sdp_mid,
-            },
+            candidate: IceCandidate { candidate, sdp_m_line_index, sdp_mid },
         });
         Ok(())
     }
@@ -1790,8 +1772,7 @@ impl PeerEventHandler for InnerRoom {
         &self,
         local_track: Rc<local::Track>,
     ) -> Self::Output {
-        self.on_local_track
-            .call1(local::LocalMediaTrack::new(local_track));
+        self.on_local_track.call1(local::LocalMediaTrack::new(local_track));
         Ok(())
     }
 
@@ -1911,8 +1892,7 @@ impl Drop for InnerRoom {
             });
         };
 
-        self.on_close
-            .call1(RoomCloseReason::new(*self.close_reason.borrow()));
+        self.on_close.call1(RoomCloseReason::new(*self.close_reason.borrow()));
     }
 }
 

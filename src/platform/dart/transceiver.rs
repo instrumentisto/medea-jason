@@ -2,27 +2,25 @@
 //!
 //! [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
 
-use std::{future::Future, rc::Rc};
+use std::rc::Rc;
 
 use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
 use medea_client_api_proto::EncodingParameters;
 use medea_macro::dart_bridge;
 
-use crate::{
-    media::track::local,
-    platform::{
-        self,
-        dart::utils::{
-            dart_future::FutureFromDart, handle::DartHandle, list::DartList,
-        },
-        TransceiverDirection,
-    },
-};
-
 use super::{
     codec_capability::CodecCapability, parameters::Parameters,
     send_encoding_parameters::SendEncodingParameters,
+};
+use crate::{
+    media::track::local,
+    platform::{
+        self, TransceiverDirection,
+        dart::utils::{
+            dart_future::FutureFromDart, handle::DartHandle, list::DartList,
+        },
+    },
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/transceiver.g.dart")]
@@ -209,21 +207,20 @@ impl Transceiver {
     }
 
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
-    fn direction(&self) -> impl Future<Output = TransceiverDirection> {
+    fn direction(&self) -> impl Future<Output = TransceiverDirection> + use<> {
         let handle = self.0.get();
         async move {
             let fut = unsafe { transceiver::get_direction(handle) }.unwrap();
-            unsafe { FutureFromDart::execute::<i32>(fut) }
-                .await
-                .unwrap()
-                .into()
+            unsafe { FutureFromDart::execute::<i32>(fut) }.await.unwrap().into()
         }
     }
 
     /// Returns [`Parameters`] of the underlying [RTCRtpSender].
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-    pub fn get_send_parameters(&self) -> impl Future<Output = Parameters> {
+    pub fn get_send_parameters(
+        &self,
+    ) -> impl Future<Output = Parameters> + use<> {
         let handle = self.0.get();
         async move {
             let fut =
@@ -246,7 +243,7 @@ impl Transceiver {
     pub fn set_send_parameters(
         &self,
         params: Parameters,
-    ) -> impl Future<Output = Result<(), platform::Error>> {
+    ) -> impl Future<Output = Result<(), platform::Error>> + use<> {
         let handle = self.0.get();
         let params_handle = params.handle();
         async move {

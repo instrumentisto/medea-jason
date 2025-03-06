@@ -32,10 +32,7 @@ impl ConnectionHandle {
     /// [`RoomHandle`]: api::RoomHandle
     /// [`StateError`]: api::err::StateError
     pub fn on_close(&self, cb: js_sys::Function) -> Result<(), JsValue> {
-        self.0
-            .on_close(cb.into())
-            .map_err(api::Error::from)
-            .map_err(Into::into)
+        self.0.on_close(cb.into()).map_err(api::Error::from).map_err(Into::into)
     }
 
     /// Returns ID of the remote `Member`.

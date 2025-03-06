@@ -17,26 +17,14 @@ pub mod api;
 pub mod err;
 
 use std::{
-    cell::Cell,
-    ffi::{c_void, CString},
+    ffi::{CString, c_void},
     marker::PhantomData,
     panic, ptr,
 };
 
-use dart_sys::{Dart_Handle, _Dart_Handle};
+use dart_sys::{_Dart_Handle, Dart_Handle};
 use derive_more::with_trait::Display;
 use libc::c_char;
-
-use crate::{
-    api::{api::ForeignClass, dart::err::new_panic_error},
-    media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
-    platform::utils::{
-        c_str_into_string, dart_api, free_dart_native_string,
-        handle::DartHandle, string_into_c_str,
-    },
-};
-
-pub use crate::media::MediaDirection;
 
 pub use self::{
     api::{
@@ -44,6 +32,15 @@ pub use self::{
         ReconnectHandle, RemoteMediaTrack, RoomCloseReason, RoomHandle,
     },
     err::DartError as Error,
+};
+pub use crate::media::MediaDirection;
+use crate::{
+    api::{api::ForeignClass, dart::err::new_panic_error},
+    media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
+    platform::utils::{
+        c_str_into_string, dart_api, free_dart_native_string,
+        handle::DartHandle, string_into_c_str,
+    },
 };
 
 thread_local! {
@@ -329,10 +326,9 @@ impl TryFrom<DartValueArg<()>> for () {
             | DartValue::String(_, _)
             | DartValue::Float(_)
             | DartValue::Bool(_)
-            | DartValue::Int(_) => Err(DartValueCastError {
-                expectation: "()",
-                value: value.0,
-            }),
+            | DartValue::Int(_) => {
+                Err(DartValueCastError { expectation: "()", value: value.0 })
+            }
         }
     }
 }
@@ -532,10 +528,9 @@ impl<T: PrimitiveEnum> TryFrom<DartValueArg<T>> for i64 {
             | DartValue::Handle(_)
             | DartValue::Float(_)
             | DartValue::Bool(_)
-            | DartValue::String(_, _) => Err(DartValueCastError {
-                expectation: "i64",
-                value: value.0,
-            }),
+            | DartValue::String(_, _) => {
+                Err(DartValueCastError { expectation: "i64", value: value.0 })
+            }
         }
     }
 }
@@ -684,7 +679,7 @@ impl TryFrom<i64> for MediaDirection {
 }
 
 /// Returns a [`Dart_Handle`] dereferenced from the provided pointer.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn unbox_dart_handle(
     val: ptr::NonNull<Dart_Handle>,
 ) -> Dart_Handle {
@@ -692,7 +687,7 @@ pub unsafe extern "C" fn unbox_dart_handle(
 }
 
 /// Frees the provided [`ptr::NonNull`] pointer to a [`Dart_Handle`].
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn free_boxed_dart_handle(
     val: ptr::NonNull<Dart_Handle>,
 ) {
@@ -704,7 +699,7 @@ pub unsafe extern "C" fn free_boxed_dart_handle(
 
 /// Returns a pointer to a boxed [`Dart_Handle`] created from the provided
 /// [`Dart_Handle`].
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn box_dart_handle(
     val: Dart_Handle,
 ) -> ptr::NonNull<Dart_Handle> {
@@ -713,7 +708,7 @@ pub unsafe extern "C" fn box_dart_handle(
 }
 
 /// Returns a boxed pointer to the provided [`DartValue`].
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn box_foreign_value(
     val: DartValue,
 ) -> ptr::NonNull<DartValue> {
@@ -723,11 +718,10 @@ pub unsafe extern "C" fn box_foreign_value(
 #[cfg(feature = "mockable")]
 #[expect(clippy::missing_docs_in_private_items, reason = "for testing only")]
 mod dart_value_extern_tests_helpers {
+    use super::propagate_panic;
     use crate::platform::set_panic_hook;
 
-    use super::propagate_panic;
-
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn fire_panic() {
         set_panic_hook();
         propagate_panic(|| panic!("Panicking"));

@@ -3,20 +3,20 @@
 //! [WebDriver]: https://w3.org/TR/webdriver
 
 use std::{
-    sync::{mpsc, Arc},
+    sync::{Arc, mpsc},
     time::Duration,
 };
 
 use fantoccini::{
-    wd::{Capabilities, WindowHandle},
     Client, ClientBuilder, Locator,
+    wd::{Capabilities, WindowHandle},
 };
 use futures::lock::Mutex;
 use serde::Deserialize;
-use serde_json::{json, Value as Json};
+use serde_json::{Value as Json, json};
 use tokio::task;
 
-use super::{js::Statement, Error, Result};
+use super::{Error, Result, js::Statement};
 
 /// Result returned from all the JS code executed in a browser.
 #[derive(Debug, Deserialize)]
@@ -59,11 +59,7 @@ impl WebDriverClient {
     ///
     /// If failed to create or switch to a new browser window.
     pub async fn new_window(&self) -> Result<WindowHandle> {
-        self.inner
-            .lock()
-            .await
-            .new_window(&self.file_server_host)
-            .await
+        self.inner.lock().await.new_window(&self.file_server_host).await
     }
 
     /// Switches to the provided browser window and executes the provided
@@ -78,11 +74,7 @@ impl WebDriverClient {
         window: WindowHandle,
         exec: Statement,
     ) -> Result<Json> {
-        self.inner
-            .lock()
-            .await
-            .switch_to_window_and_execute(window, exec)
-            .await
+        self.inner.lock().await.switch_to_window_and_execute(window, exec).await
     }
 
     /// Synchronously closes a [WebDriver] session.
@@ -266,9 +258,7 @@ impl Inner {
     async fn new_window(&self, file_server_host: &str) -> Result<WindowHandle> {
         let window = self.0.new_window(true).await?.handle;
         self.0.switch_to_window(window.clone()).await?;
-        self.0
-            .goto(&format!("http://{file_server_host}/index.html"))
-            .await?;
+        self.0.goto(&format!("http://{file_server_host}/index.html")).await?;
         self.0
             .wait()
             .at_most(Duration::from_secs(120))

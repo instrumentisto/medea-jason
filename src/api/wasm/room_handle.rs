@@ -4,15 +4,14 @@
 
 use derive_more::with_trait::{From, Into};
 use js_sys::Promise;
-use wasm_bindgen::{prelude::*, JsValue};
+use wasm_bindgen::{JsValue, prelude::*};
 use wasm_bindgen_futures::future_to_promise;
 
+use super::Error;
 use crate::{
     api::{MediaSourceKind, MediaStreamSettings},
     room,
 };
-
-use super::Error;
 
 /// JS side handle to a [`Room`] where all the media happens.
 ///
@@ -90,10 +89,7 @@ impl RoomHandle {
     /// [`RoomCloseReason`]: room::RoomCloseReason
     /// [`StateError`]: crate::api::err::StateError
     pub fn on_close(&self, cb: js_sys::Function) -> Result<(), JsValue> {
-        self.0
-            .on_close(cb.into())
-            .map_err(Error::from)
-            .map_err(Into::into)
+        self.0.on_close(cb.into()).map_err(Error::from).map_err(Into::into)
     }
 
     /// Sets callback, invoked when a new [`LocalMediaTrack`] is added to this

@@ -6,12 +6,12 @@ pub mod receiver;
 pub mod sender;
 mod transitable_state;
 
-use std::{cell::RefCell, collections::HashMap, future::Future, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use derive_more::with_trait::{Display, From};
 use futures::{
-    channel::mpsc, future, future::LocalBoxFuture, FutureExt as _,
-    TryFutureExt as _,
+    FutureExt as _, TryFutureExt as _, channel::mpsc, future,
+    future::LocalBoxFuture,
 };
 use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
@@ -20,31 +20,29 @@ use medea_client_api_proto::{EncodingParameters, SvcSettings};
 use proto::{MediaSourceKind, MediaType, ScalabilityMode, TrackId};
 use tracerr::Traced;
 
-#[cfg(feature = "mockable")]
-use crate::media::{LocalTracksConstraints, RecvConstraints};
-use crate::{
-    media::{track::local, MediaKind},
-    peer::{LocalStreamUpdateCriteria, PeerEvent},
-    platform,
-    platform::{
-        send_encoding_parameters::SendEncodingParameters, CodecCapability,
-        TransceiverInit,
-    },
-    utils::{Caused, Component},
-};
-
-use super::tracks_request::TracksRequest;
-
 #[doc(inline)]
 pub use self::{
     receiver::Receiver,
     sender::Sender,
     transitable_state::{
-        media_exchange_state, mute_state, InStable, InTransition,
-        MediaExchangeState, MediaExchangeStateController, MediaState,
-        MuteState, MuteStateController, TransitableState,
-        TransitableStateController,
+        InStable, InTransition, MediaExchangeState,
+        MediaExchangeStateController, MediaState, MuteState,
+        MuteStateController, TransitableState, TransitableStateController,
+        media_exchange_state, mute_state,
     },
+};
+use super::tracks_request::TracksRequest;
+#[cfg(feature = "mockable")]
+use crate::media::{LocalTracksConstraints, RecvConstraints};
+use crate::{
+    media::{MediaKind, track::local},
+    peer::{LocalStreamUpdateCriteria, PeerEvent},
+    platform,
+    platform::{
+        CodecCapability, TransceiverInit,
+        send_encoding_parameters::SendEncodingParameters,
+    },
+    utils::{Caused, Component},
 };
 
 /// Transceiver's sending ([`Sender`]) or receiving ([`Receiver`]) side.
@@ -178,7 +176,6 @@ pub trait MediaStateControllable {
     /// With an approved stable [`MediaState`] if transition to the
     /// `desired_state` cannot be made.
     ///
-    /// [`Future`]: std::future::Future
     /// [`MediaState`]: super::MediaState
     fn when_media_state_stable(
         &self,
@@ -350,7 +347,7 @@ impl InnerMediaConnections {
             .filter(move |sender| sender.state().kind() == kind)
             .filter(move |sender| {
                 source_kind
-                    .map_or(true, |sk| sender.caps().media_source_kind() == sk)
+                    .is_none_or(|sk| sender.caps().media_source_kind() == sk)
             })
     }
 
@@ -365,14 +362,12 @@ impl InnerMediaConnections {
             .values()
             .filter(move |s| s.state().kind() == kind)
             .filter(move |s| {
-                source_kind
-                    .map_or(true, |skind| s.state().source_kind() == skind)
+                source_kind.is_none_or(|skind| s.state().source_kind() == skind)
             })
     }
 
     /// Returns all [`TransceiverSide`]s by provided [`TrackDirection`],
     /// [`MediaKind`] and [`MediaSourceKind`].
-    #[expect(clippy::as_conversions, reason = "no other way")]
     fn get_transceivers_by_direction_and_kind(
         &self,
         direction: TrackDirection,
@@ -382,11 +377,11 @@ impl InnerMediaConnections {
         match direction {
             TrackDirection::Send => self
                 .iter_senders_with_kind_and_source_kind(kind, source_kind)
-                .map(|tx| tx.state() as Rc<dyn TransceiverSide>)
+                .map(|tx| -> Rc<dyn TransceiverSide> { tx.state() })
                 .collect(),
             TrackDirection::Recv => self
                 .iter_receivers_with_kind_and_source_kind(kind, source_kind)
-                .map(|rx| rx.state() as Rc<dyn TransceiverSide>)
+                .map(|rx| -> Rc<dyn TransceiverSide> { rx.state() })
                 .collect(),
         }
     }
@@ -400,7 +395,7 @@ impl InnerMediaConnections {
         &self,
         media_type: MediaType,
         direction: platform::TransceiverDirection,
-    ) -> impl Future<Output = platform::Transceiver> + 'static {
+    ) -> impl Future<Output = platform::Transceiver> + 'static + use<> {
         let peer = Rc::clone(&self.peer);
 
         async move {
@@ -441,7 +436,8 @@ impl InnerMediaConnections {
     fn get_transceiver_by_mid(
         &self,
         mid: String,
-    ) -> impl Future<Output = Option<platform::Transceiver>> + 'static {
+    ) -> impl Future<Output = Option<platform::Transceiver>> + 'static + use<>
+    {
         self.peer.get_transceiver_by_mid(mid)
     }
 }
@@ -564,7 +560,7 @@ impl MediaConnections {
     /// from these [`MediaConnections`].
     pub fn get_transceivers_statuses(
         &self,
-    ) -> impl Future<Output = HashMap<TrackId, bool>> + 'static {
+    ) -> impl Future<Output = HashMap<TrackId, bool>> + 'static + use<> {
         let inner = self.0.borrow();
         let transceivers = inner
             .senders
@@ -587,8 +583,7 @@ impl MediaConnections {
     /// Returns [`Rc`] to [`TransceiverSide`] with a provided [`TrackId`].
     ///
     /// Returns `None` if [`TransceiverSide`] with a provided [`TrackId`]
-    /// doesn't exists in this [`MediaConnections`].
-    #[expect(clippy::as_conversions, reason = "no other way")]
+    /// doesn't exist in this [`MediaConnections`].
     pub fn get_transceiver_side_by_id(
         &self,
         track_id: TrackId,
@@ -597,23 +592,18 @@ impl MediaConnections {
         inner
             .senders
             .get(&track_id)
-            .map(|sndr| sndr.state() as Rc<dyn TransceiverSide>)
+            .map(|sndr| -> Rc<dyn TransceiverSide> { sndr.state() })
             .or_else(|| {
                 inner
                     .receivers
                     .get(&track_id)
-                    .map(|rcvr| rcvr.state() as Rc<dyn TransceiverSide>)
+                    .map(|rcvr| -> Rc<dyn TransceiverSide> { rcvr.state() })
             })
     }
 
     /// Inserts new [`sender::Component`] into [`MediaConnections`].
     pub fn insert_sender(&self, sender: sender::Component) {
-        drop(
-            self.0
-                .borrow_mut()
-                .senders
-                .insert(sender.state().id(), sender),
-        );
+        drop(self.0.borrow_mut().senders.insert(sender.state().id(), sender));
     }
 
     /// Inserts new [`receiver::Component`] into [`MediaConnections`].
@@ -702,7 +692,7 @@ impl MediaConnections {
         }
 
         future::try_join_all(sender_and_track.into_iter().map(
-            |(sender, track)| async move {
+            async |(sender, track)| {
                 Rc::clone(&sender).insert_track(track).await
             },
         ))
@@ -757,7 +747,7 @@ impl MediaConnections {
     /// insert it into the [`Receiver`].
     ///
     /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
-    pub fn sync_receivers(&self) -> impl Future<Output = ()> + 'static {
+    pub fn sync_receivers(&self) -> impl Future<Output = ()> + 'static + use<> {
         future::join_all({
             self.0
                 .borrow()
@@ -1056,12 +1046,7 @@ impl MediaConnections {
 
     /// Returns all underlying [`Sender`]'s.
     pub fn get_senders(&self) -> Vec<Rc<Sender>> {
-        self.0
-            .borrow()
-            .senders
-            .values()
-            .map(Component::obj)
-            .collect()
+        self.0.borrow().senders.values().map(Component::obj).collect()
     }
 
     /// Returns [`sender::State`] with the provided [`TrackId`].

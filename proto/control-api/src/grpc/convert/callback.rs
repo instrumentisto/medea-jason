@@ -5,12 +5,12 @@
 //! [gRPC]: https://grpc.io
 
 use time::{
-    format_description::well_known::Rfc3339, OffsetDateTime as DateTime,
+    OffsetDateTime as DateTime, format_description::well_known::Rfc3339,
 };
 
 use crate::{
     callback::{Event, OnJoinEvent, OnLeaveEvent, OnLeaveReason, Request},
-    grpc::{callback as proto, ProtobufError},
+    grpc::{ProtobufError, callback as proto},
 };
 
 impl TryFrom<proto::Request> for Request {
@@ -32,10 +32,7 @@ impl From<Request> for proto::Request {
     fn from(req: Request) -> Self {
         Self {
             fid: req.fid.to_string(),
-            at: req
-                .at
-                .format(&Rfc3339)
-                .unwrap_or_else(|e| unreachable!("{e}")),
+            at: req.at.format(&Rfc3339).unwrap_or_else(|e| unreachable!("{e}")),
             event: Some(req.event.into()),
         }
     }
@@ -85,9 +82,7 @@ impl From<proto::OnLeave> for OnLeaveEvent {
 
 impl From<OnLeaveEvent> for proto::OnLeave {
     fn from(ev: OnLeaveEvent) -> Self {
-        Self {
-            reason: proto::on_leave::Reason::from(ev.reason).into(),
-        }
+        Self { reason: proto::on_leave::Reason::from(ev.reason).into() }
     }
 }
 
