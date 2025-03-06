@@ -15,7 +15,7 @@ dependencies:
   freezed_annotation: ^2.4.4
   http: ">=0.13.6 <2.0.0"
   json_annotation: ^4.9.0
-  medea_flutter_webrtc: 0.13.0-dev+rev.104a1fbd5558a5fd70a14f424b3e3c6aa4057cb5
+  medea_flutter_webrtc: 0.13.0-dev+rev.27276f8d05a4ee76b1f8ce95abe5d03e8925d9e8
   retry: ^3.1.2
   tuple: ^2.0.2
   uuid: ^4.4.2
