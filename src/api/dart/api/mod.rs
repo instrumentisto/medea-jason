@@ -53,6 +53,7 @@ pub use self::{
     room::RoomHandle, room_close_reason::RoomCloseReason,
 };
 use crate::{
+    api::DART_HANDLER_PORT,
     media::{
         self, MediaDeviceKind,
         constraints::{ConstrainBoolean, ConstrainU32},

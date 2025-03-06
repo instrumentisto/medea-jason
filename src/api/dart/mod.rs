@@ -45,7 +45,7 @@ use crate::{
 };
 
 thread_local! {
-    /// Used to create [`flutter_rust_bridge::DartOpaque`]s on the Rust side.
+    /// Used to create [`DartOpaque`]s on the Rust side.
     pub static DART_HANDLER_PORT: Cell<Option<i64>> = Cell::default();
 }
 
