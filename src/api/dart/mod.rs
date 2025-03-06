@@ -17,6 +17,7 @@ pub mod api;
 pub mod err;
 
 use std::{
+    cell::Cell,
     ffi::{CString, c_void},
     marker::PhantomData,
     panic, ptr,
