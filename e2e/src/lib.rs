@@ -146,11 +146,7 @@
     unused,
     variant_size_differences
 )]
-#![expect( // intentional
-    clippy::unwrap_used,
-    unused_crate_dependencies,
-    reason = "OK for testing crate"
-)]
+#![expect(clippy::unwrap_used, reason = "OK for testing crate")]
 
 pub mod browser;
 pub mod object;
