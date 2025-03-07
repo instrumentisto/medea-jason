@@ -17,19 +17,17 @@ void registerFunction(
 }) {
   _caller = caller;
 
-  _function__caller__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'function__caller__set_error');
+  _function__caller__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'function__caller__set_error',
+      );
 
   Pointer<NativeFunction<Void Function(Handle, ForeignValue)>> caller_native =
-      Pointer.fromFunction(
-    _callerProxy,
-  );
+      Pointer.fromFunction(_callerProxy);
 
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_function')(
-    caller_native,
-  );
+    'register_function',
+  )(caller_native);
 }
 
 void _callerProxy(Object arg0, ForeignValue arg1) {

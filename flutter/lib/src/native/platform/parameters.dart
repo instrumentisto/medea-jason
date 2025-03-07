@@ -6,8 +6,11 @@ import 'parameters.g.dart' as bridge;
 
 /// Registers [RtpParameters] related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
-  bridge.registerFunction(dl,
-      encodings: _encodings, setEncoding: _setEncodings);
+  bridge.registerFunction(
+    dl,
+    encodings: _encodings,
+    setEncoding: _setEncodings,
+  );
 }
 
 /// Returns [SendEncodingParameters] from the provided [RtpParameters].

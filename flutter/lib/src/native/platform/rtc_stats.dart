@@ -30,7 +30,7 @@ extension RtcMediaSourceStatsMapConverter on RtcMediaSourceStats {
     return {
       'trackIdentifier': trackIdentifier,
       'kind': kind,
-      ...additionalData
+      ...additionalData,
     };
   }
 }
@@ -78,7 +78,7 @@ extension ProtocolJsonStringConverter on Protocol? {
     return switch (this) {
       Protocol.tcp => 'tcp',
       Protocol.udp => 'udp',
-      null => null
+      null => null,
     };
   }
 }
@@ -217,7 +217,7 @@ extension IceRoleJsonStringConverter on IceRole? {
       IceRole.unknown => 'unknown',
       IceRole.controlling => 'controlling',
       IceRole.controlled => 'controlled',
-      null => null
+      null => null,
     };
   }
 }
@@ -292,10 +292,7 @@ extension RtcStatsTypeMapConverter on RtcStatsType {
       throw UnsupportedError('Unsupported `RtcStats` type');
     }
 
-    return {
-      'type': statsName,
-      ...additionalData,
-    };
+    return {'type': statsName, ...additionalData};
   }
 }
 

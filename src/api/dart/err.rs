@@ -9,8 +9,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{
-        api::DART_HANDLER_PORT,
-        box_dart_handle,
+        DART_HANDLER_PORT, box_dart_handle,
         err::{
             EnumerateDevicesException, FormatException, InternalException,
             InvalidOutputAudioDeviceIdException, LocalMediaInitException,

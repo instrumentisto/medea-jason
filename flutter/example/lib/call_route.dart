@@ -103,8 +103,9 @@ class _CallState extends State<CallRoute> {
 
           if (connectionWidgets == null) {
             connectionWidgets = ConnectWidgets();
-            connectionWidgets.videoTracks =
-                Map.from({trackId: VideoView(renderer)});
+            connectionWidgets.videoTracks = Map.from({
+              trackId: VideoView(renderer),
+            });
             connectionWidgets.name = Text(remoteId);
             connectionWidgets.toggleButtons = [
               TextButton(
@@ -141,7 +142,7 @@ class _CallState extends State<CallRoute> {
                   connectionWidgets.recvAudio = !connectionWidgets.recvAudio;
                 },
                 child: const Text('Toggle audio recv'),
-              )
+              ),
             ];
           } else {
             connectionWidgets.videoTracks[trackId] = VideoView(renderer);
@@ -151,33 +152,32 @@ class _CallState extends State<CallRoute> {
             _widgets[remoteId] = connectionWidgets!;
           });
         }
-        track.onMediaDirectionChanged(
-          (newDir) async {
-            var remoteTracks = _widgets[remoteId];
+        track.onMediaDirectionChanged((newDir) async {
+          var remoteTracks = _widgets[remoteId];
 
-            if (newDir == jason.TrackMediaDirection.sendRecv) {
-              var renderer = createVideoRenderer();
-              await renderer.initialize();
-              await renderer.setSrcObject(track.getTrack());
+          if (newDir == jason.TrackMediaDirection.sendRecv) {
+            var renderer = createVideoRenderer();
+            await renderer.initialize();
+            await renderer.setSrcObject(track.getTrack());
 
-              if (remoteTracks == null) {
-                remoteTracks = ConnectWidgets();
-                remoteTracks.videoTracks =
-                    Map.from({trackId: VideoView(renderer)});
-              } else {
-                remoteTracks.videoTracks[trackId] = VideoView(renderer);
-              }
+            if (remoteTracks == null) {
+              remoteTracks = ConnectWidgets();
+              remoteTracks.videoTracks = Map.from({
+                trackId: VideoView(renderer),
+              });
             } else {
-              if (remoteTracks != null) {
-                remoteTracks.videoTracks.remove(trackId);
-              }
+              remoteTracks.videoTracks[trackId] = VideoView(renderer);
             }
+          } else {
+            if (remoteTracks != null) {
+              remoteTracks.videoTracks.remove(trackId);
+            }
+          }
 
-            setState(() {
-              _widgets[remoteId] = remoteTracks!;
-            });
-          },
-        );
+          setState(() {
+            _widgets[remoteId] = remoteTracks!;
+          });
+        });
       });
 
       call.onLocalAudioTrack((track) {
@@ -262,58 +262,61 @@ class _CallState extends State<CallRoute> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Medea call demo'), actions: <Widget>[
-        TextButton(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.blue,
+      appBar: AppBar(
+        title: const Text('Medea call demo'),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.blue,
+            ),
+            child: const Text('MediaSetting'),
+            onPressed: () async {
+              await mediaSettingDialog(context, _call!);
+            },
           ),
-          child: const Text('MediaSetting'),
-          onPressed: () async {
-            await mediaSettingDialog(context, _call!);
-          },
-        ),
-        TextButton(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.blue,
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.blue,
+            ),
+            child: const Text('Create'),
+            onPressed: () async {
+              await controlApiCreateDialog(context, _call!);
+            },
           ),
-          child: const Text('Create'),
-          onPressed: () async {
-            await controlApiCreateDialog(context, _call!);
-          },
-        ),
-        TextButton(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.blue,
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.blue,
+            ),
+            child: const Text('Get'),
+            onPressed: () async {
+              await controlApiGetDialog(context, _call!);
+            },
           ),
-          child: const Text('Get'),
-          onPressed: () async {
-            await controlApiGetDialog(context, _call!);
-          },
-        ),
-        TextButton(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.blue,
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.blue,
+            ),
+            child: const Text('Delete'),
+            onPressed: () async {
+              await controlApiDeleteDialog(context, _call!);
+            },
           ),
-          child: const Text('Delete'),
-          onPressed: () async {
-            await controlApiDeleteDialog(context, _call!);
-          },
-        ),
-        TextButton(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.blue,
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.blue,
+            ),
+            child: const Text('Callbacks'),
+            onPressed: () async {
+              await showCallbacks(context, _call!);
+            },
           ),
-          child: const Text('Callbacks'),
-          onPressed: () async {
-            await showCallbacks(context, _call!);
-          },
-        ),
-      ]),
+        ],
+      ),
       body: Center(
         child: SizedBox(
           width: MediaQuery.of(context).size.width,
@@ -326,15 +329,16 @@ class _CallState extends State<CallRoute> {
               ),
               Expanded(
                 child: Row(
-                  children: _widgets.values
-                      .map(
-                        (videoMap) => Expanded(
-                          child: Column(children: videoMap.all().toList()),
-                        ),
-                      )
-                      .toList(),
+                  children:
+                      _widgets.values
+                          .map(
+                            (videoMap) => Expanded(
+                              child: Column(children: videoMap.all().toList()),
+                            ),
+                          )
+                          .toList(),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -346,33 +350,35 @@ class _CallState extends State<CallRoute> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-                padding: const EdgeInsets.only(right: 30.0),
-                child: FloatingActionButton(
-                  onPressed: () async {
-                    setState(() {
-                      _audioEnabled = !_audioEnabled;
-                    });
+              padding: const EdgeInsets.only(right: 30.0),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  setState(() {
+                    _audioEnabled = !_audioEnabled;
+                  });
 
-                    await _call!.toggleAudio(_audioEnabled);
-                  },
-                  heroTag: null,
-                  child: Icon(_audioEnabled ? Icons.mic_off : Icons.mic),
-                )),
+                  await _call!.toggleAudio(_audioEnabled);
+                },
+                heroTag: null,
+                child: Icon(_audioEnabled ? Icons.mic_off : Icons.mic),
+              ),
+            ),
             Padding(
-                padding: const EdgeInsets.only(right: 30.0),
-                child: FloatingActionButton(
-                  onPressed: () async {
-                    setState(() {
-                      _videoEnabled = !_videoEnabled;
-                    });
+              padding: const EdgeInsets.only(right: 30.0),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  setState(() {
+                    _videoEnabled = !_videoEnabled;
+                  });
 
-                    await _call!.toggleVideo(_videoEnabled);
-                  },
-                  heroTag: null,
-                  child: Icon(
-                    _videoEnabled ? Icons.videocam_off : Icons.videocam,
-                  ),
-                )),
+                  await _call!.toggleVideo(_videoEnabled);
+                },
+                heroTag: null,
+                child: Icon(
+                  _videoEnabled ? Icons.videocam_off : Icons.videocam,
+                ),
+              ),
+            ),
             FloatingActionButton(
               onPressed: () async {
                 await _call!.dispose();
@@ -400,18 +406,19 @@ Future<void> showCallbacks(BuildContext context, Call call) async {
           width: double.maxFinite,
           child: ListView(
             shrinkWrap: true,
-            children: cbs
-                .map(
-                  (cb) => Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(child: Text(cb.event.toJson().toString())),
-                      Expanded(child: Text(cb.at)),
-                      Expanded(child: Text(cb.fid)),
-                    ],
-                  ),
-                )
-                .toList(),
+            children:
+                cbs
+                    .map(
+                      (cb) => Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(child: Text(cb.event.toJson().toString())),
+                          Expanded(child: Text(cb.at)),
+                          Expanded(child: Text(cb.fid)),
+                        ],
+                      ),
+                    )
+                    .toList(),
           ),
         ),
       );
@@ -436,9 +443,7 @@ Future<void> controlApiGetDialog(BuildContext context, Call call) async {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Flexible(
-                      child: Text('local://'),
-                    ),
+                    const Flexible(child: Text('local://')),
                     const SizedBox(width: 10),
                     Expanded(
                       child: TextFormField(
@@ -446,9 +451,7 @@ Future<void> controlApiGetDialog(BuildContext context, Call call) async {
                         onChanged: (newRoomId) async {
                           roomId = newRoomId;
                         },
-                        decoration: const InputDecoration(
-                          hintText: 'Room ID',
-                        ),
+                        decoration: const InputDecoration(hintText: 'Room ID'),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -486,7 +489,7 @@ Future<void> controlApiGetDialog(BuildContext context, Call call) async {
                     Navigator.pop(context);
                   },
                   child: const Text('Get'),
-                )
+                ),
               ],
             );
           },
@@ -521,9 +524,7 @@ Future<void> controlApiDeleteDialog(BuildContext context, Call call) async {
                         onChanged: (newRoomId) async {
                           roomId = newRoomId;
                         },
-                        decoration: const InputDecoration(
-                          hintText: 'Room ID',
-                        ),
+                        decoration: const InputDecoration(hintText: 'Room ID'),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -560,7 +561,7 @@ Future<void> controlApiDeleteDialog(BuildContext context, Call call) async {
                     Navigator.pop(context);
                   },
                   child: const Text('Get'),
-                )
+                ),
               ],
             );
           },
@@ -574,12 +575,18 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
   final displayList = await call.enumerateDisplay();
 
   final deviceList = await call.enumerateDevice();
-  final videoDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.videoInput)
-      .toList();
-  final audioDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.audioInput)
-      .toList();
+  final videoDevices =
+      deviceList
+          .where(
+            (element) => element.kind() == jason.MediaDeviceKind.videoInput,
+          )
+          .toList();
+  final audioDevices =
+      deviceList
+          .where(
+            (element) => element.kind() == jason.MediaDeviceKind.audioInput,
+          )
+          .toList();
 
   await showDialog<void>(
     context: context,
@@ -593,9 +600,10 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                 SwitchListTile(
                   title: const Text('Screen share'),
                   value: call.screenShare,
-                  onChanged: (v) => setStateSb(() {
-                    call.screenShare = v;
-                  }),
+                  onChanged:
+                      (v) => setStateSb(() {
+                        call.screenShare = v;
+                      }),
                 ),
                 DropdownButton<String>(
                   value: call.videoDisplayId,
@@ -612,19 +620,23 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                       call.videoDisplayId = value!;
                     });
                   },
-                  items: displayList.map<DropdownMenuItem<String>>((value) {
-                    return DropdownMenuItem<String>(
-                      value: value.deviceId(),
-                      child: Text(value.title() == null
-                          ? value.deviceId()
-                          : value.title()!),
-                    );
-                  }).toList(),
+                  items:
+                      displayList.map<DropdownMenuItem<String>>((value) {
+                        return DropdownMenuItem<String>(
+                          value: value.deviceId(),
+                          child: Text(
+                            value.title() == null
+                                ? value.deviceId()
+                                : value.title()!,
+                          ),
+                        );
+                      }).toList(),
                 ),
                 TextFormField(
-                  initialValue: call.selectedDisplayFrameRate == null
-                      ? '30'
-                      : call.selectedDisplayFrameRate.toString(),
+                  initialValue:
+                      call.selectedDisplayFrameRate == null
+                          ? '30'
+                          : call.selectedDisplayFrameRate.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -633,14 +645,13 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                       // No-op.
                     }
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Display FPS',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Display FPS'),
                 ),
                 TextFormField(
-                  initialValue: call.selectedDisplayWidth == null
-                      ? '640'
-                      : call.selectedDisplayWidth.toString(),
+                  initialValue:
+                      call.selectedDisplayWidth == null
+                          ? '640'
+                          : call.selectedDisplayWidth.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -649,14 +660,13 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                       // No-op.
                     }
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Display width',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Display width'),
                 ),
                 TextFormField(
-                  initialValue: call.selectedDisplayHeight == null
-                      ? '480'
-                      : call.selectedDisplayHeight.toString(),
+                  initialValue:
+                      call.selectedDisplayHeight == null
+                          ? '480'
+                          : call.selectedDisplayHeight.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -684,12 +694,13 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                       call.videoDeviceId = value;
                     });
                   },
-                  items: videoDevices.map<DropdownMenuItem<String>>((value) {
-                    return DropdownMenuItem<String>(
-                      value: value.deviceId(),
-                      child: Text(value.label()),
-                    );
-                  }).toList(),
+                  items:
+                      videoDevices.map<DropdownMenuItem<String>>((value) {
+                        return DropdownMenuItem<String>(
+                          value: value.deviceId(),
+                          child: Text(value.label()),
+                        );
+                      }).toList(),
                 ),
                 DropdownButton<String>(
                   value: call.audioDeviceId,
@@ -706,17 +717,19 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                       call.audioDeviceId = value;
                     });
                   },
-                  items: audioDevices.map<DropdownMenuItem<String>>((value) {
-                    return DropdownMenuItem<String>(
-                      value: value.deviceId(),
-                      child: Text(value.label()),
-                    );
-                  }).toList(),
+                  items:
+                      audioDevices.map<DropdownMenuItem<String>>((value) {
+                        return DropdownMenuItem<String>(
+                          value: value.deviceId(),
+                          child: Text(value.label()),
+                        );
+                      }).toList(),
                 ),
                 TextFormField(
-                  initialValue: call.selectedDeviceWidth == null
-                      ? '640'
-                      : call.selectedDeviceWidth.toString(),
+                  initialValue:
+                      call.selectedDeviceWidth == null
+                          ? '640'
+                          : call.selectedDeviceWidth.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -728,9 +741,10 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                   decoration: const InputDecoration(labelText: 'Device width'),
                 ),
                 TextFormField(
-                  initialValue: call.selectedDeviceHeight == null
-                      ? '480'
-                      : call.selectedDeviceHeight.toString(),
+                  initialValue:
+                      call.selectedDeviceHeight == null
+                          ? '480'
+                          : call.selectedDeviceHeight.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -793,9 +807,7 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 TextButton(
                   onPressed: () async {
                     var videoTrack = jason.DeviceVideoTrackConstraints();
@@ -818,8 +830,9 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                       displayTrack.exactWidth(call.selectedDisplayWidth!);
                     }
                     if (call.selectedDisplayFrameRate != null) {
-                      displayTrack
-                          .exactFrameRate(call.selectedDisplayFrameRate!);
+                      displayTrack.exactFrameRate(
+                        call.selectedDisplayFrameRate!,
+                      );
                     }
 
                     var audioTrack = jason.AudioTrackConstraints();
@@ -910,8 +923,9 @@ Future<void> controlApiCreateRoomDialog(BuildContext context, Call call) {
                         child: TextFormField(
                           initialValue: null,
                           onChanged: (newRoomId) => roomId = newRoomId,
-                          decoration:
-                              const InputDecoration(hintText: 'Room ID'),
+                          decoration: const InputDecoration(
+                            hintText: 'Room ID',
+                          ),
                         ),
                       ),
                     ],
@@ -924,7 +938,7 @@ Future<void> controlApiCreateRoomDialog(BuildContext context, Call call) {
                     Navigator.pop(context);
                   },
                   child: const Text('Create'),
-                )
+                ),
               ],
             );
           },
@@ -952,37 +966,39 @@ Future<void> controlApiCreateMemberDialog(BuildContext context, Call call) {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Flexible(child: Text('local://')),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: null,
-                        onChanged: (newRoomId) {
-                          roomId = newRoomId;
-                        },
-                        decoration: const InputDecoration(hintText: 'Room ID'),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Flexible(child: Text('local://')),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: TextFormField(
+                          initialValue: null,
+                          onChanged: (newRoomId) {
+                            roomId = newRoomId;
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'Room ID',
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: null,
-                        onChanged: (newMemberId) {
-                          memberId = newMemberId;
-                        },
-                        decoration:
-                            const InputDecoration(hintText: 'Member ID'),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: TextFormField(
+                          initialValue: null,
+                          onChanged: (newMemberId) {
+                            memberId = newMemberId;
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'Member ID',
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                )),
-                const SizedBox(height: 10),
-                const Flexible(
-                  child: Text('Credentials'),
+                    ],
+                  ),
                 ),
+                const SizedBox(height: 10),
+                const Flexible(child: Text('Credentials')),
                 Flexible(
                   child: TextFormField(
                     initialValue: null,
@@ -995,51 +1011,48 @@ Future<void> controlApiCreateMemberDialog(BuildContext context, Call call) {
                 const SizedBox(height: 10),
                 const Flexible(child: Text('Timeout')),
                 Flexible(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(width: 10),
-                    const Flexible(child: Text('IDLE')),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: null,
-                        onChanged: (newIdle) async {
-                          idle = newIdle;
-                        },
-                        decoration: const InputDecoration(hintText: '10s'),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Flexible(
-                      child: Text('Reconnect'),
-                    ),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: null,
-                        onChanged: (newReconnect) async {
-                          reconnectTimeout = newReconnect;
-                        },
-                        decoration: const InputDecoration(
-                          hintText: '10s',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(width: 10),
+                      const Flexible(child: Text('IDLE')),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: TextFormField(
+                          initialValue: null,
+                          onChanged: (newIdle) async {
+                            idle = newIdle;
+                          },
+                          decoration: const InputDecoration(hintText: '10s'),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Flexible(child: Text('Ping')),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: null,
-                        onChanged: (newPing) async {
-                          ping = newPing;
-                        },
-                        decoration: const InputDecoration(hintText: '3s'),
+                      const SizedBox(width: 10),
+                      const Flexible(child: Text('Reconnect')),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: TextFormField(
+                          initialValue: null,
+                          onChanged: (newReconnect) async {
+                            reconnectTimeout = newReconnect;
+                          },
+                          decoration: const InputDecoration(hintText: '10s'),
+                        ),
                       ),
-                    ),
-                  ],
-                )),
+                      const SizedBox(width: 10),
+                      const Flexible(child: Text('Ping')),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: TextFormField(
+                          initialValue: null,
+                          onChanged: (newPing) async {
+                            ping = newPing;
+                          },
+                          decoration: const InputDecoration(hintText: '3s'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 10),
                 TextButton(
                   onPressed: () async {
@@ -1059,7 +1072,7 @@ Future<void> controlApiCreateMemberDialog(BuildContext context, Call call) {
                     Navigator.pop(context);
                   },
                   child: const Text('Create'),
-                )
+                ),
               ],
             );
           },
@@ -1089,45 +1102,49 @@ Future<void> controlApiCreateEndpointDialog(BuildContext context, Call call) {
                 const SizedBox(height: 10),
                 const Text('Endpoint URI'),
                 Flexible(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Flexible(child: Text('local://')),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: null,
-                        onChanged: (newRoomId) async {
-                          roomId = newRoomId;
-                        },
-                        decoration: const InputDecoration(hintText: 'Room ID'),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: null,
-                        onChanged: (newMemberId) async {
-                          memberId = newMemberId;
-                        },
-                        decoration:
-                            const InputDecoration(hintText: 'Member ID'),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: null,
-                        onChanged: (newEndpointId) async {
-                          endpointId = newEndpointId;
-                        },
-                        decoration: const InputDecoration(
-                          hintText: 'Endpoint ID',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Flexible(child: Text('local://')),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: TextFormField(
+                          initialValue: null,
+                          onChanged: (newRoomId) async {
+                            roomId = newRoomId;
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'Room ID',
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                )),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: TextFormField(
+                          initialValue: null,
+                          onChanged: (newMemberId) async {
+                            memberId = newMemberId;
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'Member ID',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: TextFormField(
+                          initialValue: null,
+                          onChanged: (newEndpointId) async {
+                            endpointId = newEndpointId;
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'Endpoint ID',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 10),
                 const Flexible(child: Text('Endpoint type')),
                 Flexible(
@@ -1143,13 +1160,16 @@ Future<void> controlApiCreateEndpointDialog(BuildContext context, Call call) {
                     onChanged: (String? value) {
                       endpointType = value!;
                     },
-                    items: ['PlayEndpoint', 'PublishEndpoint']
-                        .map<DropdownMenuItem<String>>((value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                    items:
+                        [
+                          'PlayEndpoint',
+                          'PublishEndpoint',
+                        ].map<DropdownMenuItem<String>>((value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -1188,18 +1208,26 @@ Future<void> controlApiCreateEndpointDialog(BuildContext context, Call call) {
                   onPressed: () async {
                     if (endpointType == 'PlayEndpoint') {
                       final endpoint = WebRtcPlayEndpoint(endpointId, url);
-                      await call.controlApi
-                          .createPlayEndpoint(roomId, memberId, endpoint);
+                      await call.controlApi.createPlayEndpoint(
+                        roomId,
+                        memberId,
+                        endpoint,
+                      );
                     } else {
-                      final endpoint =
-                          WebRtcPublishEndpoint(endpointId, P2pMode.Always);
-                      await call.controlApi
-                          .createPublishEndpoint(roomId, memberId, endpoint);
+                      final endpoint = WebRtcPublishEndpoint(
+                        endpointId,
+                        P2pMode.Always,
+                      );
+                      await call.controlApi.createPublishEndpoint(
+                        roomId,
+                        memberId,
+                        endpoint,
+                      );
                     }
                     Navigator.pop(context);
                   },
                   child: const Text('Create'),
-                )
+                ),
               ],
             );
           },

@@ -27,29 +27,17 @@ void registerFunctions(DynamicLibrary dl) {
 /// Kind of a [MediaStreamConstraints.video][0] setting.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-video
-enum VideoConstraintKind {
-  facingMode,
-  deviceId,
-  width,
-  height,
-  frameRate,
-}
+enum VideoConstraintKind { facingMode, deviceId, width, height, frameRate }
 
 /// Kind of a [MediaStreamConstraints.audio][0] setting.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
-enum AudioConstraintKind {
-  deviceId,
-  autoGainControl,
-}
+enum AudioConstraintKind { deviceId, autoGainControl }
 
 /// Indicates necessity of a [AudioConstraints] or [VideoConstraints] setting.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-enum ConstraintType {
-  optional,
-  mandatory,
-}
+enum ConstraintType { optional, mandatory }
 
 /// Returns new empty [DeviceConstraints].
 webrtc.DeviceConstraints _newDeviceConstraints() {

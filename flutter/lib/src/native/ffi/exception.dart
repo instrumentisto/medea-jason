@@ -10,19 +10,21 @@ import 'native_string.dart';
 
 /// Registers functions allowing Rust to create Dart [Exception]s and [Error]s.
 void registerFunctions(DynamicLibrary dl) {
-  bridge.registerFunction(dl,
-      newStateError: _newStateError,
-      newFormatException: _newFormatException,
-      newLocalMediaInitException: _newLocalMediaInitException,
-      newEnumerateDevicesException: _newEnumerateDevicesException,
-      newRpcClientException: _newRpcClientException,
-      newMediaStateTransitionException: _newMediaStateTransitionException,
-      newInternalException: _newInternalException,
-      newMediaSettingsUpdateException: _newMediaSettingsUpdateException,
-      newInvalidOutputAudioDeviceIdException:
-          _newInvalidOutputAudioDeviceIdException,
-      newPanicException: _newPanicException,
-      newMicVolumeException: _newMicVolumeException);
+  bridge.registerFunction(
+    dl,
+    newStateError: _newStateError,
+    newFormatException: _newFormatException,
+    newLocalMediaInitException: _newLocalMediaInitException,
+    newEnumerateDevicesException: _newEnumerateDevicesException,
+    newRpcClientException: _newRpcClientException,
+    newMediaStateTransitionException: _newMediaStateTransitionException,
+    newInternalException: _newInternalException,
+    newMediaSettingsUpdateException: _newMediaSettingsUpdateException,
+    newInvalidOutputAudioDeviceIdException:
+        _newInvalidOutputAudioDeviceIdException,
+    newPanicException: _newPanicException,
+    newMicVolumeException: _newMicVolumeException,
+  );
 }
 
 /// Creates a new [StateError] with the provided [message].
@@ -37,72 +39,105 @@ Object _newFormatException(Pointer<Utf8> message) {
 
 /// Creates a new [NativeLocalMediaInitException] with the provided error [kind],
 /// [message], [cause] and [stacktrace].
-Object _newLocalMediaInitException(int kind, Pointer<Utf8> message,
-    ForeignValue cause, Pointer<Utf8> stacktrace) {
+Object _newLocalMediaInitException(
+  int kind,
+  Pointer<Utf8> message,
+  ForeignValue cause,
+  Pointer<Utf8> stacktrace,
+) {
   return NativeLocalMediaInitException(
-      LocalMediaInitExceptionKind.values[kind],
-      message.nativeStringToDartString(),
-      cause.toDart(),
-      stacktrace.nativeStringToDartString());
+    LocalMediaInitExceptionKind.values[kind],
+    message.nativeStringToDartString(),
+    cause.toDart(),
+    stacktrace.nativeStringToDartString(),
+  );
 }
 
 /// Creates a new [NativeEnumerateDevicesException] with the provided error
 /// [cause] and [stacktrace].
 Object _newEnumerateDevicesException(
-    Pointer<Handle> cause, Pointer<Utf8> stacktrace) {
+  Pointer<Handle> cause,
+  Pointer<Utf8> stacktrace,
+) {
   return NativeEnumerateDevicesException(
-      unboxDartHandle(cause), stacktrace.nativeStringToDartString());
+    unboxDartHandle(cause),
+    stacktrace.nativeStringToDartString(),
+  );
 }
 
 /// Creates a new [InvalidOutputAudioDeviceIdException] with the provided
 /// [trace].
 Object _newInvalidOutputAudioDeviceIdException(Pointer<Utf8> trace) {
   return NativeInvalidOutputAudioDeviceIdException(
-      trace.nativeStringToDartString());
+    trace.nativeStringToDartString(),
+  );
 }
 
 /// Creates a new [MicVolumeException] with the provided error [cause] and
 /// [trace].
 Object _newMicVolumeException(Pointer<Handle> cause, Pointer<Utf8> trace) {
   return NativeMicVolumeException(
-      unboxDartHandle(cause), trace.nativeStringToDartString());
+    unboxDartHandle(cause),
+    trace.nativeStringToDartString(),
+  );
 }
 
 /// Creates a new [NativeRpcClientException] with the provided error [kind],
 /// [message], [cause] and [stacktrace].
-Object _newRpcClientException(int kind, Pointer<Utf8> message,
-    ForeignValue cause, Pointer<Utf8> stacktrace) {
+Object _newRpcClientException(
+  int kind,
+  Pointer<Utf8> message,
+  ForeignValue cause,
+  Pointer<Utf8> stacktrace,
+) {
   return NativeRpcClientException(
-      RpcClientExceptionKind.values[kind],
-      message.nativeStringToDartString(),
-      cause.toDart(),
-      stacktrace.nativeStringToDartString());
+    RpcClientExceptionKind.values[kind],
+    message.nativeStringToDartString(),
+    cause.toDart(),
+    stacktrace.nativeStringToDartString(),
+  );
 }
 
 /// Creates a new [NativeMediaStateTransitionException] with the provided error
 /// [message] and [stacktrace].
 NativeMediaStateTransitionException _newMediaStateTransitionException(
-    Pointer<Utf8> message, Pointer<Utf8> stacktrace, int kind) {
+  Pointer<Utf8> message,
+  Pointer<Utf8> stacktrace,
+  int kind,
+) {
   return NativeMediaStateTransitionException(
-      message.nativeStringToDartString(),
-      stacktrace.nativeStringToDartString(),
-      MediaStateTransitionExceptionKind.values[kind]);
+    message.nativeStringToDartString(),
+    stacktrace.nativeStringToDartString(),
+    MediaStateTransitionExceptionKind.values[kind],
+  );
 }
 
 /// Creates a new [InternalException] with the provided error [message], error
 /// [cause] and [stacktrace].
 NativeInternalException _newInternalException(
-    Pointer<Utf8> message, ForeignValue cause, Pointer<Utf8> stacktrace) {
-  return NativeInternalException(message.nativeStringToDartString(),
-      cause.toDart(), stacktrace.nativeStringToDartString());
+  Pointer<Utf8> message,
+  ForeignValue cause,
+  Pointer<Utf8> stacktrace,
+) {
+  return NativeInternalException(
+    message.nativeStringToDartString(),
+    cause.toDart(),
+    stacktrace.nativeStringToDartString(),
+  );
 }
 
 /// Creates a new [NativeMediaSettingsUpdateException] with the provided error
 /// [message], error [cause] and [rolledBack] property.
 NativeMediaSettingsUpdateException _newMediaSettingsUpdateException(
-    Pointer<Utf8> message, Pointer<Handle> cause, bool rolledBack) {
+  Pointer<Utf8> message,
+  Pointer<Handle> cause,
+  bool rolledBack,
+) {
   return NativeMediaSettingsUpdateException(
-      message.nativeStringToDartString(), unboxDartHandle(cause), rolledBack);
+    message.nativeStringToDartString(),
+    unboxDartHandle(cause),
+    rolledBack,
+  );
 }
 
 /// Creates a new [NativePanicException].
@@ -137,7 +172,11 @@ class NativeLocalMediaInitException extends LocalMediaInitException {
 
   /// Instantiates a new [NativeLocalMediaInitException].
   NativeLocalMediaInitException(
-      this._kind, this._message, this._cause, this._nativeStackTrace);
+    this._kind,
+    this._message,
+    this._cause,
+    this._nativeStackTrace,
+  );
 
   @override
   dynamic cause() {
@@ -238,7 +277,11 @@ class NativeRpcClientException extends RpcClientException {
 
   /// Instantiates a new [NativeRpcClientException].
   NativeRpcClientException(
-      this._kind, this._message, this._cause, this._nativeStackTrace);
+    this._kind,
+    this._message,
+    this._cause,
+    this._nativeStackTrace,
+  );
 
   @override
   dynamic cause() {
@@ -276,7 +319,10 @@ class NativeMediaStateTransitionException
 
   /// Instantiates a new [NativeMediaStateTransitionException].
   NativeMediaStateTransitionException(
-      this._message, this._nativeStackTrace, this._kind);
+    this._message,
+    this._nativeStackTrace,
+    this._kind,
+  );
 
   @override
   String message() {
@@ -351,7 +397,10 @@ class NativeMediaSettingsUpdateException extends MediaSettingsUpdateException {
 
   /// Instantiates a new [NativeMediaSettingsUpdateException].
   NativeMediaSettingsUpdateException(
-      this._message, this._updateException, this._rolledBack);
+    this._message,
+    this._updateException,
+    this._rolledBack,
+  );
 
   @override
   dynamic cause() {

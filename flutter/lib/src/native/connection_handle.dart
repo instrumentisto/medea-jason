@@ -13,7 +13,7 @@ class NativeConnectionHandle implements ConnectionHandle {
   /// Constructs a new [ConnectionHandle] backed by a Rust struct behind the
   /// provided [frb.ConnectionHandle].
   NativeConnectionHandle(frb.ConnectionHandle connectionHandle)
-      : opaque = RustOpaque(connectionHandle) {
+    : opaque = RustOpaque(connectionHandle) {
     RustHandlesStorage().insertHandle(this);
   }
 
@@ -29,9 +29,11 @@ class NativeConnectionHandle implements ConnectionHandle {
 
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
-    opaque.inner.onRemoteTrackAdded(f: (t) {
-      f(NativeRemoteMediaTrack(frb.RemoteMediaTrack.fromPtr(ptr: t.address)));
-    });
+    opaque.inner.onRemoteTrackAdded(
+      f: (t) {
+        f(NativeRemoteMediaTrack(frb.RemoteMediaTrack.fromPtr(ptr: t.address)));
+      },
+    );
   }
 
   @override

@@ -21,7 +21,7 @@ class NativeRoomHandle implements RoomHandle {
   /// Constructs a new [RoomHandle] backed by the Rust struct behind the
   /// provided [frb.RoomHandle].
   NativeRoomHandle(frb.RoomHandle roomHandle)
-      : opaque = RustOpaque(roomHandle) {
+    : opaque = RustOpaque(roomHandle) {
     RustHandlesStorage().insertHandle(this);
   }
 
@@ -31,12 +31,17 @@ class NativeRoomHandle implements RoomHandle {
   }
 
   @override
-  Future<void> setLocalMediaSettings(base_settings.MediaStreamSettings settings,
-      bool stopFirst, bool rollbackOnFail) async {
+  Future<void> setLocalMediaSettings(
+    base_settings.MediaStreamSettings settings,
+    bool stopFirst,
+    bool rollbackOnFail,
+  ) async {
     await (opaque.inner.setLocalMediaSettings(
-        settings: (settings as MediaStreamSettings).setting,
-        stopFirst: stopFirst,
-        rollbackOnFail: rollbackOnFail) as Future);
+          settings: (settings as MediaStreamSettings).setting,
+          stopFirst: stopFirst,
+          rollbackOnFail: rollbackOnFail,
+        )
+        as Future);
   }
 
   @override
@@ -101,37 +106,47 @@ class NativeRoomHandle implements RoomHandle {
 
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
-    opaque.inner.onNewConnection(cb: (t) {
-      f(NativeConnectionHandle(frb.ConnectionHandle.fromPtr(ptr: t.address)));
-    });
+    opaque.inner.onNewConnection(
+      cb: (t) {
+        f(NativeConnectionHandle(frb.ConnectionHandle.fromPtr(ptr: t.address)));
+      },
+    );
   }
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
-    opaque.inner.onClose(cb: (t) {
-      f(NativeRoomCloseReason(frb.RoomCloseReason.fromPtr(ptr: t.address)));
-    });
+    opaque.inner.onClose(
+      cb: (t) {
+        f(NativeRoomCloseReason(frb.RoomCloseReason.fromPtr(ptr: t.address)));
+      },
+    );
   }
 
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
-    opaque.inner.onLocalTrack(cb: (t) {
-      f(NativeLocalMediaTrack(frb.LocalMediaTrack.fromPtr(ptr: t.address)));
-    });
+    opaque.inner.onLocalTrack(
+      cb: (t) {
+        f(NativeLocalMediaTrack(frb.LocalMediaTrack.fromPtr(ptr: t.address)));
+      },
+    );
   }
 
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
-    opaque.inner.onConnectionLoss(cb: (t) {
-      f(NativeReconnectHandle(frb.ReconnectHandle.fromPtr(ptr: t.address)));
-    });
+    opaque.inner.onConnectionLoss(
+      cb: (t) {
+        f(NativeReconnectHandle(frb.ReconnectHandle.fromPtr(ptr: t.address)));
+      },
+    );
   }
 
   @override
   void onFailedLocalMedia(void Function(Object) f) {
-    opaque.inner.onFailedLocalMedia(cb: (err) {
-      f(err);
-    });
+    opaque.inner.onFailedLocalMedia(
+      cb: (err) {
+        f(err);
+      },
+    );
   }
 
   @moveSemantics

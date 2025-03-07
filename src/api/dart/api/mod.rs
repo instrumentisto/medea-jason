@@ -41,7 +41,7 @@ pub mod remote_media_track;
 pub mod room;
 pub mod room_close_reason;
 
-use std::{cell::Cell, ptr};
+use std::ptr;
 
 pub use dart_sys::Dart_Handle;
 use flutter_rust_bridge::{DartOpaque, frb};
@@ -53,17 +53,13 @@ pub use self::{
     room::RoomHandle, room_close_reason::RoomCloseReason,
 };
 use crate::{
+    api::DART_HANDLER_PORT,
     media::{
         self, MediaDeviceKind,
         constraints::{ConstrainBoolean, ConstrainU32},
     },
     platform::{self},
 };
-
-thread_local! {
-    /// Used to create [`DartOpaque`]s on the Rust side.
-    pub static DART_HANDLER_PORT: Cell<Option<i64>> = Cell::default();
-}
 
 /// Rust structure having wrapper class in Dart.
 ///
