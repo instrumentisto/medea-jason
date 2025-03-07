@@ -15,7 +15,8 @@ See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md)
 
 - [Flutter] to 3.29 version. ([#200])
 - Dependencies:
-  - [`flutter_rust_bridge`] to 2.8.0 version. ([#200])
+    - [`flutter_rust_bridge`] to 2.8.0 version. ([#200])
+    - [`medea_flutter_webrtc`] to 0.13.0 version. ([#200])
 
 [#200]: /../../pull/200
 
