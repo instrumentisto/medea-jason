@@ -88,7 +88,7 @@ thread_local! {
 /// [`panic`]: panic!
 pub fn set_panic_callback(cb: Function<String>) {
     if let Some(mut old_cb) = PANIC_FN.replace(Some(ManuallyDrop::new(cb))) {
-        unsafe { ManuallyDrop::drop(&mut old_cb) };
+        unsafe { ManuallyDrop::drop(&mut old_cb); }
     }
 }
 
