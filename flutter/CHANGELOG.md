@@ -18,7 +18,12 @@ See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md)
     - [`flutter_rust_bridge`] to 2.8.0 version. ([#200])
     - [`medea_flutter_webrtc`] to 0.13.0 version. ([#200])
 
+### Fixed
+
+- Segfault when closing [Flutter] application on macOS. ([#201])
+
 [#200]: /../../pull/200
+[#201]: /../../pull/201
 
 
 
