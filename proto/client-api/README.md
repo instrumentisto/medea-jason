@@ -2,7 +2,7 @@ Medea Client API protocol
 =========================
 
 [![Latest version](https://img.shields.io/crates/v/medea-client-api-proto "Latest version")](https://crates.io/crates/medea-client-api-proto)
-[![Rust 1.65+](https://img.shields.io/badge/rustc-1.65+-lightgray.svg "Rust 1.65+")](https://blog.rust-lang.org/2022/11/03/Rust-1.65.0.html)
+[![Rust 1.85+](https://img.shields.io/badge/rustc-1.85+-lightgray.svg "Rust 1.85+")](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0.html)
 [![Unsafe Forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg "Unsafe forbidden")](https://github.com/rust-secure-code/safety-dance)
 [![Rust docs](https://docs.rs/medea-client-api-proto/badge.svg "Rust docs")](https://docs.rs/medea-client-api-proto)
 
