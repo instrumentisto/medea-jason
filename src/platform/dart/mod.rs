@@ -74,10 +74,10 @@ pub fn set_panic_hook() {
 }
 
 thread_local! {
-    // Note: Wrapped with ManuallyDrop cause platform::Function calls DartVM
-    //       API on drop, which will be unaccessible when thread local data is
-    //       dropped.
     /// [`Function`] being called whenever Rust code [`panic`]s.
+    // NOTE: Wrapped with `ManuallyDrop` because `platform::Function` calls
+    //       DartVM API on `Drop`, which is already inaccessible once thread
+    //       local data is dropped.
     static PANIC_FN: RefCell<Option<ManuallyDrop<Function<String>>>> =
         RefCell::default();
 }
@@ -87,10 +87,8 @@ thread_local! {
 ///
 /// [`panic`]: panic!
 pub fn set_panic_callback(cb: Function<String>) {
-    if let Some(mut old_cb) = PANIC_FN.replace(Some(ManuallyDrop::new(cb))) {
-        unsafe {
-            ManuallyDrop::drop(&mut old_cb);
-        }
+    if let Some(old_cb) = PANIC_FN.replace(Some(ManuallyDrop::new(cb))) {
+        drop(ManuallyDrop::into_inner(old_cb));
     }
 }
 

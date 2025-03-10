@@ -12,7 +12,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Changed
 
-- Bumped up [MSRV] to 1.85 because of migration to 2024 edition. ([6f760c83])
+- Bumped up [MSRV] to 1.85 because of migration to 2024 edition. ([todo])
 
 ### Upgraded
 
@@ -22,12 +22,12 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Fixed
 
-- Segfault when closing Flutter application on macOS. ([#201])
+- Segfault when closing [Flutter] application on macOS. ([#201])
 
 [#200]: /../../pull/200
 [#201]: /../../pull/200
 [3ed7d2bf]: /../../commit/3ed7d2bf59ed1237d9e55c4b65ea5cad833306fa
-[6f760c83]: /../../commit/6f760c836f9c5293b5fefae8a0cb4ee2bd5cfda2
+[todo]: /../../commit/todo
 
 
 
@@ -470,6 +470,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 [Cargo features]: https://doc.rust-lang.org/cargo/reference/features.html
+[Flutter]: https://flutter.dev
 [MSRV]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
 [SFU]: https://webrtcglossary.com/sfu
 [Semantic Versioning 2.0.0]: https://semver.org
