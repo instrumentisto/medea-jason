@@ -12,7 +12,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Changed
 
-- Bumped up [MSRV] to 1.85 because of migration to 2024 edition. ([todo])
+- Bumped up [MSRV] to 1.85 because of migration to 2024 edition. ([6f760c83])
 
 ### Upgraded
 
@@ -20,9 +20,14 @@ All user visible changes to this project will be documented in this file. This p
     - [`derive-more`] to 2.0 version. ([3ed7d2bf])
     - [`flutter_rust_bridge`] to 2.8.0 version. ([#200])
 
+### Fixed
+
+- Segfault when closing Flutter application on macOS. ([#201])
+
 [#200]: /../../pull/200
+[#201]: /../../pull/200
 [3ed7d2bf]: /../../commit/3ed7d2bf59ed1237d9e55c4b65ea5cad833306fa
-[todo]: /../../commit/todo
+[6f760c83]: /../../commit/6f760c836f9c5293b5fefae8a0cb4ee2bd5cfda2
 
 
 
