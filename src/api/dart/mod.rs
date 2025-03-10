@@ -17,6 +17,7 @@ pub mod api;
 pub mod err;
 
 use std::{
+    cell::Cell,
     ffi::{CString, c_void},
     marker::PhantomData,
     panic, ptr,
@@ -42,6 +43,11 @@ use crate::{
         handle::DartHandle, string_into_c_str,
     },
 };
+
+thread_local! {
+    /// Used to create [`DartOpaque`]s on the Rust side.
+    pub static DART_HANDLER_PORT: Cell<Option<i64>> = Cell::default();
+}
 
 /// Wraps the provided function to catch all the Rust panics and propagate them
 /// to the Dart side.

@@ -14,7 +14,7 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
   /// Constructs a new [LocalMediaTrack] backed by the Rust struct behind the
   /// provided [frb.LocalMediaTrack].
   NativeLocalMediaTrack(frb.LocalMediaTrack localMediaTrack)
-      : opaque = RustOpaque(localMediaTrack) {
+    : opaque = RustOpaque(localMediaTrack) {
     RustHandlesStorage().insertHandle(this);
   }
 

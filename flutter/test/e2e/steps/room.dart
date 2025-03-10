@@ -13,7 +13,7 @@ List<StepDefinitionGeneric> steps() {
     whenJasonObjectDisposes,
     whenRoomClosedByClient,
     whenMemberEnablesViaLocalMediaSettings,
-    whenMemberJoinsRoom
+    whenMemberJoinsRoom,
   ];
 }
 
@@ -48,42 +48,46 @@ StepDefinitionGeneric whenJasonObjectDisposes = when1<String, CustomWorld>(
 
 StepDefinitionGeneric givenMemberGumWillError =
     given2<String, String, CustomWorld>(
-  RegExp(r"(\S+)'s `getUserMedia\(\)` (audio |video |)errors$"),
-  (id, kind, context) async {
-    var member = context.world.members[id]!;
-    Tuple2<bool, bool> gumSetting;
-    if (kind.isEmpty) {
-      gumSetting = const Tuple2(true, true);
-    } else {
-      gumSetting = Tuple2(kind.contains('audio'), kind.contains('video'));
-    }
-    member.getUserMediaMock(gumSetting.item1, gumSetting.item2);
-  },
-);
+      RegExp(r"(\S+)'s `getUserMedia\(\)` (audio |video |)errors$"),
+      (id, kind, context) async {
+        var member = context.world.members[id]!;
+        Tuple2<bool, bool> gumSetting;
+        if (kind.isEmpty) {
+          gumSetting = const Tuple2(true, true);
+        } else {
+          gumSetting = Tuple2(kind.contains('audio'), kind.contains('video'));
+        }
+        member.getUserMediaMock(gumSetting.item1, gumSetting.item2);
+      },
+    );
 
 StepDefinitionGeneric thenRoomFailedLocalStreamFires =
     then2<String, String, CustomWorld>(
-  RegExp(r"(\S+)'s `Room.on_failed_local_stream\(\)` fires {int} time(:?s)?$"),
-  (id, times, context) async {
-    var member = context.world.members[id]!;
-    var timesParse = int.parse(times);
-    await member.waitFailedLocalStreamCount(timesParse);
-  },
-);
+      RegExp(
+        r"(\S+)'s `Room.on_failed_local_stream\(\)` fires {int} time(:?s)?$",
+      ),
+      (id, times, context) async {
+        var member = context.world.members[id]!;
+        var timesParse = int.parse(times);
+        await member.waitFailedLocalStreamCount(timesParse);
+      },
+    );
 
 StepDefinitionGeneric whenMemberEnablesViaLocalMediaSettings =
     then2<String, String, CustomWorld>(
-  RegExp(r'(\S+) enables (video|audio|video and audio) in local '
-      r'media settings'),
-  (id, kind, context) async {
-    var member = context.world.members[id]!;
-    var setting = MediaStreamSettings();
-    if (kind.contains('video')) {
-      setting.deviceVideo(DeviceVideoTrackConstraints());
-    }
-    if (kind.contains('audio')) {
-      setting.audio(AudioTrackConstraints());
-    }
-    await member.room.setLocalMediaSettings(setting, true, true);
-  },
-);
+      RegExp(
+        r'(\S+) enables (video|audio|video and audio) in local '
+        r'media settings',
+      ),
+      (id, kind, context) async {
+        var member = context.world.members[id]!;
+        var setting = MediaStreamSettings();
+        if (kind.contains('video')) {
+          setting.deviceVideo(DeviceVideoTrackConstraints());
+        }
+        if (kind.contains('audio')) {
+          setting.audio(AudioTrackConstraints());
+        }
+        await member.room.setLocalMediaSettings(setting, true, true);
+      },
+    );

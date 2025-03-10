@@ -3,11 +3,7 @@ import 'package:gherkin/gherkin.dart';
 import '../world/custom_world.dart';
 
 List<StepDefinitionGeneric> steps() {
-  return [
-    wsConnectionLoss,
-    wsConnectionRestore,
-    connectionIsLost,
-  ];
+  return [wsConnectionLoss, wsConnectionRestore, connectionIsLost];
 }
 
 StepDefinitionGeneric wsConnectionLoss = when1<String, CustomWorld>(

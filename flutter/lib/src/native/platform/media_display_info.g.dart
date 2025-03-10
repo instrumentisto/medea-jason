@@ -21,27 +21,24 @@ void registerFunction(
   _deviceId = deviceId;
   _title = title;
 
-  _media_display_info__device_id__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'media_display_info__device_id__set_error');
-  _media_display_info__title__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-          'media_display_info__title__set_error');
+  _media_display_info__device_id__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_display_info__device_id__set_error',
+      );
+  _media_display_info__title__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_display_info__title__set_error',
+      );
 
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> deviceId_native =
-      Pointer.fromFunction(
-    _deviceIdProxy,
-  );
+      Pointer.fromFunction(_deviceIdProxy);
   Pointer<NativeFunction<Pointer Function(Handle)>> title_native =
-      Pointer.fromFunction(
-    _titleProxy,
-  );
+      Pointer.fromFunction(_titleProxy);
 
-  dl.lookupFunction<Void Function(Pointer, Pointer),
-      void Function(Pointer, Pointer)>('register_media_display_info')(
-    deviceId_native,
-    title_native,
-  );
+  dl.lookupFunction<
+    Void Function(Pointer, Pointer),
+    void Function(Pointer, Pointer)
+  >('register_media_display_info')(deviceId_native, title_native);
 }
 
 Pointer<Utf8> _deviceIdProxy(Object arg0) {

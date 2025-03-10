@@ -62,7 +62,10 @@ class MockWebSocket {
   /// Subscribes to the created [WebSocket] messages with the specified
   /// [onMessage] and [onClose] callbacks.
   static Future<WebSocket> Function() connect(
-      Pointer<Utf8> addr, Object onMessage, Object onClose) {
+    Pointer<Utf8> addr,
+    Object onMessage,
+    Object onClose,
+  ) {
     onMessage as Function;
     onClose as Function;
     return () async {
@@ -100,7 +103,10 @@ class MockWebSocket {
 /// Subscribes to the created [WebSocket] messages with the given [onMessage]
 /// and [onClose] callbacks.
 Future<WebSocket> Function() _connect(
-    Pointer<Utf8> addr, Object onMessage, Object onClose) {
+  Pointer<Utf8> addr,
+  Object onMessage,
+  Object onClose,
+) {
   onMessage as Function;
   onClose as Function;
   return () async {

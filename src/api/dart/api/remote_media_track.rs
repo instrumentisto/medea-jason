@@ -6,7 +6,7 @@ use flutter_rust_bridge::{DartOpaque, frb};
 use send_wrapper::SendWrapper;
 
 use crate::{
-    api::{MediaDirection, api::DART_HANDLER_PORT, dart::api::ForeignClass},
+    api::{DART_HANDLER_PORT, MediaDirection, dart::api::ForeignClass},
     media::{MediaKind, MediaSourceKind, track::remote as core},
     platform,
 };

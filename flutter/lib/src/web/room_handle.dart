@@ -26,8 +26,11 @@ class WebRoomHandle implements RoomHandle {
   }
 
   @override
-  Future<void> setLocalMediaSettings(base_settings.MediaStreamSettings settings,
-      bool stopFirst, bool rollbackOnFail) async {
+  Future<void> setLocalMediaSettings(
+    base_settings.MediaStreamSettings settings,
+    bool stopFirst,
+    bool rollbackOnFail,
+  ) async {
     await fallibleFuture(
       obj
           .set_local_media_settings(
@@ -118,9 +121,7 @@ class WebRoomHandle implements RoomHandle {
   void onLocalTrack(void Function(LocalMediaTrack) f) {
     void fn(JSAny? track) =>
         f(WebLocalMediaTrack(track as wasm.LocalMediaTrack));
-    fallibleFunction(
-      () => obj.on_local_track(fn.toJS),
-    );
+    fallibleFunction(() => obj.on_local_track(fn.toJS));
   }
 
   @override
