@@ -10,8 +10,8 @@ use std::{
 use futures::stream::LocalBoxStream;
 
 use crate::{
-    subscribers_store::progressable::{self, Processed},
     Guarded, MutObservableFieldGuard, Progressable,
+    subscribers_store::progressable::{self, Processed},
 };
 
 /// Reactive [`Cell`] with a progress tracking.
@@ -62,8 +62,6 @@ where
 
     /// Returns [`Future`] that will be resolved when all the underlying data
     /// updates will be processed by all subscribers.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_all_processed(&self) -> Processed<'static> {
         self.0.borrow().when_all_processed()
     }

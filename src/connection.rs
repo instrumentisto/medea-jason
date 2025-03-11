@@ -3,14 +3,13 @@
 use std::{
     cell::{Cell, RefCell},
     collections::{HashMap, HashSet},
-    future::Future,
     rc::{Rc, Weak},
 };
 
 use derive_more::with_trait::{Display, From};
 use futures::{
-    future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
-    StreamExt as _,
+    FutureExt as _, StreamExt as _, future, future::LocalBoxFuture,
+    stream::LocalBoxStream,
 };
 use medea_client_api_proto::{
     self as proto, ConnectionQualityScore, MemberId, TrackId,
@@ -19,11 +18,10 @@ use tracerr::Traced;
 
 use crate::{
     api,
-    media::{track::remote, MediaKind, MediaSourceKind, RecvConstraints},
+    media::{MediaKind, MediaSourceKind, RecvConstraints, track::remote},
     peer::{
-        media_exchange_state, receiver, MediaState,
-        MediaStateControllable as _, ProhibitedStateError,
-        TransceiverSide as _,
+        MediaState, MediaStateControllable as _, ProhibitedStateError,
+        TransceiverSide as _, media_exchange_state, receiver,
     },
     platform,
     utils::{Caused, TaskHandle},
@@ -336,8 +334,8 @@ impl InnerConnection {
         let receivers = self.receivers.borrow().clone();
         let mut change_tasks = Vec::new();
         for r in receivers {
-            let source_filter = source_kind
-                .map_or(true, |skind| skind == r.source_kind().into());
+            let source_filter =
+                source_kind.is_none_or(|skind| skind == r.source_kind().into());
 
             if r.is_subscription_needed(desired_state)
                 && r.kind() == kind
@@ -442,7 +440,7 @@ impl ConnectionHandle {
     pub fn enable_remote_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Enabled.into(),
             MediaKind::Video,
@@ -463,7 +461,7 @@ impl ConnectionHandle {
     pub fn disable_remote_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Disabled.into(),
             MediaKind::Video,
@@ -483,7 +481,7 @@ impl ConnectionHandle {
     /// or a media server didn't approve this state transition.
     pub fn enable_remote_audio(
         &self,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Enabled.into(),
             MediaKind::Audio,
@@ -503,7 +501,7 @@ impl ConnectionHandle {
     /// or a media server didn't approve this state transition.
     pub fn disable_remote_audio(
         &self,
-    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Disabled.into(),
             MediaKind::Audio,
@@ -532,9 +530,7 @@ impl ConnectionHandle {
         };
 
         Box::pin(async move {
-            inner
-                .change_media_state(desired_state, kind, source_kind)
-                .await
+            inner.change_media_state(desired_state, kind, source_kind).await
         })
     }
 }

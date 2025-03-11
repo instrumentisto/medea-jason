@@ -127,17 +127,17 @@ Future<RtpTransceiver?> Function() _getTransceiverByMid(
 ) {
   peer as PeerConnection;
   return () => peer.getTransceivers().then((transceivers) {
-        var mMid = mid.nativeStringToDartString();
-        RtpTransceiver? result;
-        for (var transceiver in transceivers) {
-          if (transceiver.mid == mMid) {
-            result = transceiver;
-          } else {
-            transceiver.dispose();
-          }
-        }
-        return result;
-      });
+    var mMid = mid.nativeStringToDartString();
+    RtpTransceiver? result;
+    for (var transceiver in transceivers) {
+      if (transceiver.mid == mMid) {
+        result = transceiver;
+      } else {
+        transceiver.dispose();
+      }
+    }
+    return result;
+  });
 }
 
 /// Sets a remote SDP offer in the provided [PeerConnection].

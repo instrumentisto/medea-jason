@@ -3,9 +3,8 @@
 use derive_more::with_trait::From;
 use medea_macro::dart_bridge;
 
+use super::utils::{NonNullDartValueArgExt as _, dart_string_into_rust};
 use crate::platform::dart::utils::handle::DartHandle;
-
-use super::utils::{dart_string_into_rust, NonNullDartValueArgExt as _};
 
 #[dart_bridge("flutter/lib/src/native/platform/media_display_info.g.dart")]
 mod media_display_info {

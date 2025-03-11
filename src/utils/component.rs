@@ -3,7 +3,7 @@
 use std::{borrow::Borrow, convert::Infallible, fmt::Display, rc::Rc};
 
 use derive_more::with_trait::Deref;
-use futures::{future, Future, FutureExt as _, Stream, StreamExt as _};
+use futures::{FutureExt as _, Stream, StreamExt as _, future};
 use medea_reactive::AllProcessed;
 use sealed::sealed;
 
@@ -96,11 +96,7 @@ impl<S: ComponentState<O> + 'static, O: 'static> Component<S, O> {
             WatchersSpawner::new(Rc::clone(&state), Rc::clone(&obj));
         state.spawn_watchers(&mut watchers_spawner);
 
-        Self {
-            state,
-            obj,
-            _spawned_watchers: watchers_spawner.finish(),
-        }
+        Self { state, obj, _spawned_watchers: watchers_spawner.finish() }
     }
 }
 
@@ -172,11 +168,7 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
 
     /// Creates new [`WatchersSpawner`] for the provided object and state.
     const fn new(state: Rc<S>, obj: Rc<O>) -> Self {
-        Self {
-            state,
-            obj,
-            spawned_watchers: Vec::new(),
-        }
+        Self { state, obj, spawned_watchers: Vec::new() }
     }
 
     /// Returns [`TaskHandle`]s for the watchers spawned by this

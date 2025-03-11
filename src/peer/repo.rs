@@ -8,18 +8,17 @@ use medea_macro::watchers;
 use medea_reactive::ObservableHashMap;
 use tracerr::Traced;
 
+use super::{PeerConnection, PeerEvent};
 use crate::{
     connection::Connections,
     media::{LocalTracksConstraints, MediaManager, RecvConstraints},
     peer::{self, RtcPeerConnectionError},
     platform,
     utils::{
-        component, AsProtoState, SynchronizableState as _, TaskHandle,
-        Updatable as _,
+        AsProtoState, SynchronizableState as _, TaskHandle, Updatable as _,
+        component,
     },
 };
-
-use super::{PeerConnection, PeerEvent};
 
 /// Component responsible for the [`peer::Component`] creating and removing.
 pub type Component = component::Component<State, Repository>;
@@ -34,11 +33,7 @@ impl Component {
     /// Returns all [`PeerConnection`]s stored in the repository.
     #[must_use]
     pub fn get_all(&self) -> Vec<Rc<PeerConnection>> {
-        self.peers
-            .borrow()
-            .values()
-            .map(component::Component::obj)
-            .collect()
+        self.peers.borrow().values().map(component::Component::obj).collect()
     }
 
     /// Notifies all [`peer::Component`]s about a RPC connection loss.

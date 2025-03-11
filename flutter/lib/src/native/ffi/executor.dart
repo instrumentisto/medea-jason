@@ -26,14 +26,16 @@ class Executor {
   /// Initializes Rust part of the [Executor], creates a [ReceivePort] that
   /// accepts commands to poll Rust futures.
   Executor(DynamicLibrary dylib)
-      : _loopInit = dylib
-            .lookup<NativeFunction<_ExecutorInitC>>('rust_executor_init')
-            .asFunction(),
-        _taskPoll = dylib
-            .lookup<NativeFunction<_ExecutorPollTaskC>>(
-              'rust_executor_poll_task',
-            )
-            .asFunction() {
+    : _loopInit =
+          dylib
+              .lookup<NativeFunction<_ExecutorInitC>>('rust_executor_init')
+              .asFunction(),
+      _taskPoll =
+          dylib
+              .lookup<NativeFunction<_ExecutorPollTaskC>>(
+                'rust_executor_poll_task',
+              )
+              .asFunction() {
     _wakePort = ReceivePort()..listen(_pollTask);
     _loopInit(_wakePort.sendPort.nativePort);
   }

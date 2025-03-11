@@ -10,6 +10,7 @@ use crate::platform::dart::utils::{
 };
 
 use super::utils::{c_str_into_string, string_into_c_str};
+use crate::platform::dart::utils::handle::DartHandle;
 
 #[dart_bridge(
     "flutter/lib/src/native/platform/send_encoding_parameters.g.dart"

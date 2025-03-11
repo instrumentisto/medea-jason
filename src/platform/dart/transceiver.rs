@@ -8,21 +8,19 @@ use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
+use super::{
+    codec_capability::CodecCapability, parameters::Parameters,
+    send_encoding_parameters::SendEncodingParameters,
+    send_parameters::SendParameters,
+};
 use crate::{
     media::track::local,
     platform::{
-        self,
+        self, TransceiverDirection,
         dart::utils::{
             dart_future::FutureFromDart, handle::DartHandle, list::DartList,
         },
-        TransceiverDirection,
     },
-};
-
-use super::{
-    codec_capability::CodecCapability,
-    send_encoding_parameters::SendEncodingParameters,
-    send_parameters::SendParameters,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/transceiver.g.dart")]

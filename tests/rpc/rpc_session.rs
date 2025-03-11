@@ -7,7 +7,7 @@ use std::{
     sync::atomic::{AtomicBool, Ordering},
 };
 
-use futures::{future, stream, FutureExt as _, StreamExt as _};
+use futures::{FutureExt as _, StreamExt as _, future, stream};
 use medea_client_api_proto::{
     ClientMsg, CloseReason, Command, Event, ServerMsg,
 };
@@ -23,7 +23,7 @@ use medea_jason::{
 };
 use wasm_bindgen_test::*;
 
-use crate::{delay_for, rpc::RPC_SETTINGS, timeout, TEST_ROOM_URL};
+use crate::{TEST_ROOM_URL, delay_for, rpc::RPC_SETTINGS, timeout};
 
 wasm_bindgen_test_configure!(run_in_browser);
 
@@ -64,11 +64,8 @@ async fn could_not_auth_err() {
 
     let connect_fut = Rc::clone(&session)
         .connect(ConnectionInfo::from_str(TEST_ROOM_URL).unwrap());
-    let connect_err = timeout(100, connect_fut)
-        .await
-        .unwrap()
-        .unwrap_err()
-        .into_inner();
+    let connect_err =
+        timeout(100, connect_fut).await.unwrap().unwrap_err().into_inner();
     assert!(matches!(connect_err, SessionError::AuthorizationFailed));
 
     // other callbacks should not fire

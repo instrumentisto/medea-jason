@@ -11,7 +11,7 @@ class NativeReconnectHandle implements ReconnectHandle {
   /// Constructs a new [ReconnectHandle] backed by the Rust struct behind the
   /// provided [frb.ReconnectHandle].
   NativeReconnectHandle(frb.ReconnectHandle reconnectHandle)
-      : opaque = RustOpaque(reconnectHandle) {
+    : opaque = RustOpaque(reconnectHandle) {
     RustHandlesStorage().insertHandle(this);
   }
 
@@ -58,7 +58,8 @@ class NativeReconnectHandle implements ReconnectHandle {
       multiplier: multiplier,
       maxDelay: maxDelay,
       maxElapsedTimeMs: maxElapsedTimeMs,
-    ) as Future);
+    )
+        as Future);
   }
 
   @moveSemantics

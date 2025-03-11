@@ -2,13 +2,11 @@
 //!
 //! [`platform::dart::executor`]: crate::platform::executor
 
-#[cfg(doc)]
-use std::future::Future;
 use std::{
     cell::RefCell,
     sync::{
-        atomic::{AtomicBool, Ordering},
         Arc,
+        atomic::{AtomicBool, Ordering},
     },
     task::{Context, Waker},
     thread::{self, ThreadId},
@@ -26,8 +24,6 @@ use crate::platform::dart::executor::task_wake;
 #[derive(Debug)]
 struct Inner {
     /// An actual [`Future`] that this [`Task`] is driving.
-    ///
-    /// [`Future`]: std::future::Future
     #[debug(skip)]
     future: LocalBoxFuture<'static, ()>,
 
@@ -37,14 +33,10 @@ struct Inner {
 
 /// Wrapper for a [`Future`] that can be polled by an external single threaded
 /// Dart executor.
-///
-/// [`Future`]: std::future::Future
 #[derive(Debug)]
 pub struct Task {
     /// [`Task`]'s inner data containing an actual [`Future`] and its
     /// [`Waker`]. Dropped on the [`Task`] completion.
-    ///
-    /// [`Future`]: std::future::Future
     inner: RefCell<Option<Inner>>,
 
     /// Indicates whether there is a [`Poll::Pending`] awake request of this
@@ -81,8 +73,6 @@ impl Task {
     ///
     /// Must be called on the same thread where the [`Task`] will be polled,
     /// otherwise polling will panic.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn spawn(future: LocalBoxFuture<'static, ()>) {
         let this = Arc::new(Self {
             inner: RefCell::new(None),
@@ -104,8 +94,6 @@ impl Task {
     ///
     /// If called not on the same thread where this [`Task`] was originally
     /// created.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn poll(&self) {
         assert_eq!(
             self.thread_id,

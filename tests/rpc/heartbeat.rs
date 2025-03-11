@@ -3,8 +3,9 @@
 use std::{rc::Rc, time::Duration};
 
 use futures::{
+    StreamExt,
     channel::{mpsc, oneshot},
-    future, stream, StreamExt,
+    future, stream,
 };
 use medea_client_api_proto::{ClientMsg, ServerMsg};
 use medea_jason::{
@@ -30,12 +31,8 @@ wasm_bindgen_test_configure!(run_in_browser);
 async fn sends_pong_on_received_ping() {
     let mut transport = MockRpcTransport::new();
     let (on_message_tx, on_message_rx) = mpsc::unbounded();
-    transport
-        .expect_connect()
-        .return_once(|_| Box::pin(future::ok(())));
-    transport
-        .expect_on_message()
-        .return_once(|| Box::pin(on_message_rx));
+    transport.expect_connect().return_once(|_| Box::pin(future::ok(())));
+    transport.expect_on_message().return_once(|| Box::pin(on_message_rx));
     let (test_tx, test_rx) = oneshot::channel();
     transport.expect_send().return_once(move |msg| {
         test_tx.send(msg.clone()).unwrap();
@@ -70,12 +67,8 @@ async fn sends_pong_on_received_ping() {
 #[wasm_bindgen_test]
 async fn on_idle_works() {
     let mut transport = MockRpcTransport::new();
-    transport
-        .expect_connect()
-        .return_once(|_| Box::pin(future::ok(())));
-    transport
-        .expect_on_message()
-        .return_once(|| stream::pending().boxed());
+    transport.expect_connect().return_once(|_| Box::pin(future::ok(())));
+    transport.expect_on_message().return_once(|| stream::pending().boxed());
     transport.expect_send().return_once(|_| Ok(()));
 
     let hb = Heartbeat::start(
@@ -101,12 +94,8 @@ async fn on_idle_works() {
 #[wasm_bindgen_test]
 async fn pre_sends_pong() {
     let mut transport = MockRpcTransport::new();
-    transport
-        .expect_connect()
-        .return_once(|_| Box::pin(future::ok(())));
-    transport
-        .expect_on_message()
-        .return_once(|| stream::pending().boxed());
+    transport.expect_connect().return_once(|_| Box::pin(future::ok(())));
+    transport.expect_on_message().return_once(|| stream::pending().boxed());
     let (on_message_tx, mut on_message_rx) = mpsc::unbounded();
     transport.expect_send().return_once(move |msg| {
         on_message_tx.unbounded_send(msg.clone()).unwrap();
@@ -135,12 +124,8 @@ async fn pre_sends_pong() {
 #[wasm_bindgen_test]
 async fn transport_is_dropped_when_hearbeater_is_dropped() {
     let mut transport = MockRpcTransport::new();
-    transport
-        .expect_connect()
-        .return_once(|_| Box::pin(future::ok(())));
-    transport
-        .expect_on_message()
-        .returning(|| stream::pending().boxed());
+    transport.expect_connect().return_once(|_| Box::pin(future::ok(())));
+    transport.expect_on_message().returning(|| stream::pending().boxed());
     let transport: Rc<dyn RpcTransport> = Rc::new(transport);
 
     let hb = Heartbeat::start(

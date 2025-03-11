@@ -6,7 +6,6 @@
 
 use std::{
     cell::{Cell, RefCell},
-    future::Future,
     rc::Rc,
 };
 
@@ -24,17 +23,15 @@ use web_sys::{
     RtcStatsReport, RtcTrackEvent,
 };
 
+use super::ice_server::RtcIceServers;
 use crate::{
     media::MediaKind,
     platform::{
-        self,
-        wasm::{transceiver::TransceiverInit, utils::EventListener},
-        IceCandidate, IceCandidateError, MediaStreamTrack,
+        self, IceCandidate, IceCandidateError, MediaStreamTrack,
         RtcPeerConnectionError, RtcStats, SdpType, Transceiver,
+        wasm::{transceiver::TransceiverInit, utils::EventListener},
     },
 };
-
-use super::ice_server::RtcIceServers;
 
 /// Shortcut for a [`Result`] holding a [`Traced`] [`RtcPeerConnectionError`].
 type RtcPeerConnectionResult<T> = Result<T, Traced<RtcPeerConnectionError>>;
@@ -631,7 +628,7 @@ impl RtcPeerConnection {
     pub fn get_transceiver_by_mid(
         &self,
         mid: String,
-    ) -> impl Future<Output = Option<Transceiver>> + 'static {
+    ) -> impl Future<Output = Option<Transceiver>> + 'static + use<> {
         let mut transceiver = None;
 
         for tr in self.peer.get_transceivers() {

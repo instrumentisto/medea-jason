@@ -3,7 +3,7 @@
 use std::{cell::RefCell, rc::Rc, time::Duration};
 
 use derive_more::with_trait::{Debug, Mul};
-use futures::{channel::mpsc, future, stream::LocalBoxStream, StreamExt as _};
+use futures::{StreamExt as _, channel::mpsc, future, stream::LocalBoxStream};
 use medea_client_api_proto::{ClientMsg, ServerMsg};
 
 use crate::{platform, utils::TaskHandle};
@@ -35,8 +35,6 @@ struct Inner {
 
     /// [`TaskHandle`] for [`Future`] which sends [`ClientMsg::Pong`] on
     /// [`ServerMsg::Ping`].
-    ///
-    /// [`Future`]: std::future::Future
     handle_ping_task: Option<TaskHandle>,
 
     /// [`TaskHandle`] for idle watchdog.

@@ -9,7 +9,7 @@ use futures::channel::oneshot;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{propagate_panic, DartValue, DartValueArg},
+    api::{DartValue, DartValueArg, propagate_panic},
     platform::{self, utils::dart_api},
 };
 
@@ -19,7 +19,7 @@ mod callback {
 
     use dart_sys::Dart_Handle;
 
-    use crate::platform::{dart::utils::callback::Callback, Error};
+    use crate::platform::{Error, dart::utils::callback::Callback};
 
     extern "C" {
         /// Returns a [`Dart_Handle`] to a newly created Dart callback accepting
@@ -42,7 +42,7 @@ mod callback {
 /// # Safety
 ///
 /// Provided callback should be a valid [`Callback`] pointer.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn Callback__call_two_arg(
     mut cb: ptr::NonNull<Callback>,
     first: DartValue,
@@ -60,7 +60,7 @@ pub unsafe extern "C" fn Callback__call_two_arg(
 /// # Safety
 ///
 /// Provided [`Callback`] should be a valid [`Callback`] pointer.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn Callback__call(
     mut cb: ptr::NonNull<Callback>,
     val: DartValue,
@@ -242,11 +242,10 @@ pub mod tests {
 
     use dart_sys::Dart_Handle;
 
+    use super::Callback;
     use crate::api::DartValueArg;
 
-    use super::Callback;
-
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn test_callback_listener_int(
         expects: DartValueArg<i64>,
     ) -> Dart_Handle {
@@ -257,7 +256,7 @@ pub mod tests {
         .into_dart()
     }
 
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn test_callback_listener_string(
         expects: DartValueArg<String>,
     ) -> Dart_Handle {
@@ -268,7 +267,7 @@ pub mod tests {
         .into_dart()
     }
 
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn test_callback_listener_optional_int(
         expects: DartValueArg<Option<i64>>,
     ) -> Dart_Handle {
@@ -279,7 +278,7 @@ pub mod tests {
         .into_dart()
     }
 
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn test_callback_listener_optional_string(
         expects: DartValueArg<Option<String>>,
     ) -> Dart_Handle {
@@ -298,7 +297,7 @@ pub mod tests {
         >> = RefCell::default();
     }
 
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn register__test__test_callback_handle_function(
         f: TestCallbackHandleFunction,
     ) {
@@ -306,7 +305,7 @@ pub mod tests {
     }
 
     #[expect(clippy::expect_used, reason = "intended behavior")]
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn test_callback_listener_dart_handle() -> Dart_Handle
     {
         Callback::from_once(move |val: Dart_Handle| {

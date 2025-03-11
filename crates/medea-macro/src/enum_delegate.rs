@@ -36,10 +36,7 @@ pub(crate) fn derive(
     let enum_name_iter = iter::repeat(enum_name);
 
     let variants = if let syn::Data::Enum(data) = &inp.data {
-        data.variants
-            .iter()
-            .map(|c| c.ident.clone())
-            .collect::<Vec<_>>()
+        data.variants.iter().map(|c| c.ident.clone()).collect::<Vec<_>>()
     } else {
         return Err(Error::new(
             inp.span(),

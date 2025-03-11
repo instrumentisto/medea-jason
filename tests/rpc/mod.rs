@@ -8,10 +8,10 @@ mod websocket;
 use std::{cell::Cell, collections::HashMap, rc::Rc};
 
 use futures::{
+    StreamExt as _,
     channel::{mpsc, oneshot},
     future, stream,
     stream::LocalBoxStream,
-    StreamExt as _,
 };
 use medea_client_api_proto::{
     ClientMsg, CloseReason, Command, Event, PeerId, RpcSettings, ServerMsg,
@@ -64,15 +64,11 @@ fn on_message_mock(
 /// 4. Check that subscriber from step 2 receives this [`Event`].
 #[wasm_bindgen_test]
 async fn message_received_from_transport_is_transmitted_to_sub() {
-    const SRV_EVENT: Event = Event::PeersRemoved {
-        peer_ids: Vec::new(),
-    };
+    const SRV_EVENT: Event = Event::PeersRemoved { peer_ids: Vec::new() };
 
     let ws = Rc::new(WebSocketRpcClient::new(Box::new(|| {
         let mut transport = MockRpcTransport::new();
-        transport
-            .expect_connect()
-            .return_once(|_| Box::pin(future::ok(())));
+        transport.expect_connect().return_once(|_| Box::pin(future::ok(())));
         transport.expect_on_state_change().return_once(|| {
             stream::once(async { TransportState::Open }).boxed()
         });
@@ -82,10 +78,7 @@ async fn message_received_from_transport_is_transmitted_to_sub() {
                     idle_timeout_ms: 10_000,
                     ping_interval_ms: 10_000,
                 }),
-                ServerMsg::Event {
-                    room_id: "".into(),
-                    event: SRV_EVENT,
-                },
+                ServerMsg::Event { room_id: "".into(), event: SRV_EVENT },
             ])
             .boxed()
         });
@@ -100,10 +93,7 @@ async fn message_received_from_transport_is_transmitted_to_sub() {
 
     assert_eq!(
         stream.next().await.unwrap(),
-        RpcEvent::Event {
-            room_id: "".into(),
-            event: SRV_EVENT
-        }
+        RpcEvent::Event { room_id: "".into(), event: SRV_EVENT }
     );
 }
 
@@ -121,9 +111,7 @@ async fn message_received_from_transport_is_transmitted_to_sub() {
 #[wasm_bindgen_test]
 async fn transport_is_dropped_when_client_is_dropped() {
     let mut transport = MockRpcTransport::new();
-    transport
-        .expect_connect()
-        .return_once(|_| Box::pin(future::ok(())));
+    transport.expect_connect().return_once(|_| Box::pin(future::ok(())));
     transport.expect_send().returning(|_| Ok(()));
     transport.expect_set_close_reason().return_const(());
     transport
@@ -159,9 +147,7 @@ async fn transport_is_dropped_when_client_is_dropped() {
 #[wasm_bindgen_test]
 async fn send_goes_to_transport() {
     let mut transport = MockRpcTransport::new();
-    transport
-        .expect_connect()
-        .return_once(|_| Box::pin(future::ok(())));
+    transport.expect_connect().return_once(|_| Box::pin(future::ok(())));
     let (on_send_tx, mut on_send_rx) = mpsc::unbounded();
     transport
         .expect_on_state_change()
@@ -226,9 +212,7 @@ mod on_close {
     /// [`CloseMsg`].
     async fn get_client(close_msg: CloseMsg) -> Rc<WebSocketRpcClient> {
         let mut transport = MockRpcTransport::new();
-        transport
-            .expect_connect()
-            .return_once(|_| Box::pin(future::ok(())));
+        transport.expect_connect().return_once(|_| Box::pin(future::ok(())));
         transport.expect_on_state_change().return_once(move || {
             stream::iter(vec![
                 TransportState::Open,
@@ -321,12 +305,10 @@ mod transport_close_reason_on_drop {
     /// Returns [`WebSocketRpcClient`] and [`oneshot::Receiver`] which will be
     /// resolved with [`RpcTransport`]'s close reason
     /// ([`ClientDisconnect`]).
-    async fn get_client(
-    ) -> (Rc<WebSocketRpcClient>, oneshot::Receiver<ClientDisconnect>) {
+    async fn get_client()
+    -> (Rc<WebSocketRpcClient>, oneshot::Receiver<ClientDisconnect>) {
         let mut transport = MockRpcTransport::new();
-        transport
-            .expect_connect()
-            .return_once(|_| Box::pin(future::ok(())));
+        transport.expect_connect().return_once(|_| Box::pin(future::ok(())));
         transport.expect_on_state_change().return_once(|| {
             stream::once(async { TransportState::Open }).boxed()
         });
@@ -338,11 +320,9 @@ mod transport_close_reason_on_drop {
         });
         transport.expect_send().return_once(|_| Ok(()));
         let (test_tx, test_rx) = oneshot::channel();
-        transport
-            .expect_set_close_reason()
-            .return_once(move |reason| {
-                test_tx.send(reason).unwrap();
-            });
+        transport.expect_set_close_reason().return_once(move |reason| {
+            test_tx.send(reason).unwrap();
+        });
 
         let ws = new_client(Rc::new(transport));
         ws.clone().connect(join_room_url()).await.unwrap();
@@ -495,10 +475,7 @@ mod connect {
             first_connect_fut.await.unwrap();
         });
 
-        timeout(1000, ws.connect(join_room_url()))
-            .await
-            .unwrap()
-            .unwrap();
+        timeout(1000, ws.connect(join_room_url())).await.unwrap().unwrap();
     }
 
     /// Tests that [`WebSocketRpcClient::connect`] will be instantly resolved
@@ -539,10 +516,7 @@ mod connect {
         })));
         ws.clone().connect(join_room_url()).await.unwrap();
 
-        timeout(50, ws.connect(join_room_url()))
-            .await
-            .unwrap()
-            .unwrap();
+        timeout(50, ws.connect(join_room_url())).await.unwrap().unwrap();
     }
 }
 
@@ -595,14 +569,9 @@ mod on_connection_loss {
     async fn on_reconnected() {
         let ws = helper(Some(100), Some(10), None).await;
 
-        timeout(90, ws.on_connection_loss().next())
-            .await
-            .unwrap_err();
+        timeout(90, ws.on_connection_loss().next()).await.unwrap_err();
 
-        timeout(150, ws.on_connection_loss().next())
-            .await
-            .unwrap()
-            .unwrap();
+        timeout(150, ws.on_connection_loss().next()).await.unwrap().unwrap();
 
         timeout(100, ws.on_normal_close()).await.unwrap_err();
     }
@@ -721,9 +690,8 @@ mod on_connection_loss {
 mod on_reconnected {
     use medea_reactive::ObservableCell;
 
-    use crate::yield_now;
-
     use super::*;
+    use crate::yield_now;
 
     /// Checks that [`RpcClient::on_reconnected`] doesn't fires on
     /// first [`RpcClient`] connection.

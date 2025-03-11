@@ -10,45 +10,45 @@ mod tracks_request;
 
 use std::{
     cell::{Cell, RefCell},
-    collections::{hash_map::DefaultHasher, HashMap},
+    collections::{HashMap, hash_map::DefaultHasher},
     hash::{Hash as _, Hasher as _},
     rc::Rc,
 };
 
 use derive_more::with_trait::{Display, From};
-use futures::{channel::mpsc, future, StreamExt as _};
+use futures::{StreamExt as _, channel::mpsc, future};
 use medea_client_api_proto::{
-    stats::StatId, Command, ConnectionMode, IceConnectionState,
-    MediaSourceKind, MemberId, PeerConnectionState, PeerId as Id, PeerId,
-    TrackId, TrackPatchCommand,
+    Command, ConnectionMode, IceConnectionState, MediaSourceKind, MemberId,
+    PeerConnectionState, PeerId as Id, PeerId, TrackId, TrackPatchCommand,
+    stats::StatId,
 };
 use medea_macro::dispatchable;
 use tracerr::Traced;
 
-use crate::{
-    connection::Connections,
-    media::{
-        track::{local, remote},
-        InitLocalTracksError, LocalTracksConstraints, MediaKind, MediaManager,
-        MediaStreamSettings, RecvConstraints,
-    },
-    platform,
-    utils::Caused,
-};
-
 #[doc(inline)]
 pub use self::{
-    component::{Component, State, DESCRIPTION_APPROVE_TIMEOUT},
+    component::{Component, DESCRIPTION_APPROVE_TIMEOUT, State},
     media::{
-        media_exchange_state, mute_state, receiver, sender, GetMidsError,
-        InsertLocalTracksError, MediaConnections, MediaExchangeState,
-        MediaExchangeStateController, MediaState, MediaStateControllable,
-        MuteState, MuteStateController, ProhibitedStateError, TrackDirection,
-        TransceiverSide, TransitableState, TransitableStateController,
+        GetMidsError, InsertLocalTracksError, MediaConnections,
+        MediaExchangeState, MediaExchangeStateController, MediaState,
+        MediaStateControllable, MuteState, MuteStateController,
+        ProhibitedStateError, TrackDirection, TransceiverSide,
+        TransitableState, TransitableStateController, media_exchange_state,
+        mute_state, receiver, sender,
     },
     platform::RtcPeerConnectionError,
     stream_update_criteria::LocalStreamUpdateCriteria,
     tracks_request::{SimpleTracksRequest, TracksRequest, TracksRequestError},
+};
+use crate::{
+    connection::Connections,
+    media::{
+        InitLocalTracksError, LocalTracksConstraints, MediaKind, MediaManager,
+        MediaStreamSettings, RecvConstraints,
+        track::{local, remote},
+    },
+    platform,
+    utils::Caused,
 };
 
 /// Errors occurring in [`PeerConnection::update_local_stream()`] method.
@@ -496,18 +496,10 @@ impl PeerConnection {
     ) {
         let patch = match event {
             TrackEvent::MediaExchangeIntention { id, enabled } => {
-                TrackPatchCommand {
-                    id,
-                    muted: None,
-                    enabled: Some(enabled),
-                }
+                TrackPatchCommand { id, muted: None, enabled: Some(enabled) }
             }
             TrackEvent::MuteUpdateIntention { id, muted } => {
-                TrackPatchCommand {
-                    id,
-                    muted: Some(muted),
-                    enabled: None,
-                }
+                TrackPatchCommand { id, muted: Some(muted), enabled: None }
             }
         };
 
@@ -575,10 +567,7 @@ impl PeerConnection {
 
         if !stats.0.is_empty() {
             drop(self.peer_events_sender.unbounded_send(
-                PeerEvent::StatsUpdate {
-                    peer_id: self.id,
-                    stats,
-                },
+                PeerEvent::StatsUpdate { peer_id: self.id, stats },
             ));
         }
     }
@@ -792,15 +781,13 @@ impl PeerConnection {
         HashMap<TrackId, media_exchange_state::Stable>,
         Traced<UpdateLocalStreamError>,
     > {
-        self.inner_update_local_stream(criteria)
-            .await
-            .inspect_err(|e| {
-                drop(self.peer_events_sender.unbounded_send(
-                    PeerEvent::FailedLocalMedia {
-                        error: tracerr::map_from(e.clone()),
-                    },
-                ));
-            })
+        self.inner_update_local_stream(criteria).await.inspect_err(|e| {
+            drop(self.peer_events_sender.unbounded_send(
+                PeerEvent::FailedLocalMedia {
+                    error: tracerr::map_from(e.clone()),
+                },
+            ));
+        })
     }
 
     /// Returns [`MediaStreamSettings`] for the provided [`MediaKind`] and
@@ -1021,11 +1008,7 @@ impl PeerConnection {
                 .map_err(tracerr::map_from_and_wrap!())?;
         } else {
             self.ice_candidates_buffer.borrow_mut().push(
-                platform::IceCandidate {
-                    candidate,
-                    sdp_m_line_index,
-                    sdp_mid,
-                },
+                platform::IceCandidate { candidate, sdp_m_line_index, sdp_mid },
             );
         }
         Ok(())

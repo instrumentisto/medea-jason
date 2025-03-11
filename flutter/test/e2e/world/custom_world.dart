@@ -54,20 +54,23 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         const Tuple2<MediaKind, MediaSourceKind>(
           MediaKind.audio,
           MediaSourceKind.device,
-        ): true,
+        ):
+            true,
       });
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
           MediaKind.video,
           MediaSourceKind.device,
-        ): true,
+        ):
+            true,
       });
       if (isSfu) {
         sendState.addAll({
           const Tuple2<MediaKind, MediaSourceKind>(
             MediaKind.video,
             MediaSourceKind.display,
-          ): true,
+          ):
+              true,
         });
       }
 
@@ -84,13 +87,15 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         const Tuple2<MediaKind, MediaSourceKind>(
           MediaKind.audio,
           MediaSourceKind.device,
-        ): true,
+        ):
+            true,
       });
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
           MediaKind.video,
           MediaSourceKind.device,
-        ): true,
+        ):
+            true,
       });
 
       if (isSfu) {
@@ -98,7 +103,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
           const Tuple2<MediaKind, MediaSourceKind>(
             MediaKind.video,
             MediaSourceKind.display,
-          ): true,
+          ):
+              true,
         });
       }
 
@@ -285,7 +291,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       if (isSfu) {
         if (!otherMember.enabledAudio) {
           for (var track in member
-              .connectionStore.remoteTracks[element.key]!.values
+              .connectionStore
+              .remoteTracks[element.key]!
+              .values
               .map((e) => e.last)
               .where((element) => element.kind() == MediaKind.audio)) {
             await member.waitMediaDirectionTrack(
@@ -297,7 +305,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
         if (!otherMember.enabledVideo) {
           for (var track in member
-              .connectionStore.remoteTracks[element.key]!.values
+              .connectionStore
+              .remoteTracks[element.key]!
+              .values
               .map((e) => e.last)
               .where((element) => element.kind() == MediaKind.video)) {
             await member.waitMediaDirectionTrack(
@@ -308,7 +318,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         }
         if (!member.enabledAudio) {
           for (var track in otherMember
-              .connectionStore.remoteTracks[memberId]!.values
+              .connectionStore
+              .remoteTracks[memberId]!
+              .values
               .map((e) => e.last)
               .where((element) => element.kind() == MediaKind.audio)) {
             await otherMember.waitMediaDirectionTrack(
@@ -320,7 +332,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
         if (!member.enabledVideo) {
           for (var track in otherMember
-              .connectionStore.remoteTracks[memberId]!.values
+              .connectionStore
+              .remoteTracks[memberId]!
+              .values
               .map((e) => e.last)
               .where((element) => element.kind() == MediaKind.video)) {
             await otherMember.waitMediaDirectionTrack(

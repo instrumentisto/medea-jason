@@ -9,8 +9,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{
-        api::DART_HANDLER_PORT,
-        box_dart_handle,
+        DART_HANDLER_PORT, box_dart_handle,
         err::{
             EnumerateDevicesException, FormatException, InternalException,
             InvalidOutputAudioDeviceIdException, LocalMediaInitException,
@@ -28,9 +27,8 @@ mod exception {
     use dart_sys::Dart_Handle;
     use libc::c_char;
 
-    use crate::{api::DartValue, platform::Error};
-
     use super::DartError;
+    use crate::{api::DartValue, platform::Error};
 
     /// Invokes other Dart closures that accept a [`DartValue`] argument.
     extern "C" {

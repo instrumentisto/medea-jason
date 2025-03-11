@@ -17,7 +17,6 @@ pub mod utils;
 
 use std::time::Duration;
 
-use futures::Future;
 use js_sys::Promise;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::Window;
@@ -77,8 +76,6 @@ where
 /// # Panics
 ///
 /// If fails to interact with JS side.
-///
-/// [`Future`]: std::future::Future
 #[expect(clippy::unwrap_used, reason = "JS interop error is unexpected")]
 pub async fn delay_for(delay: Duration) {
     let delay_ms = delay.as_millis().try_into().unwrap_or(i32::MAX);

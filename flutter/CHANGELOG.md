@@ -6,10 +6,32 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.7.1] · 2024-12-30
-[0.7.1]: /../../tree/medea-jason-0.7.1/flutter
+## [0.8.0] · 2025-01-10
+[0.8.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.8.0/flutter
 
-See also [`medea-jason` crate 0.7.1 changes](/../../tree/medea-jason-0.7.1/CHANGELOG.md).
+See also [`medea-jason` crate `master` changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.8.0/CHANGELOG.md).
+
+### Upgraded
+
+- [Flutter] to 3.29 version. ([#200])
+- Dependencies:
+    - [`flutter_rust_bridge`] to 2.8.0 version. ([#200])
+    - [`medea_flutter_webrtc`] to 0.13.0 version. ([#200])
+
+### Fixed
+
+- Segfault when closing [Flutter] application on macOS. ([#201])
+
+[#200]: https://github.com/instrumentisto/medea-jason/pull/200
+[#201]: https://github.com/instrumentisto/medea-jason/pull/201
+
+
+
+
+## [0.7.1] · 2024-12-30
+[0.7.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.7.1/flutter
+
+See also [`medea-jason` crate 0.7.1 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.7.1/CHANGELOG.md).
 
 ### Fixed
 
@@ -20,46 +42,46 @@ See also [`medea-jason` crate 0.7.1 changes](/../../tree/medea-jason-0.7.1/CHANG
 - Dependencies:
     - [`flutter_rust_bridge`] to 2.7.0 version. ([#195])
 
-[#195]: /../../pull/195
-[#197]: /../../pull/197
+[#195]: https://github.com/instrumentisto/medea-jason/pull/195
+[#197]: https://github.com/instrumentisto/medea-jason/pull/197
 
 
 
 
 ## [0.7.0] · 2024-10-29
-[0.7.0]: /../../tree/medea-jason-0.7.0/flutter
+[0.7.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.7.0/flutter
 
-See also [`medea-jason` crate 0.7.0 changes](/../../tree/medea-jason-0.7.0/CHANGELOG.md).
+See also [`medea-jason` crate 0.7.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.7.0/CHANGELOG.md).
 
 ### Upgraded
 
 - Dependencies:
     - [`flutter_rust_bridge`] to 2.4.0 version. ([#188])
 
-[#188]: /../../pull/188
+[#188]: https://github.com/instrumentisto/medea-jason/pull/188
 
 
 
 
 ## [0.6.1] · 2024-09-11
-[0.6.1]: /../../tree/medea-jason-0.6.1/flutter
+[0.6.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.6.1/flutter
 
-See also [`medea-jason` crate 0.6.1 changes](/../../tree/medea-jason-0.6.1/CHANGELOG.md).
+See also [`medea-jason` crate 0.6.1 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.6.1/CHANGELOG.md).
 
 ### Upgraded
 
 - Dependencies:
     - [`medea_flutter_webrtc`] to 0.11.1 version. ([#186])
 
-[#186]: /../../pull/186
+[#186]: https://github.com/instrumentisto/medea-jason/pull/186
 
 
 
 
 ## [0.6.0] · 2024-08-27
-[0.6.0]: /../../tree/medea-jason-0.6.0/flutter
+[0.6.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.6.0/flutter
 
-See also [`medea-jason` crate 0.6.0 changes](/../../tree/medea-jason-0.6.0/CHANGELOG.md).
+See also [`medea-jason` crate 0.6.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.6.0/CHANGELOG.md).
 
 ### BC Breaks
 
@@ -71,16 +93,16 @@ See also [`medea-jason` crate 0.6.0 changes](/../../tree/medea-jason-0.6.0/CHANG
 - Dependencies:
     - [`flutter_rust_bridge`] to 2.2.0 version. ([#182])
 
-[#181]: /../../pull/181
-[#182]: /../../pull/182
+[#181]: https://github.com/instrumentisto/medea-jason/pull/181
+[#182]: https://github.com/instrumentisto/medea-jason/pull/182
 
 
 
 
 ## [0.5.0] · 2024-08-05
-[0.5.0]: /../../tree/medea-jason-0.5.0/flutter
+[0.5.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.5.0/flutter
 
-See also [`medea-jason` crate 0.5.0 changes](/../../tree/medea-jason-0.5.0/CHANGELOG.md).
+See also [`medea-jason` crate 0.5.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.5.0/CHANGELOG.md).
 
 ### Added
 
@@ -90,8 +112,8 @@ See also [`medea-jason` crate 0.5.0 changes](/../../tree/medea-jason-0.5.0/CHANG
 
 - Migrated from [`dart:html`] to [`package:web`] package ([#178]).
 
-[#140]: /../../pull/140
-[#178]: /../../pull/178
+[#140]: https://github.com/instrumentisto/medea-jason/pull/140
+[#178]: https://github.com/instrumentisto/medea-jason/pull/178
 [`dart:html`]: https://dart.dev/libraries/dart-html
 [`package:web`]: https://pub.dev/packages/web
 
@@ -99,7 +121,7 @@ See also [`medea-jason` crate 0.5.0 changes](/../../tree/medea-jason-0.5.0/CHANG
 
 
 ## [0.4.0] · 2023-07-11
-[0.4.0]: /../../tree/medea-jason-0.4.0/flutter
+[0.4.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.4.0/flutter
 
 ### BC Breaks
 
@@ -110,13 +132,13 @@ See also [`medea-jason` crate 0.5.0 changes](/../../tree/medea-jason-0.5.0/CHANG
 - Initial mute state on incoming tracks in [SFU] mode ([#119]).
 - Incorrect `ConnectionHandle`s creation and disposal in [SFU] mode ([#119]).
 
-[#119]: /../../pull/119
+[#119]: https://github.com/instrumentisto/medea-jason/pull/119
 
 
 
 
 ## [0.3.0] · 2023-06-09
-[0.3.0]: /../../tree/medea-jason-0.3.0/flutter
+[0.3.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.3.0/flutter
 
 ### Added
 

@@ -6,14 +6,27 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.1.3] · 2025-03-10
+[0.1.3]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.1.3/crates/medea-macro
+
+### Changed
+
+- Bumped up [MSRV] to 1.85 because of migration to [2024 edition][013-1]. ([6f760c83])
+
+[6f760c83]: https://github.com/instrumentisto/medea-jason/commit/6f760c836f9c5293b5fefae8a0cb4ee2bd5cfda2
+[013-1]: https://doc.rust-lang.org/edition-guide/rust-2024/index.html
+
+
+
+
 ## [0.1.2] · 2023-06-09
-[0.1.2]: /../../tree/medea-macro-0.1.2/crates/medea-macro
+[0.1.2]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.1.2/crates/medea-macro
 
 ### Updated
 
 - Switch to [2021 Rust edition][012-1] ([#16]).
 
-[#16]: /../../pull/16
+[#16]: https://github.com/instrumentisto/medea-jason/pull/16
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
 
 
@@ -62,5 +75,5 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-
+[MSRV]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
 [Semantic Versioning 2.0.0]: https://semver.org

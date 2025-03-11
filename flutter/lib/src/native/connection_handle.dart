@@ -13,7 +13,7 @@ class NativeConnectionHandle implements ConnectionHandle {
   /// Constructs a new [ConnectionHandle] backed by a Rust struct behind the
   /// provided [frb.ConnectionHandle].
   NativeConnectionHandle(frb.ConnectionHandle connectionHandle)
-      : opaque = RustOpaque(connectionHandle) {
+    : opaque = RustOpaque(connectionHandle) {
     RustHandlesStorage().insertHandle(this);
   }
 

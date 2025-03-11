@@ -21,7 +21,7 @@ class NativeRoomHandle implements RoomHandle {
   /// Constructs a new [RoomHandle] backed by the Rust struct behind the
   /// provided [frb.RoomHandle].
   NativeRoomHandle(frb.RoomHandle roomHandle)
-      : opaque = RustOpaque(roomHandle) {
+    : opaque = RustOpaque(roomHandle) {
     RustHandlesStorage().insertHandle(this);
   }
 
@@ -40,7 +40,8 @@ class NativeRoomHandle implements RoomHandle {
       settings: (settings as MediaStreamSettings).setting,
       stopFirst: stopFirst,
       rollbackOnFail: rollbackOnFail,
-    ) as Future);
+    )
+        as Future);
   }
 
   @override

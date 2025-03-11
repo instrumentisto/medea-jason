@@ -28,11 +28,9 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::{cell::RefCell, panic};
+use std::{cell::RefCell, mem::ManuallyDrop, panic};
 
 use libc::c_void;
-
-use crate::platform::utils::dart_api;
 
 pub use self::{
     codec_capability::CodecCapability,
@@ -47,15 +45,16 @@ pub use self::{
     rtc_stats::RtcStats,
     transceiver::{Transceiver, TransceiverInit},
     transport::WebSocketRpcTransport,
-    utils::{completer::delay_for, Function},
+    utils::{Function, completer::delay_for},
 };
+use crate::platform::utils::dart_api;
 
 /// Function to initialize `dart_api_dl` functions.
 ///
 /// # Safety
 ///
 /// This function should never be called manually.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn init_jason_dart_api_dl(data: *mut c_void) -> isize {
     unsafe { dart_api::initialize_api(data) }
 }
@@ -74,7 +73,11 @@ pub fn set_panic_hook() {
 
 thread_local! {
     /// [`Function`] being called whenever Rust code [`panic`]s.
-    static PANIC_FN: RefCell<Option<Function<String>>> = RefCell::default();
+    // NOTE: Wrapped with `ManuallyDrop` because `platform::Function` calls
+    //       DartVM API on `Drop`, which is already inaccessible once thread
+    //       local data is dropped.
+    static PANIC_FN: RefCell<Option<ManuallyDrop<Function<String>>>> =
+        RefCell::default();
 }
 
 /// Sets the provided [`Function`] as a callback to be called whenever Rust code
@@ -82,7 +85,9 @@ thread_local! {
 ///
 /// [`panic`]: panic!
 pub fn set_panic_callback(cb: Function<String>) {
-    PANIC_FN.set(Some(cb));
+    if let Some(old_cb) = PANIC_FN.replace(Some(ManuallyDrop::new(cb))) {
+        drop(ManuallyDrop::into_inner(old_cb));
+    }
 }
 
 #[cfg(target_os = "android")]

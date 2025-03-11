@@ -6,8 +6,6 @@ mod errors;
 pub mod component;
 mod resettable_delay;
 
-use std::future::Future;
-
 use derive_more::with_trait::From;
 use futures::future::{self, AbortHandle};
 use medea_reactive::Guarded;
@@ -16,12 +14,10 @@ use medea_reactive::Guarded;
 pub use self::{
     component::{AsProtoState, Component, SynchronizableState, Updatable},
     errors::{Caused, JsonParseError},
-    resettable_delay::{resettable_delay_for, ResettableDelayHandle},
+    resettable_delay::{ResettableDelayHandle, resettable_delay_for},
 };
 
 /// Wrapper around [`AbortHandle`] which aborts [`Future`] on [`Drop`].
-///
-/// [`Future`]: std::future::Future
 #[derive(Debug, From)]
 pub struct TaskHandle(AbortHandle);
 

@@ -2,13 +2,12 @@ use std::time::Duration;
 
 use cucumber::{given, then, when};
 use medea_e2e::object::{
-    remote_track::MediaDirection, AwaitCompletion, MediaSourceKind,
+    AwaitCompletion, MediaSourceKind, remote_track::MediaDirection,
 };
 use tokio::time::timeout;
 
-use crate::World;
-
 use super::{parse_media_kind, parse_media_kinds};
+use crate::World;
 
 #[given(regex = r"^(\S+)'s `getUserMedia\(\)` request has added latency$")]
 async fn given_gum_delay(world: &mut World, id: String) {
@@ -80,11 +79,8 @@ async fn then_remote_media_direction_is(
     };
 
     let member = world.get_member(&id).unwrap();
-    let connection = member
-        .connections()
-        .wait_for_connection(remote_id)
-        .await
-        .unwrap();
+    let connection =
+        member.connections().wait_for_connection(remote_id).await.unwrap();
     let tracks_store = connection.tracks_store().await.unwrap();
     let track = tracks_store
         .get_track(media_kind, MediaSourceKind::Device)

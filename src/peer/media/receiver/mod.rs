@@ -8,19 +8,17 @@ use futures::channel::mpsc;
 use medea_client_api_proto as proto;
 use proto::{ConnectionMode, TrackId};
 
+#[doc(inline)]
+pub use self::component::{Component, State};
+use super::TransceiverSide as _;
 use crate::{
-    media::{track::remote, MediaDirection, RecvConstraints, TrackConstraints},
+    media::{MediaDirection, RecvConstraints, TrackConstraints, track::remote},
     peer::{
-        media::media_exchange_state, MediaConnections,
-        MediaStateControllable as _, PeerEvent, TrackEvent,
+        MediaConnections, MediaStateControllable as _, PeerEvent, TrackEvent,
+        media::media_exchange_state,
     },
     platform, utils,
 };
-
-use super::TransceiverSide as _;
-
-#[doc(inline)]
-pub use self::component::{Component, State};
 
 /// Representation of a [`remote::Track`] that is being received from some
 /// remote peer. It may have two states: `waiting` and `receiving`.
@@ -201,8 +199,7 @@ impl Receiver {
     pub async fn is_receiving(&self) -> bool {
         let transceiver = self.transceiver.borrow().clone();
         let is_recv_direction = if let Some(trcv) = transceiver {
-            trcv.has_direction(platform::TransceiverDirection::RECV)
-                .await
+            trcv.has_direction(platform::TransceiverDirection::RECV).await
         } else {
             false
         };

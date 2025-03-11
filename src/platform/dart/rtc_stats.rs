@@ -13,7 +13,7 @@ pub struct RtcStats(pub Vec<RtcStat>);
 pub mod mock {
     use crate::api::DartValueArg;
 
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn test_rtc_stats_parse(
         expects: DartValueArg<String>,
     ) -> u64 {

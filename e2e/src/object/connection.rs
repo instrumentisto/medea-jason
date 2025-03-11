@@ -1,11 +1,10 @@
 //! `Connection` JS object's representation.
 
+use super::Error;
 use crate::{
     browser::Statement,
-    object::{tracks_store, MediaKind, Object},
+    object::{MediaKind, Object, tracks_store},
 };
-
-use super::Error;
 
 /// Representation of a `Connection` JS object.
 #[derive(Clone, Copy, Debug)]
@@ -90,8 +89,6 @@ impl Object<Connection> {
     /// # Errors
     ///
     /// If failed to execute JS statement.
-    ///
-    /// [`Future`]: std::future::Future
     pub async fn wait_for_close(&self) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript

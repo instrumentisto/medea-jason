@@ -48,18 +48,18 @@ StepDefinitionGeneric whenJasonObjectDisposes = when1<String, CustomWorld>(
 
 StepDefinitionGeneric givenMemberGumWillError =
     given2<String, String, CustomWorld>(
-  RegExp(r"(\S+)'s `getUserMedia\(\)` (audio |video |)errors$"),
-  (id, kind, context) async {
-    var member = context.world.members[id]!;
-    Tuple2<bool, bool> gumSetting;
-    if (kind.isEmpty) {
-      gumSetting = const Tuple2(true, true);
-    } else {
-      gumSetting = Tuple2(kind.contains('audio'), kind.contains('video'));
-    }
-    member.getUserMediaMock(gumSetting.item1, gumSetting.item2);
-  },
-);
+      RegExp(r"(\S+)'s `getUserMedia\(\)` (audio |video |)errors$"),
+      (id, kind, context) async {
+        var member = context.world.members[id]!;
+        Tuple2<bool, bool> gumSetting;
+        if (kind.isEmpty) {
+          gumSetting = const Tuple2(true, true);
+        } else {
+          gumSetting = Tuple2(kind.contains('audio'), kind.contains('video'));
+        }
+        member.getUserMediaMock(gumSetting.item1, gumSetting.item2);
+      },
+    );
 
 StepDefinitionGeneric thenRoomFailedLocalStreamFires =
     then2<String, String, CustomWorld>(

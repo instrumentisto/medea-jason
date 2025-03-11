@@ -245,9 +245,11 @@ class Member {
             );
           }
           var keys = connectionStore.onMediaDirectionChanged.keys;
-          for (var i = 0;
-              i < connectionStore.onMediaDirectionChanged.length;
-              ++i) {
+          for (
+            var i = 0;
+            i < connectionStore.onMediaDirectionChanged.length;
+            ++i
+          ) {
             var cb = connectionStore.onMediaDirectionChanged[keys.elementAt(i)];
             cb!(direction);
           }
@@ -333,16 +335,20 @@ class Member {
     }
 
     if (connectionStore.remoteTracks[id]!.values.any((element) {
-      var stopped = connectionStore
-              .callbackCounter[element.last.getTrack().id()]!['stopped']! >
+      var stopped =
+          connectionStore.callbackCounter[element.last
+              .getTrack()
+              .id()]!['stopped']! >
           0;
       return sourceCheck(element.last.mediaSourceKind(), source) &&
           kindCheck(element.last.kind(), kind) &&
           !stopped;
     })) {
       return connectionStore.remoteTracks[id]!.values.lastWhere((element) {
-        var stopped = connectionStore
-                .callbackCounter[element.last.getTrack().id()]!['stopped']! >
+        var stopped =
+            connectionStore.callbackCounter[element.last
+                .getTrack()
+                .id()]!['stopped']! >
             0;
         return sourceCheck(element.last.mediaSourceKind(), source) &&
             kindCheck(element.last.kind(), kind) &&
@@ -421,12 +427,14 @@ class Member {
       // All transceivers are always `sendrecv` in SFU mode.
       return const Tuple2<int, int>(3, 3);
     }
-    var sendCount = sendState.entries
-        .where((element) => other.recvState[element.key]! && element.value)
-        .length;
-    var recvCount = recvState.entries
-        .where((element) => other.sendState[element.key]! && element.value)
-        .length;
+    var sendCount =
+        sendState.entries
+            .where((element) => other.recvState[element.key]! && element.value)
+            .length;
+    var recvCount =
+        recvState.entries
+            .where((element) => other.sendState[element.key]! && element.value)
+            .length;
     return Tuple2<int, int>(sendCount, recvCount);
   }
 

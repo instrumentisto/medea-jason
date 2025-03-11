@@ -7,20 +7,19 @@ use std::{
 };
 
 use futures::{
-    future, future::Either, stream::LocalBoxStream, FutureExt as _,
-    StreamExt as _,
+    FutureExt as _, StreamExt as _, future, future::Either,
+    stream::LocalBoxStream,
 };
 use medea_reactive::{Processed, ProgressableCell};
 
+use super::TransitableState;
 use crate::{
     peer::media::transitable_state::{
-        media_exchange_state, mute_state, InStable, InTransition,
+        InStable, InTransition, media_exchange_state, mute_state,
     },
     platform,
-    utils::{resettable_delay_for, ResettableDelayHandle},
+    utils::{ResettableDelayHandle, resettable_delay_for},
 };
-
-use super::TransitableState;
 
 /// [`TransitableStateController`] for the [`mute_state`].
 pub type MuteStateController =
@@ -140,7 +139,7 @@ where
     pub fn subscribe_stable(&self) -> LocalBoxStream<'static, S> {
         self.state
             .subscribe()
-            .filter_map(|s| async move {
+            .filter_map(async |s| {
                 let (s, _guard) = s.into_parts();
                 if let TransitableState::Stable(stable) = s {
                     Some(stable)
@@ -158,7 +157,7 @@ where
     pub fn subscribe_transition(&self) -> LocalBoxStream<'static, T> {
         self.state
             .subscribe()
-            .filter_map(|s| async move {
+            .filter_map(async |s| {
                 let (s, _guard) = s.into_parts();
                 if let TransitableState::Transition(transition) = s {
                     Some(transition)
@@ -210,7 +209,6 @@ where
     /// With an approved stable [`MediaState`] if transition to the
     /// `desired_state` cannot be made.
     ///
-    /// [`Future`]: std::future::Future
     /// [`MediaState`]: super::MediaState
     pub fn when_media_state_stable(
         &self,
@@ -223,7 +221,11 @@ where
                 match state {
                     TransitableState::Transition(_) => continue,
                     TransitableState::Stable(s) => {
-                        return if s == desired_state { Ok(()) } else { Err(s) }
+                        return if s == desired_state {
+                            Ok(())
+                        } else {
+                            Err(s)
+                        };
                     }
                 }
             }
@@ -240,8 +242,6 @@ where
 
     /// Returns [`Future`] which will be resolved once [`TransitableState`] is
     /// transited to the [`TransitableState::Stable`].
-    ///
-    /// [`Future`]: std::future::Future
     pub fn when_stabilized(self: Rc<Self>) -> Processed<'static, ()> {
         Processed::new(Box::new(move || {
             let stable = self.subscribe_stable();

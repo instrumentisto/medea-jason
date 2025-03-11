@@ -148,16 +148,22 @@ void main() {
   testWidgets('Primitive arguments Callback validation', (
     WidgetTester widgetTester,
   ) async {
-    final intListener = dl.lookupFunction<Handle Function(ForeignValue),
-        Object Function(ForeignValue)>('test_callback_listener_int');
-    final stringListener = dl.lookupFunction<Handle Function(ForeignValue),
-        Object Function(ForeignValue)>('test_callback_listener_string');
-    final optionalIntListener = dl.lookupFunction<Handle Function(ForeignValue),
-        Object Function(ForeignValue)>('test_callback_listener_optional_int');
+    final intListener = dl.lookupFunction<
+      Handle Function(ForeignValue),
+      Object Function(ForeignValue)
+    >('test_callback_listener_int');
+    final stringListener = dl.lookupFunction<
+      Handle Function(ForeignValue),
+      Object Function(ForeignValue)
+    >('test_callback_listener_string');
+    final optionalIntListener = dl.lookupFunction<
+      Handle Function(ForeignValue),
+      Object Function(ForeignValue)
+    >('test_callback_listener_optional_int');
     final optionalStringListener = dl.lookupFunction<
-        Handle Function(ForeignValue),
-        Object Function(
-            ForeignValue)>('test_callback_listener_optional_string');
+      Handle Function(ForeignValue),
+      Object Function(ForeignValue)
+    >('test_callback_listener_optional_string');
 
     var intVal = ForeignValue.fromInt(45);
     var stringVal = ForeignValue.fromString('test string');
@@ -195,33 +201,39 @@ void main() {
   });
 
   testWidgets('FutureResolver primitives', (WidgetTester widgetTester) async {
-    final intResolver =
-        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-      'test__future_from_dart__int',
-    );
-    final stringResolver =
-        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-      'test__future_from_dart__string',
-    );
+    final intResolver = dl
+        .lookupFunction<Handle Function(Handle), Object Function(Object)>(
+          'test__future_from_dart__int',
+        );
+    final stringResolver = dl
+        .lookupFunction<Handle Function(Handle), Object Function(Object)>(
+          'test__future_from_dart__string',
+        );
 
-    var intVal = await (intResolver(
-      () => Future.delayed(const Duration(milliseconds: 500), () async {
-        return 45;
-      }),
-    ) as Future);
-    var stringVal = await (stringResolver(
-      () => Future.delayed(const Duration(milliseconds: 500), () async {
-        return 'test string';
-      }),
-    ) as Future);
+    var intVal =
+        await (intResolver(
+              () => Future.delayed(const Duration(milliseconds: 500), () async {
+                return 45;
+              }),
+            )
+            as Future);
+    var stringVal =
+        await (stringResolver(
+              () => Future.delayed(const Duration(milliseconds: 500), () async {
+                return 'test string';
+              }),
+            )
+            as Future);
 
     expect(intVal as int, equals(45));
     expect(stringVal as String, 'test string');
   });
 
   testWidgets('GetStats() works', (WidgetTester widgetTester) async {
-    final testRtcStatsParse = dl.lookupFunction<Uint64 Function(ForeignValue),
-        int Function(ForeignValue)>('test_rtc_stats_parse');
+    final testRtcStatsParse = dl.lookupFunction<
+      Uint64 Function(ForeignValue),
+      int Function(ForeignValue)
+    >('test_rtc_stats_parse');
 
     var pc1 = await webrtc.PeerConnection.create(
       webrtc.IceTransportType.all,
@@ -305,8 +317,8 @@ void main() {
 
     var testObj = TestObj(0);
     fut() => Future.delayed(const Duration(milliseconds: 500), () async {
-          return testObj;
-        });
+      return testObj;
+    });
     await (handleResolver(fut) as Future);
     expect(testObj.val, equals(45));
   });
@@ -320,8 +332,8 @@ void main() {
     );
 
     fut() => Future.delayed(const Duration(milliseconds: 500), () async {
-          throw Exception('Test Exception');
-        });
+      throw Exception('Test Exception');
+    });
     var res = await (futureCatchesException(fut) as Future);
     expect(res as int, equals(1));
   });

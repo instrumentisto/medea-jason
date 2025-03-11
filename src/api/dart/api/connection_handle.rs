@@ -1,11 +1,11 @@
 //! External handler to a [`Connection`] with a remote `Member`.
 
-use flutter_rust_bridge::{frb, DartOpaque};
+use flutter_rust_bridge::{DartOpaque, frb};
 use send_wrapper::SendWrapper;
 use tracerr::Traced;
 
 use crate::{
-    api::{dart::api::ForeignClass, Error as DartError},
+    api::{Error as DartError, dart::api::ForeignClass},
     connection as core,
     media::MediaSourceKind,
     platform::{self, utils::dart_future::IntoDartFuture as _},

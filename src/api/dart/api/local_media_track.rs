@@ -4,14 +4,14 @@
 //! [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 //! [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
 
-use flutter_rust_bridge::{frb, DartOpaque};
+use flutter_rust_bridge::{DartOpaque, frb};
 use send_wrapper::SendWrapper;
 
 #[cfg(doc)]
 use crate::media::track::local;
 use crate::{
-    api::{api::DART_HANDLER_PORT, dart::api::ForeignClass, Error},
-    media::{track::local as core, MediaKind, MediaSourceKind},
+    api::{DART_HANDLER_PORT, Error, dart::api::ForeignClass},
+    media::{MediaKind, MediaSourceKind, track::local as core},
     platform::{self, utils::dart_future::IntoDartFuture as _},
 };
 

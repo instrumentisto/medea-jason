@@ -10,16 +10,15 @@ use derive_more::with_trait::{Display, From};
 use medea_client_api_proto::MediaSourceKind;
 use tracerr::Traced;
 
+use super::track::local;
 use crate::{
     media::{
-        track::MediaStreamTrackState, MediaKind, MediaStreamSettings,
-        MultiSourceTracksConstraints,
+        MediaKind, MediaStreamSettings, MultiSourceTracksConstraints,
+        track::MediaStreamTrackState,
     },
     platform,
     utils::Caused,
 };
-
-use super::track::local;
 
 /// Errors returned from the [`MediaManagerHandle::enumerate_devices()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
@@ -197,20 +196,14 @@ impl InnerMediaManager {
     async fn enumerate_devices(
         &self,
     ) -> Result<Vec<platform::MediaDeviceInfo>, Traced<platform::Error>> {
-        self.media_devices
-            .enumerate_devices()
-            .await
-            .map_err(tracerr::wrap!())
+        self.media_devices.enumerate_devices().await.map_err(tracerr::wrap!())
     }
 
     /// Returns a list of [`platform::MediaDisplayInfo`] objects.
     async fn enumerate_displays(
         &self,
     ) -> Result<Vec<platform::MediaDisplayInfo>, Traced<platform::Error>> {
-        self.media_devices
-            .enumerate_displays()
-            .await
-            .map_err(tracerr::wrap!())
+        self.media_devices.enumerate_displays().await.map_err(tracerr::wrap!())
     }
 
     /// Obtains [`local::Track`]s based on a provided
@@ -489,10 +482,7 @@ impl MediaManager {
         caps: I,
     ) -> Result<Vec<(Rc<local::Track>, bool)>, Traced<InitLocalTracksError>>
     {
-        self.0
-            .get_tracks(caps.into())
-            .await
-            .map_err(tracerr::wrap!())
+        self.0.get_tracks(caps.into()).await.map_err(tracerr::wrap!())
     }
 
     /// Instantiates a new [`MediaManagerHandle`] for external usage.
@@ -533,9 +523,7 @@ impl MediaManagerHandle {
             .0
             .upgrade()
             .ok_or_else(|| tracerr::new!(EnumerateDevicesError::Detached))?;
-        this.enumerate_devices()
-            .await
-            .map_err(tracerr::map_from_and_wrap!())
+        this.enumerate_devices().await.map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Returns a list of [`platform::MediaDisplayInfo`] objects representing
@@ -552,9 +540,7 @@ impl MediaManagerHandle {
             .0
             .upgrade()
             .ok_or_else(|| tracerr::new!(EnumerateDisplaysError::Detached))?;
-        this.enumerate_displays()
-            .await
-            .map_err(tracerr::map_from_and_wrap!())
+        this.enumerate_displays().await.map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Returns [`local::LocalMediaTrack`]s objects, built from the provided
@@ -651,9 +637,7 @@ impl MediaManagerHandle {
             .0
             .upgrade()
             .ok_or_else(|| tracerr::new!(MicVolumeError::Detached))?;
-        this.microphone_volume()
-            .await
-            .map_err(tracerr::map_from_and_wrap!())
+        this.microphone_volume().await.map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Subscribes onto the `devicechange` event of this [`MediaManagerHandle`].

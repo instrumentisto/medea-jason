@@ -3,8 +3,8 @@
 
 use std::time::Duration;
 
-use backoff::{future::Retry, ExponentialBackoff};
-use futures::{channel::oneshot, future::BoxFuture, Future, FutureExt as _};
+use backoff::{ExponentialBackoff, future::Retry};
+use futures::{FutureExt as _, channel::oneshot, future::BoxFuture};
 
 use crate::platform;
 

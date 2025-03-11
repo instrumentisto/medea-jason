@@ -30,26 +30,26 @@ StepDefinitionGeneric whenEnablesOrMutes =
     var kind = parseMediaKind(audioOrVideo);
     var member = context.world.members[id]!;
 
-    var awaitable = awaits.contains('awaits');
-    var error = awaits.contains('errors');
-    Future<void> future;
-    switch (action) {
-      case 'enables':
-        future = member.toggleMedia(kind.item1, kind.item2, true);
-        break;
+        var awaitable = awaits.contains('awaits');
+        var error = awaits.contains('errors');
+        Future<void> future;
+        switch (action) {
+          case 'enables':
+            future = member.toggleMedia(kind.item1, kind.item2, true);
+            break;
 
-      case 'disables':
-        future = member.toggleMedia(kind.item1, kind.item2, false);
-        break;
+          case 'disables':
+            future = member.toggleMedia(kind.item1, kind.item2, false);
+            break;
 
-      case 'mutes':
-        future = member.toggleMute(kind.item1, kind.item2, true);
-        break;
+          case 'mutes':
+            future = member.toggleMute(kind.item1, kind.item2, true);
+            break;
 
-      default:
-        future = member.toggleMute(kind.item1, kind.item2, false);
-        break;
-    }
+          default:
+            future = member.toggleMute(kind.item1, kind.item2, false);
+            break;
+        }
 
     if (awaitable) {
       try {
@@ -81,21 +81,21 @@ StepDefinitionGeneric whenMemberEnablesRemoteTrack =
     var parsedKind = parseMediaKind(kind);
     var member = context.world.members[id]!;
 
-    if (toggle == 'enables') {
-      if (parsedKind.item1 == MediaKind.audio) {
-        await member.room.enableRemoteAudio();
-      } else {
-        await member.room.enableRemoteVideo();
-      }
-    } else {
-      if (parsedKind.item1 == MediaKind.audio) {
-        await member.room.disableRemoteAudio();
-      } else {
-        await member.room.disableRemoteVideo();
-      }
-    }
-  },
-);
+        if (toggle == 'enables') {
+          if (parsedKind.item1 == MediaKind.audio) {
+            await member.room.enableRemoteAudio();
+          } else {
+            await member.room.enableRemoteVideo();
+          }
+        } else {
+          if (parsedKind.item1 == MediaKind.audio) {
+            await member.room.disableRemoteAudio();
+          } else {
+            await member.room.disableRemoteVideo();
+          }
+        }
+      },
+    );
 
 StepDefinitionGeneric thenRemoteMediaDirectionIs =
     then4<String, String, String, String, CustomWorld>(
@@ -106,7 +106,7 @@ StepDefinitionGeneric thenRemoteMediaDirectionIs =
   (id, String kind, remoteId, direction, context) async {
     var member = context.world.members[id]!;
 
-    var parsedKind = parseMediaKind(kind);
+        var parsedKind = parseMediaKind(kind);
 
     await member.waitForConnect(remoteId);
     var track = await member.waitRemoteTrackFrom(
@@ -119,11 +119,11 @@ StepDefinitionGeneric thenRemoteMediaDirectionIs =
       (e) => e.name.toLowerCase() == direction.toLowerCase(),
     );
 
-    await member
-        .waitMediaDirectionTrack(dir, track)
-        .timeout(const Duration(seconds: 10));
-  },
-);
+        await member
+            .waitMediaDirectionTrack(dir, track)
+            .timeout(const Duration(seconds: 10));
+      },
+    );
 
 StepDefinitionGeneric thenLocalTrackMuteState =
     then3<String, String, String, CustomWorld>(
@@ -160,7 +160,7 @@ StepDefinitionGeneric thenTrackIsStopped = then2<String, String, CustomWorld>(
 
 StepDefinitionGeneric whenMemberFreesAllLocalTracks =
     when1<String, CustomWorld>(RegExp(r'(\S+) frees all local tracks$'), (
-  id,
+      id,
   context,
 ) async {
   var member = context.world.members[id]!;
@@ -169,7 +169,7 @@ StepDefinitionGeneric whenMemberFreesAllLocalTracks =
 
 StepDefinitionGeneric whenMemberSwitchesDeviceWithLatency =
     when1<String, CustomWorld>(RegExp(r'(\S+) switches device with latency$'), (
-  id,
+      id,
   context,
 ) async {
   var member = context.world.members[id]!;

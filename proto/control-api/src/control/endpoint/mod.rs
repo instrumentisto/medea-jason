@@ -29,19 +29,13 @@ pub struct Endpoint {
 
 impl From<WebRtcPlay> for Endpoint {
     fn from(play: WebRtcPlay) -> Self {
-        Self {
-            id: play.id.into(),
-            spec: play.spec.into(),
-        }
+        Self { id: play.id.into(), spec: play.spec.into() }
     }
 }
 
 impl From<WebRtcPublish> for Endpoint {
     fn from(publish: WebRtcPublish) -> Self {
-        Self {
-            id: publish.id.into(),
-            spec: publish.spec.into(),
-        }
+        Self { id: publish.id.into(), spec: publish.spec.into() }
     }
 }
 

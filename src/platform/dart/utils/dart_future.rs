@@ -2,7 +2,7 @@
 //!
 //! [0]: https://api.dart.dev/stable/dart-async/Future-class.html
 
-use std::{future::Future, marker::PhantomData, ptr};
+use std::{marker::PhantomData, ptr};
 
 use dart_sys::Dart_Handle;
 use derive_more::with_trait::Debug;
@@ -12,8 +12,8 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{
-        api::DART_HANDLER_PORT, propagate_panic, DartValue, DartValueArg,
-        Error as DartError,
+        DART_HANDLER_PORT, DartValue, DartValueArg, Error as DartError,
+        propagate_panic,
     },
     platform::{
         dart::{error::Error, utils::Completer},
@@ -28,7 +28,7 @@ mod future_from_dart {
 
     use dart_sys::Dart_Handle;
 
-    use crate::platform::{dart::utils::dart_future::FutureFromDart, Error};
+    use crate::platform::{Error, dart::utils::dart_future::FutureFromDart};
 
     /// Resolves the provided [Dart `Future`][0] with the provided
     /// [`FutureFromDart`].
@@ -50,7 +50,7 @@ mod future_from_dart {
 /// # Safety
 ///
 /// The provided [`FutureFromDart`] shouldn't be previously freed.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn FutureFromDart__resolve_ok(
     future: ptr::NonNull<FutureFromDart>,
     val: DartValue,
@@ -69,7 +69,7 @@ pub unsafe extern "C" fn FutureFromDart__resolve_ok(
 /// # Safety
 ///
 /// The provided [`FutureFromDart`] shouldn't be previously freed.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn FutureFromDart__resolve_err(
     future: ptr::NonNull<FutureFromDart>,
     val: Dart_Handle,
@@ -216,6 +216,7 @@ pub mod tests {
 
     use dart_sys::Dart_Handle;
 
+    use super::{DartFuture, IntoDartFuture as _};
     use crate::{
         api::err::FormatException,
         platform::dart::utils::{
@@ -223,9 +224,7 @@ pub mod tests {
         },
     };
 
-    use super::{DartFuture, IntoDartFuture as _};
-
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn test__future_from_dart__int(
         future: Dart_Handle,
     ) -> DartFuture<Result<i64, FormatException>> {
@@ -239,7 +238,7 @@ pub mod tests {
         .into_dart_future()
     }
 
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn test__future_from_dart__string(
         future: Dart_Handle,
     ) -> DartFuture<Result<String, FormatException>> {
@@ -262,7 +261,7 @@ pub mod tests {
         > = RefCell::default();
     }
 
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn register__test__future_from_dart_handle_fn(
         f: TestFutureHandleFunction,
     ) {
@@ -270,7 +269,7 @@ pub mod tests {
     }
 
     #[expect(clippy::expect_used, reason = "intended behavior")]
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn test__future_from_dart__handle(
         future: Dart_Handle,
     ) -> DartFuture<Result<(), FormatException>> {
@@ -290,7 +289,7 @@ pub mod tests {
         .into_dart_future()
     }
 
-    #[no_mangle]
+    #[unsafe(no_mangle)]
     pub unsafe extern "C" fn test__future_from_dart__fails(
         future: Dart_Handle,
     ) -> DartFuture<Result<i64, FormatException>> {

@@ -18,7 +18,7 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   /// Creates a new [MediaManagerHandle] backed by the Rust struct behind the
   /// provided [frb.MediaManagerHandle].
   NativeMediaManagerHandle(frb.MediaManagerHandle mediaManager)
-      : opaque = RustOpaque(mediaManager) {
+    : opaque = RustOpaque(mediaManager) {
     RustHandlesStorage().insertHandle(this);
   }
 
@@ -29,7 +29,9 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
     Pointer tracks;
     tracks = await (opaque.inner.initLocalTracks(
       caps: (caps as MediaStreamSettings).setting,
-    ) as Future) as Pointer;
+    )
+                as Future)
+            as Pointer;
 
     return frb
         .vecLocalTracksFromRaw(ptr: tracks.address)

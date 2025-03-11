@@ -6,8 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.3.1] · 2025-03-10
+[0.3.1]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.3.0/crates/medea-macro
+
+### Changed
+
+- Bumped up [MSRV] to 1.85 because of migration to [2024 edition][031-1]. ([6f760c83])
+
+[6f760c83]: https://github.com/instrumentisto/medea-jason/commit/6f760c836f9c5293b5fefae8a0cb4ee2bd5cfda2
+[031-1]: https://doc.rust-lang.org/edition-guide/rust-2024/index.html
+
+
+
+
 ## [0.3.0] · 2023-06-09
-[0.3.0]: /../../tree/medea-macro-0.3.0/crates/medea-macro
+[0.3.0]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.3.0/crates/medea-macro
 
 ### BC Breaks
 
@@ -22,14 +35,14 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Updated
 
-- Switched to [2021 Rust edition][012-1] ([#16]).
+- Switched to [2021 Rust edition][030-1] ([#16]).
 - Switched to 2.0 version of [`syn`] ([6234b23f]).
 
-[#4]: /../../pull/4
-[#14]: /../../pull/14
-[#16]: /../../pull/16
-[012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
-[6234b23f]: /../../commit/6234b23f66e81c0ce411dfb8cdf983eda51cd2ad
+[#4]: https://github.com/instrumentisto/medea-jason/pull/4
+[#14]: https://github.com/instrumentisto/medea-jason/pull/14
+[#16]: https://github.com/instrumentisto/medea-jason/pull/16
+[030-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
+[6234b23f]: https://github.com/instrumentisto/medea-jason/commit/6234b23f66e81c0ce411dfb8cdf983eda51cd2ad
 
 
 

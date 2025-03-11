@@ -14,7 +14,7 @@ use secrecy::{ExposeSecret as _, SecretString};
 use serde::{Deserialize, Serialize, Serializer};
 use url::Url;
 
-use super::{endpoint, room, Pipeline};
+use super::{Pipeline, endpoint, room};
 
 /// Media [`Element`] representing a client authorized to participate in some
 /// bigger media pipeline ([`Room`], for example).
@@ -191,12 +191,7 @@ impl FromStr for Sid {
             _ = path.pop().pop();
         }
 
-        Ok(Self {
-            public_url: url.into(),
-            room_id,
-            member_id,
-            creds,
-        })
+        Ok(Self { public_url: url.into(), room_id, member_id, creds })
     }
 }
 
@@ -278,7 +273,7 @@ impl Credentials {
     /// Generates new random [`Credentials::Plain`].
     #[must_use]
     pub fn random() -> Self {
-        use rand::{distr::Alphanumeric, Rng as _};
+        use rand::{Rng as _, distr::Alphanumeric};
 
         Self::Plain(
             rand::rng()
@@ -326,10 +321,7 @@ impl PartialEq for PlainCredentials {
     fn eq(&self, other: &Self) -> bool {
         use subtle::ConstantTimeEq as _;
 
-        self.expose_str()
-            .as_bytes()
-            .ct_eq(other.expose_str().as_bytes())
-            .into()
+        self.expose_str().as_bytes().ct_eq(other.expose_str().as_bytes()).into()
     }
 }
 

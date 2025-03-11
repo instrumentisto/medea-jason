@@ -44,22 +44,23 @@ StepDefinitionGeneric thenMemberHasRemoteTrack =
 
 StepDefinitionGeneric thenMemberDoesntHaveRemoteTracksWith =
     then2<String, String, CustomWorld>(
-  RegExp(r"(\S+) doesn't have remote tracks from (\S+)$"),
-  (id, partnerId, context) async {
-    var member = context.world.members[id]!;
-    await member.waitForConnect(partnerId);
-    var tracksCount = member.connectionStore.remoteTracks[partnerId]!.length;
-    expect(tracksCount, 0);
-  },
-);
+      RegExp(r"(\S+) doesn't have remote tracks from (\S+)$"),
+      (id, partnerId, context) async {
+        var member = context.world.members[id]!;
+        await member.waitForConnect(partnerId);
+        var tracksCount =
+            member.connectionStore.remoteTracks[partnerId]!.length;
+        expect(tracksCount, 0);
+      },
+    );
 
 StepDefinitionGeneric thenMemberHasNRemoteTracksFrom =
     then4<String, int, String, String, CustomWorld>(
-  RegExp(r'(\S+) has {int} (live|stopped) remote tracks from (\S+)$'),
-  (id, expectedCount, liveOrStopped, remoteId, context) async {
-    var member = context.world.members[id]!;
-    await member.waitForConnect(remoteId);
-    var live = (liveOrStopped == 'live');
+      RegExp(r'(\S+) has {int} (live|stopped) remote tracks from (\S+)$'),
+      (id, expectedCount, liveOrStopped, remoteId, context) async {
+        var member = context.world.members[id]!;
+        await member.waitForConnect(remoteId);
+        var live = (liveOrStopped == 'live');
 
     // We might have to wait for Rust side for a little bit.
     await retry(() async {
@@ -74,15 +75,15 @@ StepDefinitionGeneric thenMemberHasNRemoteTracksFrom =
 
 StepDefinitionGeneric thenMemberHasLocalTracks =
     then2<String, int, CustomWorld>(
-  RegExp(r'(\S+) has {int} local track(?:s)?$'),
-  (id, expectedCount, context) async {
-    await context.world.waitForInterconnection(id);
-    var member = context.world.members[id]!;
-    var actualCount = member.connectionStore.localTracks.length;
+      RegExp(r'(\S+) has {int} local track(?:s)?$'),
+      (id, expectedCount, context) async {
+        await context.world.waitForInterconnection(id);
+        var member = context.world.members[id]!;
+        var actualCount = member.connectionStore.localTracks.length;
 
-    expect(actualCount, expectedCount);
-  },
-);
+        expect(actualCount, expectedCount);
+      },
+    );
 
 StepDefinitionGeneric thenDoesntHaveRemoteTrack =
     then4<String, String, String, String, CustomWorld>(
@@ -135,7 +136,7 @@ StepDefinitionGeneric thenRemoteMediaTrack =
     var member = context.world.members[id]!;
     var parsedKind = parseMediaKind(kind);
 
-    await member.waitForConnect(partnerId);
+        await member.waitForConnect(partnerId);
 
     var track = await member.waitRemoteTrackFrom(
       partnerId,
@@ -143,13 +144,13 @@ StepDefinitionGeneric thenRemoteMediaTrack =
       parsedKind.item1,
     );
 
-    if (state == 'enabled') {
-      await member.waitEnabledTrack(track);
-    } else {
-      await member.waitDisabledTrack(track);
-    }
-  },
-);
+        if (state == 'enabled') {
+          await member.waitEnabledTrack(track);
+        } else {
+          await member.waitDisabledTrack(track);
+        }
+      },
+    );
 
 StepDefinitionGeneric thenRemoteTrackStops =
     then3<String, String, String, CustomWorld>(
@@ -188,24 +189,24 @@ StepDefinitionGeneric thenCallbackFiresOnRemoteTrack =
       parsedKind.item1,
     );
 
-    await member.waitForTrackCbFireCount(callbackKind, track, times);
-  },
-);
+        await member.waitForTrackCbFireCount(callbackKind, track, times);
+      },
+    );
 
 StepDefinitionGeneric thenMemberDoesntHaveLiveLocalTracks =
     then1<String, CustomWorld>(
-  RegExp(r"(\S+) doesn't have live local tracks$"),
-  (id, context) async {
-    var member = context.world.members[id]!;
-    var count = 0;
-    for (var element in member.connectionStore.localTracks) {
-      if (await element.getTrack().state() == MediaStreamTrackState.live) {
-        ++count;
-      }
-    }
-    expect(count, 0);
-  },
-);
+      RegExp(r"(\S+) doesn't have live local tracks$"),
+      (id, context) async {
+        var member = context.world.members[id]!;
+        var count = 0;
+        for (var element in member.connectionStore.localTracks) {
+          if (await element.getTrack().state() == MediaStreamTrackState.live) {
+            ++count;
+          }
+        }
+        expect(count, 0);
+      },
+    );
 
 StepDefinitionGeneric thenHasLocalTrack = then2<String, String, CustomWorld>(
   RegExp(r'(\S+) has local (audio|(?:device |display )?video)$'),

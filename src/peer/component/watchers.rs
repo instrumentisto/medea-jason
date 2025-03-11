@@ -3,7 +3,7 @@
 use std::{collections::HashSet, rc::Rc};
 
 use derive_more::with_trait::{Display, From};
-use futures::{future, StreamExt as _};
+use futures::{StreamExt as _, future};
 use medea_client_api_proto::{
     IceCandidate, MemberId, NegotiationRole, TrackId,
 };
@@ -11,16 +11,15 @@ use medea_macro::watchers;
 use medea_reactive::Guarded;
 use tracerr::Traced;
 
+use super::{Component, PeerConnection, State};
 use crate::{
     peer::{
+        GetMidsError, PeerEvent, RtcPeerConnectionError,
         component::{NegotiationState, SyncState},
         media::{receiver, sender},
-        GetMidsError, PeerEvent, RtcPeerConnectionError,
     },
-    utils::{transpose_guarded, Updatable as _},
+    utils::{Updatable as _, transpose_guarded},
 };
-
-use super::{Component, PeerConnection, State};
 
 /// Errors occurring in watchers of a [`Component`].
 #[derive(Clone, Debug, Display, From)]
@@ -211,11 +210,10 @@ impl Component {
             state.connection_mode,
         )
         .await;
-        peer.media_connections
-            .insert_receiver(receiver::Component::new(
-                Rc::new(receiver),
-                Rc::clone(&rcvr_state),
-            ));
+        peer.media_connections.insert_receiver(receiver::Component::new(
+            Rc::new(receiver),
+            Rc::clone(&rcvr_state),
+        ));
         for conn in conns {
             conn.add_receiver(Rc::clone(&rcvr_state));
         }

@@ -7,12 +7,11 @@ use js_sys::Promise;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
 
+use super::Error;
 use crate::{
     api::{LocalMediaTrack, MediaDeviceDetails, MediaStreamSettings},
     media,
 };
-
-use super::Error;
 
 /// [`MediaManagerHandle`] is a weak reference to a [`MediaManager`].
 ///

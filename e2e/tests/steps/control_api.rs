@@ -6,7 +6,7 @@ use medea_control_api_mock::proto::{
 };
 use tokio::time::{sleep, timeout};
 
-use crate::world::{member, MembersPair, PairedMember, World};
+use crate::world::{MembersPair, PairedMember, World, member};
 
 #[when(regex = r"^Control API removes member (\S+)$")]
 async fn when_control_api_removes_member(world: &mut World, id: String) {
@@ -67,29 +67,25 @@ async fn then_control_api_sends_on_leave(
 #[then(regex = "^Control API doesn't send `OnLeave` callback for \
                  member (\\S+)$")]
 async fn then_control_api_doesnt_sends_on_leave(world: &mut World, id: String) {
-    assert!(timeout(
-        Duration::from_millis(300),
-        world.wait_for_on_leave(id, String::new()),
-    )
-    .await
-    .is_err());
+    assert!(
+        timeout(
+            Duration::from_millis(300),
+            world.wait_for_on_leave(id, String::new()),
+        )
+        .await
+        .is_err()
+    );
 }
 
 #[then(regex = r"^Control API sends `OnJoin` callback for member (\S+)$")]
 async fn then_control_api_sends_on_join(world: &mut World, id: String) {
-    timeout(Duration::from_secs(10), world.wait_for_on_join(id))
-        .await
-        .unwrap();
+    timeout(Duration::from_secs(10), world.wait_for_on_join(id)).await.unwrap();
 }
 
 #[when(regex = r"^Control API creates member (\S+) with `Apply` method$")]
 async fn when_control_api_creates_member(world: &mut World, id: String) {
     world
-        .create_member(member::Builder {
-            id,
-            is_send: false,
-            is_recv: false,
-        })
+        .create_member(member::Builder { id, is_send: false, is_recv: false })
         .await
         .unwrap();
 }

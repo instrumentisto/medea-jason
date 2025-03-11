@@ -19,9 +19,8 @@ use medea_e2e::{
 use tokio::time::{interval, sleep};
 use uuid::Uuid;
 
-use crate::{conf, control};
-
 pub use self::member::{Builder as MemberBuilder, Member};
+use crate::{conf, control};
 
 /// Returns Control API path for the provided `room_id`, `member_id` and
 /// `endpoint_id`.
@@ -312,10 +311,7 @@ impl World {
                 .connections()
                 .wait_for_connection(partner.id().to_owned())
                 .await?;
-            conn.tracks_store()
-                .await?
-                .wait_for_count(recv_count)
-                .await?;
+            conn.tracks_store().await?.wait_for_count(recv_count).await?;
 
             let partner_conn = partner
                 .connections()
@@ -725,11 +721,8 @@ impl World {
     ///
     /// [`Room`]: crate::object::room::Room
     pub async fn delete_room_element(&mut self) {
-        let resp = self
-            .control_client
-            .delete(self.room_id.as_str())
-            .await
-            .unwrap();
+        let resp =
+            self.control_client.delete(self.room_id.as_str()).await.unwrap();
         assert!(resp.error.is_none());
     }
 

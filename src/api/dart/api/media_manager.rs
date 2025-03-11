@@ -1,6 +1,6 @@
 //! External handle to a [`MediaManager`].
 
-use flutter_rust_bridge::{frb, DartOpaque};
+use flutter_rust_bridge::{DartOpaque, frb};
 use futures::TryFutureExt as _;
 use send_wrapper::SendWrapper;
 use tracerr::Traced;
@@ -9,11 +9,11 @@ use tracerr::Traced;
 use crate::media::MediaManager;
 use crate::{
     api::{
+        Error as DartError,
         api::{
             ApiMediaDeviceDetails, ApiMediaDisplayDetails,
             ApiMediaStreamSettings, LocalMediaTrack,
         },
-        Error as DartError,
     },
     media::{self as core},
     platform::{self, utils::dart_future::IntoDartFuture as _},

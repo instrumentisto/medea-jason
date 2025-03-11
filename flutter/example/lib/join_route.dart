@@ -78,10 +78,11 @@ class _JoinRouteState extends State<JoinRoute> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CallRoute(
-                      _roomId,
-                      _memberId,
-                      isSFUMode,
+                    builder:
+                        (context) => CallRoute(
+                          _roomId,
+                          _memberId,
+                          isSFUMode,
                       isPublish,
                       publishVideo,
                       publishAudio,

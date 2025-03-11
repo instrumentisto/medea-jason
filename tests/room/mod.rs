@@ -3,8 +3,9 @@ mod room;
 use std::{cell::RefCell, rc::Rc};
 
 use futures::{
+    StreamExt,
     channel::{mpsc, oneshot},
-    stream, StreamExt,
+    stream,
 };
 use medea_client_api_proto::{
     ClientMsg, CloseReason, Command, Event, ServerMsg,
@@ -17,10 +18,10 @@ use medea_jason::{
 };
 use medea_reactive::ObservableCell;
 use wasm_bindgen::closure::Closure;
-use wasm_bindgen_futures::{spawn_local, JsFuture};
+use wasm_bindgen_futures::{JsFuture, spawn_local};
 use wasm_bindgen_test::*;
 
-use crate::{delay_for, rpc::RPC_SETTINGS, timeout, yield_now, TEST_ROOM_URL};
+use crate::{TEST_ROOM_URL, delay_for, rpc::RPC_SETTINGS, timeout, yield_now};
 
 wasm_bindgen_test_configure!(run_in_browser);
 
@@ -56,13 +57,9 @@ async fn only_one_strong_rpc_rc_exists() {
     let jason = api::Jason::from(Jason::new(Some(ws.clone())));
 
     let room = jason.init_room();
-    room.on_failed_local_media(Closure::once_into_js(|| {}).into())
-        .unwrap();
-    room.on_connection_loss(Closure::once_into_js(|| {}).into())
-        .unwrap();
-    JsFuture::from(room.join(TEST_ROOM_URL.to_string()))
-        .await
-        .unwrap();
+    room.on_failed_local_media(Closure::once_into_js(|| {}).into()).unwrap();
+    room.on_connection_loss(Closure::once_into_js(|| {}).into()).unwrap();
+    JsFuture::from(room.join(TEST_ROOM_URL.to_string())).await.unwrap();
 
     assert_eq!(Rc::strong_count(&ws), 3);
     jason.dispose();
@@ -94,12 +91,9 @@ async fn rpc_dropped_on_jason_dispose() {
             }
         });
         transport.expect_send().times(2).returning(|_| Ok(()));
-        transport
-            .expect_set_close_reason()
-            .times(1)
-            .returning(move |reason| {
-                test_tx.unbounded_send(reason).unwrap();
-            });
+        transport.expect_set_close_reason().times(1).returning(move |reason| {
+            test_tx.unbounded_send(reason).unwrap();
+        });
         transport.expect_on_state_change().return_once_st(move || {
             Box::pin(stream::once(async { TransportState::Open }))
         });
@@ -109,13 +103,9 @@ async fn rpc_dropped_on_jason_dispose() {
     let jason = api::Jason::from(Jason::new(Some(ws)));
 
     let room = jason.init_room();
-    room.on_failed_local_media(Closure::once_into_js(|| {}).into())
-        .unwrap();
-    room.on_connection_loss(Closure::once_into_js(|| {}).into())
-        .unwrap();
-    JsFuture::from(room.join(TEST_ROOM_URL.to_string()))
-        .await
-        .unwrap();
+    room.on_failed_local_media(Closure::once_into_js(|| {}).into()).unwrap();
+    room.on_connection_loss(Closure::once_into_js(|| {}).into()).unwrap();
+    JsFuture::from(room.join(TEST_ROOM_URL.to_string())).await.unwrap();
     jason.dispose();
     drop(room);
 
@@ -150,11 +140,9 @@ async fn room_dispose_works() {
                 cmd_tx.unbounded_send(cmd.clone()).ok();
                 Ok(())
             });
-            transport
-                .expect_set_close_reason()
-                .returning(move |reason| {
-                    test_tx.unbounded_send(reason).unwrap();
-                });
+            transport.expect_set_close_reason().returning(move |reason| {
+                test_tx.unbounded_send(reason).unwrap();
+            });
             transport.expect_on_state_change().returning(|| {
                 Box::pin(stream::once(async { TransportState::Open }))
             });
@@ -165,10 +153,8 @@ async fn room_dispose_works() {
     let jason = api::Jason::from(Jason::new(Some(ws)));
 
     let room = jason.init_room();
-    room.on_failed_local_media(Closure::once_into_js(|| {}).into())
-        .unwrap();
-    room.on_connection_loss(Closure::once_into_js(|| {}).into())
-        .unwrap();
+    room.on_failed_local_media(Closure::once_into_js(|| {}).into()).unwrap();
+    room.on_connection_loss(Closure::once_into_js(|| {}).into()).unwrap();
     spawn_local({
         let client_msg_txs = client_msg_txs.clone();
         async move {
@@ -176,17 +162,13 @@ async fn room_dispose_works() {
             client_msg_txs.borrow().iter().for_each(|tx| {
                 tx.unbounded_send(ServerMsg::Event {
                     room_id: "room_id".into(),
-                    event: Event::RoomJoined {
-                        member_id: "member_id".into(),
-                    },
+                    event: Event::RoomJoined { member_id: "member_id".into() },
                 })
                 .ok();
             });
         }
     });
-    JsFuture::from(room.join(TEST_ROOM_URL.to_string()))
-        .await
-        .unwrap();
+    JsFuture::from(room.join(TEST_ROOM_URL.to_string())).await.unwrap();
 
     let another_room = jason.init_room();
     another_room
@@ -202,9 +184,7 @@ async fn room_dispose_works() {
             client_msg_txs.borrow().iter().for_each(|tx| {
                 tx.unbounded_send(ServerMsg::Event {
                     room_id: "another_room_id".into(),
-                    event: Event::RoomJoined {
-                        member_id: "member_id".into(),
-                    },
+                    event: Event::RoomJoined { member_id: "member_id".into() },
                 })
                 .ok();
             });
@@ -301,13 +281,9 @@ async fn room_closes_on_rpc_transport_close() {
     let jason = api::Jason::from(Jason::new(Some(ws)));
 
     let room = jason.init_room();
-    room.on_failed_local_media(Closure::once_into_js(|| {}).into())
-        .unwrap();
-    room.on_connection_loss(Closure::once_into_js(|| {}).into())
-        .unwrap();
-    JsFuture::from(room.join(TEST_ROOM_URL.to_string()))
-        .await
-        .unwrap();
+    room.on_failed_local_media(Closure::once_into_js(|| {}).into()).unwrap();
+    room.on_connection_loss(Closure::once_into_js(|| {}).into()).unwrap();
+    JsFuture::from(room.join(TEST_ROOM_URL.to_string())).await.unwrap();
 
     let (test_tx, test_rx) = oneshot::channel();
     let closure = wasm_bindgen::closure::Closure::once_into_js(move || {

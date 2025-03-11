@@ -6,20 +6,27 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.8.0] · 2025-03-10
+[0.8.0]: https://github.com/instrumentisto/medea-jason/tree/medea-client-api-proto-0.8.0/proto/client-api
+
+### Changed
+
+- Bumped up [MSRV] to 1.85 because of migration to [2024 edition][080-1]. ([6f760c83])
 
 ### Upgraded
 
 - Dependencies:
-    - [`derive-more`] to 2.0 version. ([todo])
+    - [`derive-more`] to 2.0 version. ([3ed7d2bf])
 
-[todo]: /../../commit/todo
+[3ed7d2bf]: https://github.com/instrumentisto/medea-jason/commit/3ed7d2bf59ed1237d9e55c4b65ea5cad833306fa
+[6f760c83]: https://github.com/instrumentisto/medea-jason/commit/6f760c836f9c5293b5fefae8a0cb4ee2bd5cfda2
+[080-1]: https://doc.rust-lang.org/edition-guide/rust-2024/index.html
 
 
 
 
 ## [0.7.0] · 2024-10-29
-[0.7.0]: /../../tree/medea-client-api-proto-0.7.0/proto/client-api
+[0.7.0]: https://github.com/instrumentisto/medea-jason/tree/medea-client-api-proto-0.7.0/proto/client-api
 
 ### BC Breaks
 
@@ -30,27 +37,27 @@ All user visible changes to this project will be documented in this file. This p
 
 - `IcePassword` type. ([#190])
 
-[#189]: /../../pull/189
-[#190]: /../../pull/190
+[#189]: https://github.com/instrumentisto/medea-jason/pull/189
+[#190]: https://github.com/instrumentisto/medea-jason/pull/190
 
 
 
 
 ## [0.6.1] · 2024-08-27
-[0.6.1]: /../../tree/medea-client-api-proto-0.6.1/proto/client-api
+[0.6.1]: https://github.com/instrumentisto/medea-jason/tree/medea-client-api-proto-0.6.1/proto/client-api
 
 ### Upgraded
 
 - Dependencies:
     - [`derive-more`] to 1.0 version. ([#181])
 
-[#181]: /../../pull/181
+[#181]: https://github.com/instrumentisto/medea-jason/pull/181
 
 
 
 
 ## [0.6.0] · 2024-08-05
-[0.6.0]: /../../tree/medea-client-api-proto-0.6.0/proto/client-api
+[0.6.0]: https://github.com/instrumentisto/medea-jason/tree/medea-client-api-proto-0.6.0/proto/client-api
 
 ### BC Breaks
 
@@ -66,27 +73,27 @@ All user visible changes to this project will be documented in this file. This p
 - `IceCandidateError` type ([#151]).
 - `Codec`, `ScalabilityMode`, `SvcSettings` and `EncodingParameters` types ([#164]).
 
-[#151]: /../../pull/151
-[#164]: /../../pull/164
-[#173]: /../../pull/173
+[#151]: https://github.com/instrumentisto/medea-jason/pull/151
+[#164]: https://github.com/instrumentisto/medea-jason/pull/164
+[#173]: https://github.com/instrumentisto/medea-jason/pull/173
 
 
 
 
 ## [0.5.0] · 2023-07-11
-[0.5.0]: /../../tree/medea-client-api-proto-0.5.0/proto/client-api
+[0.5.0]: https://github.com/instrumentisto/medea-jason/tree/medea-client-api-proto-0.5.0/proto/client-api
 
 ### BC Breaks
 
 - Added `Track.muted` field ([#119]).
 
-[#119]: /../../pull/119
+[#119]: https://github.com/instrumentisto/medea-jason/pull/119
 
 
 
 
 ## [0.4.0] · 2023-06-09
-[0.4.0]: /../../tree/medea-client-api-proto-0.4.0/proto/client-api
+[0.4.0]: https://github.com/instrumentisto/medea-jason/tree/medea-client-api-proto-0.4.0/proto/client-api
 
 ### BC Breaks
 
@@ -110,12 +117,12 @@ All user visible changes to this project will be documented in this file. This p
 
 - Switch to [2021 Rust edition][012-1] ([#16]).
 
-[#16]: /../../pull/16
-[#26]: /../../pull/26
-[#46]: /../../pull/46
-[#107]: /../../pull/107
-[#113]: /../../pull/113
-[#116]: /../../pull/116
+[#16]: https://github.com/instrumentisto/medea-jason/pull/16
+[#26]: https://github.com/instrumentisto/medea-jason/pull/26
+[#46]: https://github.com/instrumentisto/medea-jason/pull/46
+[#107]: https://github.com/instrumentisto/medea-jason/pull/107
+[#113]: https://github.com/instrumentisto/medea-jason/pull/113
+[#116]: https://github.com/instrumentisto/medea-jason/pull/116
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
 
 
@@ -264,4 +271,5 @@ All user visible changes to this project will be documented in this file. This p
 
 
 [`derive-more`]: https://docs.rs/derive_more
+[MSRV]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
 [Semantic Versioning 2.0.0]: https://semver.org

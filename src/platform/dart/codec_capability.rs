@@ -7,16 +7,15 @@ use std::collections::HashMap;
 use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
+use super::utils::{
+    dart_future::FutureFromDart, dart_string_into_rust, list::DartList,
+};
 use crate::{
     media::MediaKind,
     platform::{
         codec_capability::CodecCapabilityError as Error,
         dart::utils::{handle::DartHandle, NonNullDartValueArgExt as _},
     },
-};
-
-use super::utils::{
-    dart_future::FutureFromDart, dart_string_into_rust, list::DartList,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/codec_capability.g.dart")]

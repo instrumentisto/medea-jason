@@ -9,8 +9,8 @@ use medea_client_api_proto::{ConnectionMode, TrackId, TrackPatchEvent};
 use medea_jason::{
     media::{LocalTracksConstraints, MediaManager, RecvConstraints},
     peer::{
-        media_exchange_state, LocalStreamUpdateCriteria, MediaConnections,
-        MediaStateControllable, SimpleTracksRequest,
+        LocalStreamUpdateCriteria, MediaConnections, MediaStateControllable,
+        SimpleTracksRequest, media_exchange_state,
     },
     platform::RtcPeerConnection,
     utils::Updatable as _,
@@ -131,12 +131,10 @@ async fn new_media_connections_with_disabled_audio_tracks() {
     let (media_connections, audio_track_id, video_track_id) =
         get_test_media_connections(false, true).await;
 
-    let audio_track = media_connections
-        .get_sender_state_by_id(audio_track_id)
-        .unwrap();
-    let video_track = media_connections
-        .get_sender_state_by_id(video_track_id)
-        .unwrap();
+    let audio_track =
+        media_connections.get_sender_state_by_id(audio_track_id).unwrap();
+    let video_track =
+        media_connections.get_sender_state_by_id(video_track_id).unwrap();
 
     assert!(!audio_track.enabled());
     assert!(video_track.enabled());
@@ -147,12 +145,10 @@ async fn new_media_connections_with_disabled_video_tracks() {
     let (media_connections, audio_track_id, video_track_id) =
         get_test_media_connections(true, false).await;
 
-    let audio_track = media_connections
-        .get_sender_state_by_id(audio_track_id)
-        .unwrap();
-    let video_track = media_connections
-        .get_sender_state_by_id(video_track_id)
-        .unwrap();
+    let audio_track =
+        media_connections.get_sender_state_by_id(audio_track_id).unwrap();
+    let video_track =
+        media_connections.get_sender_state_by_id(video_track_id).unwrap();
 
     assert!(audio_track.enabled());
     assert!(!video_track.enabled());
@@ -167,7 +163,7 @@ mod sender_patch {
         MediaSourceKind, MediaType, ScalabilityMode, VideoSettings,
     };
     use medea_jason::{
-        peer::{sender, MediaExchangeState},
+        peer::{MediaExchangeState, sender},
         utils::{AsProtoState, SynchronizableState, Updatable},
     };
 
@@ -397,9 +393,7 @@ mod sender_patch {
         let mut proto_state = sender.state().as_proto();
         proto_state.media_direction = MediaDirection::RecvOnly;
         proto_state.muted = true;
-        sender
-            .state()
-            .apply(proto_state, &LocalTracksConstraints::default());
+        sender.state().apply(proto_state, &LocalTracksConstraints::default());
         sender.state().when_updated().await;
 
         assert!(sender.general_disabled());
@@ -417,7 +411,7 @@ mod receiver_patch {
     };
     use medea_jason::{
         media::RecvConstraints,
-        peer::{receiver, MediaExchangeState, PeerEvent},
+        peer::{MediaExchangeState, PeerEvent, receiver},
         utils::{AsProtoState, SynchronizableState},
     };
 
@@ -427,8 +421,8 @@ mod receiver_patch {
     const MID: &str = "mid";
     const SENDER_ID: &str = "sender";
 
-    async fn get_receiver(
-    ) -> (receiver::Component, mpsc::UnboundedReceiver<PeerEvent>) {
+    async fn get_receiver()
+    -> (receiver::Component, mpsc::UnboundedReceiver<PeerEvent>) {
         let (tx, rx) = mpsc::unbounded();
         let media_connections = MediaConnections::new(
             Rc::new(RtcPeerConnection::new(Vec::new(), false).await.unwrap()),
@@ -544,9 +538,7 @@ mod receiver_patch {
         let mut proto_state = receiver.state().as_proto();
         proto_state.media_direction = MediaDirection::SendOnly;
 
-        receiver
-            .state()
-            .apply(proto_state, &LocalTracksConstraints::default());
+        receiver.state().apply(proto_state, &LocalTracksConstraints::default());
 
         receiver.state().when_updated().await;
         assert!(!receiver.state().enabled_general());

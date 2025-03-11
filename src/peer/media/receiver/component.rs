@@ -9,23 +9,22 @@ use medea_client_api_proto::{
 };
 use medea_macro::watchers;
 use medea_reactive::{
-    when_all_processed, AllProcessed, Guarded, ObservableCell, Processed,
-    ProgressableCell,
+    AllProcessed, Guarded, ObservableCell, Processed, ProgressableCell,
+    when_all_processed,
 };
 use proto::ConnectionMode;
 
+use super::Receiver;
 use crate::{
     media::{LocalTracksConstraints, MediaDirection, MediaKind},
     peer::{
-        component::SyncState,
-        media::{transitable_state::media_exchange_state, InTransition as _},
         MediaExchangeState, MediaExchangeStateController,
         MediaStateControllable, MuteStateController, TransceiverSide,
+        component::SyncState,
+        media::{InTransition as _, transitable_state::media_exchange_state},
     },
-    utils::{component, AsProtoState, SynchronizableState, Updatable},
+    utils::{AsProtoState, SynchronizableState, Updatable, component},
 };
-
-use super::Receiver;
 
 /// Component responsible for the [`Receiver`] enabling/disabling and
 /// muting/unmuting.
@@ -155,8 +154,6 @@ impl SynchronizableState for State {
 impl Updatable for State {
     /// Returns [`Future`] resolving once [`media_exchange_state`] is
     /// stabilized.
-    ///
-    /// [`Future`]: std::future::Future
     fn when_stabilized(&self) -> AllProcessed<'static> {
         let controller = Rc::clone(&self.enabled_individual);
         when_all_processed(iter::once(
@@ -172,8 +169,6 @@ impl Updatable for State {
 
     /// Returns [`Future`] resolving once [`State`] update will be applied onto
     /// the [`Receiver`].
-    ///
-    /// [`Future`]: std::future::Future
     fn when_updated(&self) -> AllProcessed<'static> {
         when_all_processed(vec![
             self.enabled_individual.when_processed().into(),
@@ -291,11 +286,9 @@ impl State {
             return;
         }
         if let Some(direction) = track_patch.media_direction {
-            self.enabled_general
-                .set(direction.is_enabled_general().into());
+            self.enabled_general.set(direction.is_enabled_general().into());
 
-            self.enabled_individual
-                .update(direction.is_recv_enabled().into());
+            self.enabled_individual.update(direction.is_recv_enabled().into());
         }
         if let Some(muted) = track_patch.muted {
             self.muted.set(muted);

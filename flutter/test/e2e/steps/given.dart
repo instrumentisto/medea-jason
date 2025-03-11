@@ -30,9 +30,11 @@ Future<void> newGivenMember(
   var endpointsDisabled = mediaSettings.contains(' with no WebRTC endpoints');
 
   var allEndpointsDisabled = endpointsDisabled && notEndpointDirection == '';
-  var isSendDisabled = endpointsDisabled &&
+  var isSendDisabled =
+      endpointsDisabled &&
       (allEndpointsDisabled || notEndpointDirection == 'publish');
-  var isRecvDisabled = endpointsDisabled &&
+  var isRecvDisabled =
+      endpointsDisabled &&
       (allEndpointsDisabled || notEndpointDirection == 'play');
 
   var memberBuilder = MemberBuilder(
@@ -127,9 +129,15 @@ StepDefinitionGeneric givenOneMember =
   },
 );
 
-StepDefinitionGeneric givenTwoMembers =
-    given6<String, String, String, String, String, String, CustomWorld>(
-        r'(room with joined |room with |joined )member(s) (\S+) and '
+StepDefinitionGeneric givenTwoMembers = given6<
+  String,
+  String,
+  String,
+  String,
+  String,
+  String,
+  CustomWorld
+        >(r'(room with joined |room with |joined )member(s) (\S+) and '
         r'(\S+)( with no WebRTC endpoints| with no publish WebRTC endpoints| '
         r'with no play WebRTC endpoints| with disabled| with muted|)'
         r'( media| audio| video|)( publishing| playing|)$', (
@@ -153,9 +161,16 @@ StepDefinitionGeneric givenTwoMembers =
   );
 });
 
-StepDefinitionGeneric givenTreeMembers =
-    given7<String, String, String, String, String, String, String, CustomWorld>(
-        r'(room with joined |room with |joined )member(s) (\S+) and '
+StepDefinitionGeneric givenTreeMembers = given7<
+  String,
+  String,
+  String,
+  String,
+  String,
+  String,
+  String,
+  CustomWorld
+        >(r'(room with joined |room with |joined )member(s) (\S+) and '
         r'(\S+) and (\S+)'
         r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
         r'with no play WebRTC endpoints| with disabled| with muted|)'

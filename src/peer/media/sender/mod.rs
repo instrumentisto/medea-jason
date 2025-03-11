@@ -12,20 +12,18 @@ use futures::channel::mpsc;
 use medea_client_api_proto::TrackId;
 use tracerr::Traced;
 
+#[doc(inline)]
+pub use self::component::{Component, State};
+use super::{
+    MediaConnections, MediaStateControllable as _, media_exchange_state,
+    mute_state,
+};
 use crate::{
-    media::{track::local, LocalTracksConstraints, TrackConstraints},
+    media::{LocalTracksConstraints, TrackConstraints, track::local},
     peer::TrackEvent,
     platform,
     utils::Caused,
 };
-
-use super::{
-    media_exchange_state, mute_state, MediaConnections,
-    MediaStateControllable as _,
-};
-
-#[doc(inline)]
-pub use self::component::{Component, State};
 
 /// Errors occurring when creating a new [`Sender`].
 #[derive(Caused, Clone, Debug, Display)]

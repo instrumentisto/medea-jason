@@ -1,18 +1,22 @@
 //! [`RtcRtpTransceiver`] wrapper.
 
-use std::{future::Future, rc::Rc};
+use std::rc::Rc;
 
 use derive_more::with_trait::From;
 use js_sys::Reflect;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{RtcRtpParameters, RtcRtpTransceiver, RtcRtpTransceiverInit};
+use web_sys::{
+    RtcRtpParameters, RtcRtpEncodingParameters, RtcRtpTransceiver, RtcRtpTransceiverInit,
+};
 
 use crate::{
     media::track::local,
-    platform,
     platform::{
+        self,
+        Error, TransceiverDirection,
         send_encoding_parameters::SendEncodingParameters,
+        wasm::codec_capability::CodecCapability,
         send_parameters::SendParameters,
         wasm::codec_capability::CodecCapability, TransceiverDirection,
     },
@@ -60,7 +64,10 @@ impl Transceiver {
     }
 
     /// Changes the receive direction of this [`Transceiver`].
-    pub fn set_recv(&self, active: bool) -> impl Future<Output = ()> + 'static {
+    pub fn set_recv(
+        &self,
+        active: bool,
+    ) -> impl Future<Output = ()> + 'static + use<> {
         let transceiver = self.0.clone();
         async move {
             let current_direction =
@@ -75,7 +82,10 @@ impl Transceiver {
     }
 
     /// Changes the send direction of this [`Transceiver`].
-    pub fn set_send(&self, active: bool) -> impl Future<Output = ()> + 'static {
+    pub fn set_send(
+        &self,
+        active: bool,
+    ) -> impl Future<Output = ()> + 'static + use<> {
         let transceiver = self.0.clone();
         async move {
             let current_direction =

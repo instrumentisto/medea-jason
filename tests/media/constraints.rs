@@ -100,9 +100,8 @@ async fn both_constraints_satisfies() {
 
     assert_eq!(tracks.len(), 2);
 
-    let (mut audio, mut video): (Vec<_>, Vec<_>) = tracks
-        .into_iter()
-        .partition(|(track, _)| match track.kind() {
+    let (mut audio, mut video): (Vec<_>, Vec<_>) =
+        tracks.into_iter().partition(|(track, _)| match track.kind() {
             MediaKind::Audio => true,
             MediaKind::Video => false,
         });
@@ -401,11 +400,7 @@ async fn merge_video() {}
 
 // Maps undefined to None.
 fn js_val_to_option(val: JsValue) -> Option<JsValue> {
-    if val.is_undefined() {
-        None
-    } else {
-        Some(val)
-    }
+    if val.is_undefined() { None } else { Some(val) }
 }
 
 /// Returns all registered media devices.
@@ -502,9 +497,8 @@ async fn simultaneous_device_and_display() {
 
     assert_eq!(tracks.len(), 3);
 
-    let (mut audio, mut video): (Vec<_>, Vec<_>) = tracks
-        .into_iter()
-        .partition(|(track, _)| match track.kind() {
+    let (mut audio, mut video): (Vec<_>, Vec<_>) =
+        tracks.into_iter().partition(|(track, _)| match track.kind() {
             MediaKind::Audio => true,
             MediaKind::Video => false,
         });
@@ -516,9 +510,7 @@ async fn simultaneous_device_and_display() {
     let display_video_track = video.pop().unwrap().0;
     assert_eq!(display_video_track.kind(), MediaKind::Video);
     assert!(
-        display_video_constraints
-            .satisfies(display_video_track.as_ref())
-            .await,
+        display_video_constraints.satisfies(display_video_track.as_ref()).await,
     );
     assert_eq!(
         display_video_track.media_source_kind(),
@@ -528,12 +520,7 @@ async fn simultaneous_device_and_display() {
     let device_video_track = video.pop().unwrap().0;
     assert_eq!(device_video_track.kind(), MediaKind::Video);
     assert!(
-        device_video_constraints
-            .satisfies(device_video_track.as_ref())
-            .await,
+        device_video_constraints.satisfies(device_video_track.as_ref()).await,
     );
-    assert_eq!(
-        device_video_track.media_source_kind(),
-        MediaSourceKind::Device,
-    );
+    assert_eq!(device_video_track.media_source_kind(), MediaSourceKind::Device);
 }

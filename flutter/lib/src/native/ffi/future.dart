@@ -28,11 +28,13 @@ void registerFunctions(DynamicLibrary dl) {
 void _completeProxy(Object f, Pointer rustFuture) {
   f as Function;
   Future fut = f();
-  fut.then((val) {
-    var arg = ForeignValue.fromDart(val);
-    _futureResolveOk(rustFuture, arg.ref);
-    arg.free();
-  }).onError((error, stackTrace) {
-    _futureResolveErr(rustFuture, error!);
-  });
+  fut
+      .then((val) {
+        var arg = ForeignValue.fromDart(val);
+        _futureResolveOk(rustFuture, arg.ref);
+        arg.free();
+      })
+      .onError((error, stackTrace) {
+        _futureResolveErr(rustFuture, error!);
+      });
 }

@@ -15,7 +15,7 @@ final _boxDartHandle = dl.lookupFunction<_BoxDartHandleC, _BoxDartHandleDart>(
 final _unboxDartHandle =
     dl.lookupFunction<_UnboxDartHandleC, _UnboxDartHandleDart>(
   'unbox_dart_handle',
-);
+    );
 final _freeBoxedDartHandle =
     dl.lookupFunction<_FreeBoxedDartHandleC, _FreeBoxedDartHandleDart>(
   'free_boxed_dart_handle',

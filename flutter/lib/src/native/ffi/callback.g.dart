@@ -21,14 +21,14 @@ void registerFunction(
   _callTwoArgProxy = callTwoArgProxy;
   _callProxy = callProxy;
 
-  _callback__call_two_arg_proxy__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'callback__call_two_arg_proxy__set_error',
-  );
-  _callback__call_proxy__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'callback__call_proxy__set_error',
-  );
+  _callback__call_two_arg_proxy__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'callback__call_two_arg_proxy__set_error',
+      );
+  _callback__call_proxy__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'callback__call_proxy__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function(Pointer)>> callTwoArgProxy_native =
       Pointer.fromFunction(_callTwoArgProxyProxy);

@@ -22,40 +22,34 @@ mixin _$ApiConstrainFacingMode {
   TResult when<TResult extends Object?>({
     required TResult Function(FacingMode field0) exact,
     required TResult Function(FacingMode field0) ideal,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(FacingMode field0)? exact,
     TResult? Function(FacingMode field0)? ideal,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(FacingMode field0)? exact,
     TResult Function(FacingMode field0)? ideal,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(ApiConstrainFacingMode_Exact value) exact,
     required TResult Function(ApiConstrainFacingMode_Ideal value) ideal,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(ApiConstrainFacingMode_Exact value)? exact,
     TResult? Function(ApiConstrainFacingMode_Ideal value)? ideal,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(ApiConstrainFacingMode_Exact value)? exact,
     TResult Function(ApiConstrainFacingMode_Ideal value)? ideal,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
 
   /// Create a copy of ApiConstrainFacingMode
   /// with the given fields replaced by the non-null parameter values.
@@ -75,8 +69,10 @@ abstract class $ApiConstrainFacingModeCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ApiConstrainFacingModeCopyWithImpl<$Res,
-        $Val extends ApiConstrainFacingMode>
+class _$ApiConstrainFacingModeCopyWithImpl<
+  $Res,
+  $Val extends ApiConstrainFacingMode
+>
     implements $ApiConstrainFacingModeCopyWith<$Res> {
   _$ApiConstrainFacingModeCopyWithImpl(this._value, this._then);
 
@@ -115,8 +111,11 @@ abstract class _$$ApiConstrainFacingMode_ExactImplCopyWith<$Res>
 
 /// @nodoc
 class __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>
-    extends _$ApiConstrainFacingModeCopyWithImpl<$Res,
-        _$ApiConstrainFacingMode_ExactImpl>
+    extends
+        _$ApiConstrainFacingModeCopyWithImpl<
+          $Res,
+          _$ApiConstrainFacingMode_ExactImpl
+        >
     implements _$$ApiConstrainFacingMode_ExactImplCopyWith<$Res> {
   __$$ApiConstrainFacingMode_ExactImplCopyWithImpl(
     _$ApiConstrainFacingMode_ExactImpl _value,
@@ -169,9 +168,11 @@ class _$ApiConstrainFacingMode_ExactImpl extends ApiConstrainFacingMode_Exact {
   @override
   @pragma('vm:prefer-inline')
   _$$ApiConstrainFacingMode_ExactImplCopyWith<
-          _$ApiConstrainFacingMode_ExactImpl>
-      get copyWith => __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<
-          _$ApiConstrainFacingMode_ExactImpl>(this, _$identity);
+    _$ApiConstrainFacingMode_ExactImpl
+  >
+  get copyWith => __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<
+    _$ApiConstrainFacingMode_ExactImpl
+  >(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -249,8 +250,9 @@ abstract class ApiConstrainFacingMode_Exact extends ApiConstrainFacingMode {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ApiConstrainFacingMode_ExactImplCopyWith<
-          _$ApiConstrainFacingMode_ExactImpl>
-      get copyWith => throw _privateConstructorUsedError;
+    _$ApiConstrainFacingMode_ExactImpl
+  >
+  get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -267,8 +269,11 @@ abstract class _$$ApiConstrainFacingMode_IdealImplCopyWith<$Res>
 
 /// @nodoc
 class __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>
-    extends _$ApiConstrainFacingModeCopyWithImpl<$Res,
-        _$ApiConstrainFacingMode_IdealImpl>
+    extends
+        _$ApiConstrainFacingModeCopyWithImpl<
+          $Res,
+          _$ApiConstrainFacingMode_IdealImpl
+        >
     implements _$$ApiConstrainFacingMode_IdealImplCopyWith<$Res> {
   __$$ApiConstrainFacingMode_IdealImplCopyWithImpl(
     _$ApiConstrainFacingMode_IdealImpl _value,
@@ -321,9 +326,11 @@ class _$ApiConstrainFacingMode_IdealImpl extends ApiConstrainFacingMode_Ideal {
   @override
   @pragma('vm:prefer-inline')
   _$$ApiConstrainFacingMode_IdealImplCopyWith<
-          _$ApiConstrainFacingMode_IdealImpl>
-      get copyWith => __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<
-          _$ApiConstrainFacingMode_IdealImpl>(this, _$identity);
+    _$ApiConstrainFacingMode_IdealImpl
+  >
+  get copyWith => __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<
+    _$ApiConstrainFacingMode_IdealImpl
+  >(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -401,6 +408,7 @@ abstract class ApiConstrainFacingMode_Ideal extends ApiConstrainFacingMode {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ApiConstrainFacingMode_IdealImplCopyWith<
-          _$ApiConstrainFacingMode_IdealImpl>
-      get copyWith => throw _privateConstructorUsedError;
+    _$ApiConstrainFacingMode_IdealImpl
+  >
+  get copyWith => throw _privateConstructorUsedError;
 }
