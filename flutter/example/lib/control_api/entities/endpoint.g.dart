@@ -25,9 +25,9 @@ WebRtcPublishEndpoint _$WebRtcPublishEndpointFromJson(
   Map<String, dynamic> json,
 ) =>
     WebRtcPublishEndpoint(
-      json['id'] as String,
-      $enumDecode(_$P2pModeEnumMap, json['p2p']),
-    )
+        json['id'] as String,
+        $enumDecode(_$P2pModeEnumMap, json['p2p']),
+      )
       ..force_relay = json['force_relay'] as bool
       ..audio_settings = AudioSettings.fromJson(
         json['audio_settings'] as Map<String, dynamic>,
@@ -38,14 +38,13 @@ WebRtcPublishEndpoint _$WebRtcPublishEndpointFromJson(
 
 Map<String, dynamic> _$WebRtcPublishEndpointToJson(
   WebRtcPublishEndpoint instance,
-) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'p2p': _$P2pModeEnumMap[instance.p2p]!,
-      'force_relay': instance.force_relay,
-      'audio_settings': instance.audio_settings,
-      'video_settings': instance.video_settings,
-    };
+) => <String, dynamic>{
+  'id': instance.id,
+  'p2p': _$P2pModeEnumMap[instance.p2p]!,
+  'force_relay': instance.force_relay,
+  'audio_settings': instance.audio_settings,
+  'video_settings': instance.video_settings,
+};
 
 const _$P2pModeEnumMap = {
   P2pMode.Always: 'Always',

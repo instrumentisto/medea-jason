@@ -148,9 +148,16 @@ StepDefinitionGeneric<TWorld> given7<
   )
   onInvoke, {
   StepDefinitionConfiguration? configuration,
-}) =>
-    step7<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5, TInput6,
-        TInput7>(pattern, 7, onInvoke, configuration: configuration);
+}) => step7<
+  TWorld,
+  TInput1,
+  TInput2,
+  TInput3,
+  TInput4,
+  TInput5,
+  TInput6,
+  TInput7
+>(pattern, 7, onInvoke, configuration: configuration);
 
 StepDefinitionGeneric<TWorld> given8<
   TInput1,
@@ -177,9 +184,17 @@ StepDefinitionGeneric<TWorld> given8<
   )
   onInvoke, {
   StepDefinitionConfiguration? configuration,
-}) =>
-    step8<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5, TInput6, TInput7,
-        TInput8>(pattern, 8, onInvoke, configuration: configuration);
+}) => step8<
+  TWorld,
+  TInput1,
+  TInput2,
+  TInput3,
+  TInput4,
+  TInput5,
+  TInput6,
+  TInput7,
+  TInput8
+>(pattern, 8, onInvoke, configuration: configuration);
 
 StepDefinitionGeneric<TWorld> given9<
   TInput1,
@@ -208,9 +223,18 @@ StepDefinitionGeneric<TWorld> given9<
   )
   onInvoke, {
   StepDefinitionConfiguration? configuration,
-}) =>
-    step9<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5, TInput6, TInput7,
-        TInput8, TInput9>(pattern, 9, onInvoke, configuration: configuration);
+}) => step9<
+  TWorld,
+  TInput1,
+  TInput2,
+  TInput3,
+  TInput4,
+  TInput5,
+  TInput6,
+  TInput7,
+  TInput8,
+  TInput9
+>(pattern, 9, onInvoke, configuration: configuration);
 
 Tuple2<MediaKind, MediaSourceKind> parseMediaKind(String kind) {
   var kind_ = MediaKind.video;

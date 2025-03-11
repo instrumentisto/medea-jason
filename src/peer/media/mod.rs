@@ -38,8 +38,8 @@ use crate::{
     peer::{LocalStreamUpdateCriteria, PeerEvent},
     platform,
     platform::{
-        CodecCapability, TransceiverInit, transceiver::probe_target_codecs
-        send_encoding_parameters::SendEncodingParameters,
+        TransceiverInit, send_encoding_parameters::SendEncodingParameters,
+        transceiver::probe_target_codecs,
     },
     utils::{Caused, Component},
 };
@@ -347,7 +347,6 @@ impl InnerMediaConnections {
                     );
 
                     let transceiver = peer.add_transceiver(kind, init).await;
-
                     let target_codecs = probe_target_codecs(
                         settings
                             .encoding_parameters

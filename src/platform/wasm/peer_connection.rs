@@ -551,8 +551,7 @@ impl RtcPeerConnection {
             offer_options.set_ice_restart(true);
         }
         let create_offer = JsFuture::from(
-            self.peer
-                .create_offer_with_rtc_offer_options(&offer_options),
+            self.peer.create_offer_with_rtc_offer_options(&offer_options),
         )
         .await
         .map_err(Into::into)

@@ -10,16 +10,16 @@ typedef _ErrorSetterFnDart = void Function(Object);
 Object Function(Pointer<Utf8>)? _newStateError;
 Object Function(Pointer<Utf8>)? _newFormatException;
 Object Function(int, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)?
-    _newLocalMediaInitException;
+_newLocalMediaInitException;
 Object Function(Pointer<Handle>, Pointer<Utf8>)? _newEnumerateDevicesException;
 Object Function(int, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)?
-    _newRpcClientException;
+_newRpcClientException;
 Object Function(Pointer<Utf8>, Pointer<Utf8>, int)?
-    _newMediaStateTransitionException;
+_newMediaStateTransitionException;
 Object Function(Pointer<Utf8>, ForeignValue, Pointer<Utf8>)?
-    _newInternalException;
+_newInternalException;
 Object Function(Pointer<Utf8>, Pointer<Handle>, bool)?
-    _newMediaSettingsUpdateException;
+_newMediaSettingsUpdateException;
 Object Function(Pointer<Utf8>)? _newInvalidOutputAudioDeviceIdException;
 Object Function(Pointer<Handle>, Pointer<Utf8>)? _newMicVolumeException;
 Object Function()? _newPanicException;
@@ -33,7 +33,7 @@ _ErrorSetterFnDart? _exception__new_media_state_transition_exception__set_error;
 _ErrorSetterFnDart? _exception__new_internal_exception__set_error;
 _ErrorSetterFnDart? _exception__new_media_settings_update_exception__set_error;
 _ErrorSetterFnDart?
-    _exception__new_invalid_output_audio_device_id_exception__set_error;
+_exception__new_invalid_output_audio_device_id_exception__set_error;
 _ErrorSetterFnDart? _exception__new_mic_volume_exception__set_error;
 _ErrorSetterFnDart? _exception__new_panic_exception__set_error;
 
@@ -42,21 +42,21 @@ void registerFunction(
   required Object Function(Pointer<Utf8>) newStateError,
   required Object Function(Pointer<Utf8>) newFormatException,
   required Object Function(int, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)
-      newLocalMediaInitException,
+  newLocalMediaInitException,
   required Object Function(Pointer<Handle>, Pointer<Utf8>)
-      newEnumerateDevicesException,
+  newEnumerateDevicesException,
   required Object Function(int, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)
-      newRpcClientException,
+  newRpcClientException,
   required Object Function(Pointer<Utf8>, Pointer<Utf8>, int)
-      newMediaStateTransitionException,
+  newMediaStateTransitionException,
   required Object Function(Pointer<Utf8>, ForeignValue, Pointer<Utf8>)
-      newInternalException,
+  newInternalException,
   required Object Function(Pointer<Utf8>, Pointer<Handle>, bool)
-      newMediaSettingsUpdateException,
+  newMediaSettingsUpdateException,
   required Object Function(Pointer<Utf8>)
-      newInvalidOutputAudioDeviceIdException,
+  newInvalidOutputAudioDeviceIdException,
   required Object Function(Pointer<Handle>, Pointer<Utf8>)
-      newMicVolumeException,
+  newMicVolumeException,
   required Object Function() newPanicException,
 }) {
   _newStateError = newStateError;
@@ -72,126 +72,128 @@ void registerFunction(
   _newMicVolumeException = newMicVolumeException;
   _newPanicException = newPanicException;
 
-  _exception__new_state_error__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'exception__new_state_error__set_error',
-  );
-  _exception__new_format_exception__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'exception__new_format_exception__set_error',
-  );
-  _exception__new_local_media_init_exception__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'exception__new_local_media_init_exception__set_error',
-  );
-  _exception__new_enumerate_devices_exception__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'exception__new_enumerate_devices_exception__set_error',
-  );
-  _exception__new_rpc_client_exception__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'exception__new_rpc_client_exception__set_error',
-  );
-  _exception__new_media_state_transition_exception__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'exception__new_media_state_transition_exception__set_error',
-  );
-  _exception__new_internal_exception__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'exception__new_internal_exception__set_error',
-  );
-  _exception__new_media_settings_update_exception__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'exception__new_media_settings_update_exception__set_error',
-  );
-  _exception__new_invalid_output_audio_device_id_exception__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'exception__new_invalid_output_audio_device_id_exception__set_error',
-  );
-  _exception__new_mic_volume_exception__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'exception__new_mic_volume_exception__set_error',
-  );
-  _exception__new_panic_exception__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'exception__new_panic_exception__set_error',
-  );
+  _exception__new_state_error__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'exception__new_state_error__set_error',
+      );
+  _exception__new_format_exception__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'exception__new_format_exception__set_error',
+      );
+  _exception__new_local_media_init_exception__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'exception__new_local_media_init_exception__set_error',
+      );
+  _exception__new_enumerate_devices_exception__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'exception__new_enumerate_devices_exception__set_error',
+      );
+  _exception__new_rpc_client_exception__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'exception__new_rpc_client_exception__set_error',
+      );
+  _exception__new_media_state_transition_exception__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'exception__new_media_state_transition_exception__set_error',
+      );
+  _exception__new_internal_exception__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'exception__new_internal_exception__set_error',
+      );
+  _exception__new_media_settings_update_exception__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'exception__new_media_settings_update_exception__set_error',
+      );
+  _exception__new_invalid_output_audio_device_id_exception__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'exception__new_invalid_output_audio_device_id_exception__set_error',
+      );
+  _exception__new_mic_volume_exception__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'exception__new_mic_volume_exception__set_error',
+      );
+  _exception__new_panic_exception__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'exception__new_panic_exception__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>> newStateError_native =
       Pointer.fromFunction(_newStateErrorProxy);
   Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
-      newFormatException_native =
-      Pointer.fromFunction(_newFormatExceptionProxy);
+  newFormatException_native = Pointer.fromFunction(_newFormatExceptionProxy);
   Pointer<
-          NativeFunction<
-              Handle Function(
-                  Int64, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)>>
-      newLocalMediaInitException_native = Pointer.fromFunction(
+    NativeFunction<
+      Handle Function(Int64, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)
+    >
+  >
+  newLocalMediaInitException_native = Pointer.fromFunction(
     _newLocalMediaInitExceptionProxy,
   );
   Pointer<NativeFunction<Handle Function(Pointer<Handle>, Pointer<Utf8>)>>
-      newEnumerateDevicesException_native = Pointer.fromFunction(
+  newEnumerateDevicesException_native = Pointer.fromFunction(
     _newEnumerateDevicesExceptionProxy,
   );
   Pointer<
-          NativeFunction<
-              Handle Function(
-                  Int64, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)>>
-      newRpcClientException_native = Pointer.fromFunction(
+    NativeFunction<
+      Handle Function(Int64, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)
+    >
+  >
+  newRpcClientException_native = Pointer.fromFunction(
     _newRpcClientExceptionProxy,
   );
   Pointer<NativeFunction<Handle Function(Pointer<Utf8>, Pointer<Utf8>, Int64)>>
-      newMediaStateTransitionException_native = Pointer.fromFunction(
+  newMediaStateTransitionException_native = Pointer.fromFunction(
     _newMediaStateTransitionExceptionProxy,
   );
   Pointer<
-          NativeFunction<
-              Handle Function(Pointer<Utf8>, ForeignValue, Pointer<Utf8>)>>
-      newInternalException_native = Pointer.fromFunction(
+    NativeFunction<Handle Function(Pointer<Utf8>, ForeignValue, Pointer<Utf8>)>
+  >
+  newInternalException_native = Pointer.fromFunction(
     _newInternalExceptionProxy,
   );
   Pointer<NativeFunction<Handle Function(Pointer<Utf8>, Pointer<Handle>, Bool)>>
-      newMediaSettingsUpdateException_native = Pointer.fromFunction(
+  newMediaSettingsUpdateException_native = Pointer.fromFunction(
     _newMediaSettingsUpdateExceptionProxy,
   );
   Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
-      newInvalidOutputAudioDeviceIdException_native = Pointer.fromFunction(
+  newInvalidOutputAudioDeviceIdException_native = Pointer.fromFunction(
     _newInvalidOutputAudioDeviceIdExceptionProxy,
   );
   Pointer<NativeFunction<Handle Function(Pointer<Handle>, Pointer<Utf8>)>>
-      newMicVolumeException_native = Pointer.fromFunction(
+  newMicVolumeException_native = Pointer.fromFunction(
     _newMicVolumeExceptionProxy,
   );
   Pointer<NativeFunction<Handle Function()>> newPanicException_native =
       Pointer.fromFunction(_newPanicExceptionProxy);
 
   dl.lookupFunction<
-      Void Function(
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-      ),
-      void Function(
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-      )>('register_exception')(
+    Void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    ),
+    void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    )
+  >('register_exception')(
     newStateError_native,
     newFormatException_native,
     newLocalMediaInitException_native,

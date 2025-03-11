@@ -552,12 +552,13 @@ mod receiver_patch {
 mod codec_probing {
     use std::collections::HashMap;
 
-    use super::*;
     use medea_client_api_proto::Codec;
     use medea_jason::{
         media::MediaKind,
-        platform::{transceiver::probe_target_codecs, CodecCapability},
+        platform::{CodecCapability, transceiver::probe_target_codecs},
     };
+
+    use super::*;
 
     fn target_codecs_mime_types(codecs: &[CodecCapability]) -> Vec<String> {
         let mut mime_types: Vec<_> =

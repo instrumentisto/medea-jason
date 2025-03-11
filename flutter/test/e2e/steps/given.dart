@@ -104,30 +104,30 @@ Future<void> newGivenMember(
 
 StepDefinitionGeneric givenOneMember =
     given5<String, String, String, String, String, CustomWorld>(
-  r'(room with joined |room with |joined |)member (\S+)'
-  r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
-  r'with no play WebRTC endpoints| with disabled| with muted|)'
-  r'( media| audio| video|)( publishing| playing|)$',
-  (
-    joined,
-    firstMemberId,
-    endpoints,
-    disabledMediaType,
-    disabledDirection,
-    context,
-  ) async {
-    await newGivenMember(
-      joined,
-      firstMemberId,
-      '',
-      '',
-      endpoints,
-      disabledMediaType,
-      disabledDirection,
-      context,
+      r'(room with joined |room with |joined |)member (\S+)'
+      r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
+      r'with no play WebRTC endpoints| with disabled| with muted|)'
+      r'( media| audio| video|)( publishing| playing|)$',
+      (
+        joined,
+        firstMemberId,
+        endpoints,
+        disabledMediaType,
+        disabledDirection,
+        context,
+      ) async {
+        await newGivenMember(
+          joined,
+          firstMemberId,
+          '',
+          '',
+          endpoints,
+          disabledMediaType,
+          disabledDirection,
+          context,
+        );
+      },
     );
-  },
-);
 
 StepDefinitionGeneric givenTwoMembers = given6<
   String,
@@ -137,10 +137,10 @@ StepDefinitionGeneric givenTwoMembers = given6<
   String,
   String,
   CustomWorld
-        >(r'(room with joined |room with |joined )member(s) (\S+) and '
-        r'(\S+)( with no WebRTC endpoints| with no publish WebRTC endpoints| '
-        r'with no play WebRTC endpoints| with disabled| with muted|)'
-        r'( media| audio| video|)( publishing| playing|)$', (
+>(r'(room with joined |room with |joined )member(s) (\S+) and '
+    r'(\S+)( with no WebRTC endpoints| with no publish WebRTC endpoints| '
+    r'with no play WebRTC endpoints| with disabled| with muted|)'
+    r'( media| audio| video|)( publishing| playing|)$', (
   joined,
   firstMemberId,
   secondMemberId,
@@ -170,11 +170,11 @@ StepDefinitionGeneric givenTreeMembers = given7<
   String,
   String,
   CustomWorld
-        >(r'(room with joined |room with |joined )member(s) (\S+) and '
-        r'(\S+) and (\S+)'
-        r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
-        r'with no play WebRTC endpoints| with disabled| with muted|)'
-        r'( media| audio| video|)( publishing| playing|)$', (
+>(r'(room with joined |room with |joined )member(s) (\S+) and '
+    r'(\S+) and (\S+)'
+    r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
+    r'with no play WebRTC endpoints| with disabled| with muted|)'
+    r'( media| audio| video|)( publishing| playing|)$', (
   joined,
   firstMemberId,
   secondMemberId,

@@ -22,40 +22,34 @@ mixin _$ConstrainBoolean {
   TResult when<TResult extends Object?>({
     required TResult Function(bool field0) exact,
     required TResult Function(bool field0) ideal,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(bool field0)? exact,
     TResult? Function(bool field0)? ideal,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(bool field0)? exact,
     TResult Function(bool field0)? ideal,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(ConstrainBoolean_Exact value) exact,
     required TResult Function(ConstrainBoolean_Ideal value) ideal,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(ConstrainBoolean_Exact value)? exact,
     TResult? Function(ConstrainBoolean_Ideal value)? ideal,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(ConstrainBoolean_Exact value)? exact,
     TResult Function(ConstrainBoolean_Ideal value)? ideal,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
 
   /// Create a copy of ConstrainBoolean
   /// with the given fields replaced by the non-null parameter values.
@@ -91,11 +85,13 @@ class _$ConstrainBooleanCopyWithImpl<$Res, $Val extends ConstrainBoolean>
   $Res call({Object? field0 = null}) {
     return _then(
       _value.copyWith(
-        field0: null == field0
-            ? _value.field0
-            : field0 // ignore: cast_nullable_to_non_nullable
-                as bool,
-      ) as $Val,
+            field0:
+                null == field0
+                    ? _value.field0
+                    : field0 // ignore: cast_nullable_to_non_nullable
+                        as bool,
+          )
+          as $Val,
     );
   }
 }
@@ -167,11 +163,11 @@ class _$ConstrainBoolean_ExactImpl extends ConstrainBoolean_Exact {
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainBoolean_ExactImplCopyWith<_$ConstrainBoolean_ExactImpl>
-      get copyWith => __$$ConstrainBoolean_ExactImplCopyWithImpl<
-              _$ConstrainBoolean_ExactImpl>(
-            this,
-            _$identity,
-          );
+  get copyWith =>
+      __$$ConstrainBoolean_ExactImplCopyWithImpl<_$ConstrainBoolean_ExactImpl>(
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
@@ -249,7 +245,7 @@ abstract class ConstrainBoolean_Exact extends ConstrainBoolean {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainBoolean_ExactImplCopyWith<_$ConstrainBoolean_ExactImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -319,11 +315,11 @@ class _$ConstrainBoolean_IdealImpl extends ConstrainBoolean_Ideal {
   @override
   @pragma('vm:prefer-inline')
   _$$ConstrainBoolean_IdealImplCopyWith<_$ConstrainBoolean_IdealImpl>
-      get copyWith => __$$ConstrainBoolean_IdealImplCopyWithImpl<
-              _$ConstrainBoolean_IdealImpl>(
-            this,
-            _$identity,
-          );
+  get copyWith =>
+      __$$ConstrainBoolean_IdealImplCopyWithImpl<_$ConstrainBoolean_IdealImpl>(
+        this,
+        _$identity,
+      );
 
   @override
   @optionalTypeArgs
@@ -401,7 +397,7 @@ abstract class ConstrainBoolean_Ideal extends ConstrainBoolean {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ConstrainBoolean_IdealImplCopyWith<_$ConstrainBoolean_IdealImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -412,45 +408,39 @@ mixin _$ConstrainU32 {
     required TResult Function(int field0) exact,
     required TResult Function(int field0) ideal,
     required TResult Function(int field0, int field1) range,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(int field0)? exact,
     TResult? Function(int field0)? ideal,
     TResult? Function(int field0, int field1)? range,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(int field0)? exact,
     TResult Function(int field0)? ideal,
     TResult Function(int field0, int field1)? range,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(ConstrainU32_Exact value) exact,
     required TResult Function(ConstrainU32_Ideal value) ideal,
     required TResult Function(ConstrainU32_Range value) range,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(ConstrainU32_Exact value)? exact,
     TResult? Function(ConstrainU32_Ideal value)? ideal,
     TResult? Function(ConstrainU32_Range value)? range,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(ConstrainU32_Exact value)? exact,
     TResult Function(ConstrainU32_Ideal value)? ideal,
     TResult Function(ConstrainU32_Range value)? range,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
 
   /// Create a copy of ConstrainU32
   /// with the given fields replaced by the non-null parameter values.
@@ -486,11 +476,13 @@ class _$ConstrainU32CopyWithImpl<$Res, $Val extends ConstrainU32>
   $Res call({Object? field0 = null}) {
     return _then(
       _value.copyWith(
-        field0: null == field0
-            ? _value.field0
-            : field0 // ignore: cast_nullable_to_non_nullable
-                as int,
-      ) as $Val,
+            field0:
+                null == field0
+                    ? _value.field0
+                    : field0 // ignore: cast_nullable_to_non_nullable
+                        as int,
+          )
+          as $Val,
     );
   }
 }

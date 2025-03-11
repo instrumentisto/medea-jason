@@ -9,7 +9,7 @@ use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
 use super::{
-    codec_capability::CodecCapability, parameters::Parameters,
+    codec_capability::CodecCapability,
     send_encoding_parameters::SendEncodingParameters,
     send_parameters::SendParameters,
 };
@@ -209,10 +209,7 @@ impl Transceiver {
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
     async fn direction(&self) -> TransceiverDirection {
         let fut = unsafe { transceiver::get_direction(self.0.get()) }.unwrap();
-        unsafe { FutureFromDart::execute::<i32>(fut) }
-            .await
-            .unwrap()
-            .into()
+        unsafe { FutureFromDart::execute::<i32>(fut) }.await.unwrap().into()
     }
 
     /// Returns [`SendParameters`] of the underlying [RTCRtpSender].

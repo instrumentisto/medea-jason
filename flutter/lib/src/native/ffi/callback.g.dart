@@ -35,9 +35,10 @@ void registerFunction(
   Pointer<NativeFunction<Handle Function(Pointer)>> callProxy_native =
       Pointer.fromFunction(_callProxyProxy);
 
-  dl.lookupFunction<Void Function(Pointer, Pointer),
-          void Function(Pointer, Pointer)>('register_callback')(
-      callTwoArgProxy_native, callProxy_native);
+  dl.lookupFunction<
+    Void Function(Pointer, Pointer),
+    void Function(Pointer, Pointer)
+  >('register_callback')(callTwoArgProxy_native, callProxy_native);
 }
 
 Object _callTwoArgProxyProxy(Pointer arg0) {

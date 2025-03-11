@@ -33,26 +33,26 @@ void registerFunction(
   _errorCode = errorCode;
   _errorText = errorText;
 
-  _ice_candidate_error__address__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'ice_candidate_error__address__set_error',
-  );
-  _ice_candidate_error__port__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'ice_candidate_error__port__set_error',
-  );
-  _ice_candidate_error__url__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'ice_candidate_error__url__set_error',
-  );
-  _ice_candidate_error__error_code__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'ice_candidate_error__error_code__set_error',
-  );
-  _ice_candidate_error__error_text__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'ice_candidate_error__error_text__set_error',
-  );
+  _ice_candidate_error__address__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'ice_candidate_error__address__set_error',
+      );
+  _ice_candidate_error__port__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'ice_candidate_error__port__set_error',
+      );
+  _ice_candidate_error__url__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'ice_candidate_error__url__set_error',
+      );
+  _ice_candidate_error__error_code__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'ice_candidate_error__error_code__set_error',
+      );
+  _ice_candidate_error__error_text__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'ice_candidate_error__error_text__set_error',
+      );
 
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> address_native =
       Pointer.fromFunction(_addressProxy);
@@ -66,9 +66,9 @@ void registerFunction(
       Pointer.fromFunction(_errorTextProxy);
 
   dl.lookupFunction<
-      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
-      void Function(Pointer, Pointer, Pointer, Pointer,
-          Pointer)>('register_ice_candidate_error')(
+    Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
+    void Function(Pointer, Pointer, Pointer, Pointer, Pointer)
+  >('register_ice_candidate_error')(
     address_native,
     port_native,
     url_native,

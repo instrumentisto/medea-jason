@@ -73,66 +73,66 @@ void registerFunction(
   _isOnAudioLevelAvailable = isOnAudioLevelAvailable;
   _onAudioLevelChanged = onAudioLevelChanged;
 
-  _media_stream_track__id__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__id__set_error',
-  );
-  _media_stream_track__device_id__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__device_id__set_error',
-  );
-  _media_stream_track__kind__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__kind__set_error',
-  );
-  _media_stream_track__facing_mode__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__facing_mode__set_error',
-  );
-  _media_stream_track__height__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__height__set_error',
-  );
-  _media_stream_track__width__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__width__set_error',
-  );
-  _media_stream_track__enabled__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__enabled__set_error',
-  );
-  _media_stream_track__set_enabled__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__set_enabled__set_error',
-  );
-  _media_stream_track__ready_state__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__ready_state__set_error',
-  );
-  _media_stream_track__stop__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__stop__set_error',
-  );
-  _media_stream_track__on_ended__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__on_ended__set_error',
-  );
-  _media_stream_track__clone__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__clone__set_error',
-  );
-  _media_stream_track__dispose__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__dispose__set_error',
-  );
-  _media_stream_track__is_on_audio_level_available__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__is_on_audio_level_available__set_error',
-  );
-  _media_stream_track__on_audio_level_changed__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_stream_track__on_audio_level_changed__set_error',
-  );
+  _media_stream_track__id__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__id__set_error',
+      );
+  _media_stream_track__device_id__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__device_id__set_error',
+      );
+  _media_stream_track__kind__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__kind__set_error',
+      );
+  _media_stream_track__facing_mode__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__facing_mode__set_error',
+      );
+  _media_stream_track__height__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__height__set_error',
+      );
+  _media_stream_track__width__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__width__set_error',
+      );
+  _media_stream_track__enabled__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__enabled__set_error',
+      );
+  _media_stream_track__set_enabled__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__set_enabled__set_error',
+      );
+  _media_stream_track__ready_state__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__ready_state__set_error',
+      );
+  _media_stream_track__stop__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__stop__set_error',
+      );
+  _media_stream_track__on_ended__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__on_ended__set_error',
+      );
+  _media_stream_track__clone__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__clone__set_error',
+      );
+  _media_stream_track__dispose__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__dispose__set_error',
+      );
+  _media_stream_track__is_on_audio_level_available__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__is_on_audio_level_available__set_error',
+      );
+  _media_stream_track__on_audio_level_changed__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__on_audio_level_changed__set_error',
+      );
 
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> id_native =
       Pointer.fromFunction(_idProxy);
@@ -161,49 +161,49 @@ void registerFunction(
   Pointer<NativeFunction<Handle Function(Handle)>> dispose_native =
       Pointer.fromFunction(_disposeProxy);
   Pointer<NativeFunction<Bool Function(Handle)>>
-      isOnAudioLevelAvailable_native = Pointer.fromFunction(
+  isOnAudioLevelAvailable_native = Pointer.fromFunction(
     _isOnAudioLevelAvailableProxy,
     false,
   );
   Pointer<NativeFunction<Void Function(Handle, Handle)>>
-      onAudioLevelChanged_native =
-      Pointer.fromFunction(_onAudioLevelChangedProxy);
+  onAudioLevelChanged_native = Pointer.fromFunction(_onAudioLevelChangedProxy);
 
   dl.lookupFunction<
-      Void Function(
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-      ),
-      void Function(
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-      )>('register_media_stream_track')(
+    Void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    ),
+    void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    )
+  >('register_media_stream_track')(
     id_native,
     deviceId_native,
     kind_native,

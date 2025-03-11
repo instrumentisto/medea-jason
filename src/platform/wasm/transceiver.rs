@@ -6,19 +6,15 @@ use derive_more::with_trait::From;
 use js_sys::Reflect;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{
-    RtcRtpParameters, RtcRtpEncodingParameters, RtcRtpTransceiver, RtcRtpTransceiverInit,
-};
+use web_sys::{RtcRtpParameters, RtcRtpTransceiver, RtcRtpTransceiverInit};
 
 use crate::{
     media::track::local,
     platform::{
-        self,
-        Error, TransceiverDirection,
+        self, TransceiverDirection,
         send_encoding_parameters::SendEncodingParameters,
-        wasm::codec_capability::CodecCapability,
         send_parameters::SendParameters,
-        wasm::codec_capability::CodecCapability, TransceiverDirection,
+        wasm::codec_capability::CodecCapability,
     },
 };
 

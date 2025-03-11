@@ -7,7 +7,7 @@ use crate::{
     media::MediaKind,
     platform,
     platform::{
-        send_encoding_parameters::SendEncodingParameters, CodecCapability,
+        CodecCapability, send_encoding_parameters::SendEncodingParameters,
     },
     utils::Caused,
 };

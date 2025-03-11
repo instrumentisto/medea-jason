@@ -21,10 +21,10 @@ void registerFunction(
   _init = init;
   _set = set;
 
-  _map__init__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'map__init__set_error',
-  );
+  _map__init__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'map__init__set_error',
+      );
   _map__set__set_error = dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
     'map__set__set_error',
   );
@@ -33,10 +33,12 @@ void registerFunction(
     _initProxy,
   );
   Pointer<NativeFunction<Void Function(Handle, Pointer<Utf8>, ForeignValue)>>
-      set_native = Pointer.fromFunction(_setProxy);
+  set_native = Pointer.fromFunction(_setProxy);
 
-  dl.lookupFunction<Void Function(Pointer, Pointer),
-      void Function(Pointer, Pointer)>('register_map')(init_native, set_native);
+  dl.lookupFunction<
+    Void Function(Pointer, Pointer),
+    void Function(Pointer, Pointer)
+  >('register_map')(init_native, set_native);
 }
 
 Object _initProxy() {

@@ -5,11 +5,10 @@
 use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
-use crate::platform::dart::utils::handle::DartHandle;
-
 use super::{
     send_encoding_parameters::SendEncodingParameters, utils::list::DartList,
 };
+use crate::platform::dart::utils::handle::DartHandle;
 
 #[dart_bridge("flutter/lib/src/native/platform/send_parameters.g.dart")]
 mod send_parameters {
@@ -24,7 +23,7 @@ mod send_parameters {
         /// [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
         /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
         pub fn encodings(parameters: Dart_Handle)
-            -> Result<Dart_Handle, Error>;
+        -> Result<Dart_Handle, Error>;
     }
 }
 

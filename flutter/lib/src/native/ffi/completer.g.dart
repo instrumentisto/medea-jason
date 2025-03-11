@@ -33,26 +33,26 @@ void registerFunction(
   _future = future;
   _delayed = delayed;
 
-  _completer__init__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'completer__init__set_error',
-  );
-  _completer__complete__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'completer__complete__set_error',
-  );
-  _completer__complete_error__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'completer__complete_error__set_error',
-  );
-  _completer__future__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'completer__future__set_error',
-  );
-  _completer__delayed__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'completer__delayed__set_error',
-  );
+  _completer__init__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'completer__init__set_error',
+      );
+  _completer__complete__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'completer__complete__set_error',
+      );
+  _completer__complete_error__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'completer__complete_error__set_error',
+      );
+  _completer__future__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'completer__future__set_error',
+      );
+  _completer__delayed__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'completer__delayed__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function()>> init_native = Pointer.fromFunction(
     _initProxy,
@@ -60,16 +60,16 @@ void registerFunction(
   Pointer<NativeFunction<Void Function(Handle, ForeignValue)>> complete_native =
       Pointer.fromFunction(_completeProxy);
   Pointer<NativeFunction<Void Function(Handle, Pointer<Handle>)>>
-      completeError_native = Pointer.fromFunction(_completeErrorProxy);
+  completeError_native = Pointer.fromFunction(_completeErrorProxy);
   Pointer<NativeFunction<Handle Function(Handle)>> future_native =
       Pointer.fromFunction(_futureProxy);
   Pointer<NativeFunction<Handle Function(Int32)>> delayed_native =
       Pointer.fromFunction(_delayedProxy);
 
   dl.lookupFunction<
-      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
-      void Function(
-          Pointer, Pointer, Pointer, Pointer, Pointer)>('register_completer')(
+    Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
+    void Function(Pointer, Pointer, Pointer, Pointer, Pointer)
+  >('register_completer')(
     init_native,
     complete_native,
     completeError_native,

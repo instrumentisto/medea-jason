@@ -1,14 +1,13 @@
 //! Platform-agnostic functionality of [`platform::RtcPeerConnection`].
 
 use derive_more::with_trait::{Display, From};
+#[cfg(doc)]
+use platform::Transceiver;
 
 use crate::{
     platform::{self, RtcStatsError},
     utils::Caused,
 };
-
-#[cfg(doc)]
-use platform::Transceiver;
 
 /// Representation of [RTCSdpType].
 ///

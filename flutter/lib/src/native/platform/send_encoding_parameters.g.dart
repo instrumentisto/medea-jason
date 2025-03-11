@@ -19,16 +19,16 @@ void Function(Object, Pointer<Utf8>)? _setScalabilityMode;
 Pointer Function(Object)? _getScalabilityMode;
 
 _ErrorSetterFnDart?
-    _send_encoding_parameters__new_send_encoding_parameters__set_error;
+_send_encoding_parameters__new_send_encoding_parameters__set_error;
 _ErrorSetterFnDart? _send_encoding_parameters__get_rid__set_error;
 _ErrorSetterFnDart? _send_encoding_parameters__set_active__set_error;
 _ErrorSetterFnDart? _send_encoding_parameters__get_active__set_error;
 _ErrorSetterFnDart? _send_encoding_parameters__set_max_bitrate__set_error;
 _ErrorSetterFnDart? _send_encoding_parameters__get_max_bitrate__set_error;
 _ErrorSetterFnDart?
-    _send_encoding_parameters__set_scale_resolution_down_by__set_error;
+_send_encoding_parameters__set_scale_resolution_down_by__set_error;
 _ErrorSetterFnDart?
-    _send_encoding_parameters__get_scale_resolution_down_by__set_error;
+_send_encoding_parameters__get_scale_resolution_down_by__set_error;
 _ErrorSetterFnDart? _send_encoding_parameters__set_scalability_mode__set_error;
 _ErrorSetterFnDart? _send_encoding_parameters__get_scalability_mode__set_error;
 
@@ -56,49 +56,49 @@ void registerFunction(
   _setScalabilityMode = setScalabilityMode;
   _getScalabilityMode = getScalabilityMode;
 
-  _send_encoding_parameters__new_send_encoding_parameters__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'send_encoding_parameters__new_send_encoding_parameters__set_error',
-  );
-  _send_encoding_parameters__get_rid__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'send_encoding_parameters__get_rid__set_error',
-  );
-  _send_encoding_parameters__set_active__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'send_encoding_parameters__set_active__set_error',
-  );
-  _send_encoding_parameters__get_active__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'send_encoding_parameters__get_active__set_error',
-  );
-  _send_encoding_parameters__set_max_bitrate__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'send_encoding_parameters__set_max_bitrate__set_error',
-  );
-  _send_encoding_parameters__get_max_bitrate__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'send_encoding_parameters__get_max_bitrate__set_error',
-  );
-  _send_encoding_parameters__set_scale_resolution_down_by__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'send_encoding_parameters__set_scale_resolution_down_by__set_error',
-  );
-  _send_encoding_parameters__get_scale_resolution_down_by__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'send_encoding_parameters__get_scale_resolution_down_by__set_error',
-  );
-  _send_encoding_parameters__set_scalability_mode__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'send_encoding_parameters__set_scalability_mode__set_error',
-  );
-  _send_encoding_parameters__get_scalability_mode__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'send_encoding_parameters__get_scalability_mode__set_error',
-  );
+  _send_encoding_parameters__new_send_encoding_parameters__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'send_encoding_parameters__new_send_encoding_parameters__set_error',
+      );
+  _send_encoding_parameters__get_rid__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'send_encoding_parameters__get_rid__set_error',
+      );
+  _send_encoding_parameters__set_active__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'send_encoding_parameters__set_active__set_error',
+      );
+  _send_encoding_parameters__get_active__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'send_encoding_parameters__get_active__set_error',
+      );
+  _send_encoding_parameters__set_max_bitrate__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'send_encoding_parameters__set_max_bitrate__set_error',
+      );
+  _send_encoding_parameters__get_max_bitrate__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'send_encoding_parameters__get_max_bitrate__set_error',
+      );
+  _send_encoding_parameters__set_scale_resolution_down_by__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'send_encoding_parameters__set_scale_resolution_down_by__set_error',
+      );
+  _send_encoding_parameters__get_scale_resolution_down_by__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'send_encoding_parameters__get_scale_resolution_down_by__set_error',
+      );
+  _send_encoding_parameters__set_scalability_mode__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'send_encoding_parameters__set_scalability_mode__set_error',
+      );
+  _send_encoding_parameters__get_scalability_mode__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'send_encoding_parameters__get_scalability_mode__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function(Pointer<Utf8>, Bool)>>
-      newSendEncodingParameters_native = Pointer.fromFunction(
+  newSendEncodingParameters_native = Pointer.fromFunction(
     _newSendEncodingParametersProxy,
   );
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> getRid_native =
@@ -112,44 +112,44 @@ void registerFunction(
   Pointer<NativeFunction<Pointer Function(Handle)>> getMaxBitrate_native =
       Pointer.fromFunction(_getMaxBitrateProxy);
   Pointer<NativeFunction<Void Function(Handle, Double)>>
-      setScaleResolutionDownBy_native = Pointer.fromFunction(
+  setScaleResolutionDownBy_native = Pointer.fromFunction(
     _setScaleResolutionDownByProxy,
   );
   Pointer<NativeFunction<Pointer Function(Handle)>>
-      getScaleResolutionDownBy_native = Pointer.fromFunction(
+  getScaleResolutionDownBy_native = Pointer.fromFunction(
     _getScaleResolutionDownByProxy,
   );
   Pointer<NativeFunction<Void Function(Handle, Pointer<Utf8>)>>
-      setScalabilityMode_native =
-      Pointer.fromFunction(_setScalabilityModeProxy);
+  setScalabilityMode_native = Pointer.fromFunction(_setScalabilityModeProxy);
   Pointer<NativeFunction<Pointer Function(Handle)>> getScalabilityMode_native =
       Pointer.fromFunction(_getScalabilityModeProxy);
 
   dl.lookupFunction<
-      Void Function(
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-      ),
-      void Function(
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-      )>('register_send_encoding_parameters')(
+    Void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    ),
+    void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    )
+  >('register_send_encoding_parameters')(
     newSendEncodingParameters_native,
     getRid_native,
     setActive_native,

@@ -17,10 +17,10 @@ void registerFunction(
 }) {
   _encodings = encodings;
 
-  _send_parameters__encodings__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'send_parameters__encodings__set_error',
-  );
+  _send_parameters__encodings__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'send_parameters__encodings__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function(Handle)>> encodings_native =
       Pointer.fromFunction(_encodingsProxy);

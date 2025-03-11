@@ -16,7 +16,7 @@ Pointer<Utf8> Function(Object)? _parameters;
 
 _ErrorSetterFnDart? _codec_capability__get_sender_codec_capabilities__set_error;
 _ErrorSetterFnDart?
-    _codec_capability__get_receiver_codec_capabilities__set_error;
+_codec_capability__get_receiver_codec_capabilities__set_error;
 _ErrorSetterFnDart? _codec_capability__mime_type__set_error;
 _ErrorSetterFnDart? _codec_capability__clock_rate__set_error;
 _ErrorSetterFnDart? _codec_capability__channels__set_error;
@@ -38,37 +38,37 @@ void registerFunction(
   _channels = channels;
   _parameters = parameters;
 
-  _codec_capability__get_sender_codec_capabilities__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'codec_capability__get_sender_codec_capabilities__set_error',
-  );
-  _codec_capability__get_receiver_codec_capabilities__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'codec_capability__get_receiver_codec_capabilities__set_error',
-  );
-  _codec_capability__mime_type__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'codec_capability__mime_type__set_error',
-  );
-  _codec_capability__clock_rate__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'codec_capability__clock_rate__set_error',
-  );
-  _codec_capability__channels__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'codec_capability__channels__set_error',
-  );
-  _codec_capability__parameters__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'codec_capability__parameters__set_error',
-  );
+  _codec_capability__get_sender_codec_capabilities__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'codec_capability__get_sender_codec_capabilities__set_error',
+      );
+  _codec_capability__get_receiver_codec_capabilities__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'codec_capability__get_receiver_codec_capabilities__set_error',
+      );
+  _codec_capability__mime_type__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'codec_capability__mime_type__set_error',
+      );
+  _codec_capability__clock_rate__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'codec_capability__clock_rate__set_error',
+      );
+  _codec_capability__channels__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'codec_capability__channels__set_error',
+      );
+  _codec_capability__parameters__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'codec_capability__parameters__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function(Int64)>>
-      getSenderCodecCapabilities_native = Pointer.fromFunction(
+  getSenderCodecCapabilities_native = Pointer.fromFunction(
     _getSenderCodecCapabilitiesProxy,
   );
   Pointer<NativeFunction<Handle Function(Int64)>>
-      getReceiverCodecCapabilities_native = Pointer.fromFunction(
+  getReceiverCodecCapabilities_native = Pointer.fromFunction(
     _getReceiverCodecCapabilitiesProxy,
   );
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> mimeType_native =
@@ -81,9 +81,9 @@ void registerFunction(
       Pointer.fromFunction(_parametersProxy);
 
   dl.lookupFunction<
-      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
-      void Function(Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer)>('register_codec_capability')(
+    Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
+    void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer)
+  >('register_codec_capability')(
     getSenderCodecCapabilities_native,
     getReceiverCodecCapabilities_native,
     mimeType_native,

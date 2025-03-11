@@ -17,10 +17,10 @@ void registerFunction(
 }) {
   _completeProxy = completeProxy;
 
-  _future_from_dart__complete_proxy__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'future_from_dart__complete_proxy__set_error',
-  );
+  _future_from_dart__complete_proxy__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'future_from_dart__complete_proxy__set_error',
+      );
 
   Pointer<NativeFunction<Void Function(Handle, Pointer)>> completeProxy_native =
       Pointer.fromFunction(_completeProxyProxy);

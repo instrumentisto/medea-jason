@@ -53,46 +53,46 @@ void registerFunction(
   _onDeviceChange = onDeviceChange;
   _getMediaExceptionKind = getMediaExceptionKind;
 
-  _media_devices__enumerate_devices__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_devices__enumerate_devices__set_error',
-  );
-  _media_devices__enumerate_displays__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_devices__enumerate_displays__set_error',
-  );
-  _media_devices__get_user_media__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_devices__get_user_media__set_error',
-  );
-  _media_devices__get_display_media__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_devices__get_display_media__set_error',
-  );
-  _media_devices__set_output_audio_id__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_devices__set_output_audio_id__set_error',
-  );
-  _media_devices__microphone_volume_is_available__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_devices__microphone_volume_is_available__set_error',
-  );
-  _media_devices__microphone_volume__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_devices__microphone_volume__set_error',
-  );
-  _media_devices__set_microphone_volume__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_devices__set_microphone_volume__set_error',
-  );
-  _media_devices__on_device_change__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_devices__on_device_change__set_error',
-  );
-  _media_devices__get_media_exception_kind__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_devices__get_media_exception_kind__set_error',
-  );
+  _media_devices__enumerate_devices__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_devices__enumerate_devices__set_error',
+      );
+  _media_devices__enumerate_displays__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_devices__enumerate_displays__set_error',
+      );
+  _media_devices__get_user_media__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_devices__get_user_media__set_error',
+      );
+  _media_devices__get_display_media__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_devices__get_display_media__set_error',
+      );
+  _media_devices__set_output_audio_id__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_devices__set_output_audio_id__set_error',
+      );
+  _media_devices__microphone_volume_is_available__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_devices__microphone_volume_is_available__set_error',
+      );
+  _media_devices__microphone_volume__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_devices__microphone_volume__set_error',
+      );
+  _media_devices__set_microphone_volume__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_devices__set_microphone_volume__set_error',
+      );
+  _media_devices__on_device_change__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_devices__on_device_change__set_error',
+      );
+  _media_devices__get_media_exception_kind__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_devices__get_media_exception_kind__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function()>> enumerateDevices_native =
       Pointer.fromFunction(_enumerateDevicesProxy);
@@ -103,9 +103,9 @@ void registerFunction(
   Pointer<NativeFunction<Handle Function(Handle)>> getDisplayMedia_native =
       Pointer.fromFunction(_getDisplayMediaProxy);
   Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
-      setOutputAudioId_native = Pointer.fromFunction(_setOutputAudioIdProxy);
+  setOutputAudioId_native = Pointer.fromFunction(_setOutputAudioIdProxy);
   Pointer<NativeFunction<Handle Function()>>
-      microphoneVolumeIsAvailable_native = Pointer.fromFunction(
+  microphoneVolumeIsAvailable_native = Pointer.fromFunction(
     _microphoneVolumeIsAvailableProxy,
   );
   Pointer<NativeFunction<Handle Function()>> microphoneVolume_native =
@@ -118,30 +118,31 @@ void registerFunction(
       Pointer.fromFunction(_getMediaExceptionKindProxy, 0);
 
   dl.lookupFunction<
-      Void Function(
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-      ),
-      void Function(
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-        Pointer,
-      )>('register_media_devices')(
+    Void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    ),
+    void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    )
+  >('register_media_devices')(
     enumerateDevices_native,
     enumerateDisplays_native,
     getUserMedia_native,

@@ -52,24 +52,24 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (builder.isSend) {
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-          MediaKind.audio,
-          MediaSourceKind.device,
-        ):
+              MediaKind.audio,
+              MediaSourceKind.device,
+            ):
             true,
       });
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-          MediaKind.video,
-          MediaSourceKind.device,
-        ):
+              MediaKind.video,
+              MediaSourceKind.device,
+            ):
             true,
       });
       if (isSfu) {
         sendState.addAll({
           const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.video,
-            MediaSourceKind.display,
-          ):
+                MediaKind.video,
+                MediaSourceKind.display,
+              ):
               true,
         });
       }
@@ -85,25 +85,25 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (builder.isRecv) {
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-          MediaKind.audio,
-          MediaSourceKind.device,
-        ):
+              MediaKind.audio,
+              MediaSourceKind.device,
+            ):
             true,
       });
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-          MediaKind.video,
-          MediaSourceKind.device,
-        ):
+              MediaKind.video,
+              MediaSourceKind.device,
+            ):
             true,
       });
 
       if (isSfu) {
         recvState.addAll({
           const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.video,
-            MediaSourceKind.display,
-          ):
+                MediaKind.video,
+                MediaSourceKind.display,
+              ):
               true,
         });
       }
@@ -134,15 +134,15 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (builder.isSend) {
       var recvEndpoints =
           members.entries.where((element) => element.value.isRecv).map((e) {
-        var endpointId = 'play-$builderId';
-        var mId = e.value.id;
-        var id = '$roomId/$mId/$endpointId';
-        var elem = WebRtcPlayEndpoint(
-          endpointId,
-          'local://$roomId/$builderId/publish',
-        );
-        return Tuple2(id, elem);
-      }).toList();
+            var endpointId = 'play-$builderId';
+            var mId = e.value.id;
+            var id = '$roomId/$mId/$endpointId';
+            var elem = WebRtcPlayEndpoint(
+              endpointId,
+              'local://$roomId/$builderId/publish',
+            );
+            return Tuple2(id, elem);
+          }).toList();
 
       for (var element in recvEndpoints) {
         await controlClient.create(element.item1, element.item2);
@@ -265,14 +265,15 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   /// Waits until a [Member] with the provided ID will connect with his
   /// responders.
   Future<void> waitForInterconnection(String memberId) async {
-    var interconnectedMembers = members.entries
-        .where(
-          (element) =>
-              element.value.isJoined &&
-              element.value.id != memberId &&
-              (element.value.isRecv || element.value.isSend),
-        )
-        .toList();
+    var interconnectedMembers =
+        members.entries
+            .where(
+              (element) =>
+                  element.value.isJoined &&
+                  element.value.id != memberId &&
+                  (element.value.isRecv || element.value.isSend),
+            )
+            .toList();
     var member = members[memberId]!;
 
     for (var i = 0; i < interconnectedMembers.length; ++i) {
@@ -370,8 +371,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         );
       } catch (e) {
         if (!e.toString().contains(
-              'Endpoint with provided FID already exists',
-            )) {
+          'Endpoint with provided FID already exists',
+        )) {
           rethrow;
         }
       }
@@ -396,8 +397,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         );
       } catch (e) {
         if (!e.toString().contains(
-              'Endpoint with provided FID already exists',
-            )) {
+          'Endpoint with provided FID already exists',
+        )) {
           rethrow;
         }
       }

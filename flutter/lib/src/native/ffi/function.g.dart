@@ -17,10 +17,10 @@ void registerFunction(
 }) {
   _caller = caller;
 
-  _function__caller__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'function__caller__set_error',
-  );
+  _function__caller__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'function__caller__set_error',
+      );
 
   Pointer<NativeFunction<Void Function(Handle, ForeignValue)>> caller_native =
       Pointer.fromFunction(_callerProxy);

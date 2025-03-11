@@ -84,22 +84,22 @@ StepDefinitionGeneric whenControlApiRemovesMemberViaApply =
 
 StepDefinitionGeneric whenControlApiInterconnectsMembers =
     when2<String, String, CustomWorld>(
-  r'Control API interconnects (\S+) and (\S+)$',
-  (id, partnerId, context) async {
-    var memberPair = MembersPair(
-      PairedMember(
-        id,
-        AudioSettings(PublishPolicy.Optional),
-        VideoSettings(PublishPolicy.Optional),
-        true,
-      ),
-      PairedMember(
-        partnerId,
-        AudioSettings(PublishPolicy.Optional),
-        VideoSettings(PublishPolicy.Optional),
-        true,
-      ),
-    );
+      r'Control API interconnects (\S+) and (\S+)$',
+      (id, partnerId, context) async {
+        var memberPair = MembersPair(
+          PairedMember(
+            id,
+            AudioSettings(PublishPolicy.Optional),
+            VideoSettings(PublishPolicy.Optional),
+            true,
+          ),
+          PairedMember(
+            partnerId,
+            AudioSettings(PublishPolicy.Optional),
+            VideoSettings(PublishPolicy.Optional),
+            true,
+          ),
+        );
 
         await context.world.interconnectMembers(memberPair);
       },
@@ -107,23 +107,23 @@ StepDefinitionGeneric whenControlApiInterconnectsMembers =
 
 StepDefinitionGeneric whenControlApiInterconnectsViaApply =
     when2<String, String, CustomWorld>(
-  r'Control API interconnects (\S+) and (\S+) with '
-  r'`Apply` method$',
-  (id, partnerId, context) async {
-    var memberPair = MembersPair(
-      PairedMember(
-        id,
-        AudioSettings(PublishPolicy.Optional),
-        VideoSettings(PublishPolicy.Optional),
-        true,
-      ),
-      PairedMember(
-        partnerId,
-        AudioSettings(PublishPolicy.Optional),
-        VideoSettings(PublishPolicy.Optional),
-        true,
-      ),
-    );
+      r'Control API interconnects (\S+) and (\S+) with '
+      r'`Apply` method$',
+      (id, partnerId, context) async {
+        var memberPair = MembersPair(
+          PairedMember(
+            id,
+            AudioSettings(PublishPolicy.Optional),
+            VideoSettings(PublishPolicy.Optional),
+            true,
+          ),
+          PairedMember(
+            partnerId,
+            AudioSettings(PublishPolicy.Optional),
+            VideoSettings(PublishPolicy.Optional),
+            true,
+          ),
+        );
 
         await context.world.interconnectMembersViaApply(memberPair);
       },

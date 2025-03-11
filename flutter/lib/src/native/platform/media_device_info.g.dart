@@ -33,26 +33,26 @@ void registerFunction(
   _groupId = groupId;
   _isFailed = isFailed;
 
-  _media_device_info__device_id__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_device_info__device_id__set_error',
-  );
-  _media_device_info__kind__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_device_info__kind__set_error',
-  );
-  _media_device_info__label__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_device_info__label__set_error',
-  );
-  _media_device_info__group_id__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_device_info__group_id__set_error',
-  );
-  _media_device_info__is_failed__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'media_device_info__is_failed__set_error',
-  );
+  _media_device_info__device_id__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_device_info__device_id__set_error',
+      );
+  _media_device_info__kind__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_device_info__kind__set_error',
+      );
+  _media_device_info__label__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_device_info__label__set_error',
+      );
+  _media_device_info__group_id__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_device_info__group_id__set_error',
+      );
+  _media_device_info__is_failed__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_device_info__is_failed__set_error',
+      );
 
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> deviceId_native =
       Pointer.fromFunction(_deviceIdProxy);
@@ -66,9 +66,9 @@ void registerFunction(
       Pointer.fromFunction(_isFailedProxy, false);
 
   dl.lookupFunction<
-      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
-      void Function(Pointer, Pointer, Pointer, Pointer,
-          Pointer)>('register_media_device_info')(
+    Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
+    void Function(Pointer, Pointer, Pointer, Pointer, Pointer)
+  >('register_media_device_info')(
     deviceId_native,
     kind_native,
     label_native,

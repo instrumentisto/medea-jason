@@ -221,11 +221,7 @@ impl WebSocketRpcClient {
     ) {
         self.send_command(
             room_id,
-            Command::JoinRoom {
-                member_id,
-                credential,
-                capabilities,
-            },
+            Command::JoinRoom { member_id, credential, capabilities },
         );
     }
 

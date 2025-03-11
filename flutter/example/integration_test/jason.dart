@@ -189,10 +189,10 @@ void main() {
     dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
       'register__test__test_callback_handle_function',
     )(Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
-    final dartHandleListener =
-        dl.lookupFunction<Handle Function(), Object Function()>(
-      'test_callback_listener_dart_handle',
-    );
+    final dartHandleListener = dl
+        .lookupFunction<Handle Function(), Object Function()>(
+          'test_callback_listener_dart_handle',
+        );
 
     var obj = TestObj(0);
 
@@ -310,10 +310,10 @@ void main() {
       'register__test__future_from_dart_handle_fn',
     )(Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
 
-    final handleResolver =
-        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-      'test__future_from_dart__handle',
-    );
+    final handleResolver = dl
+        .lookupFunction<Handle Function(Handle), Object Function(Object)>(
+          'test__future_from_dart__handle',
+        );
 
     var testObj = TestObj(0);
     fut() => Future.delayed(const Duration(milliseconds: 500), () async {
@@ -326,10 +326,10 @@ void main() {
   testWidgets('FutureResolver catches exceptions', (
     WidgetTester widgetTester,
   ) async {
-    final futureCatchesException =
-        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-      'test__future_from_dart__fails',
-    );
+    final futureCatchesException = dl
+        .lookupFunction<Handle Function(Handle), Object Function(Object)>(
+          'test__future_from_dart__fails',
+        );
 
     fut() => Future.delayed(const Duration(milliseconds: 500), () async {
       throw Exception('Test Exception');

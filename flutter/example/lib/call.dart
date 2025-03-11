@@ -101,20 +101,22 @@ class Call {
       var devices = await _mediaManager.enumerateDevices();
 
       if (publishVideo) {
-        videoDeviceId = devices
-            .firstWhere(
-              (element) => element.kind() == MediaDeviceKind.videoInput,
-            )
-            .deviceId();
+        videoDeviceId =
+            devices
+                .firstWhere(
+                  (element) => element.kind() == MediaDeviceKind.videoInput,
+                )
+                .deviceId();
         constraints.deviceVideo(DeviceVideoTrackConstraints());
       }
 
       if (publishAudio) {
-        audioDeviceId = devices
-            .firstWhere(
-              (element) => element.kind() == MediaDeviceKind.audioInput,
-            )
-            .deviceId();
+        audioDeviceId =
+            devices
+                .firstWhere(
+                  (element) => element.kind() == MediaDeviceKind.audioInput,
+                )
+                .deviceId();
         constraints.audio(AudioTrackConstraints());
       }
 

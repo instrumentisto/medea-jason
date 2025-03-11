@@ -5,12 +5,10 @@
 use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
-use crate::platform::dart::utils::{
-    handle::DartHandle, NonNullDartValueArgExt as _,
-};
-
 use super::utils::{c_str_into_string, string_into_c_str};
-use crate::platform::dart::utils::handle::DartHandle;
+use crate::platform::dart::utils::{
+    NonNullDartValueArgExt as _, handle::DartHandle,
+};
 
 #[dart_bridge(
     "flutter/lib/src/native/platform/send_encoding_parameters.g.dart"
@@ -158,11 +156,7 @@ impl SendEncodingParameters {
 
         let rid = unsafe { c_str_into_string(rid) };
 
-        if rid.is_empty() {
-            None
-        } else {
-            Some(rid)
-        }
+        if rid.is_empty() { None } else { Some(rid) }
     }
 
     /// Sets [activeness][1] of these [`SendEncodingParameters`].

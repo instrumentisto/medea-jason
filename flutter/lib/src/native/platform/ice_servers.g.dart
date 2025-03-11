@@ -21,27 +21,29 @@ void registerFunction(
   _init = init;
   _add = add;
 
-  _ice_servers__init__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'ice_servers__init__set_error',
-  );
-  _ice_servers__add__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'ice_servers__add__set_error',
-  );
+  _ice_servers__init__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'ice_servers__init__set_error',
+      );
+  _ice_servers__add__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'ice_servers__add__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function()>> init_native = Pointer.fromFunction(
     _initProxy,
   );
   Pointer<
-          NativeFunction<
-              Void Function(Handle, Pointer<Utf8>, ForeignValue, ForeignValue)>>
-      add_native = Pointer.fromFunction(_addProxy);
+    NativeFunction<
+      Void Function(Handle, Pointer<Utf8>, ForeignValue, ForeignValue)
+    >
+  >
+  add_native = Pointer.fromFunction(_addProxy);
 
   dl.lookupFunction<
-      Void Function(Pointer, Pointer),
-      void Function(
-          Pointer, Pointer)>('register_ice_servers')(init_native, add_native);
+    Void Function(Pointer, Pointer),
+    void Function(Pointer, Pointer)
+  >('register_ice_servers')(init_native, add_native);
 }
 
 Object _initProxy() {

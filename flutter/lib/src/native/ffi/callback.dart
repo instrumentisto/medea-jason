@@ -14,10 +14,10 @@ typedef _CallbackTwoArgCallDart =
 final _callbackCall = dl.lookupFunction<_CallbackCallC, _CallbackCallDart>(
   'Callback__call',
 );
-final _callbackTwoArgCall =
-    dl.lookupFunction<_CallbackTwoArgCallC, _CallbackTwoArgCallDart>(
-  'Callback__call_two_arg',
-);
+final _callbackTwoArgCall = dl
+    .lookupFunction<_CallbackTwoArgCallC, _CallbackTwoArgCallDart>(
+      'Callback__call_two_arg',
+    );
 
 /// Registers the closure callers functions in Rust.
 void registerFunctions(DynamicLibrary dl) {

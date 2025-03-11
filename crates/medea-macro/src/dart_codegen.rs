@@ -62,14 +62,14 @@ pub(crate) enum DartType {
     /// [Uint64]: https://api.dart.dev/stable/dart-ffi/Uint64-class.html
     Uint64,
 
-    /// 32-bit floating-point .
+    /// 32-bit floating-point.
     ///
     /// Represents [Float] on the Dart side.
     ///
     /// [Uint64]: https://api.dart.dev/stable/dart-ffi/Float-class.html
     Float,
 
-    /// 64-bit floating-point .
+    /// 64-bit floating-point.
     ///
     /// Represents [Double] on the Dart side.
     ///

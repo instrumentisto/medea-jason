@@ -54,11 +54,11 @@ class NativeReconnectHandle implements ReconnectHandle {
     }
 
     await (opaque.inner.reconnectWithBackoff(
-      startingDelay: startingDelayMs,
-      multiplier: multiplier,
-      maxDelay: maxDelay,
-      maxElapsedTimeMs: maxElapsedTimeMs,
-    )
+          startingDelay: startingDelayMs,
+          multiplier: multiplier,
+          maxDelay: maxDelay,
+          maxElapsedTimeMs: maxElapsedTimeMs,
+        )
         as Future);
   }
 

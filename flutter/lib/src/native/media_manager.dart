@@ -27,9 +27,10 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
     base_settings.MediaStreamSettings caps,
   ) async {
     Pointer tracks;
-    tracks = await (opaque.inner.initLocalTracks(
-      caps: (caps as MediaStreamSettings).setting,
-    )
+    tracks =
+        await (opaque.inner.initLocalTracks(
+                  caps: (caps as MediaStreamSettings).setting,
+                )
                 as Future)
             as Pointer;
 

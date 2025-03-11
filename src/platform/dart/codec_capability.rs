@@ -14,7 +14,7 @@ use crate::{
     media::MediaKind,
     platform::{
         codec_capability::CodecCapabilityError as Error,
-        dart::utils::{handle::DartHandle, NonNullDartValueArgExt as _},
+        dart::utils::{NonNullDartValueArgExt as _, handle::DartHandle},
     },
 };
 
@@ -166,9 +166,7 @@ impl CodecCapability {
         let clock_rate: Option<i32> =
             Option::try_from(unsafe { clock_rate.unbox() }).unwrap();
 
-        clock_rate
-            .and_then(|v| u32::try_from(v).ok())
-            .unwrap_or_default()
+        clock_rate.and_then(|v| u32::try_from(v).ok()).unwrap_or_default()
     }
 
     /// Returns [channels][2] of the provided [RTCRtpCodec][1].

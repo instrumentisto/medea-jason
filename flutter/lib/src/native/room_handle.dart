@@ -37,10 +37,10 @@ class NativeRoomHandle implements RoomHandle {
     bool rollbackOnFail,
   ) async {
     await (opaque.inner.setLocalMediaSettings(
-      settings: (settings as MediaStreamSettings).setting,
-      stopFirst: stopFirst,
-      rollbackOnFail: rollbackOnFail,
-    )
+          settings: (settings as MediaStreamSettings).setting,
+          stopFirst: stopFirst,
+          rollbackOnFail: rollbackOnFail,
+        )
         as Future);
   }
 

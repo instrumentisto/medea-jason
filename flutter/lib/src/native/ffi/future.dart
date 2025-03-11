@@ -6,17 +6,17 @@ import 'future.g.dart' as bridge;
 
 typedef _FutureResolveOkC = Void Function(Pointer, ForeignValue);
 typedef _FutureResolveOkDart = void Function(Pointer, ForeignValue);
-final _futureResolveOk =
-    dl.lookupFunction<_FutureResolveOkC, _FutureResolveOkDart>(
-  'FutureFromDart__resolve_ok',
-);
+final _futureResolveOk = dl
+    .lookupFunction<_FutureResolveOkC, _FutureResolveOkDart>(
+      'FutureFromDart__resolve_ok',
+    );
 
 typedef _FutureResolveErrC = Void Function(Pointer, Handle);
 typedef _FutureResolveErrDart = void Function(Pointer, Object);
-final _futureResolveErr =
-    dl.lookupFunction<_FutureResolveErrC, _FutureResolveErrDart>(
-  'FutureFromDart__resolve_err',
-);
+final _futureResolveErr = dl
+    .lookupFunction<_FutureResolveErrC, _FutureResolveErrDart>(
+      'FutureFromDart__resolve_err',
+    );
 
 /// Registers functions required for Rust's `FutureFromDart` to work.
 void registerFunctions(DynamicLibrary dl) {

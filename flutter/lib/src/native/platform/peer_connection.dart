@@ -56,9 +56,9 @@ Future<PeerConnection> Function() _newPeer(
   var servers = iceServers as List<dynamic>;
   var iceType = isForceRelayed ? IceTransportType.relay : IceTransportType.all;
   return () => PeerConnection.create(
-        iceType,
-        servers.map((e) => e as IceServer).toList(),
-      );
+    iceType,
+    servers.map((e) => e as IceServer).toList(),
+  );
 }
 
 /// Sets the provided [f] to the [PeerConnection.onTrack] callback.
@@ -171,8 +171,8 @@ Future<void> Function() _setLocalDescription(
     sdpType = SessionDescriptionType.answer;
   }
   return () => conn.setLocalDescription(
-        SessionDescription(sdpType, sdp.nativeStringToDartString()),
-      );
+    SessionDescription(sdpType, sdp.nativeStringToDartString()),
+  );
 }
 
 /// Creates a new SDP offer for the provided [PeerConnection].
@@ -219,8 +219,8 @@ int _iceConnectionState(Object conn) {
 Future<void> Function() _rollback(Object conn) {
   conn as PeerConnection;
   return () => conn.setLocalDescription(
-        SessionDescription(SessionDescriptionType.rollback, ''),
-      );
+    SessionDescription(SessionDescriptionType.rollback, ''),
+  );
 }
 
 /// Returns all the [RtpTransceiver]s of the provided [PeerConnection].

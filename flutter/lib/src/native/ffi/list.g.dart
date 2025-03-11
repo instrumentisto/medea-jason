@@ -29,22 +29,22 @@ void registerFunction(
   _init = init;
   _add = add;
 
-  _list__get__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'list__get__set_error',
-  );
-  _list__length__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'list__length__set_error',
-  );
-  _list__init__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'list__init__set_error',
-  );
-  _list__add__set_error =
-      dl.lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-    'list__add__set_error',
-  );
+  _list__get__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'list__get__set_error',
+      );
+  _list__length__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'list__length__set_error',
+      );
+  _list__init__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'list__init__set_error',
+      );
+  _list__add__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'list__add__set_error',
+      );
 
   Pointer<NativeFunction<Pointer Function(Handle, Uint32)>> get_native =
       Pointer.fromFunction(_getProxy);
@@ -56,9 +56,10 @@ void registerFunction(
   Pointer<NativeFunction<Void Function(Handle, ForeignValue)>> add_native =
       Pointer.fromFunction(_addProxy);
 
-  dl.lookupFunction<Void Function(Pointer, Pointer, Pointer, Pointer),
-          void Function(Pointer, Pointer, Pointer, Pointer)>('register_list')(
-      get_native, length_native, init_native, add_native);
+  dl.lookupFunction<
+    Void Function(Pointer, Pointer, Pointer, Pointer),
+    void Function(Pointer, Pointer, Pointer, Pointer)
+  >('register_list')(get_native, length_native, init_native, add_native);
 }
 
 Pointer _getProxy(Object arg0, int arg1) {

@@ -580,16 +580,18 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
   final displayList = await call.enumerateDisplay();
 
   final deviceList = await call.enumerateDevice();
-  final videoDevices = deviceList
-      .where(
-        (element) => element.kind() == jason.MediaDeviceKind.videoInput,
-      )
-      .toList();
-  final audioDevices = deviceList
-      .where(
-        (element) => element.kind() == jason.MediaDeviceKind.audioInput,
-      )
-      .toList();
+  final videoDevices =
+      deviceList
+          .where(
+            (element) => element.kind() == jason.MediaDeviceKind.videoInput,
+          )
+          .toList();
+  final audioDevices =
+      deviceList
+          .where(
+            (element) => element.kind() == jason.MediaDeviceKind.audioInput,
+          )
+          .toList();
 
   await showDialog<void>(
     context: context,
@@ -623,16 +625,17 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                       call.videoDisplayId = value!;
                     });
                   },
-                  items: displayList.map<DropdownMenuItem<String>>((value) {
-                    return DropdownMenuItem<String>(
-                      value: value.deviceId(),
-                      child: Text(
-                        value.title() == null
-                            ? value.deviceId()
-                            : value.title()!,
-                      ),
-                    );
-                  }).toList(),
+                  items:
+                      displayList.map<DropdownMenuItem<String>>((value) {
+                        return DropdownMenuItem<String>(
+                          value: value.deviceId(),
+                          child: Text(
+                            value.title() == null
+                                ? value.deviceId()
+                                : value.title()!,
+                          ),
+                        );
+                      }).toList(),
                 ),
                 TextFormField(
                   initialValue:
@@ -1092,6 +1095,7 @@ Future<void> controlApiCreateEndpointDialog(BuildContext context, Call call) {
       var memberId = '';
       var endpointId = '';
       var url = '';
+      var forceRelay = false;
       var isSFUMode = true;
       var endpointType = 'PlayEndpoint';
 
@@ -1162,10 +1166,11 @@ Future<void> controlApiCreateEndpointDialog(BuildContext context, Call call) {
                     onChanged: (String? value) {
                       endpointType = value!;
                     },
-                    items: [
-                      'PlayEndpoint',
-                      'PublishEndpoint',
-                    ].map<DropdownMenuItem<String>>((value) {
+                    items:
+                        [
+                          'PlayEndpoint',
+                          'PublishEndpoint',
+                        ].map<DropdownMenuItem<String>>((value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -1204,6 +1209,14 @@ Future<void> controlApiCreateEndpointDialog(BuildContext context, Call call) {
                     onChanged: (v) => setStateSb(() => isSFUMode = v),
                   ),
                 ),
+                if (!isSFUMode)
+                  Flexible(
+                    child: SwitchListTile(
+                      title: const Text('Force relay'),
+                      value: forceRelay,
+                      onChanged: (v) => setStateSb(() => forceRelay = v),
+                    ),
+                  ),
                 const SizedBox(height: 10),
                 TextButton(
                   onPressed: () async {

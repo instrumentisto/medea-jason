@@ -700,38 +700,38 @@ mod disable_send_tracks {
     /// only device video will be disabled/enabled.
     #[wasm_bindgen_test]
     async fn disable_enable_device_video() {
-        // let audio_track = audio_track(TrackId(1), false);
-        // let device_video_track =
-        //     video_track(TrackId(2), false, MediaSourceKind::Device);
-        // let display_video_track =
-        //     video_track(TrackId(3), false, MediaSourceKind::Display);
-        //
-        // let (room, peer, _, _) = get_test_room_and_exist_peer(
-        //     vec![audio_track, device_video_track, display_video_track],
-        //     Some(media_stream_settings(true, true)),
-        // )
-        // .await;
-        //
-        // if is_firefox() {
-        //     return;
-        // }
-        //
-        // let room_handle = api::RoomHandle::from(room.new_handle());
-        // JsFuture::from(
-        //     room_handle.disable_video(Some(api::MediaSourceKind::Device)),
-        // )
-        // .await
-        // .unwrap();
-        // assert!(!peer.is_send_video_enabled(Some(MediaSourceKind::Device)));
-        // assert!(peer.is_send_video_enabled(Some(MediaSourceKind::Display)));
-        //
-        // JsFuture::from(
-        //     room_handle.enable_video(Some(api::MediaSourceKind::Device)),
-        // )
-        // .await
-        // .unwrap();
-        // assert!(peer.is_send_video_enabled(Some(MediaSourceKind::Device)));
-        // assert!(peer.is_send_video_enabled(Some(MediaSourceKind::Display)));
+        let audio_track = audio_track(TrackId(1), false);
+        let device_video_track =
+            video_track(TrackId(2), false, MediaSourceKind::Device);
+        let display_video_track =
+            video_track(TrackId(3), false, MediaSourceKind::Display);
+
+        let (room, peer, _, _) = get_test_room_and_exist_peer(
+            vec![audio_track, device_video_track, display_video_track],
+            Some(media_stream_settings(true, true)),
+        )
+        .await;
+
+        if is_firefox() {
+            return;
+        }
+
+        let room_handle = api::RoomHandle::from(room.new_handle());
+        JsFuture::from(
+            room_handle.disable_video(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
+        assert!(!peer.is_send_video_enabled(Some(MediaSourceKind::Device)));
+        assert!(peer.is_send_video_enabled(Some(MediaSourceKind::Display)));
+
+        JsFuture::from(
+            room_handle.enable_video(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
+        assert!(peer.is_send_video_enabled(Some(MediaSourceKind::Device)));
+        assert!(peer.is_send_video_enabled(Some(MediaSourceKind::Display)));
     }
 
     /// Tests that when [`JsMediaSouceKind::Display`] is provided to the

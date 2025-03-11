@@ -88,11 +88,13 @@ class _$ApiConstrainFacingModeCopyWithImpl<
   $Res call({Object? field0 = null}) {
     return _then(
       _value.copyWith(
-        field0: null == field0
-            ? _value.field0
-            : field0 // ignore: cast_nullable_to_non_nullable
-                as FacingMode,
-      ) as $Val,
+            field0:
+                null == field0
+                    ? _value.field0
+                    : field0 // ignore: cast_nullable_to_non_nullable
+                        as FacingMode,
+          )
+          as $Val,
     );
   }
 }
