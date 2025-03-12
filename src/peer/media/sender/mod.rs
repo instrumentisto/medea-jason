@@ -330,7 +330,7 @@ impl Sender {
     pub async fn get_send_encodings(
         &self,
     ) -> Box<[platform::SendEncodingParameters]> {
-        self.transceiver.get_send_encodings().await
+        self.transceiver.get_send_parameters().await.encodings()
     }
 }
 

@@ -149,14 +149,10 @@ impl MediaDevices {
             .map(DartList::from)
             .map_err(tracerr::from_and_wrap!())?;
 
-        let len = displays.length();
-        let mut result = Vec::with_capacity(len);
-        for i in 0..len {
-            let val = displays.get(i).unwrap();
-            result.push(MediaDisplayInfo::from(val));
-        }
-
-        Ok(result)
+        Ok(Vec::from(displays)
+            .into_iter()
+            .map(|caps: DartHandle| MediaDisplayInfo::from(caps))
+            .collect())
     }
 
     /// Prompts a user for permissions to use a media input device, producing

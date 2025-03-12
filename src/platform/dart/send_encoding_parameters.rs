@@ -88,7 +88,7 @@ mod send_encoding_parameters {
         /// [1]: https://tinyurl.com/ypzzc75t
         pub fn get_scale_resolution_down_by(
             encoding: Dart_Handle,
-        ) -> Result<ptr::NonNull<DartValueArg<Option<f64>>>, Error>;
+        ) -> Result<f64, Error>;
 
         /// Sets [scalabilityMode][1] of the provided
         /// [RTCRtpEncodingParameters][0].
@@ -107,7 +107,7 @@ mod send_encoding_parameters {
         /// [1]: https://tinyurl.com/3zuaee45
         pub fn get_scalability_mode(
             encoding: Dart_Handle,
-        ) -> Result<ptr::NonNull<DartValueArg<Option<String>>>, Error>;
+        ) -> Result<ptr::NonNull<c_char>, Error>;
     }
 }
 
@@ -216,14 +216,10 @@ impl SendEncodingParameters {
     /// [1]: https://tinyurl.com/ypzzc75t
     #[must_use]
     pub fn scale_resolution_down_by(&self) -> f64 {
-        let scale_resolution_down_by = unsafe {
+        unsafe {
             send_encoding_parameters::get_scale_resolution_down_by(self.0.get())
         }
-        .unwrap();
-
-        Option::try_from(unsafe { scale_resolution_down_by.unbox() })
-            .unwrap()
-            .unwrap_or(1.0)
+        .unwrap()
     }
 
     /// Sets [scalabilityMode][1] of these [`SendEncodingParameters`].
@@ -247,8 +243,10 @@ impl SendEncodingParameters {
     pub fn scalability_mode(&self) -> Option<String> {
         let mode = unsafe {
             send_encoding_parameters::get_scalability_mode(self.0.get())
-        }
-        .unwrap();
-        Option::try_from(unsafe { mode.unbox() }).unwrap()
+                .unwrap()
+        };
+        let mode = unsafe { c_str_into_string(mode) };
+
+        if mode.is_empty() { None } else { Some(mode) }
     }
 }

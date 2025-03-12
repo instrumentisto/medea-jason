@@ -14,9 +14,9 @@ bool Function(Object)? _getActive;
 void Function(Object, int)? _setMaxBitrate;
 Pointer Function(Object)? _getMaxBitrate;
 void Function(Object, double)? _setScaleResolutionDownBy;
-Pointer Function(Object)? _getScaleResolutionDownBy;
+double Function(Object)? _getScaleResolutionDownBy;
 void Function(Object, Pointer<Utf8>)? _setScalabilityMode;
-Pointer Function(Object)? _getScalabilityMode;
+Pointer<Utf8> Function(Object)? _getScalabilityMode;
 
 _ErrorSetterFnDart?
 _send_encoding_parameters__new_send_encoding_parameters__set_error;
@@ -41,9 +41,9 @@ void registerFunction(
   required void Function(Object, int) setMaxBitrate,
   required Pointer Function(Object) getMaxBitrate,
   required void Function(Object, double) setScaleResolutionDownBy,
-  required Pointer Function(Object) getScaleResolutionDownBy,
+  required double Function(Object) getScaleResolutionDownBy,
   required void Function(Object, Pointer<Utf8>) setScalabilityMode,
-  required Pointer Function(Object) getScalabilityMode,
+  required Pointer<Utf8> Function(Object) getScalabilityMode,
 }) {
   _newSendEncodingParameters = newSendEncodingParameters;
   _getRid = getRid;
@@ -115,14 +115,15 @@ void registerFunction(
   setScaleResolutionDownBy_native = Pointer.fromFunction(
     _setScaleResolutionDownByProxy,
   );
-  Pointer<NativeFunction<Pointer Function(Handle)>>
+  Pointer<NativeFunction<Double Function(Handle)>>
   getScaleResolutionDownBy_native = Pointer.fromFunction(
     _getScaleResolutionDownByProxy,
+    0,
   );
   Pointer<NativeFunction<Void Function(Handle, Pointer<Utf8>)>>
   setScalabilityMode_native = Pointer.fromFunction(_setScalabilityModeProxy);
-  Pointer<NativeFunction<Pointer Function(Handle)>> getScalabilityMode_native =
-      Pointer.fromFunction(_getScalabilityModeProxy);
+  Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>>
+  getScalabilityMode_native = Pointer.fromFunction(_getScalabilityModeProxy);
 
   dl.lookupFunction<
     Void Function(
@@ -226,12 +227,12 @@ void _setScaleResolutionDownByProxy(Object arg0, double arg1) {
   }
 }
 
-Pointer _getScaleResolutionDownByProxy(Object arg0) {
+double _getScaleResolutionDownByProxy(Object arg0) {
   try {
     return _getScaleResolutionDownBy!(arg0);
   } catch (e) {
     _send_encoding_parameters__get_scale_resolution_down_by__set_error!(e);
-    return Pointer.fromAddress(0);
+    return 0;
   }
 }
 
@@ -244,7 +245,7 @@ void _setScalabilityModeProxy(Object arg0, Pointer<Utf8> arg1) {
   }
 }
 
-Pointer _getScalabilityModeProxy(Object arg0) {
+Pointer<Utf8> _getScalabilityModeProxy(Object arg0) {
   try {
     return _getScalabilityMode!(arg0);
   } catch (e) {

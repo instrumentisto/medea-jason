@@ -81,15 +81,13 @@ void _setScaleResolutionDownBy(Object encoding, double scaleResolutionDownBy) {
 
 /// Returns [SendEncodingParameters.scaleResolutionDownBy] of the provided
 /// [SendEncodingParameters].
-Pointer _getScaleResolutionDownBy(Object encoding) {
+double _getScaleResolutionDownBy(Object encoding) {
   encoding as SendEncodingParameters;
 
   if (encoding.scaleResolutionDownBy != null) {
-    return ForeignValue.fromDouble(
-      encoding.scaleResolutionDownBy!,
-    ).intoRustOwned();
+    return encoding.scaleResolutionDownBy!;
   } else {
-    return ForeignValue.none().intoRustOwned();
+    return 1.0;
   }
 }
 
@@ -102,12 +100,12 @@ void _setScalabilityMode(Object encoding, Pointer<Utf8> scalabilityMode) {
 
 /// Returns [SendEncodingParameters.scalabilityMode] of the provided
 /// [SendEncodingParameters].
-Pointer _getScalabilityMode(Object encoding) {
+Pointer<Utf8> _getScalabilityMode(Object encoding) {
   encoding as SendEncodingParameters;
 
   if (encoding.scalabilityMode != null) {
-    return ForeignValue.fromString(encoding.scalabilityMode!).intoRustOwned();
+    return encoding.scalabilityMode!.toNativeUtf8();
   } else {
-    return ForeignValue.none().intoRustOwned();
+    return ''.toNativeUtf8();
   }
 }

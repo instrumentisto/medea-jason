@@ -14,7 +14,7 @@ use crate::{
     media::MediaKind,
     platform::{
         codec_capability::CodecCapabilityError as Error,
-        dart::utils::{NonNullDartValueArgExt as _, handle::DartHandle},
+        dart::utils::handle::DartHandle,
     },
 };
 
@@ -24,7 +24,7 @@ mod codec_capability {
 
     use dart_sys::Dart_Handle;
 
-    use crate::{api::DartValueArg, platform::Error};
+    use crate::platform::Error;
 
     extern "C" {
         /// Returns [RTCRtpSender]'s available [RTCRtpCodecCapability][1]s.
@@ -55,17 +55,13 @@ mod codec_capability {
         ///
         /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
         /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-clockrate
-        pub fn clock_rate(
-            codec_capability: Dart_Handle,
-        ) -> Result<ptr::NonNull<DartValueArg<Option<i32>>>, Error>;
+        pub fn clock_rate(codec_capability: Dart_Handle) -> Result<u32, Error>;
 
         /// Returns [channels][2] of the provided [RTCRtpCodec][1].
         ///
         /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
         /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-channels
-        pub fn channels(
-            codec_capability: Dart_Handle,
-        ) -> Result<ptr::NonNull<DartValueArg<Option<i32>>>, Error>;
+        pub fn channels(codec_capability: Dart_Handle) -> Result<u32, Error>;
 
         /// Returns [sdpFmtpLine][2] of the provided [RTCRtpCodec][1].
         ///
@@ -161,12 +157,7 @@ impl CodecCapability {
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-clockrate
     #[must_use]
     pub fn clock_rate(&self) -> u32 {
-        let clock_rate =
-            unsafe { codec_capability::clock_rate(self.0.get()) }.unwrap();
-        let clock_rate: Option<i32> =
-            Option::try_from(unsafe { clock_rate.unbox() }).unwrap();
-
-        clock_rate.and_then(|v| u32::try_from(v).ok()).unwrap_or_default()
+        unsafe { codec_capability::clock_rate(self.0.get()) }.unwrap()
     }
 
     /// Returns [channels][2] of the provided [RTCRtpCodec][1].
@@ -178,10 +169,8 @@ impl CodecCapability {
     pub fn channels(&self) -> Option<u16> {
         let channels =
             unsafe { codec_capability::channels(self.0.get()) }.unwrap();
-        let channels: Option<i32> =
-            Option::try_from(unsafe { channels.unbox() }).unwrap();
 
-        channels.and_then(|v| u16::try_from(v).ok())
+        if channels > 0 { u16::try_from(channels).ok() } else { None }
     }
 
     /// Returns [sdpFmtpLine][2] of the provided [RTCRtpCodec][1].

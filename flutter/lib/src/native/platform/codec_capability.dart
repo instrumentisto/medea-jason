@@ -4,7 +4,6 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
-import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'codec_capability.g.dart' as bridge;
 
 /// Registers [RtpCodecCapability] related functions in Rust.
@@ -46,24 +45,24 @@ Pointer<Utf8> _mimeType(Object codecCapability) {
 }
 
 /// Returns [RtpCodecCapability.clockRate].
-Pointer _clockRate(Object codecCapability) {
+int _clockRate(Object codecCapability) {
   codecCapability as RtpCodecCapability;
 
   if (codecCapability.clockRate != null) {
-    return ForeignValue.fromInt(codecCapability.clockRate!).intoRustOwned();
+    return codecCapability.clockRate!;
   } else {
-    return ForeignValue.none().intoRustOwned();
+    return 0;
   }
 }
 
 /// Returns [RtpCodecCapability.numChannels].
-Pointer _channels(Object codecCapability) {
+int _channels(Object codecCapability) {
   codecCapability as RtpCodecCapability;
 
   if (codecCapability.numChannels != null) {
-    return ForeignValue.fromInt(codecCapability.numChannels!).intoRustOwned();
+    return codecCapability.numChannels!;
   } else {
-    return ForeignValue.none().intoRustOwned();
+    return 0;
   }
 }
 

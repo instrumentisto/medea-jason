@@ -266,20 +266,6 @@ impl Transceiver {
     }
 }
 
-#[cfg(feature = "mockable")]
-// TODO: Try remove on next Rust version upgrade.
-#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
-#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
-impl Transceiver {
-    /// Returns list of [`SendEncodingParameters`] of this [`Transceiver`]'s
-    /// [RTCRtpSender].
-    ///
-    /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-    pub async fn get_send_encodings(&self) -> Box<[SendEncodingParameters]> {
-        self.get_send_parameters().await.encodings()
-    }
-}
-
 impl Drop for Transceiver {
     fn drop(&mut self) {
         if Rc::get_mut(&mut self.0).is_some() {

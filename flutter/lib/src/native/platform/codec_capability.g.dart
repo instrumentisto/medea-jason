@@ -10,8 +10,8 @@ typedef _ErrorSetterFnDart = void Function(Object);
 Object Function(int)? _getSenderCodecCapabilities;
 Object Function(int)? _getReceiverCodecCapabilities;
 Pointer<Utf8> Function(Object)? _mimeType;
-Pointer Function(Object)? _clockRate;
-Pointer Function(Object)? _channels;
+int Function(Object)? _clockRate;
+int Function(Object)? _channels;
 Pointer<Utf8> Function(Object)? _parameters;
 
 _ErrorSetterFnDart? _codec_capability__get_sender_codec_capabilities__set_error;
@@ -27,8 +27,8 @@ void registerFunction(
   required Object Function(int) getSenderCodecCapabilities,
   required Object Function(int) getReceiverCodecCapabilities,
   required Pointer<Utf8> Function(Object) mimeType,
-  required Pointer Function(Object) clockRate,
-  required Pointer Function(Object) channels,
+  required int Function(Object) clockRate,
+  required int Function(Object) channels,
   required Pointer<Utf8> Function(Object) parameters,
 }) {
   _getSenderCodecCapabilities = getSenderCodecCapabilities;
@@ -73,10 +73,10 @@ void registerFunction(
   );
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> mimeType_native =
       Pointer.fromFunction(_mimeTypeProxy);
-  Pointer<NativeFunction<Pointer Function(Handle)>> clockRate_native =
-      Pointer.fromFunction(_clockRateProxy);
-  Pointer<NativeFunction<Pointer Function(Handle)>> channels_native =
-      Pointer.fromFunction(_channelsProxy);
+  Pointer<NativeFunction<Uint32 Function(Handle)>> clockRate_native =
+      Pointer.fromFunction(_clockRateProxy, 0);
+  Pointer<NativeFunction<Uint32 Function(Handle)>> channels_native =
+      Pointer.fromFunction(_channelsProxy, 0);
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> parameters_native =
       Pointer.fromFunction(_parametersProxy);
 
@@ -120,21 +120,21 @@ Pointer<Utf8> _mimeTypeProxy(Object arg0) {
   }
 }
 
-Pointer _clockRateProxy(Object arg0) {
+int _clockRateProxy(Object arg0) {
   try {
     return _clockRate!(arg0);
   } catch (e) {
     _codec_capability__clock_rate__set_error!(e);
-    return Pointer.fromAddress(0);
+    return 0;
   }
 }
 
-Pointer _channelsProxy(Object arg0) {
+int _channelsProxy(Object arg0) {
   try {
     return _channels!(arg0);
   } catch (e) {
     _codec_capability__channels__set_error!(e);
-    return Pointer.fromAddress(0);
+    return 0;
   }
 }
 
