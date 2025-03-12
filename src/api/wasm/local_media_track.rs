@@ -7,6 +7,7 @@ use js_sys::Promise;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
 
+use super::Error;
 use crate::{
     api::{MediaKind, MediaSourceKind},
     media::track::local,
@@ -61,5 +62,27 @@ impl LocalMediaTrack {
     #[must_use]
     pub fn media_source_kind(&self) -> MediaSourceKind {
         self.0.media_source_kind().into()
+    }
+
+    /// Indicates whether an `OnAudioLevelChangedCallback` is supported for this
+    /// [`LocalMediaTrack`].
+    #[must_use]
+    pub fn is_on_audio_level_available(&self) -> bool {
+        self.0.is_on_audio_level_available()
+    }
+
+    /// Sets the provided `OnAudioLevelChangedCallback` for this
+    /// [`LocalMediaTrack`].
+    ///
+    /// It's called for live [`LocalMediaTrack`]s once their audio level
+    /// changes.
+    pub fn on_audio_level_changed(
+        &self,
+        cb: js_sys::Function,
+    ) -> Result<(), JsValue> {
+        self.0
+            .on_audio_level_changed(cb.into())
+            .map_err(Error::from)
+            .map_err(Into::into)
     }
 }

@@ -8,11 +8,13 @@ use std::rc::Rc;
 
 use derive_more::with_trait::AsRef;
 use medea_client_api_proto as proto;
+use tracerr::Traced;
 
 use super::MediaStreamTrackState;
 use crate::{
     media::{MediaKind, MediaSourceKind},
     platform,
+    room::HandleDetachedError,
 };
 
 /// Wrapper around a [`platform::MediaStreamTrack`] received from a
@@ -183,8 +185,15 @@ impl LocalMediaTrack {
     ///
     /// It's called for live [`LocalMediaTrack`]s when their audio level
     /// changes.
-    pub fn on_audio_level_changed(&self, callback: platform::Function<i32>) {
-        self.get_track().on_audio_level_changed(move |v| callback.call1(v));
+    pub fn on_audio_level_changed(
+        &self,
+        callback: platform::Function<i32>,
+    ) -> Result<(), Traced<HandleDetachedError>> {
+        self.get_track()
+            .on_audio_level_changed(move |v| callback.call1(v))
+            .unwrap();
+
+        Ok(())
     }
 
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is

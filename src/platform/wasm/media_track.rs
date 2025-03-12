@@ -6,11 +6,13 @@ use std::{cell::RefCell, rc::Rc};
 
 use derive_more::with_trait::AsRef;
 use futures::future;
+use wasm_bindgen_futures::JsFuture;
 
 use crate::{
     media::{
         FacingMode, MediaKind, MediaSourceKind, track::MediaStreamTrackState,
     },
+    platform,
     platform::wasm::utils::EventListener,
 };
 
@@ -35,6 +37,8 @@ pub struct MediaStreamTrack {
 
     /// Media source kind of this [MediaStreamTrack][1].
     ///
+    /// Equals `None` for remote tracks.
+    ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     source_kind: Option<MediaSourceKind>,
 
@@ -44,6 +48,9 @@ pub struct MediaStreamTrack {
     on_ended: RefCell<
         Option<EventListener<web_sys::MediaStreamTrack, web_sys::Event>>,
     >,
+
+    // TODO: forking?
+    audio_level_watcher: Rc<RefCell<Option<AudioLevelWatcher>>>,
 }
 
 impl MediaStreamTrack {
@@ -59,11 +66,13 @@ impl MediaStreamTrack {
             "video" => MediaKind::Video,
             _ => unreachable!(),
         };
+
         Self {
             sys_track: Rc::new(sys_track),
             source_kind,
             kind,
             on_ended: RefCell::new(None),
+            audio_level_watcher: Rc::new(RefCell::new(None)),
         }
     }
 
@@ -220,6 +229,7 @@ impl MediaStreamTrack {
             kind: self.kind,
             source_kind: self.source_kind,
             on_ended: RefCell::new(None),
+            audio_level_watcher: Rc::clone(&self.audio_level_watcher),
         })
     }
 
@@ -255,8 +265,9 @@ impl MediaStreamTrack {
     /// Indicates whether an `OnAudioLevelChangedCallback` is supported for this
     /// [`MediaStreamTrack`].
     #[must_use]
-    pub const fn is_on_audio_level_available(&self) -> bool {
-        false
+    pub fn is_on_audio_level_available(&self) -> bool {
+        // Only local audio tracks.
+        self.kind == MediaKind::Audio && self.source_kind.is_none()
     }
 
     /// Sets the provided `OnAudioLevelChangedCallback` for this
@@ -264,9 +275,109 @@ impl MediaStreamTrack {
     ///
     /// It's called for live [`MediaStreamTrack`]s when their audio level
     /// changes.
-    pub fn on_audio_level_changed<F>(&self, _callback: F)
+    pub fn on_audio_level_changed<F>(&self, cb: F) -> Result<(), js_sys::Error>
     where
         F: 'static + FnMut(i32),
     {
+        let mut watcher = self.audio_level_watcher.borrow_mut();
+        if let Some(v) = &*watcher {
+            drop(v.cb.replace(Box::new(cb)));
+        } else {
+            *watcher = Some(AudioLevelWatcher::new(&self.sys_track, cb)?);
+        }
+
+        Ok(())
+    }
+}
+
+struct AudioLevelWatcher {
+    /// Callback that audio level updates are provided to.
+    cb: Rc<RefCell<Box<dyn FnMut(i32)>>>,
+
+    /// [`web_sys::AudioContext`] holding this [`AudioLevelWatcher`] audio
+    /// processing pipeline.
+    audio_ctx: web_sys::AudioContext,
+
+    /// [`web_sys::AudioSourceNode`] that wraps the [`MediaStreamTrack`] being
+    /// watched.
+    src: web_sys::MediaStreamAudioSourceNode,
+
+    /// [`web_sys::AnalyserNode`] that is processing audio data.
+    analyzer: web_sys::AnalyserNode,
+}
+
+impl AudioLevelWatcher {
+    fn new<F>(
+        track: &web_sys::MediaStreamTrack,
+        cb: F,
+    ) -> Result<Self, js_sys::Error>
+    where
+        F: 'static + FnMut(i32),
+    {
+        /// [`web_sys::AnalyserNode`] FFT size.
+        ///
+        /// Must be a power of two in the [32..32768] range.
+        const FFT_SIZE: u32 = 128;
+
+        let audio_ctx = web_sys::AudioContext::new()?;
+        let cb: Box<dyn FnMut(i32)> = Box::new(cb);
+        let cb = Rc::new(RefCell::new(cb));
+
+        let stream = {
+            let stream = web_sys::MediaStream::new()?;
+            stream.add_track(track);
+            stream
+        };
+        // TODO: Use createMediaStreamTrackSource when available
+        let src = audio_ctx.create_media_stream_source(&stream)?;
+        let analyzer = audio_ctx.create_analyser()?;
+        analyzer.set_fft_size(FFT_SIZE);
+        // u32 as usize is safe
+        // frequency_bin_count = Half the FFT size.
+        let mut audio_buf =
+            vec![0u8; usize::try_from(analyzer.frequency_bin_count()).unwrap()];
+        let audio_buf_len = audio_buf.len() as i32;
+
+        src.connect_with_audio_node(&analyzer)?;
+        platform::spawn({
+            let cb = Rc::clone(&cb);
+            let analyzer = analyzer.clone();
+            let audio_ctx = audio_ctx.clone();
+            async move {
+                loop {
+                    platform::delay_for(std::time::Duration::from_millis(100))
+                        .await;
+                    if audio_ctx.state() == web_sys::AudioContextState::Closed {
+                        break;
+                    }
+
+                    analyzer.get_byte_frequency_data(&mut audio_buf);
+                    let level: i32 =
+                        audio_buf.iter().map(|a| i32::from(*a)).sum::<i32>()
+                            / audio_buf_len;
+                    cb.borrow_mut()(level);
+                }
+            }
+        });
+
+        Ok(Self { cb, src, analyzer, audio_ctx })
+    }
+}
+
+impl std::fmt::Debug for AudioLevelWatcher {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("AudioLevelWatcher").finish_non_exhaustive()
+    }
+}
+
+impl Drop for AudioLevelWatcher {
+    fn drop(&mut self) {
+        drop(self.src.disconnect());
+        drop(self.analyzer.disconnect());
+        if let Ok(close) = self.audio_ctx.close() {
+            platform::spawn(async {
+                drop(JsFuture::from(close).await);
+            });
+        }
     }
 }
