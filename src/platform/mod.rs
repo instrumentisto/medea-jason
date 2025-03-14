@@ -22,10 +22,12 @@ pub use self::transport::MockRpcTransport;
 pub use self::wasm::*;
 pub use self::{
     callback::Callback,
+    codec_capability::get_capabilities,
     peer_connection::{
         IceCandidate, IceCandidateError, RtcPeerConnectionError, SdpType,
     },
     rtc_stats::RtcStatsError,
+    send_encoding_parameters::SendEncodingParameters,
     transceiver::Direction as TransceiverDirection,
     transport::{RpcTransport, TransportError, TransportState},
 };

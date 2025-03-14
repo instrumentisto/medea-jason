@@ -795,7 +795,6 @@ impl InterconnectedPeers {
                     required: true,
                     source_kind: MediaSourceKind::Device,
                     encoding_parameters: Vec::new(),
-                    svc_settings: Vec::new(),
                 }),
             },
         ]
@@ -826,7 +825,6 @@ impl InterconnectedPeers {
                     required: true,
                     source_kind: MediaSourceKind::Device,
                     encoding_parameters: Vec::new(),
-                    svc_settings: Vec::new(),
                 }),
             },
         ]
@@ -1298,7 +1296,6 @@ async fn new_remote_track() {
                     required: true,
                     source_kind: MediaSourceKind::Device,
                     encoding_parameters: Vec::new(),
-                    svc_settings: Vec::new(),
                 }),
             },
             LocalTracksConstraints::default(),

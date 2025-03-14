@@ -17,6 +17,7 @@ class CallRoute extends StatefulWidget {
   const CallRoute(
     this.roomId,
     this.memberId,
+    this.isSFUMode,
     this.isPublish,
     this.publishVideo,
     this.publishAudio,
@@ -26,6 +27,7 @@ class CallRoute extends StatefulWidget {
 
   final String roomId;
   final String memberId;
+  final bool isSFUMode;
   final bool isPublish;
   final bool publishAudio;
   final bool publishVideo;
@@ -60,6 +62,7 @@ class ConnectWidgets {
 }
 
 class _CallState extends State<CallRoute> {
+  late bool _isSFUMode;
   late bool _isPublish;
   late bool _publishAudio;
   late bool _publishVideo;
@@ -85,6 +88,7 @@ class _CallState extends State<CallRoute> {
 
     _roomId = widget.roomId;
     _memberId = widget.memberId;
+    _isSFUMode = widget.isSFUMode;
     _isPublish = widget.isPublish;
     _publishVideo = widget.publishVideo;
     _publishAudio = widget.publishAudio;
@@ -181,11 +185,13 @@ class _CallState extends State<CallRoute> {
       });
 
       call.onLocalAudioTrack((track) {
-        track.onAudioLevelChanged((volume) {
-          setState(() {
-            currentAudioLevel = volume / 100;
+        if (track.isOnAudioLevelAvailable()) {
+          track.onAudioLevelChanged((volume) {
+            setState(() {
+              currentAudioLevel = volume / 100;
+            });
           });
-        });
+        }
       });
       call.onLocalDeviceStream((track) async {
         if (localCameraVideo == null) {
@@ -247,6 +253,7 @@ class _CallState extends State<CallRoute> {
         _publishVideo,
         _publishAudio,
         _fakeMedia,
+        _isSFUMode,
       );
 
       setState(() {
@@ -1091,6 +1098,7 @@ Future<void> controlApiCreateEndpointDialog(BuildContext context, Call call) {
       var endpointId = '';
       var url = '';
       var forceRelay = false;
+      var isSFUMode = true;
       var endpointType = 'PlayEndpoint';
 
       return AlertDialog(
@@ -1198,11 +1206,19 @@ Future<void> controlApiCreateEndpointDialog(BuildContext context, Call call) {
                 const SizedBox(height: 10),
                 Flexible(
                   child: SwitchListTile(
-                    title: const Text('Force relay'),
-                    value: forceRelay,
-                    onChanged: (v) => setStateSb(() => forceRelay = v),
+                    title: const Text('SFU mode'),
+                    value: isSFUMode,
+                    onChanged: (v) => setStateSb(() => isSFUMode = v),
                   ),
                 ),
+                if (!isSFUMode)
+                  Flexible(
+                    child: SwitchListTile(
+                      title: const Text('Force relay'),
+                      value: forceRelay,
+                      onChanged: (v) => setStateSb(() => forceRelay = v),
+                    ),
+                  ),
                 const SizedBox(height: 10),
                 TextButton(
                   onPressed: () async {
@@ -1216,7 +1232,7 @@ Future<void> controlApiCreateEndpointDialog(BuildContext context, Call call) {
                     } else {
                       final endpoint = WebRtcPublishEndpoint(
                         endpointId,
-                        P2pMode.Always,
+                        isSFUMode ? P2pMode.Never : P2pMode.Always,
                       );
                       await call.controlApi.createPublishEndpoint(
                         roomId,

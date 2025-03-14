@@ -1,6 +1,8 @@
 //! Platform-agnostic functionality of [`platform::RtcPeerConnection`].
 
 use derive_more::with_trait::{Display, From};
+#[cfg(doc)]
+use platform::Transceiver;
 
 use crate::{
     platform::{self, RtcStatsError},
@@ -147,4 +149,9 @@ pub enum RtcPeerConnectionError {
     #[display("Failed to set remote SDP description: {_0}")]
     #[from(ignore)]
     SetRemoteDescriptionFailed(platform::Error),
+
+    /// [`Transceiver::update_send_encodings`] error.
+    #[display("Failed to update sender encodings: {_0}")]
+    #[from(ignore)]
+    UpdateSendEncodingsError(platform::transceiver::UpdateSendEncodingError),
 }

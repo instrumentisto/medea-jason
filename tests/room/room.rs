@@ -348,7 +348,6 @@ mod disable_recv_tracks {
                             required: true,
                             source_kind: MediaSourceKind::Device,
                             encoding_parameters: Vec::new(),
-                            svc_settings: Vec::new(),
                         }),
                     },
                     Track {
@@ -692,7 +691,6 @@ mod disable_send_tracks {
                 required,
                 source_kind,
                 encoding_parameters: Vec::new(),
-                svc_settings: Vec::new(),
             }),
         }
     }
@@ -1463,7 +1461,6 @@ mod patches_generation {
                     required: false,
                     source_kind: proto::MediaSourceKind::Device,
                     encoding_parameters: Vec::new(),
-                    svc_settings: Vec::new(),
                 }),
                 Direction::Send { receivers: Vec::new(), mid: None },
             ),
@@ -1714,7 +1711,6 @@ mod patches_generation {
                 source_kind: proto::MediaSourceKind::Display,
                 required: false,
                 encoding_parameters: Vec::new(),
-                svc_settings: Vec::new(),
             }),
             Direction::Send { mid: None, receivers: vec![] },
         ));
@@ -1769,7 +1765,6 @@ mod patches_generation {
                 source_kind: proto::MediaSourceKind::Display,
                 required: false,
                 encoding_parameters: Vec::new(),
-                svc_settings: Vec::new(),
             }),
             Direction::Send { mid: None, receivers: vec![] },
         ));
@@ -2299,7 +2294,6 @@ mod set_local_media_settings {
                         required: false,
                         source_kind: MediaSourceKind::Device,
                         encoding_parameters: Vec::new(),
-                        svc_settings: Vec::new(),
                     }),
                 }],
                 ice_servers: Vec::new(),
@@ -2332,7 +2326,6 @@ mod set_local_media_settings {
                                     required: true,
                                     source_kind: MediaSourceKind::Device,
                                     encoding_parameters: Vec::new(),
-                                    svc_settings: Vec::new(),
                                 }),
                             }],
                             ice_servers: Vec::new(),
@@ -3187,7 +3180,6 @@ async fn sender_answerer() {
                         required: true,
                         source_kind: MediaSourceKind::Device,
                         encoding_parameters: Vec::new(),
-                        svc_settings: Vec::new(),
                     }),
                 },
             ],

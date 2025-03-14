@@ -200,14 +200,22 @@ async fn room_dispose_works() {
         cmd_rx.next().await.unwrap(),
         ClientMsg::Command {
             room_id: _,
-            command: Command::JoinRoom { member_id: _, credential: _ }
+            command: Command::JoinRoom {
+                member_id: _,
+                credential: _,
+                capabilities: _
+            }
         }
     ));
     assert!(matches!(
         cmd_rx.next().await.unwrap(),
         ClientMsg::Command {
             room_id: _,
-            command: Command::JoinRoom { member_id: _, credential: _ }
+            command: Command::JoinRoom {
+                member_id: _,
+                credential: _,
+                capabilities: _
+            }
         }
     ));
 

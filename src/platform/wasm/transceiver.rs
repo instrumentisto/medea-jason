@@ -4,18 +4,16 @@ use std::rc::Rc;
 
 use derive_more::with_trait::From;
 use js_sys::Reflect;
-use medea_client_api_proto::EncodingParameters;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{
-    RtcRtpEncodingParameters, RtcRtpTransceiver, RtcRtpTransceiverInit,
-};
+use web_sys::{RtcRtpParameters, RtcRtpTransceiver, RtcRtpTransceiverInit};
 
 use crate::{
     media::track::local,
     platform::{
-        Error, TransceiverDirection,
+        self, TransceiverDirection,
         send_encoding_parameters::SendEncodingParameters,
+        send_parameters::SendParameters,
         wasm::codec_capability::CodecCapability,
     },
 };
@@ -115,7 +113,7 @@ impl Transceiver {
     pub async fn set_send_track(
         &self,
         new_track: Option<&Rc<local::Track>>,
-    ) -> Result<(), Error> {
+    ) -> Result<(), platform::Error> {
         drop(
             JsFuture::from(self.0.sender().replace_track(
                 new_track.map(|track| (**track).as_ref().as_ref()),
@@ -139,51 +137,31 @@ impl Transceiver {
         self.0.stopped()
     }
 
-    /// Updates parameters of `encodings` for the underlying [RTCRtpSender] of
-    /// this [`Transceiver`].
+    /// Returns [`SendParameters`] of the underlying [RTCRtpSender].
+    ///
+    /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
+    pub async fn get_send_parameters(&self) -> SendParameters {
+        SendParameters::from(self.0.sender().get_parameters())
+    }
+
+    /// Sets [`SendParameters`] into the underlying [RTCRtpSender].
     ///
     /// # Errors
     ///
     /// With [`platform::Error`] if the underlying [setParameters()][1] call
     /// fails.
     ///
-    /// [RTCRtpSender]: https://w3.org/TR/webrtc#dom-rtcrtpsender
+    /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-setparameters
-    pub async fn update_send_encodings(
+    pub async fn set_send_parameters(
         &self,
-        encodings: Vec<EncodingParameters>,
-    ) -> Result<(), Error> {
-        let params = self.0.sender().get_parameters();
-        let Some(encs) = params.get_encodings() else {
-            return Ok(());
-        };
-
-        for enc in encs.iter().map(RtcRtpEncodingParameters::from) {
-            let rid = enc.get_rid();
-
-            let Some(encoding) =
-                encodings.iter().find(|e| Some(&e.rid) == rid.as_ref())
-            else {
-                continue;
-            };
-
-            enc.set_active(encoding.active);
-            if let Some(max_bitrate) = encoding.max_bitrate {
-                enc.set_max_bitrate(max_bitrate);
-            }
-            if let Some(scale_resolution_down_by) =
-                encoding.scale_resolution_down_by
-            {
-                enc.set_scale_resolution_down_by(
-                    scale_resolution_down_by.into(),
-                );
-            }
-        }
-
+        params: SendParameters,
+    ) -> Result<(), platform::Error> {
         drop(
-            JsFuture::from(
-                self.0.sender().set_parameters_with_parameters(&params),
-            )
+            JsFuture::from(self.0.sender().set_parameters_with_parameters(
+                &RtcRtpParameters::from(params),
+            ))
             .await?,
         );
 
