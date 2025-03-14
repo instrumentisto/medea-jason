@@ -185,11 +185,13 @@ class _CallState extends State<CallRoute> {
       });
 
       call.onLocalAudioTrack((track) {
-        track.onAudioLevelChanged((volume) {
-          setState(() {
-            currentAudioLevel = volume / 100;
+        if (track.isOnAudioLevelAvailable()) {
+          track.onAudioLevelChanged((volume) {
+            setState(() {
+              currentAudioLevel = volume / 100;
+            });
           });
-        });
+        }
       });
       call.onLocalDeviceStream((track) async {
         if (localCameraVideo == null) {

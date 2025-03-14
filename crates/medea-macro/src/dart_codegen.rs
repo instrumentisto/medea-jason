@@ -165,11 +165,10 @@ impl DartType {
             | Self::Uint32
             | Self::Int64
             | Self::Uint64
-            | Self::Double
-            | Self::Float
             | Self::Handle
             | Self::HandlePointer
             | Self::ForeignValue => "0",
+            Self::Double | Self::Float => "0.0",
             Self::StringPointer | Self::Pointer => "Pointer.fromAddress(0)",
         }
     }
@@ -187,10 +186,9 @@ impl DartType {
             | Self::Uint32
             | Self::Int64
             | Self::Uint64
-            | Self::Float
-            | Self::Double
             | Self::HandlePointer
             | Self::ForeignValue => "0",
+            Self::Double | Self::Float => "0.0",
             Self::StringPointer | Self::Pointer | Self::Handle | Self::Void => {
                 ""
             }

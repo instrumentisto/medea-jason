@@ -118,7 +118,7 @@ void registerFunction(
   Pointer<NativeFunction<Double Function(Handle)>>
   getScaleResolutionDownBy_native = Pointer.fromFunction(
     _getScaleResolutionDownByProxy,
-    0,
+    0.0,
   );
   Pointer<NativeFunction<Void Function(Handle, Pointer<Utf8>)>>
   setScalabilityMode_native = Pointer.fromFunction(_setScalabilityModeProxy);
@@ -232,7 +232,7 @@ double _getScaleResolutionDownByProxy(Object arg0) {
     return _getScaleResolutionDownBy!(arg0);
   } catch (e) {
     _send_encoding_parameters__get_scale_resolution_down_by__set_error!(e);
-    return 0;
+    return 0.0;
   }
 }
 
