@@ -6,6 +6,19 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### BC Breaks
+
+- Removed `Codec` enum and `SvcSettings` struct. ([#199])
+- Added `Capabilities` to `Command::JoinRoom`. ([#199])
+- Added `EncodingParameters.codec` and `EncodingParameters.scalability_mode` fields. ([#199])
+
+[#199]: https://github.com/instrumentisto/medea-jason/pull/199
+
+
+
+
 ## [0.8.0] · 2025-03-10
 [0.8.0]: https://github.com/instrumentisto/medea-jason/tree/medea-client-api-proto-0.8.0/proto/client-api
 

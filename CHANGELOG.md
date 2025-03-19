@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.8.0...master)
+
+### Added
+
+- Support changing `RTCRtpSendParameters.encodings` via `Event::PeerUpdated`. ([#199])
+- Provide user agent media capabilities via `Command::JoinRoom`. ([#199])
+
+[#199]: /../../pull/199
+
+
+
+
 ## [0.8.0] · 2025-03-10
 [0.8.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.8.0
 
