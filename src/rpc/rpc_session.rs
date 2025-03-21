@@ -268,6 +268,8 @@ impl WebSocketRpcSession {
         let mut state_updates = self.state.subscribe();
         let weak_this = Rc::downgrade(self);
         platform::spawn(async move {
+            let capabilities = platform::get_capabilities().await;
+
             while let Some(state) = state_updates.next().await {
                 let this = upgrade_or_break!(weak_this);
                 match state {
@@ -286,10 +288,11 @@ impl WebSocketRpcSession {
                         }
                     },
                     S::Authorizing(info) => {
-                        this.client.authorize(
+                        this.client.join_room(
                             info.room_id.clone(),
                             info.member_id.clone(),
                             info.credential.clone(),
+                            capabilities.clone(),
                         );
                     }
                     S::Uninitialized

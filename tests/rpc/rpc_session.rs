@@ -13,7 +13,8 @@ use medea_client_api_proto::{
 };
 use medea_jason::{
     platform::{
-        MockRpcTransport, RpcTransport, TransportState, WebSocketRpcTransport,
+        self, MockRpcTransport, RpcTransport, TransportState,
+        WebSocketRpcTransport,
     },
     rpc::{
         CloseMsg, ConnectionInfo, RpcSession, SessionError, WebSocketRpcClient,
@@ -238,6 +239,8 @@ async fn reconnect_after_transport_abnormal_close() {
     Rc::clone(&session).reconnect().await.unwrap();
     on_reconnected.select_next_some().await;
 
+    let capabilities = platform::get_capabilities().await;
+
     drop(session);
     assert_eq!(
         *commands_sent.borrow(),
@@ -248,7 +251,8 @@ async fn reconnect_after_transport_abnormal_close() {
                 command: Command::JoinRoom {
                     member_id: "member_id".into(),
                     credential: "token".into(),
-                }
+                    capabilities: capabilities.clone(),
+                },
             },
             // reconnect
             ClientMsg::Command {
@@ -256,8 +260,9 @@ async fn reconnect_after_transport_abnormal_close() {
                 command: Command::JoinRoom {
                     member_id: "member_id".into(),
                     credential: "token".into(),
-                }
-            }
-        ]
+                    capabilities,
+                },
+            },
+        ],
     );
 }

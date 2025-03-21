@@ -10,6 +10,7 @@ pub mod media_track;
 pub mod peer_connection;
 pub mod rtc_stats;
 pub mod send_encoding_parameters;
+pub mod send_parameters;
 pub mod transceiver;
 pub mod transport;
 pub mod utils;

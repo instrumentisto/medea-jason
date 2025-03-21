@@ -6,6 +6,18 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### Added
+
+- `#[dart_bridge]` macro:
+    - Support `f32` and `f64` for passing through FFI. ([#199])
+
+[#199]: https://github.com/instrumentisto/medea-jason/pull/199
+
+
+
+
 ## [0.3.1] · 2025-03-10
 [0.3.1]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.3.0/crates/medea-macro
 

@@ -20,13 +20,15 @@ use crate::{
     media::{LocalTracksConstraints, MediaKind, TrackConstraints, VideoSource},
     peer::{
         MediaExchangeStateController, MediaState, MediaStateControllable,
-        MuteStateController, TransceiverSide, UpdateLocalStreamError,
+        MuteStateController, RtcPeerConnectionError, TransceiverSide,
+        UpdateLocalStreamError,
         component::SyncState,
         media::{
             InTransition as _, MediaExchangeState, MuteState,
             ProhibitedStateError, media_exchange_state, mute_state,
         },
     },
+    platform::transceiver::probe_target_codecs,
     utils::{AsProtoState, SynchronizableState, Updatable, component},
 };
 
@@ -96,6 +98,11 @@ pub struct State {
     ///
     /// [`local::Track`]: crate::media::track::local::Track
     receivers: RefCell<Vec<MemberId>>,
+
+    /// Parameters for sending [RTP] encodings of media.
+    ///
+    /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+    send_encodings: ProgressableCell<Vec<proto::EncodingParameters>>,
 
     /// Indicator whether the [`Sender`]'s [`local::Track`] is enabled
     /// individually.
@@ -185,6 +192,7 @@ impl SynchronizableState for State {
             connection_mode: input.connection_mode,
             local_track_state: ObservableCell::new(LocalTrackState::Stable),
             sync_state: ObservableCell::new(SyncState::Synced),
+            send_encodings: ProgressableCell::new(Vec::new()),
         }
     }
 
@@ -239,6 +247,7 @@ impl Updatable for State {
             self.enabled_individual.when_processed().into(),
             self.mute_state.when_processed().into(),
             self.enabled_general.when_all_processed().into(),
+            self.send_encodings.when_all_processed().into(),
         ])
     }
 
@@ -286,6 +295,7 @@ impl State {
             mid,
             media_type,
             receivers: RefCell::new(receivers),
+            send_encodings: ProgressableCell::new(Vec::new()),
             enabled_individual: MediaExchangeStateController::new(
                 media_exchange_state::Stable::from(
                     media_direction.is_send_enabled(),
@@ -399,6 +409,9 @@ impl State {
         }
         if let Some(receivers) = track_patch.receivers {
             *self.receivers.borrow_mut() = receivers;
+        }
+        if let Some(enc_params) = track_patch.encoding_parameters {
+            drop(self.send_encodings.replace(enc_params));
         }
     }
 
@@ -610,6 +623,40 @@ impl Component {
             ))?;
         }
         Ok(())
+    }
+
+    /// Disables media exchange on a local track acquisition error.
+    #[watch(self.send_encodings.subscribe().skip(1))]
+    async fn send_encodings_updated(
+        sender: Rc<Sender>,
+        _: Rc<State>,
+        enc_params: Guarded<Vec<proto::EncodingParameters>>,
+    ) -> Result<(), Traced<RtcPeerConnectionError>> {
+        let (enc_params, _guard) = enc_params.into_parts();
+
+        let target_codecs = probe_target_codecs(
+            enc_params.iter().filter_map(|e| e.codec.as_ref()),
+        )
+        .await;
+        // TODO: Switch to negotiationless codec change via
+        //       `RTCRtpSender.setParameters()` once
+        //       `RTCRtpEncodingParameters.codec` is supported on all
+        //       major UAs.
+        //       Track for `parameters.encodings.codec` here:
+        //       https://tinyurl.com/wytxmuss
+        if let Some(target_codecs) = target_codecs {
+            sender.transceiver.set_codec_preferences(target_codecs);
+        } else {
+            // Empty list resets preferences.
+            sender.transceiver.set_codec_preferences(Vec::new());
+        }
+
+        sender
+            .transceiver
+            .update_send_encodings(&enc_params)
+            .await
+            .map_err(RtcPeerConnectionError::UpdateSendEncodingsError)
+            .map_err(tracerr::wrap!())
     }
 }
 

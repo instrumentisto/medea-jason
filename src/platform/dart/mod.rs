@@ -7,8 +7,6 @@
     clippy::missing_panics_doc,
     clippy::undocumented_unsafe_blocks,
     clippy::unwrap_used,
-    clippy::needless_pass_by_value,
-    unused_variables,
     reason = "needs refactoring"
 )]
 
@@ -22,10 +20,10 @@ pub mod media_device_info;
 pub mod media_devices;
 pub mod media_display_info;
 pub mod media_track;
-pub mod parameters;
 pub mod peer_connection;
 pub mod rtc_stats;
 pub mod send_encoding_parameters;
+pub mod send_parameters;
 pub mod transceiver;
 pub mod transport;
 pub mod utils;

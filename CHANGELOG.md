@@ -6,6 +6,24 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.8.0...master)
+
+### BC Breaks
+
+- Minimal supported version of [`medea-client-api-proto`] is `0.9.0`. ([#199])
+
+### Added
+
+- Support of changing `RTCRtpSendParameters.encodings` via `Event::PeerUpdated`. ([#199])
+- Providing user agent media capabilities via `Command::JoinRoom`. ([#199])
+
+[#199]: https://github.com/instrumentisto/medea-jason/pull/199
+
+
+
+
 ## [0.8.0] · 2025-03-10
 [0.8.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.8.0
 
@@ -123,7 +141,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Minimal supported version of `medea-client-api-proto` is `0.6.0` ([#151]).
+- Minimal supported version of [`medea-client-api-proto`] is `0.6.0` ([#151]).
 - Library API:
     - Removed `with_rpc_client()` constructor and added `WebSocketRpcClient` as argument to `new()` constructor in `Jason` ([#175]).
 
@@ -168,7 +186,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Minimal supported version of `medea-client-api-proto` is `0.5.0` ([#119]).
+- Minimal supported version of [`medea-client-api-proto`] is `0.5.0` ([#119]).
 
 ### Fixed
 
@@ -479,5 +497,6 @@ All user visible changes to this project will be documented in this file. This p
 [VP9]: https://bloggeek.me/webrtcglossary/vp9
 [`derive_more`]: https://docs.rs/derive_more
 [`flutter_rust_bridge`]: https://docs.rs/flutter_rust_bridge
+[`medea-client-api-proto`]: https://docs.rs/medea-client-api-proto
 [`talc`]: https://docs.rs/talc
 [`wee_alloc`]: https://docs.rs/wee_alloc

@@ -1,6 +1,6 @@
 [package]
 name = "medea-client-api-proto"
-version = "0.8.0"
+version = "0.9.0-dev"
 edition = "2024"
 rust-version = "1.85"
 description = "Client API protocol implementation for Medea media server."

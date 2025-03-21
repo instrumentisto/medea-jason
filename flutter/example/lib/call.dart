@@ -88,53 +88,57 @@ class Call {
     bool publishVideo,
     bool publishAudio,
     bool fakeMedia,
+    bool isSFUMode,
   ) async {
     if (fakeMedia) {
       await webrtc.initFfiBridge();
       await webrtc.enableFakeMedia();
     }
 
-    var constraints = MediaStreamSettings();
+    if (isPublish) {
+      var constraints = MediaStreamSettings();
 
-    var devices = await _mediaManager.enumerateDevices();
+      var devices = await _mediaManager.enumerateDevices();
 
-    if (publishVideo) {
-      videoDeviceId =
-          devices
-              .firstWhere(
-                (element) => element.kind() == MediaDeviceKind.videoInput,
-              )
-              .deviceId();
-      constraints.deviceVideo(DeviceVideoTrackConstraints());
+      if (publishVideo) {
+        videoDeviceId =
+            devices
+                .firstWhere(
+                  (element) => element.kind() == MediaDeviceKind.videoInput,
+                )
+                .deviceId();
+        constraints.deviceVideo(DeviceVideoTrackConstraints());
+      }
+
+      if (publishAudio) {
+        audioDeviceId =
+            devices
+                .firstWhere(
+                  (element) => element.kind() == MediaDeviceKind.audioInput,
+                )
+                .deviceId();
+        constraints.audio(AudioTrackConstraints());
+      }
+
+      var tracks = await _mediaManager.initLocalTracks(constraints);
+      await _room.setLocalMediaSettings(constraints, false, false);
+      _tracks = tracks;
+
+      for (var track in tracks) {
+        if (track.kind() == MediaKind.video) {
+          _onLocalDeviceTrack(track.getTrack());
+        } else if (track.kind() == MediaKind.audio) {
+          _onLocalAudioTrack(track);
+        }
+      }
     }
 
-    if (publishAudio) {
-      audioDeviceId =
-          devices
-              .firstWhere(
-                (element) => element.kind() == MediaDeviceKind.audioInput,
-              )
-              .deviceId();
-      constraints.audio(AudioTrackConstraints());
-    }
-
-    var tracks = await _mediaManager.initLocalTracks(constraints);
     _room.onFailedLocalMedia((e) {
       _onError('onFailedLocalMedia: $e');
     });
     _room.onConnectionLoss((e) {
       _onError('onConnectionLoss: $e');
     });
-    await _room.setLocalMediaSettings(constraints, false, false);
-    _tracks = tracks;
-
-    for (var track in tracks) {
-      if (track.kind() == MediaKind.video) {
-        _onLocalDeviceTrack(track.getTrack());
-      } else if (track.kind() == MediaKind.audio) {
-        _onLocalAudioTrack(track);
-      }
-    }
 
     _room.onLocalTrack((track) {
       _tracks.add(track);
@@ -158,6 +162,7 @@ class Call {
           isPublish,
           publishVideo,
           publishAudio,
+          isSFUMode,
         ),
       );
       return;
@@ -172,6 +177,7 @@ class Call {
           isPublish,
           publishVideo,
           publishAudio,
+          isSFUMode,
         ),
       );
       return;
@@ -289,11 +295,15 @@ class Call {
     bool isPublish,
     bool publishAudio,
     bool publishVideo,
+    bool isSFUMode,
   ) async {
     var pipeline = HashMap<String, Endpoint>();
 
     if (isPublish) {
-      var end = WebRtcPublishEndpoint('publish', P2pMode.Always);
+      var end = WebRtcPublishEndpoint(
+        'publish',
+        isSFUMode ? P2pMode.Never : P2pMode.Always,
+      );
       end.audio_settings = AudioSettings(
         publishAudio ? PublishPolicy.Optional : PublishPolicy.Disabled,
       );
@@ -325,11 +335,15 @@ class Call {
     bool isPublish,
     bool publishAudio,
     bool publishVideo,
+    bool isSFUMode,
   ) async {
     var pipeline = HashMap<String, Endpoint>();
 
     if (isPublish) {
-      var end = WebRtcPublishEndpoint('publish', P2pMode.Always);
+      var end = WebRtcPublishEndpoint(
+        'publish',
+        isSFUMode ? P2pMode.Never : P2pMode.Always,
+      );
       end.audio_settings = AudioSettings(
         publishAudio ? PublishPolicy.Optional : PublishPolicy.Disabled,
       );

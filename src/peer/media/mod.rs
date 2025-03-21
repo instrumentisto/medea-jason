@@ -16,8 +16,7 @@ use futures::{
 use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
 use medea_client_api_proto::{ConnectionMode, MemberId};
-use medea_client_api_proto::{EncodingParameters, SvcSettings};
-use proto::{MediaSourceKind, MediaType, ScalabilityMode, TrackId};
+use proto::{MediaSourceKind, MediaType, TrackId};
 use tracerr::Traced;
 
 #[doc(inline)]
@@ -39,8 +38,8 @@ use crate::{
     peer::{LocalStreamUpdateCriteria, PeerEvent},
     platform,
     platform::{
-        CodecCapability, TransceiverInit,
-        send_encoding_parameters::SendEncodingParameters,
+        TransceiverInit, send_encoding_parameters::SendEncodingParameters,
+        transceiver::probe_target_codecs,
     },
     utils::{Caused, Component},
 };
@@ -245,77 +244,6 @@ pub enum GetMidsError {
     ReceiversWithoutMid,
 }
 
-/// Returns the required [`CodecCapability`]s and [`ScalabilityMode`] for a
-/// [`platform::Transceiver`] based on the provided [`SvcSettings`].
-pub async fn probe_video_codecs(
-    svc_settings: &Vec<SvcSettings>,
-) -> (Vec<CodecCapability>, Option<ScalabilityMode>) {
-    /// List of required codecs for every [`MediaKind::Video`] of a
-    /// [`platform::Transceiver`].
-    const REQUIRED_CODECS: [&str; 3] =
-        ["video/rtx", "video/red", "video/ulpfec"];
-
-    let mut target_scalability_mode = None;
-    let mut target_codecs = Vec::new();
-
-    let Ok(codecs) =
-        CodecCapability::get_sender_codec_capabilities(MediaKind::Video).await
-    else {
-        return (target_codecs, target_scalability_mode);
-    };
-
-    let mut codecs: HashMap<String, Vec<_>> =
-        codecs.into_iter().fold(HashMap::new(), |mut map, c| {
-            map.entry(c.mime_type()).or_default().push(c);
-            map
-        });
-
-    for svc in svc_settings {
-        if let Some(mut codec_cap) = codecs.remove(svc.codec.mime_type()) {
-            target_codecs.append(&mut codec_cap);
-            target_scalability_mode = Some(svc.scalability_mode);
-            break;
-        }
-    }
-    if !target_codecs.is_empty() {
-        #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
-        for (mime, mut c) in codecs {
-            if REQUIRED_CODECS.contains(&mime.as_str()) {
-                target_codecs.append(&mut c);
-            }
-        }
-    }
-
-    (target_codecs, target_scalability_mode)
-}
-
-/// Returns [`SendEncodingParameters`] for a [`platform::Transceiver`] based on
-/// the provided [`EncodingParameters`] and target [`ScalabilityMode`].
-fn get_encodings_params(
-    mut encodings: Vec<EncodingParameters>,
-    target_sm: Option<ScalabilityMode>,
-) -> Vec<SendEncodingParameters> {
-    if encodings.is_empty() && target_sm.is_some() {
-        encodings.push(EncodingParameters {
-            rid: "0".to_owned(),
-            active: true,
-            max_bitrate: None,
-            scale_resolution_down_by: None,
-        });
-    }
-
-    encodings
-        .into_iter()
-        .map(|enc| {
-            let enc = SendEncodingParameters::from(enc);
-            if let Some(target_sm) = target_sm {
-                enc.set_scalability_mode(target_sm);
-            }
-            enc
-        })
-        .collect()
-}
-
 /// Actual data of [`MediaConnections`] storage.
 #[derive(Debug)]
 struct InnerMediaConnections {
@@ -409,19 +337,30 @@ impl InnerMediaConnections {
                 MediaType::Video(settings) => {
                     let init = TransceiverInit::new(direction);
 
-                    let (target_codecs, target_scalability_mode) =
-                        probe_video_codecs(&settings.svc_settings).await;
-
-                    let encoding_params = get_encodings_params(
-                        settings.encoding_parameters,
-                        target_scalability_mode,
+                    init.set_send_encodings(
+                        settings
+                            .encoding_parameters
+                            .iter()
+                            .cloned()
+                            .map(SendEncodingParameters::from)
+                            .collect(),
                     );
-                    if !encoding_params.is_empty() {
-                        init.set_send_encodings(encoding_params);
-                    }
 
                     let transceiver = peer.add_transceiver(kind, init).await;
-                    if !target_codecs.is_empty() {
+                    let target_codecs = probe_target_codecs(
+                        settings
+                            .encoding_parameters
+                            .iter()
+                            .filter_map(|e| e.codec.as_ref()),
+                    )
+                    .await;
+                    // TODO: Switch to negotiationless codec change via
+                    //       `RTCRtpSender.setParameters()` once
+                    //       `RTCRtpEncodingParameters.codec` is supported on
+                    //       all major UAs.
+                    //       Track for `parameters.encodings.codec` here:
+                    //       https://tinyurl.com/wytxmuss
+                    if let Some(target_codecs) = target_codecs {
                         transceiver.set_codec_preferences(target_codecs);
                     }
                     transceiver
