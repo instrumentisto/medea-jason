@@ -3,11 +3,12 @@
 //! [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
 
 use dart_sys::Dart_Handle;
-use medea_client_api_proto::{EncodingParameters, ScalabilityMode};
 use medea_macro::dart_bridge;
 
 use super::utils::{c_str_into_string, string_into_c_str};
-use crate::platform::dart::utils::handle::DartHandle;
+use crate::platform::dart::utils::{
+    NonNullDartValueArgExt as _, handle::DartHandle,
+};
 
 #[dart_bridge(
     "flutter/lib/src/native/platform/send_encoding_parameters.g.dart"
@@ -17,7 +18,7 @@ mod send_encoding_parameters {
 
     use dart_sys::Dart_Handle;
 
-    use crate::platform::Error;
+    use crate::{api::DartValueArg, platform::Error};
 
     extern "C" {
         /// Creates new [RTCRtpEncodingParameters][0].
@@ -45,14 +46,30 @@ mod send_encoding_parameters {
             active: bool,
         ) -> Result<(), Error>;
 
+        /// Returns [activeness][1] of the provided
+        /// [RTCRtpEncodingParameters][0].
+        ///
+        /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-active
+        pub fn get_active(encoding: Dart_Handle) -> Result<bool, Error>;
+
         /// Sets [maxBitrate][1] of the provided [RTCRtpEncodingParameters][0].
         ///
         /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
         /// [1]:https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
         pub fn set_max_bitrate(
             encoding: Dart_Handle,
-            max_bitrate: i64,
+            max_bitrate: u32,
         ) -> Result<(), Error>;
+
+        /// Returns [maxBitrate][1] of the provided
+        /// [RTCRtpEncodingParameters][0].
+        ///
+        /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
+        /// [1]:https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
+        pub fn get_max_bitrate(
+            encoding: Dart_Handle,
+        ) -> Result<ptr::NonNull<DartValueArg<Option<u32>>>, Error>;
 
         /// Sets [scaleResolutionDownBy][1] of the provided
         /// [RTCRtpEncodingParameters][0].
@@ -61,8 +78,17 @@ mod send_encoding_parameters {
         /// [1]: https://tinyurl.com/ypzzc75t
         pub fn set_scale_resolution_down_by(
             encoding: Dart_Handle,
-            scale_resolution_down_by: i64,
+            scale_resolution_down_by: f64,
         ) -> Result<(), Error>;
+
+        /// Returns [scaleResolutionDownBy][1] of the provided
+        /// [RTCRtpEncodingParameters][0].
+        ///
+        /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
+        /// [1]: https://tinyurl.com/ypzzc75t
+        pub fn get_scale_resolution_down_by(
+            encoding: Dart_Handle,
+        ) -> Result<f64, Error>;
 
         /// Sets [scalabilityMode][1] of the provided
         /// [RTCRtpEncodingParameters][0].
@@ -73,6 +99,15 @@ mod send_encoding_parameters {
             encoding: Dart_Handle,
             scalability_mode: ptr::NonNull<c_char>,
         ) -> Result<(), Error>;
+
+        /// Returns [scalabilityMode][1] of the provided
+        /// [RTCRtpEncodingParameters][0].
+        ///
+        /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
+        /// [1]: https://tinyurl.com/3zuaee45
+        pub fn get_scalability_mode(
+            encoding: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
     }
 }
 
@@ -113,83 +148,105 @@ impl SendEncodingParameters {
     /// Returns [RID] of these [`SendEncodingParameters`].
     ///
     /// [RID]: https://w3.org/TR/webrtc#dom-rtcrtpcodingparameters-rid
+    #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
     #[must_use]
-    pub fn rid(&self) -> String {
-        let handle = self.0.get();
-        let rid = unsafe { send_encoding_parameters::get_rid(handle) }.unwrap();
-        unsafe { c_str_into_string(rid) }
+    pub fn rid(&self) -> Option<String> {
+        let rid =
+            unsafe { send_encoding_parameters::get_rid(self.0.get()).unwrap() };
+
+        let rid = unsafe { c_str_into_string(rid) };
+
+        (!rid.is_empty()).then_some(rid)
     }
 
     /// Sets [activeness][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-active
-    pub fn set_active(&mut self, active: bool) {
-        let handle = self.0.get();
-        unsafe { send_encoding_parameters::set_active(handle, active) }
+    pub fn set_active(&self, active: bool) {
+        unsafe { send_encoding_parameters::set_active(self.0.get(), active) }
             .unwrap();
+    }
+
+    /// Returns [activeness][1] of these [`SendEncodingParameters`].
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-active
+    #[must_use]
+    pub fn active(&self) -> bool {
+        unsafe { send_encoding_parameters::get_active(self.0.get()) }.unwrap()
     }
 
     /// Sets [maxBitrate][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
-    pub fn set_max_bitrate(&mut self, max_bitrate: i64) {
-        let handle = self.0.get();
+    pub fn set_max_bitrate(&self, max_bitrate: u32) {
         unsafe {
-            send_encoding_parameters::set_max_bitrate(handle, max_bitrate)
+            send_encoding_parameters::set_max_bitrate(self.0.get(), max_bitrate)
         }
         .unwrap();
+    }
+
+    /// Returns [maxBitrate][1] of these [`SendEncodingParameters`].
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
+    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
+    #[must_use]
+    pub fn max_bitrate(&self) -> Option<u32> {
+        let max_bitrate =
+            unsafe { send_encoding_parameters::get_max_bitrate(self.0.get()) }
+                .unwrap();
+
+        Option::try_from(unsafe { max_bitrate.unbox() }).unwrap()
     }
 
     /// Sets [scaleResolutionDownBy][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/ypzzc75t
-    pub fn set_scale_resolution_down_by(
-        &mut self,
-        scale_resolution_down_by: i64,
-    ) {
-        let handle = self.0.get();
+    pub fn set_scale_resolution_down_by(&self, scale_resolution_down_by: f64) {
         unsafe {
             send_encoding_parameters::set_scale_resolution_down_by(
-                handle,
+                self.0.get(),
                 scale_resolution_down_by,
             )
         }
         .unwrap();
     }
 
+    /// Returns [scaleResolutionDownBy][1] of these [`SendEncodingParameters`].
+    ///
+    /// [1]: https://tinyurl.com/ypzzc75t
+    #[must_use]
+    pub fn scale_resolution_down_by(&self) -> f64 {
+        unsafe {
+            send_encoding_parameters::get_scale_resolution_down_by(self.0.get())
+        }
+        .unwrap()
+    }
+
     /// Sets [scalabilityMode][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/3zuaee45
-    pub fn set_scalability_mode(&self, scalability_mode: ScalabilityMode) {
-        let handle = self.0.get();
+    pub fn set_scalability_mode(&self, scalability_mode: String) {
         unsafe {
             send_encoding_parameters::set_scalability_mode(
-                handle,
-                string_into_c_str(scalability_mode.to_string()),
+                self.0.get(),
+                string_into_c_str(scalability_mode),
             )
         }
         .unwrap();
     }
-}
 
-impl From<EncodingParameters> for SendEncodingParameters {
-    fn from(from: EncodingParameters) -> Self {
-        let EncodingParameters {
-            rid,
-            active,
-            max_bitrate,
-            scale_resolution_down_by,
-        } = from;
+    /// Returns [scalabilityMode][1] of these [`SendEncodingParameters`].
+    ///
+    /// [1]: https://tinyurl.com/3zuaee45
+    #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
+    #[must_use]
+    pub fn scalability_mode(&self) -> Option<String> {
+        let mode = unsafe {
+            send_encoding_parameters::get_scalability_mode(self.0.get())
+                .unwrap()
+        };
+        let mode = unsafe { c_str_into_string(mode) };
 
-        let mut enc = Self::new(rid, active);
-
-        if let Some(b) = max_bitrate {
-            enc.set_max_bitrate(b.into());
-        }
-        if let Some(s) = scale_resolution_down_by {
-            enc.set_scale_resolution_down_by(s.into());
-        }
-
-        enc
+        (!mode.is_empty()).then_some(mode)
     }
 }

@@ -62,6 +62,20 @@ pub(crate) enum DartType {
     /// [Uint64]: https://api.dart.dev/stable/dart-ffi/Uint64-class.html
     Uint64,
 
+    /// 32-bit floating-point.
+    ///
+    /// Represents [Float] on the Dart side.
+    ///
+    /// [Uint64]: https://api.dart.dev/stable/dart-ffi/Float-class.html
+    Float,
+
+    /// 64-bit floating-point.
+    ///
+    /// Represents [Double] on the Dart side.
+    ///
+    /// [Uint64]: https://api.dart.dev/stable/dart-ffi/Double-class.html
+    Double,
+
     /// Pointer to the Dart `Object`.
     ///
     /// Represents a [Handle] on the Dart side.
@@ -107,6 +121,8 @@ impl DartType {
             Self::Uint32 => "Uint32",
             Self::Int64 => "Int64",
             Self::Uint64 => "Uint64",
+            Self::Float => "Float",
+            Self::Double => "Double",
             Self::Handle => "Handle",
             Self::Pointer => "Pointer",
             Self::HandlePointer => "Pointer<Handle>",
@@ -127,6 +143,7 @@ impl DartType {
             | Self::Uint32
             | Self::Int64
             | Self::Uint64 => "int",
+            Self::Float | Self::Double => "double",
             Self::Handle => "Object",
             Self::Pointer => "Pointer",
             Self::HandlePointer => "Pointer<Handle>",
@@ -151,6 +168,7 @@ impl DartType {
             | Self::Handle
             | Self::HandlePointer
             | Self::ForeignValue => "0",
+            Self::Double | Self::Float => "0.0",
             Self::StringPointer | Self::Pointer => "Pointer.fromAddress(0)",
         }
     }
@@ -170,6 +188,7 @@ impl DartType {
             | Self::Uint64
             | Self::HandlePointer
             | Self::ForeignValue => "0",
+            Self::Double | Self::Float => "0.0",
             Self::StringPointer | Self::Pointer | Self::Handle | Self::Void => {
                 ""
             }
@@ -238,6 +257,8 @@ impl TryFrom<syn::Type> for DartType {
                     "u32" => Self::Uint32,
                     "i64" => Self::Int64,
                     "u64" => Self::Uint64,
+                    "f32" => Self::Float,
+                    "f64" => Self::Double,
                     "Dart_Handle" => Self::Handle,
                     "NonNull" => Self::from_non_null_generic(&ty.arguments)?,
                     "DartValueArg" | "DartValue" => Self::ForeignValue,

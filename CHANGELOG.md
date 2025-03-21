@@ -8,11 +8,30 @@ All user visible changes to this project will be documented in this file. This p
 
 ## master
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.7.1...master)
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.8.0...master)
+
+### BC Breaks
+
+- Minimal supported version of [`medea-client-api-proto`] is `0.9.0`. ([#199])
+
+### Added
+
+- Support of changing `RTCRtpSendParameters.encodings` via `Event::PeerUpdated`. ([#199])
+- Providing user agent media capabilities via `Command::JoinRoom`. ([#199])
+
+[#199]: https://github.com/instrumentisto/medea-jason/pull/199
+
+
+
+
+## [0.8.0] · 2025-03-10
+[0.8.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.8.0
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.7.1...medea-jason-0.8.0)
 
 ### Changed
 
-- Bumped up [MSRV] to 1.85 because of migration to 2024 edition. ([todo])
+- Bumped up [MSRV] to 1.85 because of migration to [2024 edition][080-1]. ([6f760c83])
 
 ### Upgraded
 
@@ -20,15 +39,21 @@ All user visible changes to this project will be documented in this file. This p
     - [`derive-more`] to 2.0 version. ([3ed7d2bf])
     - [`flutter_rust_bridge`] to 2.8.0 version. ([#200])
 
-[#200]: /../../pull/200
-[3ed7d2bf]: /../../commit/3ed7d2bf59ed1237d9e55c4b65ea5cad833306fa
-[todo]: /../../commit/todo
+### Fixed
+
+- Segfault when closing [Flutter] application on macOS. ([#201])
+
+[#200]: https://github.com/instrumentisto/medea-jason/pull/200
+[#201]: https://github.com/instrumentisto/medea-jason/pull/200
+[3ed7d2bf]: https://github.com/instrumentisto/medea-jason/commit/3ed7d2bf59ed1237d9e55c4b65ea5cad833306fa
+[6f760c83]: https://github.com/instrumentisto/medea-jason/commit/6f760c836f9c5293b5fefae8a0cb4ee2bd5cfda2
+[080-1]: https://doc.rust-lang.org/edition-guide/rust-2024/index.html
 
 
 
 
 ## [0.7.1] · 2024-12-30
-[0.7.1]: /../../tree/medea-jason-0.7.1
+[0.7.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.7.1
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.7.0...medea-jason-0.7.1)
 
@@ -41,14 +66,14 @@ All user visible changes to this project will be documented in this file. This p
 - Dependencies:
     - [`flutter_rust_bridge`] to 2.7.0 version. ([#195])
 
-[#195]: /../../pull/195
-[#197]: /../../pull/197
+[#195]: https://github.com/instrumentisto/medea-jason/pull/195
+[#197]: https://github.com/instrumentisto/medea-jason/pull/197
 
 
 
 
 ## [0.7.0] · 2024-10-29
-[0.7.0]: /../../tree/medea-jason-0.7.0
+[0.7.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.7.0
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.6.1...medea-jason-0.7.0)
 
@@ -67,14 +92,14 @@ All user visible changes to this project will be documented in this file. This p
 - Dependencies:
     - [`flutter_rust_bridge`] to 2.4.0 version. ([#188])
 
-[#187]: /../../pull/187
-[#188]: /../../pull/188
+[#187]: https://github.com/instrumentisto/medea-jason/pull/187
+[#188]: https://github.com/instrumentisto/medea-jason/pull/188
 
 
 
 
 ## [0.6.1] · 2024-09-11
-[0.6.1]: /../../tree/medea-jason-0.6.1
+[0.6.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.6.1
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.6.0...medea-jason-0.6.1)
 
@@ -82,13 +107,13 @@ All user visible changes to this project will be documented in this file. This p
 
 - Bumped up [MSRV] to 1.81. ([fe29ee20])
 
-[fe29ee20]: /../../commit/fe29ee20b7dd210145a2004ebe8389140aec10a3
+[fe29ee20]: https://github.com/instrumentisto/medea-jason/commit/fe29ee20b7dd210145a2004ebe8389140aec10a3
 
 
 
 
 ## [0.6.0] · 2024-08-27
-[0.6.0]: /../../tree/medea-jason-0.6.0
+[0.6.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.6.0
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.5.0...medea-jason-0.6.0)
 
@@ -102,21 +127,21 @@ All user visible changes to this project will be documented in this file. This p
     - [`derive-more`] to 1.0 version. ([#181])
     - [`flutter_rust_bridge`] to 2.2.0 version. ([#182])
 
-[#180]: /../../pull/180
-[#181]: /../../pull/181
-[#182]: /../../pull/182
+[#180]: https://github.com/instrumentisto/medea-jason/pull/180
+[#181]: https://github.com/instrumentisto/medea-jason/pull/181
+[#182]: https://github.com/instrumentisto/medea-jason/pull/182
 
 
 
 
 ## [0.5.0] · 2024-08-05
-[0.5.0]: /../../tree/medea-jason-0.5.0
+[0.5.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.5.0
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.4.0...medea-jason-0.5.0)
 
 ### BC Breaks
 
-- Minimal supported version of `medea-client-api-proto` is `0.6.0` ([#151]).
+- Minimal supported version of [`medea-client-api-proto`] is `0.6.0` ([#151]).
 - Library API:
     - Removed `with_rpc_client()` constructor and added `WebSocketRpcClient` as argument to `new()` constructor in `Jason` ([#175]).
 
@@ -140,41 +165,41 @@ All user visible changes to this project will be documented in this file. This p
 - Segfault on Dart isolate shutdown ([#163]).
 - Exception in Dart code might be ignored by Rust caller ([#176]).
 
-[#135]: /../../pull/135
-[#138]: /../../pull/138
-[#151]: /../../pull/151
-[#162]: /../../pull/162
-[#163]: /../../pull/163
-[#166]: /../../pull/166
-[#167]: /../../pull/167
-[#172]: /../../pull/172
-[#175]: /../../pull/175
-[#176]: /../../pull/176
+[#135]: https://github.com/instrumentisto/medea-jason/pull/135
+[#138]: https://github.com/instrumentisto/medea-jason/pull/138
+[#151]: https://github.com/instrumentisto/medea-jason/pull/151
+[#162]: https://github.com/instrumentisto/medea-jason/pull/162
+[#163]: https://github.com/instrumentisto/medea-jason/pull/163
+[#166]: https://github.com/instrumentisto/medea-jason/pull/166
+[#167]: https://github.com/instrumentisto/medea-jason/pull/167
+[#172]: https://github.com/instrumentisto/medea-jason/pull/172
+[#175]: https://github.com/instrumentisto/medea-jason/pull/175
+[#176]: https://github.com/instrumentisto/medea-jason/pull/176
 
 
 
 
 ## [0.4.0] · 2023-07-11
-[0.4.0]: /../../tree/medea-jason-0.4.0
+[0.4.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.4.0
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.3.0...medea-jason-0.4.0)
 
 ### BC Breaks
 
-- Minimal supported version of `medea-client-api-proto` is `0.5.0` ([#119]).
+- Minimal supported version of [`medea-client-api-proto`] is `0.5.0` ([#119]).
 
 ### Fixed
 
 - Initial mute state on incoming tracks in [SFU] mode ([#119]).
 - Incorrect `ConnectionHandle`s creation and disposal in [SFU] mode ([#119]).
 
-[#119]: /../../pull/119
+[#119]: https://github.com/instrumentisto/medea-jason/pull/119
 
 
 
 
 ## [0.3.0] · 2023-06-09
-[0.3.0]: /../../tree/medea-jason-0.3.0
+[0.3.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.3.0
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/a2ce6b92...medea-jason-0.3.0)
 
@@ -259,27 +284,27 @@ All user visible changes to this project will be documented in this file. This p
 - Switch to [2021 Rust edition][012-1] ([#16]).
 
 [instrumentisto/medea#206]: https://github.com/instrumentisto/medea/pull/206
-[#4]: /../../pull/4
-[#8]: /../../pull/8
-[#9]: /../../pull/9
-[#10]: /../../pull/10
-[#12]: /../../pull/12
-[#14]: /../../pull/14
-[#16]: /../../pull/16
-[#26]: /../../pull/26
-[#28]: /../../pull/28
-[#29]: /../../pull/29
-[#30]: /../../pull/30
-[#31]: /../../pull/31
-[#43]: /../../pull/43
-[#46]: /../../pull/46
-[#49]: /../../pull/49
-[#52]: /../../pull/52
-[#57]: /../../pull/57
-[#59]: /../../pull/59
-[#81]: /../../pull/81
-[#106]: /../../pull/106
-[#106]: /../../pull/109
+[#4]: https://github.com/instrumentisto/medea-jason/pull/4
+[#8]: https://github.com/instrumentisto/medea-jason/pull/8
+[#9]: https://github.com/instrumentisto/medea-jason/pull/9
+[#10]: https://github.com/instrumentisto/medea-jason/pull/10
+[#12]: https://github.com/instrumentisto/medea-jason/pull/12
+[#14]: https://github.com/instrumentisto/medea-jason/pull/14
+[#16]: https://github.com/instrumentisto/medea-jason/pull/16
+[#26]: https://github.com/instrumentisto/medea-jason/pull/26
+[#28]: https://github.com/instrumentisto/medea-jason/pull/28
+[#29]: https://github.com/instrumentisto/medea-jason/pull/29
+[#30]: https://github.com/instrumentisto/medea-jason/pull/30
+[#31]: https://github.com/instrumentisto/medea-jason/pull/31
+[#43]: https://github.com/instrumentisto/medea-jason/pull/43
+[#46]: https://github.com/instrumentisto/medea-jason/pull/46
+[#49]: https://github.com/instrumentisto/medea-jason/pull/49
+[#52]: https://github.com/instrumentisto/medea-jason/pull/52
+[#57]: https://github.com/instrumentisto/medea-jason/pull/57
+[#59]: https://github.com/instrumentisto/medea-jason/pull/59
+[#81]: https://github.com/instrumentisto/medea-jason/pull/81
+[#106]: https://github.com/instrumentisto/medea-jason/pull/106
+[#106]: https://github.com/instrumentisto/medea-jason/pull/109
 
 
 
@@ -465,11 +490,13 @@ All user visible changes to this project will be documented in this file. This p
 
 
 [Cargo features]: https://doc.rust-lang.org/cargo/reference/features.html
+[Flutter]: https://flutter.dev
 [MSRV]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
 [SFU]: https://webrtcglossary.com/sfu
 [Semantic Versioning 2.0.0]: https://semver.org
 [VP9]: https://bloggeek.me/webrtcglossary/vp9
 [`derive_more`]: https://docs.rs/derive_more
 [`flutter_rust_bridge`]: https://docs.rs/flutter_rust_bridge
+[`medea-client-api-proto`]: https://docs.rs/medea-client-api-proto
 [`talc`]: https://docs.rs/talc
 [`wee_alloc`]: https://docs.rs/wee_alloc

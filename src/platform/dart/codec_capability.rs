@@ -2,6 +2,8 @@
 //!
 //! [RTCRtpCodecCapability]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
 
+use std::collections::HashMap;
+
 use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
@@ -33,11 +35,39 @@ mod codec_capability {
             kind: i64,
         ) -> Result<Dart_Handle, Error>;
 
-        /// Returns [mimeType][2] of the provided [RTCRtpCodecCapability][1].
+        /// Returns [RTCRtpReceiver]'s available [RTCRtpCodecCapability][1]s.
         ///
+        /// [RTCRtpReceiver]: https://w3.org/TR/webrtc#dom-rtcrtpreceiver
         /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
-        /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
+        pub fn get_receiver_codec_capabilities(
+            kind: i64,
+        ) -> Result<Dart_Handle, Error>;
+
+        /// Returns [mimeType][2] of the provided [RTCRtpCodec][1].
+        ///
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+        /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-mimetype
         pub fn mime_type(
+            codec_capability: Dart_Handle,
+        ) -> Result<ptr::NonNull<c_char>, Error>;
+
+        /// Returns [clockRate][2] of the provided [RTCRtpCodec][1].
+        ///
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+        /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-clockrate
+        pub fn clock_rate(codec_capability: Dart_Handle) -> Result<u32, Error>;
+
+        /// Returns [channels][2] of the provided [RTCRtpCodec][1].
+        ///
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+        /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-channels
+        pub fn channels(codec_capability: Dart_Handle) -> Result<u32, Error>;
+
+        /// Returns [sdpFmtpLine][2] of the provided [RTCRtpCodec][1].
+        ///
+        /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
+        /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-sdpfmtpline
+        pub fn parameters(
             codec_capability: Dart_Handle,
         ) -> Result<ptr::NonNull<c_char>, Error>;
     }
@@ -83,14 +113,76 @@ impl CodecCapability {
             .collect())
     }
 
-    /// Returns [MIME media type][2] of this [`CodecCapability`].
+    /// Returns available [RTCRtpReceiver]'s [`CodecCapability`]s.
     ///
-    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability-mimetype
+    /// # Errors
+    ///
+    /// With [`Error::FailedToGetCapabilities`] if fails to retrieve
+    /// [`CodecCapability`]s.
+    ///
+    /// [RTCRtpReceiver]: https://w3.org/TR/webrtc#dom-rtcrtpreceiver
+    pub async fn get_receiver_codec_capabilities(
+        kind: MediaKind,
+    ) -> Result<Vec<Self>, Error> {
+        let fut = unsafe {
+            codec_capability::get_receiver_codec_capabilities(kind as i64)
+        }
+        .unwrap();
+
+        #[expect(clippy::map_err_ignore, reason = "not useful")]
+        let res: DartHandle = unsafe { FutureFromDart::execute(fut) }
+            .await
+            .map_err(|_| Error::FailedToGetCapabilities)?;
+
+        Ok(Vec::from(DartList::from(res))
+            .into_iter()
+            .map(|caps: DartHandle| Self::from(caps))
+            .collect())
+    }
+
+    /// Returns [mimeType][2] of this [`CodecCapability`].
+    ///
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-mimetype
     #[must_use]
     pub fn mime_type(&self) -> String {
         let mime_type =
             unsafe { codec_capability::mime_type(self.0.get()) }.unwrap();
         unsafe { dart_string_into_rust(mime_type) }
+    }
+
+    /// Returns [clockRate][2] of this [`CodecCapability`].
+    ///
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-clockrate
+    #[must_use]
+    pub fn clock_rate(&self) -> u32 {
+        unsafe { codec_capability::clock_rate(self.0.get()) }.unwrap()
+    }
+
+    /// Returns [channels][2] of this [`CodecCapability`].
+    ///
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-channels
+    #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
+    #[must_use]
+    pub fn channels(&self) -> Option<u16> {
+        let channels =
+            unsafe { codec_capability::channels(self.0.get()) }.unwrap();
+
+        if channels > 0 { u16::try_from(channels).ok() } else { None }
+    }
+
+    /// Returns [sdpFmtpLine][2] of this [`CodecCapability`].
+    ///
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-sdpfmtpline
+    #[must_use]
+    pub fn parameters(&self) -> HashMap<String, String> {
+        let params_json_ptr =
+            unsafe { codec_capability::parameters(self.0.get()) }.unwrap();
+        let params_json = unsafe { dart_string_into_rust(params_json_ptr) };
+
+        serde_json::from_str(&params_json).unwrap_or_else(|_| {
+            log::error!("Failed to parse codec params: {params_json}");
+            HashMap::new()
+        })
     }
 
     /// Returns the underlying [`Dart_Handle`] of this [`CodecCapability`].

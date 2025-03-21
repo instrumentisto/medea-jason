@@ -2,7 +2,7 @@
 ================
 
 [![Latest version](https://img.shields.io/crates/v/medea-reactive "Latest version")](https://crates.io/crates/medea-reactive)
-[![Rust 1.64+](https://img.shields.io/badge/rustc-1.64+-lightgray.svg "Rust 1.64+")](https://blog.rust-lang.org/2022/09/22/Rust-1.64.0.html)
+[![Rust 1.85+](https://img.shields.io/badge/rustc-1.85+-lightgray.svg "Rust 1.85+")](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0.html)
 [![Unsafe Forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg "Unsafe forbidden")](https://github.com/rust-secure-code/safety-dance)
 [![Rust docs](https://docs.rs/medea-reactive/badge.svg "Rust docs")](https://docs.rs/medea-reactive)
 

@@ -2,19 +2,16 @@ Medea Control API protocol
 ==========================
 
 [![Latest version](https://img.shields.io/crates/v/medea-control-api-proto "Latest version")](https://crates.io/crates/medea-control-api-proto)
-[![Rust docs](https://docs.rs/medea-control-api-proto/badge.svg "Rust docs")](https://docs.rs/medea-control-api-proto)
-[![Rust 1.62+](https://img.shields.io/badge/rustc-1.62+-lightgray.svg "Rust 1.62+")](https://blog.rust-lang.org/2022/06/30/Rust-1.62.0.html)
+[![Rust 1.85+](https://img.shields.io/badge/rustc-1.85+-lightgray.svg "Rust 1.85+")](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0.html)
 [![Unsafe Forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg "Unsafe forbidden")](https://github.com/rust-secure-code/safety-dance)
+[![Rust docs](https://docs.rs/medea-control-api-proto/badge.svg "Rust docs")](https://docs.rs/medea-control-api-proto)
 
 [API docs](https://docs.rs/medea-client-api-proto) |
 [Changelog](https://github.com/instrumentisto/medea-jason/blob/master/proto/client-api/CHANGELOG.md)
 
-[API Docs](https://docs.rs/medea-control-api-proto) |
-[Changelog](https://github.com/instrumentisto/medea-jason/blob/master/proto/control-api/CHANGELOG.md)
-
 [Control API] protocol implementation for [Medea] media server.
 
-Only [gRPC] is supported at the moment.
+Only [gRPC] and direct (channel based) are supported at the moment.
 
 
 
