@@ -10,9 +10,14 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Removed `Codec` enum and `SvcSettings` struct. ([#199])
-- Added `Capabilities` to `Command::JoinRoom`. ([#199])
+- Remade `Codec` enum into struct. ([#199])
+- Removed `SvcSettings` struct. ([#199])
+- Added `capabilities` field to `Command::JoinRoom`. ([#199])
 - Added `EncodingParameters.codec` and `EncodingParameters.scalability_mode` fields. ([#199])
+
+### Added
+
+- `Capabilities` struct. ([#199])
 
 [#199]: https://github.com/instrumentisto/medea-jason/pull/199
 

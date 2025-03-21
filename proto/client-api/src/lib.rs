@@ -394,7 +394,8 @@ pub enum Command {
         /// [`Credential`] of the `Member` to authenticate with.
         credential: Credential,
 
-        /// Client reports its capabilities (e.g. available codecs, platform).
+        /// [`Capabilities`] reported by Web Client (e.g. available codecs,
+        /// platform).
         capabilities: Capabilities,
     },
 
@@ -1294,9 +1295,11 @@ pub struct EncodingParameters {
     /// [SSRC]: https://webrtcglossary.com/ssrc
     pub active: bool,
 
-    /// Optional value selecting which codec is used for this encoding's RTP
-    /// stream. If absent, the user agent can choose to use any negotiated
-    /// codec.
+    /// Concrete [`Codec`] being used for this encoding's [RTP] stream.
+    ///
+    /// If [`None`], then any negotiated codec can be used.
+    ///
+    /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
     pub codec: Option<Codec>,
 
     /// Maximum bitrate that can be used to send this encoding.
@@ -1323,46 +1326,52 @@ pub struct EncodingParameters {
     pub scalability_mode: Option<ScalabilityMode>,
 }
 
-/// Client capabilities (e.g. available codecs, platform)
+/// Client capabilities (e.g. available codecs, platform).
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
 #[derive(Clone, Debug, Eq, Default, PartialEq)]
 pub struct Capabilities {
-    /// Codec capabilities of the system for sending audio.
+    /// [`Codec`] capabilities for sending audio.
     pub audio_tx: Vec<Codec>,
 
-    /// Codec capabilities of the system for receiving audio.
+    /// [`Codec`] capabilities for receiving audio.
     pub audio_rx: Vec<Codec>,
 
-    /// Codec capabilities of the system for sending video.
+    /// [`Codec`] capabilities for sending video.
     pub video_tx: Vec<Codec>,
 
-    /// Codec capabilities of the system for receiving video.
+    /// [`Codec`] capabilities for receiving video.
     pub video_rx: Vec<Codec>,
 }
 
-/// Provides information about codec objects. Representation of an
-/// [RTCRtpCodec].
+/// Representation of an [RTCRtpCodec].
 ///
-/// [RTCRtpCodec]: https://www.w3.org/TR/webrtc/#dom-rtcrtpcodec
+/// Provides information about codec objects.
+///
+/// [RTCRtpCodec]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Codec {
-    /// The codec MIME media type/subtype. Valid media types and subtypes are
-    /// listed in [IANA-RTP-2].
+    /// [MIME] `type/subtype` of this [`Codec`].
+    ///
+    /// Valid values are listed in [IANA-RTP-2].
     ///
     /// [IANA-RTP-2]: https://tinyurl.com/IANA-RTP-2
+    /// [MIME]: https://en.wikipedia.org/wiki/Media_type
     pub mime_type: String,
 
-    /// The codec clock rate expressed in Hertz.
+    /// Clock rate expressed in [Hz (hertz)][hertz] of this [`Codec`].
+    ///
+    /// [hertz]: https://en.wikipedia.org/wiki/Hertz
     pub clock_rate: u32,
 
-    /// If present, indicates the maximum number of channels (mono=1,
-    /// stereo=2).
+    /// Maximum number of channels (`mono=1`, `stereo=2`), if any.
     pub channels: Option<u16>,
 
-    /// Codec-specific parameters that must be signaled to the remote party.
+    /// [`Codec`]-specific parameters that must be signaled to the remote party.
     ///
-    /// Corresponds to "a=fmtp" parameters in SDP.
+    /// Corresponds to `a=fmtp` parameters in [SDP].
+    ///
+    /// [SDP]: https://en.wikipedia.org/wiki/Session_Description_Protocol
     pub parameters: HashMap<String, String>,
 }
 

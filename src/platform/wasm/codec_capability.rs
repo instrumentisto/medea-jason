@@ -51,7 +51,7 @@ impl CodecCapability {
     /// # Errors
     ///
     /// With [`Error::FailedToGetCapabilities`] if fails to retrieve
-    /// capabilities.
+    /// [`CodecCapability`]s.
     ///
     /// [RTCRtpReceiver]: https://w3.org/TR/webrtc#dom-rtcrtpreceiver
     #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
@@ -75,36 +75,32 @@ impl CodecCapability {
         Ok(result)
     }
 
-    /// Returns [mimeType][2] of the provided [RTCRtpCodec][1].
+    /// Returns [mimeType][2] of this [`CodecCapability`].
     ///
-    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-mimetype
     #[must_use]
     pub fn mime_type(&self) -> String {
         self.0.get_mime_type()
     }
 
-    /// Returns [clockRate][2] of the provided [RTCRtpCodec][1].
+    /// Returns [clockRate][2] of this [`CodecCapability`].
     ///
-    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-clockrate
     #[must_use]
     pub fn clock_rate(&self) -> u32 {
         self.0.get_clock_rate()
     }
 
-    /// Returns [channels][2] of the provided [RTCRtpCodec][1].
+    /// Returns [channels][2] of this [`CodecCapability`].
     ///
-    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-channels
     #[must_use]
     pub fn channels(&self) -> Option<u16> {
         self.0.get_channels()
     }
 
-    /// Returns [sdpFmtpLine][2] of the provided [RTCRtpCodec][1].
+    /// Returns [sdpFmtpLine][2] of this [`CodecCapability`].
     ///
-    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-sdpfmtpline
     #[must_use]
     pub fn parameters(&self) -> HashMap<String, String> {

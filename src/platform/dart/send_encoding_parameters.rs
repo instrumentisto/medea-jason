@@ -148,7 +148,7 @@ impl SendEncodingParameters {
     /// Returns [RID] of these [`SendEncodingParameters`].
     ///
     /// [RID]: https://w3.org/TR/webrtc#dom-rtcrtpcodingparameters-rid
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
+    #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
     #[must_use]
     pub fn rid(&self) -> Option<String> {
         let rid =
@@ -156,7 +156,7 @@ impl SendEncodingParameters {
 
         let rid = unsafe { c_str_into_string(rid) };
 
-        if rid.is_empty() { None } else { Some(rid) }
+        (!rid.is_empty()).then_some(rid)
     }
 
     /// Sets [activeness][1] of these [`SendEncodingParameters`].
@@ -238,7 +238,7 @@ impl SendEncodingParameters {
     /// Returns [scalabilityMode][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/3zuaee45
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
+    #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
     #[must_use]
     pub fn scalability_mode(&self) -> Option<String> {
         let mode = unsafe {
@@ -247,6 +247,6 @@ impl SendEncodingParameters {
         };
         let mode = unsafe { c_str_into_string(mode) };
 
-        if mode.is_empty() { None } else { Some(mode) }
+        (!mode.is_empty()).then_some(mode)
     }
 }

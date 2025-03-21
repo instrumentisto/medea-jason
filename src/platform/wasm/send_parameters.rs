@@ -1,6 +1,6 @@
 //! Representation of [RTCRtpSendParameters][0].
 //!
-//! [0]: https://www.w3.org/TR/webrtc/#dom-rtcrtpsendparameters
+//! [0]: https://w3.org/TR/webrtc#dom-rtcrtpsendparameters
 
 use derive_more::{From, Into};
 use web_sys::{RtcRtpEncodingParameters, RtcRtpParameters};
@@ -9,7 +9,7 @@ use super::send_encoding_parameters::SendEncodingParameters;
 
 /// Representation of [RTCRtpSendParameters][0].
 ///
-/// [0]: https://www.w3.org/TR/webrtc/#dom-rtcrtpsendparameters
+/// [0]: https://w3.org/TR/webrtc#dom-rtcrtpsendparameters
 #[derive(Clone, Debug, From, Into)]
 pub struct SendParameters(RtcRtpParameters);
 

@@ -6,6 +6,18 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### Upgraded
+
+- Dependencies:
+    - [`medea-client-api-proto`] to `0.9` ([#199]).
+
+[#199]: https://github.com/instrumentisto/medea-jason/pull/199
+
+
+
+
 ## [0.14.0] · 2025-03-10
 [0.14.0]: https://github.com/instrumentisto/medea-jason/tree/medea-control-api-proto-0.14.0/proto/control-api
 

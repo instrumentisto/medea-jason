@@ -379,7 +379,7 @@ mod sender_patch {
         assert_eq!(encs[0].max_bitrate(), Some(100));
         if !is_firefox() {
             // TODO: Scalability mode is not supported in Firefox as of v135:
-            // https://bugzilla.mozilla.org/show_bug.cgi?id=1571470
+            //       https://bugzilla.mozilla.org/show_bug.cgi?id=1571470
             assert_eq!(encs[0].scalability_mode(), Some("L1T2".to_owned()));
         }
     }
@@ -693,10 +693,10 @@ mod codec_probing {
                 "video/VP9",
                 "video/red",
                 "video/rtx",
-                "video/ulpfec"
+                "video/ulpfec",
             ],
             "Browser available codecs are changed, check new codecs \
-            and update this test"
+             and update this test",
         );
     }
 }

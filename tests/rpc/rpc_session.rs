@@ -251,8 +251,8 @@ async fn reconnect_after_transport_abnormal_close() {
                 command: Command::JoinRoom {
                     member_id: "member_id".into(),
                     credential: "token".into(),
-                    capabilities: capabilities.clone()
-                }
+                    capabilities: capabilities.clone(),
+                },
             },
             // reconnect
             ClientMsg::Command {
@@ -260,9 +260,9 @@ async fn reconnect_after_transport_abnormal_close() {
                 command: Command::JoinRoom {
                     member_id: "member_id".into(),
                     credential: "token".into(),
-                    capabilities
-                }
-            }
-        ]
+                    capabilities,
+                },
+            },
+        ],
     );
 }

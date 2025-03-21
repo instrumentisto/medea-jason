@@ -63,9 +63,9 @@ impl Transceiver {
         let current_encodings = params.encodings();
 
         if updated_encodings.len() != current_encodings.len() {
-            // No encodings can be removed or added via setParameters
+            // No encodings can be removed or added via `setParameters()`
             // according to spec:
-            // https://www.w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
+            // https://w3.org/TR/webrtc#dom-rtcrtpsender-setparameters
             return Err(UpdateSendEncodingError::EncodingsLengthsMismatch {
                 current: current_encodings.len(),
                 new: updated_encodings.len(),
@@ -75,9 +75,9 @@ impl Transceiver {
         for (i, enc) in current_encodings.iter().enumerate() {
             let updated_enc = &updated_encodings[i];
             // Not updating RID cause spec:
-            // RID is not modifiable via setParameters. It can only be set or
-            // modified in addTransceiver on the sending side.
-            // https://www.w3.org/TR/webrtc/#dom-rtcrtpcodingparameters-rid
+            // RID is not modifiable via `setParameters()`. It can only be set
+            // or modified in `addTransceiver()` on the sending side.
+            // https://w3.org/TR/webrtc#dom-rtcrtpcodingparameters-rid
 
             enc.set_active(updated_enc.active);
             if let Some(max_bitrate) = updated_enc.max_bitrate {
@@ -101,14 +101,14 @@ impl Transceiver {
     }
 }
 
-/// [`Transceiver::update_send_encodings`] error.
+/// Possible errors of [`Transceiver::update_send_encodings()`].
 #[derive(Clone, Debug, Display, From)]
 pub enum UpdateSendEncodingError {
     /// [`platform::SendEncodingParameters`] list cannot be modified via
-    /// [`Transceiver::set_send_parameters`].
+    /// [`Transceiver::set_send_parameters()`].
     #[display(
-        "SendParameters.encodings length can not be changed. Tried to \
-        change from {current} to {new}"
+        "`SendParameters.encodings` length can not be changed from {current} \
+         to {new}"
     )]
     EncodingsLengthsMismatch {
         /// Number of [`proto::EncodingParameters`] stored in sender.
@@ -118,10 +118,10 @@ pub enum UpdateSendEncodingError {
         new: usize,
     },
 
-    /// [RTCRtpSender.setParameters][0] error.
+    /// [RTCRtpSender.setParameters()][0] error.
     ///
-    /// [0]: https://www.w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
-    #[display("RTCRtpSender.set_parameters error: {_0:?}")]
+    /// [0]: https://w3.org/TR/webrtc#dom-rtcrtpsender-setparameters
+    #[display("`RTCRtpSender.setParameters()` error: {_0}")]
     SetSenderParameters(platform::Error),
 }
 
@@ -162,10 +162,7 @@ pub async fn probe_target_codecs(
 
             let cap_params = cap.parameters();
 
-            #[expect(
-                clippy::iter_over_hash_type,
-                reason = "order doesn't matter"
-            )]
+            #[expect(clippy::iter_over_hash_type, reason = "doesn't matter")]
             for (k, v) in &target.parameters {
                 if cap_params.get(k) != Some(v)
                     && !DEFAULT_PARAMS.iter().any(|(dk, dv)| k == dk && v == dv)
@@ -248,8 +245,8 @@ impl From<Direction> for RtcRtpTransceiverDirection {
 }
 
 impl From<&proto::Direction> for Direction {
-    fn from(proto: &proto::Direction) -> Self {
-        match proto {
+    fn from(value: &proto::Direction) -> Self {
+        match value {
             proto::Direction::Recv { .. } => Self::RECV,
             proto::Direction::Send { .. } => Self::SEND,
         }

@@ -355,9 +355,11 @@ impl InnerMediaConnections {
                     )
                     .await;
                     // TODO: Switch to negotiationless codec change via
-                    //       RTCRtpSender.setParameters when
-                    //       RTCRtpEncodingParameters.codec is supported on all
-                    //       major UAs.
+                    //       `RTCRtpSender.setParameters()` once
+                    //       `RTCRtpEncodingParameters.codec` is supported on
+                    //       all major UAs.
+                    //       Track for `parameters.encodings.codec` here:
+                    //       https://tinyurl.com/wytxmuss
                     if let Some(target_codecs) = target_codecs {
                         transceiver.set_codec_preferences(target_codecs);
                     }

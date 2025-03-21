@@ -149,9 +149,9 @@ impl MediaDevices {
             .map(DartList::from)
             .map_err(tracerr::from_and_wrap!())?;
 
-        Ok(Vec::from(displays)
+        Ok(<Vec<DartHandle>>::from(displays)
             .into_iter()
-            .map(|caps: DartHandle| MediaDisplayInfo::from(caps))
+            .map(MediaDisplayInfo::from)
             .collect())
     }
 

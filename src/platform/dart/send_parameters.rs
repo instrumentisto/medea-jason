@@ -3,6 +3,7 @@
 //! [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
 
 use dart_sys::Dart_Handle;
+use derive_more::From;
 use medea_macro::dart_bridge;
 
 use super::{
@@ -29,15 +30,9 @@ mod send_parameters {
 
 /// Representation of [RTCRtpSendParameters][0].
 ///
-/// [0]: https://w3.org/TR/webrtc/#dom-rtcrtpsendparameters
-#[derive(Clone, Debug)]
+/// [0]: https://w3.org/TR/webrtc#dom-rtcrtpsendparameters
+#[derive(Clone, Debug, From)]
 pub struct SendParameters(DartHandle);
-
-impl From<DartHandle> for SendParameters {
-    fn from(from: DartHandle) -> Self {
-        Self(from)
-    }
-}
 
 impl SendParameters {
     /// Returns [`SendEncodingParameters`] of these [`SendParameters`].

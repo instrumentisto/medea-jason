@@ -10,7 +10,8 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- Support passing f32 and f64 through ffi when using `#[dart_bridge]` macro ([#199]).
+- `#[dart_bridge]` macro:
+    - Support `f32` and `f64` for passing through FFI. ([#199])
 
 [#199]: https://github.com/instrumentisto/medea-jason/pull/199
 

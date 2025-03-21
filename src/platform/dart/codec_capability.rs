@@ -37,7 +37,7 @@ mod codec_capability {
 
         /// Returns [RTCRtpReceiver]'s available [RTCRtpCodecCapability][1]s.
         ///
-        /// [RTCRtpReceiver]: https://www.w3.org/TR/webrtc/#dom-rtcrtpreceiver
+        /// [RTCRtpReceiver]: https://w3.org/TR/webrtc#dom-rtcrtpreceiver
         /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodeccapability
         pub fn get_receiver_codec_capabilities(
             kind: i64,
@@ -118,7 +118,7 @@ impl CodecCapability {
     /// # Errors
     ///
     /// With [`Error::FailedToGetCapabilities`] if fails to retrieve
-    /// capabilities.
+    /// [`CodecCapability`]s.
     ///
     /// [RTCRtpReceiver]: https://w3.org/TR/webrtc#dom-rtcrtpreceiver
     pub async fn get_receiver_codec_capabilities(
@@ -140,9 +140,8 @@ impl CodecCapability {
             .collect())
     }
 
-    /// Returns [mimeType][2] of the provided [RTCRtpCodec][1].
+    /// Returns [mimeType][2] of this [`CodecCapability`].
     ///
-    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-mimetype
     #[must_use]
     pub fn mime_type(&self) -> String {
@@ -151,20 +150,18 @@ impl CodecCapability {
         unsafe { dart_string_into_rust(mime_type) }
     }
 
-    /// Returns [clockRate][2] of the provided [RTCRtpCodec][1].
+    /// Returns [clockRate][2] of this [`CodecCapability`].
     ///
-    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-clockrate
     #[must_use]
     pub fn clock_rate(&self) -> u32 {
         unsafe { codec_capability::clock_rate(self.0.get()) }.unwrap()
     }
 
-    /// Returns [channels][2] of the provided [RTCRtpCodec][1].
+    /// Returns [channels][2] of this [`CodecCapability`].
     ///
-    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-channels
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
+    #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
     #[must_use]
     pub fn channels(&self) -> Option<u16> {
         let channels =
@@ -173,9 +170,8 @@ impl CodecCapability {
         if channels > 0 { u16::try_from(channels).ok() } else { None }
     }
 
-    /// Returns [sdpFmtpLine][2] of the provided [RTCRtpCodec][1].
+    /// Returns [sdpFmtpLine][2] of this [`CodecCapability`].
     ///
-    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpcodec
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-sdpfmtpline
     #[must_use]
     pub fn parameters(&self) -> HashMap<String, String> {

@@ -99,7 +99,9 @@ pub struct State {
     /// [`local::Track`]: crate::media::track::local::Track
     receivers: RefCell<Vec<MemberId>>,
 
-    /// Parameters for sending RTP encodings of media.
+    /// Parameters for sending [RTP] encodings of media.
+    ///
+    /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
     send_encodings: ProgressableCell<Vec<proto::EncodingParameters>>,
 
     /// Indicator whether the [`Sender`]'s [`local::Track`] is enabled
@@ -637,13 +639,15 @@ impl Component {
         )
         .await;
         // TODO: Switch to negotiationless codec change via
-        //       RTCRtpSender.setParameters when
-        //       RTCRtpEncodingParameters.codec is supported on all
+        //       `RTCRtpSender.setParameters()` once
+        //       `RTCRtpEncodingParameters.codec` is supported on all
         //       major UAs.
+        //       Track for `parameters.encodings.codec` here:
+        //       https://tinyurl.com/wytxmuss
         if let Some(target_codecs) = target_codecs {
             sender.transceiver.set_codec_preferences(target_codecs);
         } else {
-            // Empty list resets preferences
+            // Empty list resets preferences.
             sender.transceiver.set_codec_preferences(Vec::new());
         }
 
@@ -652,9 +656,7 @@ impl Component {
             .update_send_encodings(&enc_params)
             .await
             .map_err(RtcPeerConnectionError::UpdateSendEncodingsError)
-            .map_err(tracerr::wrap!())?;
-
-        Ok(())
+            .map_err(tracerr::wrap!())
     }
 }
 

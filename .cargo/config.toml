@@ -1,4 +1,5 @@
 [env]
+# See: https://cucumber-rs.github.io/cucumber/current/output/intellij.html
 CARGO_WORKSPACE_DIR = { value = "", relative = true }
 
 [target.wasm32-unknown-unknown]

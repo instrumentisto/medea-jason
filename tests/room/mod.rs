@@ -203,9 +203,9 @@ async fn room_dispose_works() {
             command: Command::JoinRoom {
                 member_id: _,
                 credential: _,
-                capabilities: _
-            }
-        }
+                capabilities: _,
+            },
+        },
     ));
     assert!(matches!(
         cmd_rx.next().await.unwrap(),
@@ -214,9 +214,9 @@ async fn room_dispose_works() {
             command: Command::JoinRoom {
                 member_id: _,
                 credential: _,
-                capabilities: _
-            }
-        }
+                capabilities: _,
+            },
+        },
     ));
 
     jason.close_room(room);
@@ -224,8 +224,8 @@ async fn room_dispose_works() {
         cmd_rx.next().await.unwrap(),
         ClientMsg::Command {
             room_id: _,
-            command: Command::LeaveRoom { member_id: _ }
-        }
+            command: Command::LeaveRoom { member_id: _ },
+        },
     ));
 
     jason.close_room(another_room);
@@ -233,8 +233,8 @@ async fn room_dispose_works() {
         cmd_rx.next().await.unwrap(),
         ClientMsg::Command {
             room_id: _,
-            command: Command::LeaveRoom { member_id: _ }
-        }
+            command: Command::LeaveRoom { member_id: _ },
+        },
     ));
 
     jason.dispose();

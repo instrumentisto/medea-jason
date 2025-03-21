@@ -243,9 +243,7 @@ impl Transceiver {
             unsafe { transceiver::set_send_parameters(handle, params_handle) }
                 .unwrap();
 
-        unsafe { FutureFromDart::execute::<()>(fut) }.await?;
-
-        Ok(())
+        unsafe { FutureFromDart::execute::<()>(fut) }.await
     }
 
     /// Sets preferred [`CodecCapability`] for this [`Transceiver`].
