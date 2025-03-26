@@ -12,9 +12,8 @@ use tracerr::Traced;
 
 use super::MediaStreamTrackState;
 use crate::{
-    media::{MediaKind, MediaSourceKind},
+    media::{AudioLevelError, MediaKind, MediaSourceKind},
     platform,
-    room::HandleDetachedError,
 };
 
 /// Wrapper around a [`platform::MediaStreamTrack`] received from a
@@ -177,7 +176,7 @@ impl LocalMediaTrack {
     /// [`LocalMediaTrack`].
     #[must_use]
     pub fn is_on_audio_level_available(&self) -> bool {
-        self.get_track().is_on_audio_level_available()
+        self.0.track.is_on_audio_level_available()
     }
 
     /// Sets the provided `OnAudioLevelChangedCallback` for this
@@ -185,15 +184,19 @@ impl LocalMediaTrack {
     ///
     /// It's called for live [`LocalMediaTrack`]s when their audio level
     /// changes.
+    ///
+    /// # Errors
+    ///
+    /// With [`AudioLevelError`] if platform call returns error.
     pub fn on_audio_level_changed(
         &self,
         callback: platform::Function<i32>,
-    ) -> Result<(), Traced<HandleDetachedError>> {
-        self.get_track()
+    ) -> Result<(), Traced<AudioLevelError>> {
+        self.0
+            .track
             .on_audio_level_changed(move |v| callback.call1(v))
-            .unwrap();
-
-        Ok(())
+            .map_err(AudioLevelError::from)
+            .map_err(tracerr::wrap!())
     }
 
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is

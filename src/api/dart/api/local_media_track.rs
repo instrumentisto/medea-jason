@@ -93,7 +93,8 @@ impl LocalMediaTrack {
     #[frb(sync)]
     #[must_use]
     pub fn on_audio_level_changed(&self, f: DartOpaque) {
-        self.0.on_audio_level_changed(platform::Function::new(f));
+        // Can not error on non-wasm platforms.
+        _ = self.0.on_audio_level_changed(platform::Function::new(f));
     }
 
     /// Returns a [`MediaSourceKind::Device`] if the provided

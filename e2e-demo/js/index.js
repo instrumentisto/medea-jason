@@ -665,14 +665,6 @@ window.onload = async function() {
           throw e;
         }
       }
-      // asdasdads
-      for (const track of localTracks) {
-        if (track.kind() === rust.MediaKind.Audio) {
-            track.on_audio_level_changed((asd) => {
-              console.error("asdasd " + asd);
-            });
-        }
-      }
       await updateLocalVideo(localTracks);
 
       return constraints;

@@ -2,10 +2,11 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, rc::Rc, time::Duration};
 
-use derive_more::with_trait::AsRef;
-use futures::future;
+use derive_more::{Debug, with_trait::AsRef};
+use futures::{StreamExt as _, future, stream::LocalBoxStream};
+use medea_reactive::ObservableCell;
 use wasm_bindgen_futures::JsFuture;
 
 use crate::{
@@ -49,7 +50,18 @@ pub struct MediaStreamTrack {
         Option<EventListener<web_sys::MediaStreamTrack, web_sys::Event>>,
     >,
 
-    // TODO: forking?
+    /// Listener for the audio level changes in this track (if it's a local
+    /// audio track).
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#event-mediastreamtrack-ended
+    #[expect(clippy::type_complexity, reason = "not really")]
+    #[debug(skip)]
+    on_audio_level: Rc<RefCell<Option<Box<dyn FnMut(i32)>>>>,
+
+    /// Analyzes underlying [MediaStreamTrack][1] producing current audio level.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    #[debug(skip)]
     audio_level_watcher: Rc<RefCell<Option<AudioLevelWatcher>>>,
 }
 
@@ -66,12 +78,12 @@ impl MediaStreamTrack {
             "video" => MediaKind::Video,
             _ => unreachable!(),
         };
-
         Self {
             sys_track: Rc::new(sys_track),
             source_kind,
             kind,
             on_ended: RefCell::new(None),
+            on_audio_level: Rc::new(RefCell::new(None)),
             audio_level_watcher: Rc::new(RefCell::new(None)),
         }
     }
@@ -229,6 +241,7 @@ impl MediaStreamTrack {
             kind: self.kind,
             source_kind: self.source_kind,
             on_ended: RefCell::new(None),
+            on_audio_level: Rc::new(RefCell::new(None)),
             audio_level_watcher: Rc::clone(&self.audio_level_watcher),
         })
     }
@@ -275,28 +288,59 @@ impl MediaStreamTrack {
     ///
     /// It's called for live [`MediaStreamTrack`]s when their audio level
     /// changes.
-    pub fn on_audio_level_changed<F>(&self, cb: F) -> Result<(), js_sys::Error>
+    ///
+    /// # Errors
+    ///
+    /// If platform call returns error.
+    pub fn on_audio_level_changed<F>(
+        &self,
+        cb: F,
+    ) -> Result<(), platform::Error>
     where
         F: 'static + FnMut(i32),
     {
-        let mut watcher = self.audio_level_watcher.borrow_mut();
-        if let Some(v) = &*watcher {
-            drop(v.cb.replace(Box::new(cb)));
-        } else {
-            *watcher = Some(AudioLevelWatcher::new(&self.sys_track, cb)?);
+        if !self.is_on_audio_level_available {
+            return Ok(());
         }
+
+        self.on_audio_level.borrow_mut().replace(Box::new(cb));
+        let callback = Rc::clone(&self.on_audio_level);
+
+        let mut sub = {
+            let mut audio_level_watcher = self.audio_level_watcher.borrow_mut();
+            if let Some(watcher) = audio_level_watcher.as_ref() {
+                watcher.subscribe()
+            } else {
+                let watcher = AudioLevelWatcher::new(&self.sys_track)?;
+                let sub = watcher.subscribe();
+                *audio_level_watcher = Some(watcher);
+
+                sub
+            }
+        };
+
+        platform::spawn(async move {
+            while let Some(level) = sub.next().await {
+                if let Some(callback) = callback.borrow_mut().as_mut() {
+                    callback(level);
+                } else {
+                    break;
+                }
+            }
+        });
 
         Ok(())
     }
 }
 
+/// Analyzes audio track raw data producing audio level (RMS loudness) .
 struct AudioLevelWatcher {
-    /// Callback that audio level updates are provided to.
-    cb: Rc<RefCell<Box<dyn FnMut(i32)>>>,
-
     /// [`web_sys::AudioContext`] holding this [`AudioLevelWatcher`] audio
     /// processing pipeline.
     audio_ctx: web_sys::AudioContext,
+
+    /// Latest audio level value in the [0;100] range.
+    level: Rc<ObservableCell<i32>>,
 
     /// [`web_sys::AudioSourceNode`] that wraps the [`MediaStreamTrack`] being
     /// watched.
@@ -307,21 +351,17 @@ struct AudioLevelWatcher {
 }
 
 impl AudioLevelWatcher {
-    fn new<F>(
-        track: &web_sys::MediaStreamTrack,
-        cb: F,
-    ) -> Result<Self, js_sys::Error>
-    where
-        F: 'static + FnMut(i32),
-    {
+    /// Creates a new [`AudioLevelWatcher`] for the provided
+    /// [`web_sys::MediaStreamTrack`].
+    #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
+    fn new(track: &web_sys::MediaStreamTrack) -> Result<Self, platform::Error> {
         /// [`web_sys::AnalyserNode`] FFT size.
         ///
         /// Must be a power of two in the [32..32768] range.
-        const FFT_SIZE: u32 = 128;
+        const FFT_SIZE: u32 = 256;
 
         let audio_ctx = web_sys::AudioContext::new()?;
-        let cb: Box<dyn FnMut(i32)> = Box::new(cb);
-        let cb = Rc::new(RefCell::new(cb));
+        let level = Rc::new(ObservableCell::new(0));
 
         let stream = {
             let stream = web_sys::MediaStream::new()?;
@@ -332,41 +372,51 @@ impl AudioLevelWatcher {
         let src = audio_ctx.create_media_stream_source(&stream)?;
         let analyzer = audio_ctx.create_analyser()?;
         analyzer.set_fft_size(FFT_SIZE);
-        // u32 as usize is safe
-        // frequency_bin_count = Half the FFT size.
-        let mut audio_buf =
-            vec![0u8; usize::try_from(analyzer.frequency_bin_count()).unwrap()];
-        let audio_buf_len = audio_buf.len() as i32;
+        #[expect(clippy::unwrap_used, reason = "always in bounds")]
+        let mut audio_buf = vec![0.0f32; usize::try_from(FFT_SIZE).unwrap()];
 
         src.connect_with_audio_node(&analyzer)?;
         platform::spawn({
-            let cb = Rc::clone(&cb);
+            let level = Rc::clone(&level);
             let analyzer = analyzer.clone();
             let audio_ctx = audio_ctx.clone();
             async move {
                 loop {
-                    platform::delay_for(std::time::Duration::from_millis(100))
-                        .await;
                     if audio_ctx.state() == web_sys::AudioContextState::Closed {
                         break;
                     }
 
-                    analyzer.get_byte_frequency_data(&mut audio_buf);
-                    let level: i32 =
-                        audio_buf.iter().map(|a| i32::from(*a)).sum::<i32>()
-                            / audio_buf_len;
-                    cb.borrow_mut()(level);
+                    analyzer.get_float_time_domain_data(&mut audio_buf);
+                    let mut sum = 0.0;
+                    for b in &audio_buf {
+                        sum += b * b;
+                    }
+
+                    #[expect(
+                        clippy::as_conversions,
+                        clippy::cast_precision_loss,
+                        reason = "always in bounds"
+                    )]
+                    let lvl = (sum / FFT_SIZE as f32).sqrt() * 1000.0;
+                    #[expect(
+                        clippy::as_conversions,
+                        clippy::cast_possible_truncation,
+                        reason = "always in bounds"
+                    )]
+                    level.set(lvl.round().clamp(0.0, 100.0) as i32);
+
+                    // Measure every 50 milliseconds
+                    platform::delay_for(Duration::from_millis(50)).await;
                 }
             }
         });
 
-        Ok(Self { cb, src, analyzer, audio_ctx })
+        Ok(Self { audio_ctx, level, src, analyzer })
     }
-}
 
-impl std::fmt::Debug for AudioLevelWatcher {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("AudioLevelWatcher").finish_non_exhaustive()
+    /// Subscribe to audio level changes.
+    fn subscribe(&self) -> LocalBoxStream<'static, i32> {
+        self.level.subscribe()
     }
 }
 

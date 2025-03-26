@@ -24,7 +24,10 @@ pub use self::{
         InvalidOutputAudioDeviceIdError, MediaManager, MediaManagerHandle,
         MicVolumeError,
     },
-    track::{MediaSourceKind, MediaStreamTrackState, remote::MediaDirection},
+    track::{
+        AudioLevelError, MediaSourceKind, MediaStreamTrackState,
+        remote::MediaDirection,
+    },
 };
 
 /// [MediaStreamTrack.kind][1] representation.

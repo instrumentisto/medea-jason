@@ -52,6 +52,8 @@ abstract class LocalMediaTrack implements MediaTrack {
   /// Sets the provided [OnAudioLevelChangedCallback] for this [MediaTrack].
   ///
   /// It's called for live [MediaTrack]s when their audio level changes.
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
   void onAudioLevelChanged(OnAudioLevelChangedCallback f);
 
   /// Returns a [MediaStreamTrackState.live] if this [LocalMediaTrack] is
