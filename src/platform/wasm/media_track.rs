@@ -280,7 +280,7 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn is_on_audio_level_available(&self) -> bool {
         // Only local audio tracks.
-        self.kind == MediaKind::Audio && self.source_kind.is_none()
+        self.kind == MediaKind::Audio && self.source_kind.is_some()
     }
 
     /// Sets the provided `OnAudioLevelChangedCallback` for this
