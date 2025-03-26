@@ -299,7 +299,7 @@ impl MediaStreamTrack {
     where
         F: 'static + FnMut(i32),
     {
-        if !self.is_on_audio_level_available {
+        if !self.is_on_audio_level_available() {
             return Ok(());
         }
 
