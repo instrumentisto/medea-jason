@@ -5,7 +5,16 @@
 pub mod local;
 pub mod remote;
 
+use derive_more::{Display, From, Into};
 use medea_client_api_proto as proto;
+
+use crate::{platform, utils::Caused};
+
+/// Error returned when trying to bind to local audio track level changes.
+#[derive(Caused, Clone, Debug, Display, From, Into)]
+#[cause(error = platform::Error)]
+#[display("Failed to calculate audio track level")]
+pub struct AudioLevelError(platform::Error);
 
 /// Liveness state of a [MediaStreamTrack][1] .
 ///

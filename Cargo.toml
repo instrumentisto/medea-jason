@@ -90,6 +90,8 @@ wasm-logger = "0.2"
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
     version = "0.3.77"
     features = [
+        "AnalyserNode",
+        "AudioContext", "AudioContextState",
         "console",
         "ConstrainBooleanParameters",
         "ConstrainDomStringParameters",
@@ -100,6 +102,7 @@ wasm-logger = "0.2"
         "MediaDevices","MediaDeviceInfo", "MediaDeviceKind",
         "MediaTrackConstraints", "MediaTrackSettings",
         "MediaStream", "MediaStreamConstraints",
+        "MediaStreamAudioSourceNode",
         "MediaStreamTrack", "MediaStreamTrackState",
         "MessageEvent",
         "Navigator",

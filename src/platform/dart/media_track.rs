@@ -355,7 +355,15 @@ impl MediaStreamTrack {
     ///
     /// It's called for live [`MediaStreamTrack`]s when their audio level
     /// changes.
-    pub fn on_audio_level_changed<F>(&self, mut f: F)
+    ///
+    /// # Errors
+    ///
+    /// Never errors.
+    #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
+    pub fn on_audio_level_changed<F>(
+        &self,
+        mut f: F,
+    ) -> Result<(), platform::Error>
     where
         F: 'static + FnMut(i32),
     {
@@ -368,6 +376,8 @@ impl MediaStreamTrack {
             )
         }
         .unwrap();
+
+        Ok(())
     }
 }
 

@@ -22,8 +22,15 @@ See also [`medea-jason` crate `master` changes](https://github.com/instrumentist
 
 - Segfault when closing [Flutter] application on macOS. ([#201])
 
+### Added
+
+- `LocalMediaTrack.isOnAudioLevelAvailable()` and `LocalMediaTrack.onAudioLevelChanged()` support on Web. ([#202], [#97], [#167])
+
+[#97]: https://github.com/instrumentisto/medea-jason/issues/97
+[#167]: https://github.com/instrumentisto/medea-jason/issues/167
 [#200]: https://github.com/instrumentisto/medea-jason/pull/200
 [#201]: https://github.com/instrumentisto/medea-jason/pull/201
+[#202]: https://github.com/instrumentisto/medea-jason/pull/202
 
 
 
