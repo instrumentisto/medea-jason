@@ -187,7 +187,7 @@ impl LocalMediaTrack {
     ///
     /// # Errors
     ///
-    /// With [`AudioLevelError`] if platform call returns error.
+    /// With an [`AudioLevelError`] if platform call errors.
     pub fn on_audio_level_changed(
         &self,
         callback: platform::Function<i32>,

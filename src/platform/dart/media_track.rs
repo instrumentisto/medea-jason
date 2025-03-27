@@ -358,7 +358,7 @@ impl MediaStreamTrack {
     ///
     /// # Errors
     ///
-    /// Does not error.
+    /// Never errors.
     #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
     pub fn on_audio_level_changed<F>(
         &self,

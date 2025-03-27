@@ -75,7 +75,7 @@ impl LocalMediaTrack {
     ///
     /// # Errors
     ///
-    /// If platform call returns error.
+    /// If platform call errors.
     pub fn on_audio_level_changed(
         &self,
         cb: js_sys::Function,

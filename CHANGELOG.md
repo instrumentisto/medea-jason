@@ -18,9 +18,10 @@ All user visible changes to this project will be documented in this file. This p
 
 - Support of changing `RTCRtpSendParameters.encodings` via `Event::PeerUpdated`. ([#199])
 - Providing user agent media capabilities via `Command::JoinRoom`. ([#199])
-- `LocalMediaTrack.is_on_audio_level_available()` and `LocalMediaTrack.on_audio_level_changed()` support for Web ([#202]).
+- `LocalMediaTrack.is_on_audio_level_available()` and `LocalMediaTrack.on_audio_level_changed()` support on Web. ([#202])
 
 [#199]: https://github.com/instrumentisto/medea-jason/pull/199
+[#202]: https://github.com/instrumentisto/medea-jason/pull/202
 
 
 
