@@ -25,6 +25,13 @@ use std::{
 
 use dart_sys::{_Dart_Handle, Dart_Handle};
 use derive_more::with_trait::Display;
+use flutter_rust_bridge::{
+    JoinHandle,
+    for_generated::{
+        BaseAsyncRuntime, NoOpErrorListener, SimpleExecutor, SimpleHandler,
+        SimpleThreadPool,
+    },
+};
 use libc::c_char;
 
 pub use self::{
@@ -714,6 +721,47 @@ pub unsafe extern "C" fn box_foreign_value(
     val: DartValue,
 ) -> ptr::NonNull<DartValue> {
     ptr::NonNull::from(Box::leak(Box::new(val)))
+}
+
+/// [`SimpleHandler`] that uses [`NoOpErrorListener`],
+/// [`UnreachableAsyncRuntime`] and [`SimpleThreadPool`] with no threads.
+pub type FrbHandler = SimpleHandler<
+    SimpleExecutor<
+        NoOpErrorListener,
+        SimpleThreadPool,
+        UnreachableAsyncRuntime,
+    >,
+    NoOpErrorListener,
+>;
+
+/// Creates a new [`FrbHandler`].
+#[must_use]
+pub fn new_frb_handler() -> FrbHandler {
+    SimpleHandler::new(
+        SimpleExecutor::new(
+            NoOpErrorListener,
+            SimpleThreadPool,
+            UnreachableAsyncRuntime,
+        ),
+        NoOpErrorListener,
+    )
+}
+
+/// [`BaseAsyncRuntime`] that panics on use.
+#[derive(Debug, Copy, Clone)]
+pub struct UnreachableAsyncRuntime;
+
+impl BaseAsyncRuntime for UnreachableAsyncRuntime {
+    fn spawn<F>(&self, _: F) -> JoinHandle<F::Output>
+    where
+        F: Future<Output: Send + 'static> + Send + 'static,
+    {
+        // TODO: We don't need async runtime for `flutter_rust_bridge` but we
+        //       must keep "rust-async" Cargo feature enabled so we can use
+        //       "dart-opaque" Cargo feature. This should be fixed in frb, see:
+        //       https://github.com/fzyzcjy/flutter_rust_bridge/issues/2253
+        unreachable!("no async runtime available")
+    }
 }
 
 #[cfg(feature = "mockable")]

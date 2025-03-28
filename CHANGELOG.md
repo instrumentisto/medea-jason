@@ -20,8 +20,18 @@ All user visible changes to this project will be documented in this file. This p
 - Providing user agent media capabilities via `Command::JoinRoom`. ([#199])
 - `LocalMediaTrack.is_on_audio_level_available()` and `LocalMediaTrack.on_audio_level_changed()` support on Web. ([#202], [#97], [#167])
 
+### Fixed
+
+- Redundant async runtime created by [`flutter_rust_bridge`]. ([#203])
+
+### Upgraded
+
+- Dependencies:
+    - Upgraded [`flutter_rust_bridge`] crate to 2.9.0 version. ([#203])
+
 [#199]: https://github.com/instrumentisto/medea-jason/pull/199
 [#202]: https://github.com/instrumentisto/medea-jason/pull/202
+[#203]: https://github.com/instrumentisto/medea-jason/pull/203
 
 
 

@@ -3,14 +3,8 @@
 //!
 //! [Flutter]: https://flutter.dev
 
-// TODO: Needs refactoring.
-#![expect(
-    clippy::as_conversions,
-    clippy::unwrap_used,
-    reason = "needs refactoring"
-)]
-
 #[expect(
+    clippy::unwrap_used,
     clippy::absolute_paths,
     clippy::allow_attributes_without_reason,
     clippy::as_conversions,
@@ -41,10 +35,12 @@ pub mod remote_media_track;
 pub mod room;
 pub mod room_close_reason;
 
-use std::ptr;
+use std::{ptr, sync::LazyLock};
 
 pub use dart_sys::Dart_Handle;
-use flutter_rust_bridge::{DartOpaque, frb};
+use flutter_rust_bridge::{
+    DartOpaque, for_generated::FLUTTER_RUST_BRIDGE_RUNTIME_VERSION, frb,
+};
 
 pub use self::{
     connection_handle::ConnectionHandle, jason::Jason,
@@ -53,13 +49,34 @@ pub use self::{
     room::RoomHandle, room_close_reason::RoomCloseReason,
 };
 use crate::{
-    api::DART_HANDLER_PORT,
+    api::{
+        DART_HANDLER_PORT, FrbHandler,
+        api::api_bridge_generated::FLUTTER_RUST_BRIDGE_CODEGEN_VERSION,
+        new_frb_handler,
+    },
     media::{
         self, MediaDeviceKind,
         constraints::{ConstrainBoolean, ConstrainU32},
     },
     platform::{self},
+    utils::str_eq,
 };
+
+// Must be named `FLUTTER_RUST_BRIDGE_HANDLER` for `flutter_rust_bridge` to
+// discover it.
+pub static FLUTTER_RUST_BRIDGE_HANDLER: LazyLock<FrbHandler> =
+    LazyLock::new(|| {
+        const {
+            if !str_eq(
+                FLUTTER_RUST_BRIDGE_CODEGEN_VERSION,
+                FLUTTER_RUST_BRIDGE_RUNTIME_VERSION,
+            ) {
+                panic!("`flutter_rust_bridge` versions mismatch");
+            }
+        }
+
+        new_frb_handler()
+    });
 
 /// Rust structure having wrapper class in Dart.
 ///
@@ -348,7 +365,7 @@ pub fn vec_media_device_details_from_raw(
     unsafe { Vec::<ApiMediaDeviceDetails>::from_ptr(ptr) }
 }
 
-/// Returns the [`Vec<RustOpaque<ApiMediaDisplayDetails>>`] from the provided
+/// Returns the [`Vec<ApiMediaDisplayDetails>`] from the provided
 /// [`ForeignClass`] address.
 #[frb(sync, type_64bit_int)]
 #[must_use]
