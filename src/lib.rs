@@ -174,27 +174,3 @@ mod used_in_integration_tests_only {
     use instant as _;
     use wasm_bindgen_test as _;
 }
-
-/// Compares strings in `const` context.
-///
-/// As there is no `const impl Trait` and `l == r` calls [`Eq`], we have to
-/// write custom comparison function.
-///
-/// [`Eq`]: trait@Eq
-// TODO: Remove once `Eq` trait is allowed in `const` context.
-const fn str_eq(l: &str, r: &str) -> bool {
-    if l.len() != r.len() {
-        return false;
-    }
-
-    let (l, r) = (l.as_bytes(), r.as_bytes());
-    let mut i = 0;
-    while i < l.len() {
-        if l[i] != r[i] {
-            return false;
-        }
-        i += 1;
-    }
-
-    true
-}

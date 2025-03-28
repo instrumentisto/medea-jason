@@ -59,6 +59,7 @@ use crate::{
         constraints::{ConstrainBoolean, ConstrainU32},
     },
     platform::{self},
+    utils::str_eq,
 };
 
 // Must be named `FLUTTER_RUST_BRIDGE_HANDLER` for `flutter_rust_bridge` to
@@ -66,7 +67,7 @@ use crate::{
 pub static FLUTTER_RUST_BRIDGE_HANDLER: LazyLock<FrbHandler> =
     LazyLock::new(|| {
         const {
-            if !crate::str_eq(
+            if !str_eq(
                 FLUTTER_RUST_BRIDGE_CODEGEN_VERSION,
                 FLUTTER_RUST_BRIDGE_RUNTIME_VERSION,
             ) {

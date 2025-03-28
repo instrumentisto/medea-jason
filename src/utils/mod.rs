@@ -49,3 +49,29 @@ pub fn transpose_guarded<T>(
 ) -> impl Future<Output = Option<Guarded<T>>> {
     future::ready(val.transpose())
 }
+
+/// Compares strings in `const` context.
+///
+/// As there is no `const impl Trait` and `l == r` calls [`Eq`], we have to
+/// write custom comparison function.
+///
+/// [`Eq`]: trait@Eq
+// TODO: Remove once `Eq` trait is allowed in `const` context.
+#[cfg(not(target_family = "wasm"))]
+#[must_use]
+pub const fn str_eq(l: &str, r: &str) -> bool {
+    if l.len() != r.len() {
+        return false;
+    }
+
+    let (l, r) = (l.as_bytes(), r.as_bytes());
+    let mut i = 0;
+    while i < l.len() {
+        if l[i] != r[i] {
+            return false;
+        }
+        i += 1;
+    }
+
+    true
+}
