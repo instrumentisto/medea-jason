@@ -145,6 +145,8 @@ extension type LocalMediaTrack._(JSObject _) implements JSObject {
   external num kind();
   external num media_source_kind();
   external void on_enabled(JSFunction cb);
+  external bool is_on_audio_level_available();
+  external void on_audio_level_changed(JSFunction cb);
   external JSPromise<JSAny?> state();
 }
 

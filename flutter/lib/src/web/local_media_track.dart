@@ -52,9 +52,12 @@ class WebLocalMediaTrack implements LocalMediaTrack {
 
   @override
   bool isOnAudioLevelAvailable() {
-    return false;
+    return obj.is_on_audio_level_available();
   }
 
   @override
-  void onAudioLevelChanged(OnAudioLevelChangedCallback f) {}
+  void onAudioLevelChanged(OnAudioLevelChangedCallback f) {
+    void fn(JSAny? l) => f((l as JSNumber).toDartInt);
+    fallibleFunction(() => obj.on_audio_level_changed(fn.toJS));
+  }
 }

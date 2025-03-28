@@ -13,7 +13,7 @@ use crate::{
     api::Error,
     connection,
     media::{
-        self, EnumerateDevicesError, EnumerateDisplaysError,
+        self, AudioLevelError, EnumerateDevicesError, EnumerateDisplaysError,
         GetDisplayMediaError, GetUserMediaError, InitLocalTracksError,
         InvalidOutputAudioDeviceIdError, MicVolumeError,
     },
@@ -608,6 +608,14 @@ impl From<Traced<MicVolumeError>> for Error {
                 StateError::new(err.to_string(), stacktrace).into()
             }
         }
+    }
+}
+
+impl From<Traced<AudioLevelError>> for Error {
+    fn from(err: Traced<AudioLevelError>) -> Self {
+        let (err, stacktrace) = err.split();
+        InternalException::new(err.to_string(), Some(err.into()), stacktrace)
+            .into()
     }
 }
 
