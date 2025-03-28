@@ -6,7 +6,29 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.8.0] · 2025-01-10
+## [master] · unreleased
+[master]: /../../tree/master/flutter
+
+See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md).
+
+### Upgraded
+
+- Dependencies:
+  - [`flutter_rust_bridge`] to 2.9.0 version. ([#203])
+
+### Added
+
+- `LocalMediaTrack.isOnAudioLevelAvailable()` and `LocalMediaTrack.onAudioLevelChanged()` support on Web. ([#202], [#97], [#167])
+
+[#97]: https://github.com/instrumentisto/medea-jason/issues/97
+[#167]: https://github.com/instrumentisto/medea-jason/issues/167
+[#202]: https://github.com/instrumentisto/medea-jason/pull/202
+[#203]: https://github.com/instrumentisto/medea-jason/pull/203
+
+
+
+
+## [0.8.0] · 2025-03-10
 [0.8.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.8.0/flutter
 
 See also [`medea-jason` crate `master` changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.8.0/CHANGELOG.md).
@@ -22,15 +44,8 @@ See also [`medea-jason` crate `master` changes](https://github.com/instrumentist
 
 - Segfault when closing [Flutter] application on macOS. ([#201])
 
-### Added
-
-- `LocalMediaTrack.isOnAudioLevelAvailable()` and `LocalMediaTrack.onAudioLevelChanged()` support on Web. ([#202], [#97], [#167])
-
-[#97]: https://github.com/instrumentisto/medea-jason/issues/97
-[#167]: https://github.com/instrumentisto/medea-jason/issues/167
 [#200]: https://github.com/instrumentisto/medea-jason/pull/200
 [#201]: https://github.com/instrumentisto/medea-jason/pull/201
-[#202]: https://github.com/instrumentisto/medea-jason/pull/202
 
 
 
