@@ -1,6 +1,6 @@
 [package]
 name = "medea-control-api-proto"
-version = "0.15.0-dev"
+version = "0.15.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Control API protocol implementation for Medea media server."
