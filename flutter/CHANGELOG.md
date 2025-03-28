@@ -14,7 +14,7 @@ See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md)
 ### Upgraded
 
 - Dependencies:
-  - [`flutter_rust_bridge`] to 2.9.0 version. ([#203])
+    - [`flutter_rust_bridge`] to 2.9.0 version. ([#203])
 
 ### Added
 

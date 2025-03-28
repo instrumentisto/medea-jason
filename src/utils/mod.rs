@@ -50,6 +50,7 @@ pub fn transpose_guarded<T>(
     future::ready(val.transpose())
 }
 
+#[cfg(not(target_family = "wasm"))]
 /// Compares strings in `const` context.
 ///
 /// As there is no `const impl Trait` and `l == r` calls [`Eq`], we have to
@@ -57,7 +58,6 @@ pub fn transpose_guarded<T>(
 ///
 /// [`Eq`]: trait@Eq
 // TODO: Remove once `Eq` trait is allowed in `const` context.
-#[cfg(not(target_family = "wasm"))]
 #[must_use]
 pub const fn str_eq(l: &str, r: &str) -> bool {
     if l.len() != r.len() {

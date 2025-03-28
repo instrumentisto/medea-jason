@@ -754,8 +754,7 @@ pub struct UnreachableAsyncRuntime;
 impl BaseAsyncRuntime for UnreachableAsyncRuntime {
     fn spawn<F>(&self, _: F) -> JoinHandle<F::Output>
     where
-        F: Future + Send + 'static,
-        F::Output: Send + 'static,
+        F: Future<Output: Send + 'static> + Send + 'static,
     {
         // TODO: We don't need async runtime for `flutter_rust_bridge` but we
         //       must keep "rust-async" Cargo feature enabled so we can use

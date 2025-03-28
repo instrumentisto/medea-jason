@@ -22,7 +22,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Fixed
 
-- Useless async runtime being created by [`flutter_rust_bridge`]. ([#203])
+- Redundant async runtime created by [`flutter_rust_bridge`]. ([#203])
 
 ### Upgraded
 
