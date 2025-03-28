@@ -6,7 +6,8 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.3.2] · 2025-03-28
+[0.3.2]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.3.2/crates/medea-macro
 
 ### Added
 
@@ -19,7 +20,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 ## [0.3.1] · 2025-03-10
-[0.3.1]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.3.0/crates/medea-macro
+[0.3.1]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.3.1/crates/medea-macro
 
 ### Changed
 
