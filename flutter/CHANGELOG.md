@@ -6,10 +6,10 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [master] · unreleased
-[master]: /../../tree/master/flutter
+## [0.9.0] · 2025-03-29
+[0.9.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.9.0/flutter
 
-See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md).
+See also [`medea-jason` crate 0.9.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.9.0/CHANGELOG.md).
 
 ### Upgraded
 
@@ -31,7 +31,7 @@ See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md)
 ## [0.8.0] · 2025-03-10
 [0.8.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.8.0/flutter
 
-See also [`medea-jason` crate `master` changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.8.0/CHANGELOG.md).
+See also [`medea-jason` crate 0.8.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.8.0/CHANGELOG.md).
 
 ### Upgraded
 

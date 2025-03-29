@@ -6,9 +6,10 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.9.0] · 2025-03-29
+[0.9.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.9.0
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.8.0...master)
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.8.0...medea-jason-0.9.0)
 
 ### BC Breaks
 
