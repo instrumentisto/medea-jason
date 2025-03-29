@@ -165,11 +165,15 @@ where
 #[async_trait]
 impl<T> CallbackApi for CallbackApiClient<T>
 where
-    T: tonic::client::GrpcService<tonic::body::BoxBody> + Clone + Send + Sync,
-    T::Future: Send,
-    T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-    <T::ResponseBody as Body>::Error: Send,
-    StdError: From<<T::ResponseBody as Body>::Error>,
+    T: tonic::client::GrpcService<
+            tonic::body::Body,
+            Future: Send,
+            ResponseBody: Body<Data = Bytes, Error: Into<StdError> + Send>
+                              + Send
+                              + 'static,
+        > + Clone
+        + Send
+        + Sync,
 {
     type Error = CallbackApiClientError;
 

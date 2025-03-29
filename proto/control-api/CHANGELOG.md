@@ -6,6 +6,16 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### Upgraded
+
+- Dependencies:
+    - [`tonic`] to 0.13 version ([todo]).
+
+
+
+
 ## [0.15.0] · 2025-03-29
 [0.15.0]: https://github.com/instrumentisto/medea-jason/tree/medea-control-api-proto-0.15.0/proto/control-api
 
@@ -49,7 +59,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`medea-client-api-proto`] to `0.7` ([#189]).
+    - [`medea-client-api-proto`] to 0.7 version. ([#189])
 
 [#189]: https://github.com/instrumentisto/medea-jason/pull/189
 
