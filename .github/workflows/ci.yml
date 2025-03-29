@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  MEDEA_TAG: sfu-codec-renegotiation
+  MEDEA_TAG: edge
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 
@@ -597,9 +597,8 @@ jobs:
 
   build-jason-linux:
     name: build (medea-jason, linux)
-    runs-on: ubuntu-22.04
-    # Pin glibc to 2.28 for better compatibility.
-    container: debian:buster
+    runs-on: ubuntu-latest
+    container: debian:bookworm  # pin `glibc` to 2.36 for better compatibility
     steps:
       - uses: actions/checkout@v4
       - name: Install linux dependencies
