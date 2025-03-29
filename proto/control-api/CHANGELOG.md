@@ -6,12 +6,15 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.16.0] · 2025-03-29
+[0.16.0]: https://github.com/instrumentisto/medea-jason/tree/medea-control-api-proto-0.16.0/proto/control-api
 
 ### Upgraded
 
 - Dependencies:
-    - [`tonic`] to 0.13 version ([todo]).
+    - [`tonic`] to 0.13 version. ([58f19de1])
+
+[58f19de1]: https://github.com/instrumentisto/medea-jason/commit/58f19de156317e525d6ee8721f2fd1d96457b7ad
 
 
 
@@ -89,8 +92,8 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`medea-client-api-proto`] to `0.6` ([#151]).
-    - [`tonic`] to `0.12` ([22560ba3]).
+    - [`medea-client-api-proto`] to 0.6 version. ([#151])
+    - [`tonic`] to 0.12 version. ([22560ba3])
 
 [#151]: https://github.com/instrumentisto/medea-jason/pull/151
 [22560ba3]: https://github.com/instrumentisto/medea-jason/commit/22560ba3d0d970c907c060231a5c6363d5c1dbfa
@@ -106,7 +109,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`tonic`] to `0.11` ([b504f9dc]).
+    - [`tonic`] to 0.11 version. ([b504f9dc])
 
 [b504f9dc]: https://github.com/instrumentisto/medea-jason/commit/b504f9dc97451135e2138afabf67935e3bc53475
 
@@ -121,8 +124,8 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`prost`] to `0.12` ([7ab40e8a]);
-    - [`tonic`] to `0.10` ([7ab40e8a]).
+    - [`prost`] to 0.12 version. ([7ab40e8a])
+    - [`tonic`] to 0.10 version. ([7ab40e8a])
 
 [7ab40e8a]: https://github.com/instrumentisto/medea-jason/commit/7ab40e8a48b4add3ddee31935f11dbcd09cecece
 
@@ -137,7 +140,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`medea-client-api-proto`] to `0.5` ([#123]).
+    - [`medea-client-api-proto`] to 0.5 version. ([#123])
 
 [#123]: https://github.com/instrumentisto/medea-jason/pull/123
 
@@ -152,21 +155,21 @@ All user visible changes to this project will be documented in this file. This p
 ### Added
 
 - Abstractions:
-    - `ControlApi` and `CallbackApi` ([#55]).
+    - `ControlApi` and `CallbackApi`. ([#55])
 - gRPC:
-    - `ControlApi` and `CallbackApi` implementations ([#56]).
+    - `ControlApi` and `CallbackApi` implementations. ([#56])
 - Direct:
-    - `ControlApi` and `CallbackApi` implementations ([#65]).
+    - `ControlApi` and `CallbackApi` implementations. ([#65])
 - Cargo features:
-    - `client` and `server` ([#56]);
-    - `serde` ([#67]);
-    - `client-api` ([#68]).
+    - `client` and `server` ([#56])
+    - `serde` ([#67])
+    - `client-api` ([#68])
 
 ### Upgraded
 
 - Dependencies:
-    - [`prost`] to `0.11` ([c8332ea9]);
-    - [`tonic`] to `0.9` ([6234b23f]).
+    - [`prost`] to 0.11 version. ([c8332ea9])
+    - [`tonic`] to 0.9 version. ([6234b23f])
 
 [#55]: https://github.com/instrumentisto/medea-jason/pull/55
 [#56]: https://github.com/instrumentisto/medea-jason/pull/56
@@ -206,8 +209,8 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies: ([b3acc904])
-    - [`prost`] to `0.10`;
-    - [`tonic`] to `0.7`.
+    - [`prost`] to 0.10 version.
+    - [`tonic`] to 0.7 version.
 
 [b3acc904]: https://github.com/instrumentisto/medea-jason/commit/b3acc904165329946d0efbf2f1e7bf9dff1271df
 
@@ -222,12 +225,12 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies: ([#16])
-    - [`prost`] to `0.9`;
-    - [`tonic`] to `0.6`.
+    - [`prost`] to 0.9 version.
+    - [`tonic`] to 0.6 version.
 
 ### Updated
 
-- Switch to [2021 Rust edition][012-1] ([#16]).
+- Switch to [2021 Rust edition][012-1]. ([#16])
 
 [#16]: https://github.com/instrumentisto/medea-jason/pull/16
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
@@ -243,8 +246,8 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`prost`] to `0.8`;
-    - [`tonic`] to `0.5`.
+    - [`prost`] to 0.8 version.
+    - [`tonic`] to 0.5 version.
 
 
 
@@ -257,8 +260,8 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies: ([#199])
-    - [`prost`] to `0.7`;
-    - [`tonic`] to `0.4`.
+    - [`prost`] to 0.7 version.
+    - [`tonic`] to 0.4 version.
 
 [#199]: https://github.com/instrumentisto/medea/pull/199
 
