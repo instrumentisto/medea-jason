@@ -574,13 +574,13 @@ impl MediaStreamSettings {
 
     /// Sets the underlying [`AudioMediaTracksSettings::muted`] to the provided
     /// value.
-    fn set_audio_muted(&mut self, muted: bool) {
+    const fn set_audio_muted(&mut self, muted: bool) {
         self.audio.muted = muted;
     }
 
     /// Sets the underlying [`VideoTrackConstraints::muted`] basing on the
     /// provided [`MediaSourceKind`] to the given value.
-    fn set_video_muted(
+    const fn set_video_muted(
         &mut self,
         muted: bool,
         source_kind: Option<MediaSourceKind>,
@@ -601,13 +601,13 @@ impl MediaStreamSettings {
 
     /// Sets the underlying `enabled` field of these
     /// [`AudioMediaTracksSettings`] to the given value.
-    pub fn set_audio_publish(&mut self, enabled: bool) {
+    pub const fn set_audio_publish(&mut self, enabled: bool) {
         self.audio.enabled = enabled;
     }
 
     /// Sets the underlying [`VideoTrackConstraints`] basing on the provided
     /// [`MediaSourceKind`] to the given value.
-    pub fn set_video_publish(
+    pub const fn set_video_publish(
         &mut self,
         enabled: bool,
         source_kind: Option<MediaSourceKind>,
@@ -986,7 +986,7 @@ impl AudioTrackConstraints {
     /// Sets an exact [autoGainControl][1] constraint.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
-    pub fn exact_auto_gain_control(&mut self, auto_gain_control: bool) {
+    pub const fn exact_auto_gain_control(&mut self, auto_gain_control: bool) {
         self.auto_gain_control =
             Some(ConstrainBoolean::Exact(auto_gain_control));
     }
@@ -994,7 +994,7 @@ impl AudioTrackConstraints {
     /// Sets an ideal [autoGainControl][1] constraint.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
-    pub fn ideal_auto_gain_control(&mut self, auto_gain_control: bool) {
+    pub const fn ideal_auto_gain_control(&mut self, auto_gain_control: bool) {
         self.auto_gain_control =
             Some(ConstrainBoolean::Ideal(auto_gain_control));
     }
@@ -1176,56 +1176,56 @@ impl DeviceVideoTrackConstraints {
     /// Sets exact [facingMode][1] constraint.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-constraindomstring
-    pub fn exact_facing_mode(&mut self, facing_mode: FacingMode) {
+    pub const fn exact_facing_mode(&mut self, facing_mode: FacingMode) {
         self.facing_mode = Some(ConstrainString::Exact(facing_mode));
     }
 
     /// Sets ideal [facingMode][1] constraint.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-constraindomstring
-    pub fn ideal_facing_mode(&mut self, facing_mode: FacingMode) {
+    pub const fn ideal_facing_mode(&mut self, facing_mode: FacingMode) {
         self.facing_mode = Some(ConstrainString::Ideal(facing_mode));
     }
 
     /// Sets exact [`height`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-    pub fn exact_height(&mut self, height: u32) {
+    pub const fn exact_height(&mut self, height: u32) {
         self.height = Some(ConstrainU32::Exact(height));
     }
 
     /// Sets ideal [`height`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-    pub fn ideal_height(&mut self, height: u32) {
+    pub const fn ideal_height(&mut self, height: u32) {
         self.height = Some(ConstrainU32::Ideal(height));
     }
 
     /// Sets range of [`height`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-    pub fn height_in_range(&mut self, min: u32, max: u32) {
+    pub const fn height_in_range(&mut self, min: u32, max: u32) {
         self.height = Some(ConstrainU32::Range(min, max));
     }
 
     /// Sets exact [`width`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-    pub fn exact_width(&mut self, width: u32) {
+    pub const fn exact_width(&mut self, width: u32) {
         self.width = Some(ConstrainU32::Exact(width));
     }
 
     /// Sets ideal [`width`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-    pub fn ideal_width(&mut self, width: u32) {
+    pub const fn ideal_width(&mut self, width: u32) {
         self.width = Some(ConstrainU32::Ideal(width));
     }
 
     /// Sets range of [`width`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-    pub fn width_in_range(&mut self, min: u32, max: u32) {
+    pub const fn width_in_range(&mut self, min: u32, max: u32) {
         self.width = Some(ConstrainU32::Range(min, max));
     }
 
@@ -1358,28 +1358,28 @@ impl DisplayVideoTrackConstraints {
     /// Sets an exact [height][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-    pub fn exact_height(&mut self, height: u32) {
+    pub const fn exact_height(&mut self, height: u32) {
         self.height = Some(ConstrainU32::Exact(height));
     }
 
     /// Sets an ideal [height][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-    pub fn ideal_height(&mut self, height: u32) {
+    pub const fn ideal_height(&mut self, height: u32) {
         self.height = Some(ConstrainU32::Ideal(height));
     }
 
     /// Sets an exact [width][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-    pub fn exact_width(&mut self, width: u32) {
+    pub const fn exact_width(&mut self, width: u32) {
         self.width = Some(ConstrainU32::Exact(width));
     }
 
     /// Sets an ideal [width][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-    pub fn ideal_width(&mut self, width: u32) {
+    pub const fn ideal_width(&mut self, width: u32) {
         self.width = Some(ConstrainU32::Ideal(width));
     }
 
@@ -1393,14 +1393,14 @@ impl DisplayVideoTrackConstraints {
     /// Sets an exact [frameRate][1] constraint.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
-    pub fn exact_frame_rate(&mut self, frame_rate: u32) {
+    pub const fn exact_frame_rate(&mut self, frame_rate: u32) {
         self.frame_rate = Some(ConstrainU32::Exact(frame_rate));
     }
 
     /// Sets an ideal [frameRate][1] constraint.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
-    pub fn ideal_frame_rate(&mut self, frame_rate: u32) {
+    pub const fn ideal_frame_rate(&mut self, frame_rate: u32) {
         self.frame_rate = Some(ConstrainU32::Ideal(frame_rate));
     }
 

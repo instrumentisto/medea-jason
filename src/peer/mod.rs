@@ -474,7 +474,7 @@ impl PeerConnection {
                             log::error!(
                                 "Cannot add new remote track with mid={mid}",
                             );
-                        };
+                        }
                     });
                 }
             }));
@@ -578,7 +578,7 @@ impl PeerConnection {
         match self.peer.get_stats().await {
             Ok(stats) => self.send_peer_stats(stats),
             Err(e) => log::error!("{e}"),
-        };
+        }
     }
 
     /// Indicates whether all [`TransceiverSide`]s with the provided

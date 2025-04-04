@@ -461,7 +461,7 @@ impl RoomHandle {
                 }
             } else {
                 tracks_handles = Vec::new();
-            };
+            }
 
             while !inner.is_all_peers_in_media_state(
                 kind,
@@ -871,7 +871,7 @@ impl Room {
                                 .map_err(tracerr::wrap!(=> UnknownPeerIdError))
                             {
                                 log::error!("{e}");
-                            };
+                            }
                         }
                         RoomEvent::PeerEvent(event) => {
                             if let Err(e) =
@@ -880,7 +880,7 @@ impl Room {
                                 )
                             {
                                 log::error!("{e}");
-                            };
+                            }
                         }
                         RoomEvent::RpcClientLostConnection => {
                             this_room.handle_rpc_connection_lost();
@@ -1806,7 +1806,7 @@ impl PeerEventHandler for InnerRoom {
             if let Some(peer) = self.peers.get(peer_id) {
                 peer.scrape_and_send_peer_stats().await;
             }
-        };
+        }
         Ok(())
     }
 
@@ -1890,7 +1890,7 @@ impl Drop for InnerRoom {
             platform::spawn(async move {
                 rpc.close_with_reason(reason);
             });
-        };
+        }
 
         self.on_close.call1(RoomCloseReason::new(*self.close_reason.borrow()));
     }

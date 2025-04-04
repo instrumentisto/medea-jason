@@ -74,7 +74,7 @@ impl ResettableDelayHandle {
             if rx.await.is_err() {
                 // delay was stopped and handle was dropped
                 future::pending::<()>().await;
-            };
+            }
         };
 
         (delay_fut, this)

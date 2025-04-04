@@ -252,7 +252,7 @@ impl Receiver {
             platform::spawn(async move {
                 prev_track.stop().await;
             });
-        };
+        }
 
         // It's OK to `.clone()` here, as the `Transceiver` represents a pointer
         // to a garbage-collectable memory on each platform.

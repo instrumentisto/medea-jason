@@ -158,7 +158,7 @@ impl ControlClient {
                 for sub in subs {
                     sub.do_send(notification.clone());
                 }
-            };
+            }
         }
 
         response.map(tonic::Response::into_inner)
@@ -224,7 +224,7 @@ impl ControlClient {
                 for sub in subs {
                     sub.do_send(notification.clone());
                 }
-            };
+            }
         }
         response.map(tonic::Response::into_inner)
     }

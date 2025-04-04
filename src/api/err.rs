@@ -691,7 +691,7 @@ impl From<Traced<SessionError>> for Error {
             SE::ConnectionLost(reason) => {
                 if let Reason::ConnectError(e) = reason {
                     cause = e.into_inner().cause();
-                };
+                }
                 Some(Kind::ConnectionLost)
             }
         };

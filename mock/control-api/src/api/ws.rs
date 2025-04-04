@@ -220,6 +220,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
             Err(e) => {
                 error!("WS StreamHandler error: {e}");
             }
-        };
+        }
     }
 }

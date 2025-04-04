@@ -207,7 +207,7 @@ pub unsafe fn propagate_error(mut handle: Dart_Handle) {
         };
 
         handle = unsafe { make_unhandled(handle) };
-    };
+    }
 
     let propagate = unsafe {
         #[expect(clippy::expect_used, reason = "FFI should be initialized")]

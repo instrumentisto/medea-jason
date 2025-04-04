@@ -26,7 +26,7 @@ impl Callback<()> {
     pub fn call0(&self) {
         if let Some(f) = self.0.borrow().as_ref() {
             f.call0();
-        };
+        }
     }
 }
 

@@ -157,7 +157,7 @@ impl LocalSdp {
                         .await
                 {
                     this.rollback();
-                };
+                }
             }
         });
 

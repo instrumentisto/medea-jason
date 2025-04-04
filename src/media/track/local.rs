@@ -149,6 +149,7 @@ impl LocalMediaTrack {
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this
     /// [`LocalMediaTrack`].
+    #[expect(clippy::missing_const_for_fn, reason = "non-const deref coercion")]
     #[must_use]
     pub fn get_track(&self) -> &platform::MediaStreamTrack {
         &self.0.track

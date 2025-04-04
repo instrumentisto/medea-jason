@@ -53,6 +53,10 @@ impl MediaStreamSettings {
 #[derive(Debug, From, Into)]
 pub struct AudioTrackConstraints(media::AudioTrackConstraints);
 
+#[expect( // `wasm_bindgen` doesn't support `const fn`
+    clippy::missing_const_for_fn,
+    reason = "`wasm_bindgen` doesn't support `const fn`"
+)]
 #[wasm_bindgen]
 impl AudioTrackConstraints {
     /// Creates new [`AudioTrackConstraints`] with none constraints configured.
@@ -92,6 +96,10 @@ pub struct DeviceVideoTrackConstraints(media::DeviceVideoTrackConstraints);
 
 /// Constraints applicable to video tracks that are sourced from a screen
 /// capturing.
+#[expect( // `wasm_bindgen` doesn't support `const fn`
+    clippy::missing_const_for_fn,
+    reason = "`wasm_bindgen` doesn't support `const fn`"
+)]
 #[wasm_bindgen]
 impl DeviceVideoTrackConstraints {
     /// Creates new [`DeviceVideoTrackConstraints`] with none constraints
@@ -171,6 +179,10 @@ impl DeviceVideoTrackConstraints {
 #[derive(Clone, Debug, From, Into)]
 pub struct DisplayVideoTrackConstraints(media::DisplayVideoTrackConstraints);
 
+#[expect( // `wasm_bindgen` doesn't support `const fn`
+    clippy::missing_const_for_fn,
+    reason = "`wasm_bindgen` doesn't support `const fn`"
+)]
 #[wasm_bindgen]
 impl DisplayVideoTrackConstraints {
     /// Creates new [`DisplayVideoTrackConstraints`] with none constraints

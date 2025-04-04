@@ -219,7 +219,7 @@ where
             while let Some(state) = states.next().await {
                 let (state, _guard) = state.into_parts();
                 match state {
-                    TransitableState::Transition(_) => continue,
+                    TransitableState::Transition(_) => {}
                     TransitableState::Stable(s) => {
                         return if s == desired_state {
                             Ok(())

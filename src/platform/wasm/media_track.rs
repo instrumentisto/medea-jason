@@ -146,17 +146,17 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
-        let facing_mode = self.sys_track.get_settings().get_facing_mode();
-        facing_mode.and_then(|fm| match fm.as_ref() {
+        let facing_mode = self.sys_track.get_settings().get_facing_mode()?;
+        match facing_mode.as_ref() {
             "user" => Some(FacingMode::User),
             "environment" => Some(FacingMode::Environment),
             "left" => Some(FacingMode::Left),
             "right" => Some(FacingMode::Right),
             _ => {
-                log::error!("Unknown FacingMode: {fm}");
+                log::error!("Unknown `FacingMode`: {facing_mode}");
                 None
             }
-        })
+        }
     }
 
     /// Returns a [`height`][1] of the underlying [MediaStreamTrack][2].
@@ -165,10 +165,8 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn height(&self) -> Option<u32> {
-        self.sys_track
-            .get_settings()
-            .get_height()
-            .and_then(|w| w.try_into().ok())
+        let h = self.sys_track.get_settings().get_height()?;
+        h.try_into().ok()
     }
 
     /// Return a [`width`][1] of the underlying [MediaStreamTrack][2].
@@ -177,10 +175,8 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn width(&self) -> Option<u32> {
-        self.sys_track
-            .get_settings()
-            .get_width()
-            .and_then(|w| w.try_into().ok())
+        let w = self.sys_track.get_settings().get_width()?;
+        w.try_into().ok()
     }
 
     /// Changes an [`enabled`][1] attribute in the underlying

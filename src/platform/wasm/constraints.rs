@@ -99,7 +99,7 @@ impl From<ConstrainU32> for ConstrainDoubleRange {
                 constraint.set_min(f64::from(min));
                 constraint.set_max(f64::from(max));
             }
-        };
+        }
         constraint
     }
 }
@@ -110,7 +110,7 @@ impl From<ConstrainBoolean> for ConstrainBooleanParameters {
         match from {
             ConstrainBoolean::Exact(val) => constraint.set_exact(val),
             ConstrainBoolean::Ideal(val) => constraint.set_ideal(val),
-        };
+        }
         constraint
     }
 }
@@ -123,7 +123,7 @@ impl<T: AsRef<str>> From<&ConstrainString<T>> for ConstrainDomStringParameters {
                 .set_exact(&wasm_bindgen::JsValue::from_str(val.as_ref())),
             ConstrainString::Ideal(val) => constraint
                 .set_ideal(&wasm_bindgen::JsValue::from_str(val.as_ref())),
-        };
+        }
         constraint
     }
 }

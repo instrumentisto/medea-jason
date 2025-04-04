@@ -12,7 +12,7 @@ impl<A: Into<JsValue>> Callback<A> {
     pub fn call1<T: Into<A>>(&self, arg: T) {
         if let Some(f) = self.0.borrow().as_ref() {
             f.call1(arg.into());
-        };
+        }
     }
 }
 
