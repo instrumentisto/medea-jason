@@ -8,22 +8,31 @@ import 'jason_wasm.dart' as wasm;
 ///
 /// Returns `null` in case if the provided exception is not from Jason.
 String? _getName(dynamic e) {
-  if (e is JSAny) {
+  // This warning can be ignored due to this file being executed only in
+  // `dart2js` or `dart2wasm` environments, which have `JSAny` type in it.
+  // ignore: invalid_runtime_check_with_js_interop_types
+  if (e is! JSAny) {
+    return null;
+  }
+
+  try {
     if (!e.isA<JSObject>()) {
       return null;
     }
+  } on NoSuchMethodError {
+    return null;
+  }
 
-    e as JSObject;
+  e as JSObject;
 
-    final constructor = e.getProperty('constructor'.toJS);
-    if (constructor.isA<JSObject>()) {
-      constructor as JSObject;
+  final constructor = e.getProperty('constructor'.toJS);
+  if (constructor.isA<JSObject>()) {
+    constructor as JSObject;
 
-      if (constructor.hasProperty('name'.toJS).toDart) {
-        final name = constructor.getProperty('name'.toJS);
-        if (name.isA<JSString>()) {
-          return (name as JSString).toDart;
-        }
+    if (constructor.hasProperty('name'.toJS).toDart) {
+      final name = constructor.getProperty('name'.toJS);
+      if (name.isA<JSString>()) {
+        return (name as JSString).toDart;
       }
     }
   }
