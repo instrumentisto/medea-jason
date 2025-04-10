@@ -1,5 +1,6 @@
-import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
+
+import 'package:js_interop_utils/js_interop_utils.dart';
 
 import '../interface/exceptions.dart';
 import 'jason_wasm.dart' as wasm;
@@ -8,24 +9,26 @@ import 'jason_wasm.dart' as wasm;
 ///
 /// Returns `null` in case if the provided exception is not from Jason.
 String? _getName(dynamic e) {
-  // This warning can be ignored due to this file being executed only in
-  // `dart2js` or `dart2wasm` environments, which have `JSAny` type in it.
-  // ignore: invalid_runtime_check_with_js_interop_types
-  if (e is! JSAny) {
+  if (e is! Object) {
     return null;
   }
 
-  try {
-    if (!e.isA<JSObject>()) {
-      return null;
-    }
-  } on NoSuchMethodError {
+  // TODO: Replace with more reliable way to determine whether [e] is a [JSAny]
+  //       when dart-lang/sdk#56905 is fixed:
+  //       https://github.com/dart-lang/sdk/issues/56905
+  final js = e.asJSAny;
+
+  if (js == null) {
     return null;
   }
 
-  e as JSObject;
+  if (!js.isA<JSObject>()) {
+    return null;
+  }
 
-  final constructor = e.getProperty('constructor'.toJS);
+  js as JSObject;
+
+  final constructor = js.getProperty('constructor'.toJS);
   if (constructor.isA<JSObject>()) {
     constructor as JSObject;
 
