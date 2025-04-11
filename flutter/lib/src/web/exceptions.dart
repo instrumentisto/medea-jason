@@ -1,4 +1,6 @@
-import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
+
+import 'package:js_interop_utils/js_interop_utils.dart';
 
 import '../interface/exceptions.dart';
 import 'jason_wasm.dart' as wasm;
@@ -7,16 +9,30 @@ import 'jason_wasm.dart' as wasm;
 ///
 /// Returns `null` in case if the provided exception is not from Jason.
 String? _getName(dynamic e) {
-  if (!e.isA<JSObject>()) {
+  if (e is! Object) {
     return null;
   }
 
-  final constructor = e.getProperty('constructor'.toJS);
+  // TODO: Replace with more reliable way to determine whether [e] is a [JSAny]
+  //       once dart-lang/sdk#56905 is fixed:
+  //       https://github.com/dart-lang/sdk/issues/56905
+  final js = e.asJSAny;
+  if (js == null) {
+    return null;
+  }
+  if (!js.isA<JSObject>()) {
+    return null;
+  }
+  js as JSObject;
+
+  final constructor = js.getProperty('constructor'.toJS);
   if (constructor.isA<JSObject>()) {
+    constructor as JSObject;
+
     if (constructor.hasProperty('name'.toJS).toDart) {
       final name = constructor.getProperty('name'.toJS);
       if (name.isA<JSString>()) {
-        return name.toDart;
+        return (name as JSString).toDart;
       }
     }
   }
