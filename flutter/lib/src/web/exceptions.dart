@@ -14,18 +14,15 @@ String? _getName(dynamic e) {
   }
 
   // TODO: Replace with more reliable way to determine whether [e] is a [JSAny]
-  //       when dart-lang/sdk#56905 is fixed:
+  //       once dart-lang/sdk#56905 is fixed:
   //       https://github.com/dart-lang/sdk/issues/56905
   final js = e.asJSAny;
-
   if (js == null) {
     return null;
   }
-
   if (!js.isA<JSObject>()) {
     return null;
   }
-
   js as JSObject;
 
   final constructor = js.getProperty('constructor'.toJS);

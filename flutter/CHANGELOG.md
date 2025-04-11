@@ -7,9 +7,9 @@ All user visible changes to this project will be documented in this file. This p
 
 
 ## [master] · unreleased
-[master]: /../../tree/master/flutter
+[master]: https://github.com/instrumentisto/medea-jason/tree/master/flutter
 
-See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md).
+See also [`medea-jason` crate `master` changes](https://github.com/instrumentisto/medea-jason/tree/master/CHANGELOG.md).
 
 ### Fixed
 
