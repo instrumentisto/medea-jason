@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [master] · unreleased
+[master]: /../../tree/master/flutter
+
+See also [`medea-jason` crate `master` changes](/../../tree/master/CHANGELOG.md).
+
+### Fixed
+
+- JavaScript to Dart exceptions conversion on WEB. ([#204])
+
+[#204]: https://github.com/instrumentisto/medea-jason/pull/204
+
+
+
+
 ## [0.9.0] · 2025-03-29
 [0.9.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.9.0/flutter
 
