@@ -11,12 +11,15 @@ project(${PROJECT_NAME} LANGUAGES CXX)
 # not be changed.
 set(PLUGIN_NAME "medea_jason_plugin")
 
+# Any new source files that you add to the plugin should be added here.
+list(APPEND PLUGIN_SOURCES
+  "medea_jason_plugin.cc"
+)
+
 # Define the plugin library target. Its name must not be changed (see comment
 # on PLUGIN_NAME above).
-#
-# Any new source files that you add to the plugin should be added here.
 add_library(${PLUGIN_NAME} SHARED
-  "medea_jason_plugin.cc"
+  ${PLUGIN_SOURCES}
 )
 
 # Apply a standard set of build settings that are configured in the
@@ -42,6 +45,6 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
 # This list could contain prebuilt libraries, or libraries created by an
 # external build triggered from this build file.
 set(medea_jason_bundled_libraries
-  "${CMAKE_CURRENT_SOURCE_DIR}/lib/x86_64-unknown-linux-gnu/libmedea_jason.so"
+  ""
   PARENT_SCOPE
 )
