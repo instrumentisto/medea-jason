@@ -60,4 +60,68 @@ class WebLocalMediaTrack implements LocalMediaTrack {
     void fn(JSAny? l) => f((l as JSNumber).toDartInt);
     fallibleFunction(() => obj.on_audio_level_changed(fn.toJS));
   }
+
+  @override
+  bool isAudioProcessingAvailable() {
+    return fallibleFunction(() => obj.is_audio_processing_available());
+  }
+
+  @override
+  Future<void> setAutoGainControlEnabled(bool enabled) async {
+    await fallibleFuture(obj.set_auto_gain_control_enabled(enabled).toDart);
+  }
+
+  @override
+  Future<void> setEchoCancellationEnabled(bool enabled) async {
+    // TODO: implement setEchoCancellationEnabled
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> setHighPassFilterEnabled(bool enabled) async {
+    // TODO: implement setHighPassFilterEnabled
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> setNoiseSuppressionEnabled(bool enabled) async {
+    // TODO: implement setNoiseSuppressionEnabled
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> setNoiseSuppressionLevel(NoiseSuppressionLevel enabled) async {
+    // TODO: implement setNoiseSuppressionLevel
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<NoiseSuppressionLevel> getNoiseSuppressionLevel() async {
+    // TODO: implement getNoiseSuppressionLevel
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isAutoGainControlEnabled() async {
+    // TODO: implement isAutoGainControlEnabled
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isEchoCancellationEnabled() async {
+    // TODO: implement isEchoCancellationEnabled
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isHighPassFilterEnabled() async {
+    // TODO: implement isHighPassFilterEnabled
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isNoiseSuppressionEnabled() async {
+    // TODO: implement isNoiseSuppressionEnabled
+    throw UnimplementedError();
+  }
 }

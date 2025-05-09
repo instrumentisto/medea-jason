@@ -24,5 +24,40 @@ class AudioTrackConstraints implements base.AudioTrackConstraints {
   }
 
   @override
+  void exactEchoCancellation(bool echoCancellation) {
+    constraints.echoCancellation = ConstrainBoolean.exact(echoCancellation);
+  }
+
+  @override
+  void idealEchoCancellation(bool echoCancellation) {
+    constraints.echoCancellation = ConstrainBoolean.ideal(echoCancellation);
+  }
+
+  @override
+  void exactNoiseSuppression(bool noiseSuppression) {
+    constraints.noiseSuppression = ConstrainBoolean.exact(noiseSuppression);
+  }
+
+  @override
+  void idealNoiseSuppression(bool noiseSuppression) {
+    constraints.noiseSuppression = ConstrainBoolean.ideal(noiseSuppression);
+  }
+
+  @override
+  void noiseSuppressionLevel(NoiseSuppressionLevel noiseSuppressionLevel) {
+    constraints.noiseSuppressionLevel = noiseSuppressionLevel;
+  }
+
+  @override
+  void idealHighPassFilter(bool highPassFilter) {
+    constraints.highPassFilter = ConstrainBoolean.ideal(highPassFilter);
+  }
+
+  @override
+  void exactHighPassFilter(bool highPassFilter) {
+    constraints.highPassFilter = ConstrainBoolean.exact(highPassFilter);
+  }
+
+  @override
   void free() {}
 }

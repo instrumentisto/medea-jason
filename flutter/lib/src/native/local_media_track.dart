@@ -63,4 +63,60 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
   void onAudioLevelChanged(OnAudioLevelChangedCallback f) {
     opaque.inner.onAudioLevelChanged(f: f);
   }
+
+  @override
+  bool isAudioProcessingAvailable() {
+    return opaque.inner.isAudioProcessingAvailable();
+  }
+
+  @override
+  Future<void> setAutoGainControlEnabled(bool enabled) async {
+    await (opaque.inner.setAutoGainControlEnabled(enabled: enabled) as Future);
+  }
+
+  @override
+  Future<void> setEchoCancellationEnabled(bool enabled) async {
+    await (opaque.inner.setEchoCancellationEnabled(enabled: enabled) as Future);
+  }
+
+  @override
+  Future<void> setHighPassFilterEnabled(bool enabled) async {
+    await (opaque.inner.setHighPassFilterEnabled(enabled: enabled) as Future);
+  }
+
+  @override
+  Future<void> setNoiseSuppressionEnabled(bool enabled) async {
+    await (opaque.inner.setNoiseSuppressionEnabled(enabled: enabled) as Future);
+  }
+
+  @override
+  Future<void> setNoiseSuppressionLevel(NoiseSuppressionLevel level) async {
+    await (opaque.inner.setNoiseSuppressionLevel(level: level) as Future);
+  }
+
+  @override
+  Future<NoiseSuppressionLevel> getNoiseSuppressionLevel() async {
+    var index = await (opaque.inner.getNoiseSuppressionLevel() as Future);
+    return NoiseSuppressionLevel.values[index];
+  }
+
+  @override
+  Future<bool> isAutoGainControlEnabled() async {
+    return await (opaque.inner.isAutoGainControlEnabled() as Future) as bool;
+  }
+
+  @override
+  Future<bool> isEchoCancellationEnabled() async {
+    return await (opaque.inner.isEchoCancellationEnabled() as Future) as bool;
+  }
+
+  @override
+  Future<bool> isHighPassFilterEnabled() async {
+    return await (opaque.inner.isHighPassFilterEnabled() as Future) as bool;
+  }
+
+  @override
+  Future<bool> isNoiseSuppressionEnabled() async {
+    return await (opaque.inner.isNoiseSuppressionEnabled() as Future) as bool;
+  }
 }

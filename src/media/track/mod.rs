@@ -16,6 +16,12 @@ use crate::{platform, utils::Caused};
 #[display("Failed to calculate audio track level")]
 pub struct AudioLevelError(platform::Error);
 
+/// Error returned from media track audio processing manipulation.
+#[derive(Caused, Clone, Debug, Display, From, Into)]
+#[cause(error = platform::Error)]
+#[display("Failed to access audio processing of a track")]
+pub struct AudioProcessingError(platform::Error);
+
 /// Liveness state of a [MediaStreamTrack][1] .
 ///
 /// [1]: crate::platform::MediaStreamTrack

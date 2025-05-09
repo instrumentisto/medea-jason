@@ -48,17 +48,28 @@ impl Default for MediaStreamConstraints {
 
 impl From<AudioTrackConstraints> for MediaTrackConstraints {
     fn from(track_constraints: AudioTrackConstraints) -> Self {
+        // Noise suppression level cannot be set via web API, and
+        // "googHighPassFilter" has been removed:
+        // https://chromium.googlesource.com/chromium/src/+/4a7eeb8c
+
         let constraints = Self::new();
 
+        if let Some(device_id) = track_constraints.device_id {
+            constraints
+                .set_device_id(&ConstrainDomStringParameters::from(&device_id));
+        }
         if let Some(auto_gain_control) = track_constraints.auto_gain_control {
             constraints.set_auto_gain_control(
                 &ConstrainBooleanParameters::from(auto_gain_control),
             );
         }
-
-        if let Some(device_id) = track_constraints.device_id {
+        if let Some(aec) = track_constraints.echo_cancellation {
             constraints
-                .set_device_id(&ConstrainDomStringParameters::from(&device_id));
+                .set_echo_cancellation(&ConstrainBooleanParameters::from(aec));
+        }
+        if let Some(ns) = track_constraints.noise_suppression {
+            constraints
+                .set_noise_suppression(&ConstrainBooleanParameters::from(ns));
         }
 
         constraints

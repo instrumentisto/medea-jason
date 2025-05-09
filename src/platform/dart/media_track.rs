@@ -7,7 +7,8 @@ use medea_macro::dart_bridge;
 
 use crate::{
     media::{
-        FacingMode, MediaKind, MediaSourceKind, track::MediaStreamTrackState,
+        FacingMode, MediaKind, MediaSourceKind, NoiseSuppressionLevel,
+        track::MediaStreamTrackState,
     },
     platform::{
         self,
@@ -139,6 +140,70 @@ mod media_stream_track {
             track: Dart_Handle,
             cb: Dart_Handle,
         ) -> Result<(), Error>;
+
+        /// Returns whether provided track supports audio processing setters and
+        /// getters.
+        pub fn is_audio_processing_available(
+            track: Dart_Handle,
+        ) -> Result<bool, Error>;
+
+        /// Enables or disables noise suppression on the provided track.
+        pub fn set_noise_suppression_enabled(
+            track: Dart_Handle,
+            enable: bool,
+        ) -> Result<Dart_Handle, Error>;
+
+        /// Configures noise suppression level on the provided track.
+        pub fn set_noise_suppression_level(
+            track: Dart_Handle,
+            level: i64,
+        ) -> Result<Dart_Handle, Error>;
+
+        /// Enables or disables echo cancellation on the provided track.
+        pub fn set_echo_cancellation_enabled(
+            track: Dart_Handle,
+            enable: bool,
+        ) -> Result<Dart_Handle, Error>;
+
+        /// Enables or disables automatic gain control on the provided track.
+        pub fn set_auto_gain_control_enabled(
+            track: Dart_Handle,
+            enable: bool,
+        ) -> Result<Dart_Handle, Error>;
+
+        /// Enables or disables high pass filter on the provided track.
+        pub fn set_high_pass_filter_enabled(
+            track: Dart_Handle,
+            enable: bool,
+        ) -> Result<Dart_Handle, Error>;
+
+        /// Indicates whether noise suppression is enabled on the provided
+        /// track.
+        pub fn is_noise_suppression_enabled(
+            track: Dart_Handle,
+        ) -> Result<Dart_Handle, Error>;
+
+        /// Returns configured noise suppression level for th provided track.
+        pub fn get_noise_suppression_level(
+            track: Dart_Handle,
+        ) -> Result<Dart_Handle, Error>;
+
+        /// Indicates whether automatic gain control is enabled on the provided
+        /// track.
+        pub fn is_auto_gain_control_enabled(
+            track: Dart_Handle,
+        ) -> Result<Dart_Handle, Error>;
+
+        /// Indicates whether echo cancellation is enabled on the provided
+        /// track.
+        pub fn is_echo_cancellation_enabled(
+            track: Dart_Handle,
+        ) -> Result<Dart_Handle, Error>;
+
+        /// Indicates whether high pass filter is enabled on the provided track.
+        pub fn is_high_pass_filter_enabled(
+            track: Dart_Handle,
+        ) -> Result<Dart_Handle, Error>;
     }
 }
 
@@ -313,15 +378,12 @@ impl MediaStreamTrack {
     /// not interfere with [`Clone`] trait.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
-    pub fn fork(&self) -> impl Future<Output = Self> + 'static + use<> {
-        let handle = self.inner.get();
-        let source_kind = self.source_kind;
-        async move {
-            let fut = unsafe { media_stream_track::clone(handle) }.unwrap();
-            let new_track: DartHandle =
-                unsafe { FutureFromDart::execute(fut) }.await.unwrap();
-            Self::new(new_track, source_kind)
-        }
+    pub async fn fork(&self) -> Self {
+        let fut =
+            unsafe { media_stream_track::clone(self.inner.get()) }.unwrap();
+        let new_track: DartHandle =
+            unsafe { FutureFromDart::execute(fut) }.await.unwrap();
+        Self::new(new_track, self.source_kind)
     }
 
     /// Sets [`onended`][1] event handler of this [`MediaStreamTrack`].
@@ -378,6 +440,193 @@ impl MediaStreamTrack {
         .unwrap();
 
         Ok(())
+    }
+
+    /// Indicates whether the following function are supported for this
+    /// [`MediaStreamTrack`]:
+    /// - [`MediaStreamTrack::set_noise_suppression_enabled`]
+    /// - [`MediaStreamTrack::set_noise_suppression_level`]
+    /// - [`MediaStreamTrack::set_echo_cancellation_enabled`]
+    /// - [`MediaStreamTrack::set_auto_gain_control_enabled`]
+    /// - [`MediaStreamTrack::set_high_pass_filter_enabled`]
+    /// - [`MediaStreamTrack::is_noise_suppression_enabled`]
+    /// - [`MediaStreamTrack::is_echo_cancellation_enabled`]
+    /// - [`MediaStreamTrack::is_auto_gain_control_enabled`]
+    /// - [`MediaStreamTrack::is_high_pass_filter_enabled`]
+    #[must_use]
+    pub fn is_audio_processing_available(&self) -> bool {
+        unsafe {
+            media_stream_track::is_audio_processing_available(self.inner.get())
+        }
+        .unwrap()
+    }
+
+    /// Enables or disables noise suppression for this [`MediaStreamTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`platform::Error`] if platform call errors.
+    pub async fn set_noise_suppression_enabled(
+        &self,
+        enabled: bool,
+    ) -> Result<(), platform::Error> {
+        let fut = unsafe {
+            media_stream_track::set_noise_suppression_enabled(
+                self.inner.get(),
+                enabled,
+            )
+        }?;
+        unsafe { FutureFromDart::execute::<()>(fut) }.await
+    }
+
+    /// Sets [`NoiseSuppressionLevel`] for this [`MediaStreamTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`platform::Error`] if platform call errors.
+    pub async fn set_noise_suppression_level(
+        &self,
+        level: NoiseSuppressionLevel,
+    ) -> Result<(), platform::Error> {
+        let fut = unsafe {
+            media_stream_track::set_noise_suppression_level(
+                self.inner.get(),
+                level as i64,
+            )
+        }?;
+        unsafe { FutureFromDart::execute::<()>(fut) }.await
+    }
+
+    /// Enables or disables acoustic echo cancellation for this
+    /// [`MediaStreamTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`platform::Error`] if platform call errors.
+    pub async fn set_echo_cancellation_enabled(
+        &self,
+        enabled: bool,
+    ) -> Result<(), platform::Error> {
+        let fut = unsafe {
+            media_stream_track::set_echo_cancellation_enabled(
+                self.inner.get(),
+                enabled,
+            )
+        }?;
+        unsafe { FutureFromDart::execute::<()>(fut) }.await
+    }
+
+    /// Enables or disables auto gain control for this [`MediaStreamTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`platform::Error`] if platform call errors.
+    pub async fn set_auto_gain_control_enabled(
+        &self,
+        enabled: bool,
+    ) -> Result<(), platform::Error> {
+        let fut = unsafe {
+            media_stream_track::set_auto_gain_control_enabled(
+                self.inner.get(),
+                enabled,
+            )
+        }?;
+        unsafe { FutureFromDart::execute::<()>(fut) }.await
+    }
+
+    /// Enables or disables high pass filter for this [`MediaStreamTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`platform::Error`] if platform call errors.
+    pub async fn set_high_pass_filter_enabled(
+        &self,
+        enabled: bool,
+    ) -> Result<(), platform::Error> {
+        let fut = unsafe {
+            media_stream_track::set_high_pass_filter_enabled(
+                self.inner.get(),
+                enabled,
+            )
+        }?;
+        unsafe { FutureFromDart::execute::<()>(fut) }.await
+    }
+
+    /// Indicates whether noise suppression is enabled for this
+    /// [`MediaStreamTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`platform::Error`] if platform call errors.
+    pub async fn is_noise_suppression_enabled(
+        &self,
+    ) -> Result<bool, platform::Error> {
+        let fut = unsafe {
+            media_stream_track::is_noise_suppression_enabled(self.inner.get())
+        }?;
+        unsafe { FutureFromDart::execute::<bool>(fut) }.await
+    }
+
+    /// Returns configured [`NoiseSuppressionLevel`] for this
+    /// [`MediaStreamTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`platform::Error`] if platform call errors.
+    pub async fn get_noise_suppression_level(
+        &self,
+    ) -> Result<NoiseSuppressionLevel, platform::Error> {
+        let fut = unsafe {
+            media_stream_track::get_noise_suppression_level(self.inner.get())
+        }?;
+        let level = unsafe { FutureFromDart::execute::<i64>(fut) }.await?;
+
+        Ok(NoiseSuppressionLevel::try_from(level).unwrap())
+    }
+
+    /// Indicates whether automatic gain control is enabled for this
+    /// [`MediaStreamTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`platform::Error`] if platform call errors.
+    pub async fn is_auto_gain_control_enabled(
+        &self,
+    ) -> Result<bool, platform::Error> {
+        let fut = unsafe {
+            media_stream_track::is_auto_gain_control_enabled(self.inner.get())
+        }?;
+        unsafe { FutureFromDart::execute::<bool>(fut) }.await
+    }
+
+    /// Indicates whether echo cancellation is enabled for this
+    /// [`MediaStreamTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`platform::Error`] if platform call errors.
+    pub async fn is_echo_cancellation_enabled(
+        &self,
+    ) -> Result<bool, platform::Error> {
+        let fut = unsafe {
+            media_stream_track::is_echo_cancellation_enabled(self.inner.get())
+        }?;
+        unsafe { FutureFromDart::execute::<bool>(fut) }.await
+    }
+
+    /// Indicates whether high pass filter is enabled for this
+    /// [`MediaStreamTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`platform::Error`] if platform call errors.
+    pub async fn is_high_pass_filter_enabled(
+        &self,
+    ) -> Result<bool, platform::Error> {
+        let fut = unsafe {
+            media_stream_track::is_high_pass_filter_enabled(self.inner.get())
+        }?;
+        unsafe { FutureFromDart::execute::<bool>(fut) }.await
     }
 }
 

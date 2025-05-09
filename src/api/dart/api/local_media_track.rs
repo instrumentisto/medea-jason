@@ -11,7 +11,9 @@ use send_wrapper::SendWrapper;
 use crate::media::track::local;
 use crate::{
     api::{DART_HANDLER_PORT, Error, dart::api::ForeignClass},
-    media::{MediaKind, MediaSourceKind, track::local as core},
+    media::{
+        MediaKind, MediaSourceKind, NoiseSuppressionLevel, track::local as core,
+    },
     platform::{self, utils::dart_future::IntoDartFuture as _},
 };
 
@@ -110,6 +112,150 @@ impl LocalMediaTrack {
     #[must_use]
     pub fn media_source_kind(&self) -> MediaSourceKind {
         self.0.media_source_kind()
+    }
+
+    /// Indicates whether the following function are supported for this
+    /// [`LocalMediaTrack`]:
+    /// - [`LocalMediaTrack::set_noise_suppression_enabled`]
+    /// - [`LocalMediaTrack::set_noise_suppression_level`]
+    /// - [`LocalMediaTrack::set_echo_cancellation_enabled`]
+    /// - [`LocalMediaTrack::set_auto_gain_control_enabled`]
+    /// - [`LocalMediaTrack::set_high_pass_filter_enabled`]
+    ///
+    /// Only supported for local audio [MediaStreamTrack]s on desktop platforms.
+    #[frb(sync)]
+    pub fn is_audio_processing_available(&self) -> bool {
+        self.0.is_audio_processing_available()
+    }
+
+    /// Enables or disables noise suppression for this [`LocalMediaTrack`].
+    #[frb(sync)]
+    pub fn set_noise_suppression_enabled(&self, enabled: bool) -> DartOpaque {
+        let this = self.0.clone();
+        async move {
+            this.set_noise_suppression_enabled(enabled)
+                .await
+                .map_err(Error::from)
+        }
+        .into_dart_future()
+        .into_dart_opaque()
+    }
+
+    /// Sets [`NoiseSuppressionLevel`] for this [`LocalMediaTrack`].
+    #[frb(sync)]
+    pub fn set_noise_suppression_level(
+        &self,
+        level: NoiseSuppressionLevel,
+    ) -> DartOpaque {
+        let this = self.0.clone();
+        async move {
+            this.set_noise_suppression_level(level).await.map_err(Error::from)
+        }
+        .into_dart_future()
+        .into_dart_opaque()
+    }
+
+    /// Enables or disables acoustic echo cancellation for this
+    /// [`LocalMediaTrack`].
+    #[frb(sync)]
+    pub fn set_echo_cancellation_enabled(&self, enabled: bool) -> DartOpaque {
+        let this = self.0.clone();
+        async move {
+            this.set_echo_cancellation_enabled(enabled)
+                .await
+                .map_err(Error::from)
+        }
+        .into_dart_future()
+        .into_dart_opaque()
+    }
+
+    /// Enables or disables auto gain control for this [`LocalMediaTrack`].
+    #[frb(sync)]
+    pub fn set_auto_gain_control_enabled(&self, enabled: bool) -> DartOpaque {
+        let this = self.0.clone();
+        async move {
+            this.set_auto_gain_control_enabled(enabled)
+                .await
+                .map_err(Error::from)
+        }
+        .into_dart_future()
+        .into_dart_opaque()
+    }
+
+    /// Enables or disables high pass filter for this [`LocalMediaTrack`].
+    #[frb(sync)]
+    pub fn set_high_pass_filter_enabled(&self, enabled: bool) -> DartOpaque {
+        let this = self.0.clone();
+        async move {
+            this.set_high_pass_filter_enabled(enabled)
+                .await
+                .map_err(Error::from)
+        }
+        .into_dart_future()
+        .into_dart_opaque()
+    }
+
+    #[frb(sync)]
+    pub fn is_noise_suppression_enabled(&self) -> DartOpaque {
+        let this = self.0.clone();
+        async move {
+            this.is_noise_suppression_enabled()
+                .await
+                .map_err(Error::from)
+        }
+        .into_dart_future()
+        .into_dart_opaque()
+    }
+
+    #[frb(sync)]
+    pub fn get_noise_suppression_level(&self) -> DartOpaque {
+        let this = self.0.clone();
+        async move {
+            let lvl = this
+                .get_noise_suppression_level()
+                .await
+                .map_err(Error::from)?;
+
+            Ok::<_, Error>(lvl as i64)
+        }
+        .into_dart_future()
+        .into_dart_opaque()
+    }
+
+    #[frb(sync)]
+    pub fn is_auto_gain_control_enabled(&self) -> DartOpaque {
+        let this = self.0.clone();
+        async move {
+            this.is_auto_gain_control_enabled()
+                .await
+                .map_err(Error::from)
+        }
+        .into_dart_future()
+        .into_dart_opaque()
+    }
+
+    #[frb(sync)]
+    pub fn is_echo_cancellation_enabled(&self) -> DartOpaque {
+        let this = self.0.clone();
+        async move {
+            this.is_echo_cancellation_enabled()
+                .await
+                .map_err(Error::from)
+        }
+        .into_dart_future()
+        .into_dart_opaque()
+    }
+
+    #[frb(sync)]
+    pub fn is_high_pass_filter_enabled(&self) -> DartOpaque {
+        let this = self.0.clone();
+        async move {
+            this.is_high_pass_filter_enabled()
+                .await
+                .map_err(Error::from)
+        }
+        .into_dart_future()
+        .into_dart_opaque()
     }
 
     /// Frees the data behind the provided opaque local track.

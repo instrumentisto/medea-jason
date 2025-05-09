@@ -49,7 +49,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.9.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 223637457;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1168616946;
 
 // Section: executor
 
@@ -370,6 +370,28 @@ fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_from_ptr_impl
                      let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::from_ptr(api_ptr))?;   Ok(output_ok)
                 })()) })
 }
+fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_get_noise_suppression_level_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "LocalMediaTrack_get_noise_suppression_level", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalMediaTrack>>>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::get_noise_suppression_level(&*api_that_guard))?;   Ok(output_ok)
+                })()) })
+}
 fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_get_track_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -390,6 +412,116 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
         }
         let api_that_guard = api_that_guard.unwrap();
  let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::get_track(&*api_that_guard))?;   Ok(output_ok)
+                })()) })
+}
+fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_audio_processing_available_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "LocalMediaTrack_is_audio_processing_available", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalMediaTrack>>>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::is_audio_processing_available(&*api_that_guard))?;   Ok(output_ok)
+                })()) })
+}
+fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_auto_gain_control_enabled_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "LocalMediaTrack_is_auto_gain_control_enabled", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalMediaTrack>>>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::is_auto_gain_control_enabled(&*api_that_guard))?;   Ok(output_ok)
+                })()) })
+}
+fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_echo_cancellation_enabled_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "LocalMediaTrack_is_echo_cancellation_enabled", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalMediaTrack>>>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::is_echo_cancellation_enabled(&*api_that_guard))?;   Ok(output_ok)
+                })()) })
+}
+fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_high_pass_filter_enabled_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "LocalMediaTrack_is_high_pass_filter_enabled", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalMediaTrack>>>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::is_high_pass_filter_enabled(&*api_that_guard))?;   Ok(output_ok)
+                })()) })
+}
+fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_noise_suppression_enabled_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "LocalMediaTrack_is_noise_suppression_enabled", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalMediaTrack>>>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::is_noise_suppression_enabled(&*api_that_guard))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_on_audio_level_available_impl(
@@ -502,6 +634,121 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
         }
         let api_that_guard = api_that_guard.unwrap();
  let output_ok = Result::<_,()>::Ok({ crate::api::dart::api::local_media_track::LocalMediaTrack::on_ended(&*api_that_guard, api_f); })?;   Ok(output_ok)
+                })()) })
+}
+fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_set_auto_gain_control_enabled_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "LocalMediaTrack_set_auto_gain_control_enabled", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalMediaTrack>>>::sse_decode(&mut deserializer);
+let api_enabled = <bool>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::set_auto_gain_control_enabled(&*api_that_guard, api_enabled))?;   Ok(output_ok)
+                })()) })
+}
+fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_set_echo_cancellation_enabled_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "LocalMediaTrack_set_echo_cancellation_enabled", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalMediaTrack>>>::sse_decode(&mut deserializer);
+let api_enabled = <bool>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::set_echo_cancellation_enabled(&*api_that_guard, api_enabled))?;   Ok(output_ok)
+                })()) })
+}
+fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_set_high_pass_filter_enabled_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "LocalMediaTrack_set_high_pass_filter_enabled", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalMediaTrack>>>::sse_decode(&mut deserializer);
+let api_enabled = <bool>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::set_high_pass_filter_enabled(&*api_that_guard, api_enabled))?;   Ok(output_ok)
+                })()) })
+}
+fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_set_noise_suppression_enabled_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "LocalMediaTrack_set_noise_suppression_enabled", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalMediaTrack>>>::sse_decode(&mut deserializer);
+let api_enabled = <bool>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::set_noise_suppression_enabled(&*api_that_guard, api_enabled))?;   Ok(output_ok)
+                })()) })
+}
+fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_set_noise_suppression_level_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "LocalMediaTrack_set_noise_suppression_level", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalMediaTrack>>>::sse_decode(&mut deserializer);
+let api_level = <crate::media::constraints::NoiseSuppressionLevel>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::local_media_track::LocalMediaTrack::set_noise_suppression_level(&*api_that_guard, api_level))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__local_media_track__LocalMediaTrack_state_impl(
@@ -1768,9 +2015,25 @@ impl SseDecode for crate::api::dart::api::ApiAudioConstraints {
         let mut var_autoGainControl = <Option<
             crate::media::constraints::ConstrainBoolean,
         >>::sse_decode(deserializer);
+        let mut var_noiseSuppression = <Option<
+            crate::media::constraints::ConstrainBoolean,
+        >>::sse_decode(deserializer);
+        let mut var_noiseSuppressionLevel = <Option<
+            crate::media::constraints::NoiseSuppressionLevel,
+        >>::sse_decode(deserializer);
+        let mut var_echoCancellation = <Option<
+            crate::media::constraints::ConstrainBoolean,
+        >>::sse_decode(deserializer);
+        let mut var_highPassFilter = <Option<
+            crate::media::constraints::ConstrainBoolean,
+        >>::sse_decode(deserializer);
         return crate::api::dart::api::ApiAudioConstraints {
             device_id: var_deviceId,
             auto_gain_control: var_autoGainControl,
+            noise_suppression: var_noiseSuppression,
+            noise_suppression_level: var_noiseSuppressionLevel,
+            echo_cancellation: var_echoCancellation,
+            high_pass_filter: var_highPassFilter,
         };
     }
 }
@@ -2161,6 +2424,25 @@ impl SseDecode for crate::media::track::MediaSourceKind {
     }
 }
 
+impl SseDecode for crate::media::constraints::NoiseSuppressionLevel {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::media::constraints::NoiseSuppressionLevel::Low,
+            1 => crate::media::constraints::NoiseSuppressionLevel::Moderate,
+            2 => crate::media::constraints::NoiseSuppressionLevel::High,
+            3 => crate::media::constraints::NoiseSuppressionLevel::VeryHigh,
+            _ => unreachable!(
+                "Invalid variant for NoiseSuppressionLevel: {}",
+                inner
+            ),
+        };
+    }
+}
+
 impl SseDecode for Option<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(
@@ -2287,6 +2569,23 @@ impl SseDecode for Option<crate::media::track::MediaSourceKind> {
     }
 }
 
+impl SseDecode for Option<crate::media::constraints::NoiseSuppressionLevel> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(
+                <crate::media::constraints::NoiseSuppressionLevel>::sse_decode(
+                    deserializer,
+                ),
+            );
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<u32> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(
@@ -2388,60 +2687,71 @@ fn pde_ffi_dispatcher_sync_impl(
 14 => wire__crate__api__dart__api__jason__Jason_new_impl(ptr, rust_vec_len, data_len),
 15 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_free_impl(ptr, rust_vec_len, data_len),
 16 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_from_ptr_impl(ptr, rust_vec_len, data_len),
-17 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_get_track_impl(ptr, rust_vec_len, data_len),
-18 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_on_audio_level_available_impl(ptr, rust_vec_len, data_len),
-19 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_kind_impl(ptr, rust_vec_len, data_len),
-20 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_media_source_kind_impl(ptr, rust_vec_len, data_len),
-21 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_on_audio_level_changed_impl(ptr, rust_vec_len, data_len),
-22 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_on_ended_impl(ptr, rust_vec_len, data_len),
-23 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_state_impl(ptr, rust_vec_len, data_len),
-24 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_enumerate_devices_impl(ptr, rust_vec_len, data_len),
-25 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_enumerate_displays_impl(ptr, rust_vec_len, data_len),
-26 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_init_local_tracks_impl(ptr, rust_vec_len, data_len),
-27 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_microphone_volume_impl(ptr, rust_vec_len, data_len),
-28 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_microphone_volume_is_available_impl(ptr, rust_vec_len, data_len),
-29 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_on_device_change_impl(ptr, rust_vec_len, data_len),
-30 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_set_microphone_volume_impl(ptr, rust_vec_len, data_len),
-31 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_set_output_audio_id_impl(ptr, rust_vec_len, data_len),
-32 => wire__crate__api__dart__api__reconnect_handle__ReconnectHandle_from_ptr_impl(ptr, rust_vec_len, data_len),
-33 => wire__crate__api__dart__api__reconnect_handle__ReconnectHandle_reconnect_with_backoff_impl(ptr, rust_vec_len, data_len),
-34 => wire__crate__api__dart__api__reconnect_handle__ReconnectHandle_reconnect_with_delay_impl(ptr, rust_vec_len, data_len),
-35 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_from_ptr_impl(ptr, rust_vec_len, data_len),
-36 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_get_track_impl(ptr, rust_vec_len, data_len),
-37 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_kind_impl(ptr, rust_vec_len, data_len),
-38 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_media_direction_impl(ptr, rust_vec_len, data_len),
-39 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_media_source_kind_impl(ptr, rust_vec_len, data_len),
-40 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_muted_impl(ptr, rust_vec_len, data_len),
-41 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_on_media_direction_changed_impl(ptr, rust_vec_len, data_len),
-42 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_on_muted_impl(ptr, rust_vec_len, data_len),
-43 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_on_stopped_impl(ptr, rust_vec_len, data_len),
-44 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_on_unmuted_impl(ptr, rust_vec_len, data_len),
-45 => wire__crate__api__dart__api__room__RoomHandle_disable_audio_impl(ptr, rust_vec_len, data_len),
-46 => wire__crate__api__dart__api__room__RoomHandle_disable_remote_audio_impl(ptr, rust_vec_len, data_len),
-47 => wire__crate__api__dart__api__room__RoomHandle_disable_remote_video_impl(ptr, rust_vec_len, data_len),
-48 => wire__crate__api__dart__api__room__RoomHandle_disable_video_impl(ptr, rust_vec_len, data_len),
-49 => wire__crate__api__dart__api__room__RoomHandle_enable_audio_impl(ptr, rust_vec_len, data_len),
-50 => wire__crate__api__dart__api__room__RoomHandle_enable_remote_audio_impl(ptr, rust_vec_len, data_len),
-51 => wire__crate__api__dart__api__room__RoomHandle_enable_remote_video_impl(ptr, rust_vec_len, data_len),
-52 => wire__crate__api__dart__api__room__RoomHandle_enable_video_impl(ptr, rust_vec_len, data_len),
-53 => wire__crate__api__dart__api__room__RoomHandle_join_impl(ptr, rust_vec_len, data_len),
-54 => wire__crate__api__dart__api__room__RoomHandle_mute_audio_impl(ptr, rust_vec_len, data_len),
-55 => wire__crate__api__dart__api__room__RoomHandle_mute_video_impl(ptr, rust_vec_len, data_len),
-56 => wire__crate__api__dart__api__room__RoomHandle_on_close_impl(ptr, rust_vec_len, data_len),
-57 => wire__crate__api__dart__api__room__RoomHandle_on_connection_loss_impl(ptr, rust_vec_len, data_len),
-58 => wire__crate__api__dart__api__room__RoomHandle_on_failed_local_media_impl(ptr, rust_vec_len, data_len),
-59 => wire__crate__api__dart__api__room__RoomHandle_on_local_track_impl(ptr, rust_vec_len, data_len),
-60 => wire__crate__api__dart__api__room__RoomHandle_on_new_connection_impl(ptr, rust_vec_len, data_len),
-61 => wire__crate__api__dart__api__room__RoomHandle_set_local_media_settings_impl(ptr, rust_vec_len, data_len),
-62 => wire__crate__api__dart__api__room__RoomHandle_unmute_audio_impl(ptr, rust_vec_len, data_len),
-63 => wire__crate__api__dart__api__room__RoomHandle_unmute_video_impl(ptr, rust_vec_len, data_len),
-65 => wire__crate__api__dart__api__log_dart_exception_impl(ptr, rust_vec_len, data_len),
-66 => wire__crate__api__dart__api__on_panic_impl(ptr, rust_vec_len, data_len),
-67 => wire__crate__api__dart__api__room_close_reason__room_close_reason_from_ptr_impl(ptr, rust_vec_len, data_len),
-68 => wire__crate__api__dart__api__set_dart_opaque_message_port_impl(ptr, rust_vec_len, data_len),
-69 => wire__crate__api__dart__api__local_media_track__vec_local_tracks_from_raw_impl(ptr, rust_vec_len, data_len),
-70 => wire__crate__api__dart__api__vec_media_device_details_from_raw_impl(ptr, rust_vec_len, data_len),
-71 => wire__crate__api__dart__api__vec_media_display_details_from_raw_impl(ptr, rust_vec_len, data_len),
+17 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_get_noise_suppression_level_impl(ptr, rust_vec_len, data_len),
+18 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_get_track_impl(ptr, rust_vec_len, data_len),
+19 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_audio_processing_available_impl(ptr, rust_vec_len, data_len),
+20 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_auto_gain_control_enabled_impl(ptr, rust_vec_len, data_len),
+21 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_echo_cancellation_enabled_impl(ptr, rust_vec_len, data_len),
+22 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_high_pass_filter_enabled_impl(ptr, rust_vec_len, data_len),
+23 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_noise_suppression_enabled_impl(ptr, rust_vec_len, data_len),
+24 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_is_on_audio_level_available_impl(ptr, rust_vec_len, data_len),
+25 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_kind_impl(ptr, rust_vec_len, data_len),
+26 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_media_source_kind_impl(ptr, rust_vec_len, data_len),
+27 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_on_audio_level_changed_impl(ptr, rust_vec_len, data_len),
+28 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_on_ended_impl(ptr, rust_vec_len, data_len),
+29 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_set_auto_gain_control_enabled_impl(ptr, rust_vec_len, data_len),
+30 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_set_echo_cancellation_enabled_impl(ptr, rust_vec_len, data_len),
+31 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_set_high_pass_filter_enabled_impl(ptr, rust_vec_len, data_len),
+32 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_set_noise_suppression_enabled_impl(ptr, rust_vec_len, data_len),
+33 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_set_noise_suppression_level_impl(ptr, rust_vec_len, data_len),
+34 => wire__crate__api__dart__api__local_media_track__LocalMediaTrack_state_impl(ptr, rust_vec_len, data_len),
+35 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_enumerate_devices_impl(ptr, rust_vec_len, data_len),
+36 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_enumerate_displays_impl(ptr, rust_vec_len, data_len),
+37 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_init_local_tracks_impl(ptr, rust_vec_len, data_len),
+38 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_microphone_volume_impl(ptr, rust_vec_len, data_len),
+39 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_microphone_volume_is_available_impl(ptr, rust_vec_len, data_len),
+40 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_on_device_change_impl(ptr, rust_vec_len, data_len),
+41 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_set_microphone_volume_impl(ptr, rust_vec_len, data_len),
+42 => wire__crate__api__dart__api__media_manager__MediaManagerHandle_set_output_audio_id_impl(ptr, rust_vec_len, data_len),
+43 => wire__crate__api__dart__api__reconnect_handle__ReconnectHandle_from_ptr_impl(ptr, rust_vec_len, data_len),
+44 => wire__crate__api__dart__api__reconnect_handle__ReconnectHandle_reconnect_with_backoff_impl(ptr, rust_vec_len, data_len),
+45 => wire__crate__api__dart__api__reconnect_handle__ReconnectHandle_reconnect_with_delay_impl(ptr, rust_vec_len, data_len),
+46 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_from_ptr_impl(ptr, rust_vec_len, data_len),
+47 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_get_track_impl(ptr, rust_vec_len, data_len),
+48 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_kind_impl(ptr, rust_vec_len, data_len),
+49 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_media_direction_impl(ptr, rust_vec_len, data_len),
+50 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_media_source_kind_impl(ptr, rust_vec_len, data_len),
+51 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_muted_impl(ptr, rust_vec_len, data_len),
+52 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_on_media_direction_changed_impl(ptr, rust_vec_len, data_len),
+53 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_on_muted_impl(ptr, rust_vec_len, data_len),
+54 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_on_stopped_impl(ptr, rust_vec_len, data_len),
+55 => wire__crate__api__dart__api__remote_media_track__RemoteMediaTrack_on_unmuted_impl(ptr, rust_vec_len, data_len),
+56 => wire__crate__api__dart__api__room__RoomHandle_disable_audio_impl(ptr, rust_vec_len, data_len),
+57 => wire__crate__api__dart__api__room__RoomHandle_disable_remote_audio_impl(ptr, rust_vec_len, data_len),
+58 => wire__crate__api__dart__api__room__RoomHandle_disable_remote_video_impl(ptr, rust_vec_len, data_len),
+59 => wire__crate__api__dart__api__room__RoomHandle_disable_video_impl(ptr, rust_vec_len, data_len),
+60 => wire__crate__api__dart__api__room__RoomHandle_enable_audio_impl(ptr, rust_vec_len, data_len),
+61 => wire__crate__api__dart__api__room__RoomHandle_enable_remote_audio_impl(ptr, rust_vec_len, data_len),
+62 => wire__crate__api__dart__api__room__RoomHandle_enable_remote_video_impl(ptr, rust_vec_len, data_len),
+63 => wire__crate__api__dart__api__room__RoomHandle_enable_video_impl(ptr, rust_vec_len, data_len),
+64 => wire__crate__api__dart__api__room__RoomHandle_join_impl(ptr, rust_vec_len, data_len),
+65 => wire__crate__api__dart__api__room__RoomHandle_mute_audio_impl(ptr, rust_vec_len, data_len),
+66 => wire__crate__api__dart__api__room__RoomHandle_mute_video_impl(ptr, rust_vec_len, data_len),
+67 => wire__crate__api__dart__api__room__RoomHandle_on_close_impl(ptr, rust_vec_len, data_len),
+68 => wire__crate__api__dart__api__room__RoomHandle_on_connection_loss_impl(ptr, rust_vec_len, data_len),
+69 => wire__crate__api__dart__api__room__RoomHandle_on_failed_local_media_impl(ptr, rust_vec_len, data_len),
+70 => wire__crate__api__dart__api__room__RoomHandle_on_local_track_impl(ptr, rust_vec_len, data_len),
+71 => wire__crate__api__dart__api__room__RoomHandle_on_new_connection_impl(ptr, rust_vec_len, data_len),
+72 => wire__crate__api__dart__api__room__RoomHandle_set_local_media_settings_impl(ptr, rust_vec_len, data_len),
+73 => wire__crate__api__dart__api__room__RoomHandle_unmute_audio_impl(ptr, rust_vec_len, data_len),
+74 => wire__crate__api__dart__api__room__RoomHandle_unmute_video_impl(ptr, rust_vec_len, data_len),
+76 => wire__crate__api__dart__api__log_dart_exception_impl(ptr, rust_vec_len, data_len),
+77 => wire__crate__api__dart__api__on_panic_impl(ptr, rust_vec_len, data_len),
+78 => wire__crate__api__dart__api__room_close_reason__room_close_reason_from_ptr_impl(ptr, rust_vec_len, data_len),
+79 => wire__crate__api__dart__api__set_dart_opaque_message_port_impl(ptr, rust_vec_len, data_len),
+80 => wire__crate__api__dart__api__local_media_track__vec_local_tracks_from_raw_impl(ptr, rust_vec_len, data_len),
+81 => wire__crate__api__dart__api__vec_media_device_details_from_raw_impl(ptr, rust_vec_len, data_len),
+82 => wire__crate__api__dart__api__vec_media_display_details_from_raw_impl(ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -2613,6 +2923,10 @@ impl flutter_rust_bridge::IntoDart
         [
             self.device_id.into_into_dart().into_dart(),
             self.auto_gain_control.into_into_dart().into_dart(),
+            self.noise_suppression.into_into_dart().into_dart(),
+            self.noise_suppression_level.into_into_dart().into_dart(),
+            self.echo_cancellation.into_into_dart().into_dart(),
+            self.high_pass_filter.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -2978,6 +3292,35 @@ impl flutter_rust_bridge::IntoIntoDart<crate::media::track::MediaSourceKind>
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart
+    for crate::media::constraints::NoiseSuppressionLevel
+{
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Low => 0.into_dart(),
+            Self::Moderate => 1.into_dart(),
+            Self::High => 2.into_dart(),
+            Self::VeryHigh => 3.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::media::constraints::NoiseSuppressionLevel
+{
+}
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::media::constraints::NoiseSuppressionLevel,
+    > for crate::media::constraints::NoiseSuppressionLevel
+{
+    fn into_into_dart(
+        self,
+    ) -> crate::media::constraints::NoiseSuppressionLevel {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart
     for crate::api::dart::api::room_close_reason::RoomCloseReason
 {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
@@ -3292,6 +3635,22 @@ impl SseEncode for crate::api::dart::api::ApiAudioConstraints {
         <Option<String>>::sse_encode(self.device_id, serializer);
         <Option<crate::media::constraints::ConstrainBoolean>>::sse_encode(
             self.auto_gain_control,
+            serializer,
+        );
+        <Option<crate::media::constraints::ConstrainBoolean>>::sse_encode(
+            self.noise_suppression,
+            serializer,
+        );
+        <Option<crate::media::constraints::NoiseSuppressionLevel>>::sse_encode(
+            self.noise_suppression_level,
+            serializer,
+        );
+        <Option<crate::media::constraints::ConstrainBoolean>>::sse_encode(
+            self.echo_cancellation,
+            serializer,
+        );
+        <Option<crate::media::constraints::ConstrainBoolean>>::sse_encode(
+            self.high_pass_filter,
             serializer,
         );
     }
@@ -3659,6 +4018,27 @@ impl SseEncode for crate::media::track::MediaSourceKind {
     }
 }
 
+impl SseEncode for crate::media::constraints::NoiseSuppressionLevel {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(
+            match self {
+                crate::media::constraints::NoiseSuppressionLevel::Low => 0,
+                crate::media::constraints::NoiseSuppressionLevel::Moderate => 1,
+                crate::media::constraints::NoiseSuppressionLevel::High => 2,
+                crate::media::constraints::NoiseSuppressionLevel::VeryHigh => 3,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
 impl SseEncode for Option<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(
@@ -3773,6 +4153,21 @@ impl SseEncode for Option<crate::media::track::MediaSourceKind> {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::media::track::MediaSourceKind>::sse_encode(
+                value, serializer,
+            );
+        }
+    }
+}
+
+impl SseEncode for Option<crate::media::constraints::NoiseSuppressionLevel> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::media::constraints::NoiseSuppressionLevel>::sse_encode(
                 value, serializer,
             );
         }

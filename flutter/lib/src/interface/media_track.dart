@@ -3,9 +3,14 @@ import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import '../util/rust_handles_storage.dart';
 
 import 'enums.dart'
-    show MediaDirection, MediaKind, MediaSourceKind, MediaStreamTrackState;
+    show
+        MediaDirection,
+        MediaKind,
+        MediaSourceKind,
+        MediaStreamTrackState,
+        NoiseSuppressionLevel;
 
-export 'enums.dart' show MediaKind, MediaSourceKind;
+export 'enums.dart' show MediaKind, MediaSourceKind, NoiseSuppressionLevel;
 
 typedef TrackMediaDirection = MediaDirection;
 
@@ -59,6 +64,61 @@ abstract class LocalMediaTrack implements MediaTrack {
   /// Returns a [MediaStreamTrackState.live] if this [LocalMediaTrack] is
   /// active, or a [MediaStreamTrackState.ended] if it has ended.
   Future<MediaStreamTrackState> state();
+
+  /// Indicates whether updating audio processing configuration is supported
+  /// for this [LocalMediaTrack], which is done via following functions:
+  /// - [LocalMediaTrack.setNoiseSuppressionEnabled]
+  /// - [LocalMediaTrack.setNoiseSuppressionLevel]
+  /// - [LocalMediaTrack.setEchoCancellationEnabled]
+  /// - [LocalMediaTrack.setAutoGainControlEnabled]
+  /// - [LocalMediaTrack.setHighPassFilterEnabled]
+  bool isAudioProcessingAvailable();
+
+  /// Enabled or disables noise suppression for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
+  Future<void> setNoiseSuppressionEnabled(bool enabled);
+
+  /// Configures disables noise suppression level for this [LocalMediaTrack].
+  ///
+  /// Not supported on WEB but won't throw if called.
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
+  Future<void> setNoiseSuppressionLevel(NoiseSuppressionLevel level);
+
+  /// Enabled or disables acoustic echo cancellation for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
+  Future<void> setEchoCancellationEnabled(bool enabled);
+
+  /// Enabled or disables automatic gain control for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
+  Future<void> setAutoGainControlEnabled(bool enabled);
+
+  /// Enabled or disables high pass filter for this [LocalMediaTrack].
+  ///
+  /// Not supported on WEB but won't throw if called.
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
+  Future<void> setHighPassFilterEnabled(bool enabled);
+
+  /// Enabled or disables noise suppression for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
+  Future<bool> isNoiseSuppressionEnabled();
+
+  /// Configures disables noise suppression level for this [LocalMediaTrack].
+  Future<NoiseSuppressionLevel> getNoiseSuppressionLevel();
+
+  /// Enabled or disables acoustic echo cancellation for this [LocalMediaTrack].
+  Future<bool> isEchoCancellationEnabled();
+
+  /// Enabled or disables automatic gain control for this [LocalMediaTrack].
+  Future<bool> isAutoGainControlEnabled();
+
+  /// Enabled or disables high pass filter for this [LocalMediaTrack].
+  Future<bool> isHighPassFilterEnabled();
 }
 
 /// Representation of a received remote [`MediaStreamTrack`][1].

@@ -45,6 +45,10 @@ extension type AudioTrackConstraints._(JSObject _) implements JSObject {
   external void device_id(String device_id);
   external void exact_auto_gain_control(bool auto_gain_control);
   external void ideal_auto_gain_control(bool auto_gain_control);
+  external void ideal_echo_cancellation(bool echo_cancellation);
+  external void exact_echo_cancellation(bool echo_cancellation);
+  external void ideal_noise_suppression(bool noise_suppression);
+  external void exact_noise_suppression(bool noise_suppression);
 }
 
 @JS()
@@ -144,10 +148,17 @@ extension type LocalMediaTrack._(JSObject _) implements JSObject {
   external web.MediaStreamTrack get_track();
   external num kind();
   external num media_source_kind();
+  external JSPromise<JSAny?> state();
   external void on_enabled(JSFunction cb);
   external bool is_on_audio_level_available();
   external void on_audio_level_changed(JSFunction cb);
-  external JSPromise<JSAny?> state();
+  external bool is_audio_processing_available();
+  external JSPromise<JSAny?> set_noise_suppression_enabled(bool enabled);
+  external JSPromise<JSAny?> set_echo_cancellation_enabled(bool enabled);
+  external JSPromise<JSAny?> set_auto_gain_control_enabled(bool enabled);
+  external JSPromise<JSBoolean> is_noise_suppression_enabled();
+  external JSPromise<JSBoolean> is_auto_gain_control_enabled();
+  external JSPromise<JSBoolean> is_echo_cancellation_enabled();
 }
 
 @JS()

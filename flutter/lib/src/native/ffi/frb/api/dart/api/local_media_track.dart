@@ -7,6 +7,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import '../../../frb_generated.dart';
 import '../../../media.dart';
+import '../../../media/constraints.dart';
 import '../../../media/track.dart';
 import '../api.dart';
 
@@ -33,11 +34,32 @@ abstract class LocalMediaTrack implements RustOpaqueInterface, ForeignClass {
   static LocalMediaTrack fromPtr({required int ptr}) => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackFromPtr(ptr: ptr);
 
+  Object getNoiseSuppressionLevel();
+
   /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of the
   /// provided [`LocalMediaTrack`].
   ///
   /// [`MediaStreamTrack`]: platform::MediaStreamTrack
   Object getTrack();
+
+  /// Indicates whether the following function are supported for this
+  /// [`LocalMediaTrack`]:
+  /// - [`LocalMediaTrack::set_noise_suppression_enabled`]
+  /// - [`LocalMediaTrack::set_noise_suppression_level`]
+  /// - [`LocalMediaTrack::set_echo_cancellation_enabled`]
+  /// - [`LocalMediaTrack::set_auto_gain_control_enabled`]
+  /// - [`LocalMediaTrack::set_high_pass_filter_enabled`]
+  ///
+  /// Only supported for local audio [MediaStreamTrack]s on desktop platforms.
+  bool isAudioProcessingAvailable();
+
+  Object isAutoGainControlEnabled();
+
+  Object isEchoCancellationEnabled();
+
+  Object isHighPassFilterEnabled();
+
+  Object isNoiseSuppressionEnabled();
 
   /// Indicates whether an `OnAudioLevelChangedCallback` is supported for this
   /// [`LocalMediaTrack`].
@@ -65,6 +87,22 @@ abstract class LocalMediaTrack implements RustOpaqueInterface, ForeignClass {
 
   /// Sets callback to be invoked once this [`LocalMediaTrack`] is ended.
   void onEnded({required Object f});
+
+  /// Enables or disables auto gain control for this [`LocalMediaTrack`].
+  Object setAutoGainControlEnabled({required bool enabled});
+
+  /// Enables or disables acoustic echo cancellation for this
+  /// [`LocalMediaTrack`].
+  Object setEchoCancellationEnabled({required bool enabled});
+
+  /// Enables or disables high pass filter for this [`LocalMediaTrack`].
+  Object setHighPassFilterEnabled({required bool enabled});
+
+  /// Enables or disables noise suppression for this [`LocalMediaTrack`].
+  Object setNoiseSuppressionEnabled({required bool enabled});
+
+  /// Sets [`NoiseSuppressionLevel`] for this [`LocalMediaTrack`].
+  Object setNoiseSuppressionLevel({required NoiseSuppressionLevel level});
 
   /// Returns a [`media::MediaStreamTrackState::Live`] if this
   /// [`LocalMediaTrack`] is active, or a

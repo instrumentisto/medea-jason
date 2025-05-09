@@ -25,6 +25,17 @@ void registerFunctions(DynamicLibrary dl) {
     dispose: _dispose,
     onAudioLevelChanged: _onAudioLevelChanged,
     isOnAudioLevelAvailable: _isOnAudioLevelAvailable,
+    isAudioProcessingAvailable: _isAudioProcessingAvailable,
+    setNoiseSuppressionEnabled: _setNoiseSuppressionEnabled,
+    setNoiseSuppressionLevel: _setNoiseSuppressionLevel,
+    setEchoCancellationEnabled: _setEchoCancellationEnabled,
+    setAutoGainControlEnabled: _setAutoGainControlEnabled,
+    setHighPassFilterEnabled: _setHighPassFilterEnabled,
+    isNoiseSuppressionEnabled: _isNoiseSuppressionEnabled,
+    getNoiseSuppressionLevel: _getNoiseSuppressionLevel,
+    isAutoGainControlEnabled: _isAutoGainControlEnabled,
+    isEchoCancellationEnabled: _isEchoCancellationEnabled,
+    isHighPassFilterEnabled: _isHighPassFilterEnabled,
   );
 }
 
@@ -133,4 +144,85 @@ Future<MediaStreamTrack> Function() _clone(Object track) {
 Future<void> Function() _dispose(Object track) {
   track as MediaStreamTrack;
   return () => track.dispose();
+}
+
+bool _isAudioProcessingAvailable(Object track) {
+  track as MediaStreamTrack;
+
+  return track.isAudioProcessingAvailable();
+}
+
+Future<void> Function() _setNoiseSuppressionEnabled(
+  Object track,
+  bool enabled,
+) {
+  track as MediaStreamTrack;
+
+  return () => track.setNoiseSuppressionEnabled(enabled);
+}
+
+Future<void> Function() _setNoiseSuppressionLevel(Object track, int level) {
+  track as MediaStreamTrack;
+
+  return () =>
+      track.setNoiseSuppressionLevel(NoiseSuppressionLevel.values[level]);
+}
+
+Future<void> Function() _setEchoCancellationEnabled(
+  Object track,
+  bool enabled,
+) {
+  track as MediaStreamTrack;
+
+  return () => track.setEchoCancellationEnabled(enabled);
+}
+
+Future<void> Function() _setAutoGainControlEnabled(Object track, bool enabled) {
+  track as MediaStreamTrack;
+
+  return () => track.setAutoGainControlEnabled(enabled);
+}
+
+Future<void> Function() _setHighPassFilterEnabled(Object track, bool enabled) {
+  track as MediaStreamTrack;
+
+  return () => track.setHighPassFilterEnabled(enabled);
+}
+
+Future<bool> Function() _isNoiseSuppressionEnabled(Object track) {
+  track as MediaStreamTrack;
+
+  return () async {
+    return await track.isNoiseSuppressionEnabled();
+  };
+}
+
+Future<int> Function() _getNoiseSuppressionLevel(Object track) {
+  track as MediaStreamTrack;
+
+  return () => track.getNoiseSuppressionLevel().then((s) => s.index);
+}
+
+Future<bool> Function() _isAutoGainControlEnabled(Object track) {
+  track as MediaStreamTrack;
+
+  return () async {
+    return await track.isAutoGainControlEnabled();
+  };
+}
+
+Future<bool> Function() _isEchoCancellationEnabled(Object track) {
+  track as MediaStreamTrack;
+
+  return () async {
+    return await track.isEchoCancellationEnabled();
+  };
+}
+
+Future<bool> Function() _isHighPassFilterEnabled(Object track) {
+  track as MediaStreamTrack;
+
+  return () async {
+    return await track.isHighPassFilterEnabled();
+  };
 }

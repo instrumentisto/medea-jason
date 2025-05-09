@@ -32,7 +32,14 @@ enum VideoConstraintKind { facingMode, deviceId, width, height, frameRate }
 /// Kind of a [MediaStreamConstraints.audio][0] setting.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
-enum AudioConstraintKind { deviceId, autoGainControl }
+enum AudioConstraintKind {
+  deviceId,
+  autoGainControl,
+  noiseSuppression,
+  noiseSuppressionLevel,
+  highPassFilter,
+  echoCancellation,
+}
 
 /// Indicates necessity of a [AudioConstraints] or [VideoConstraints] setting.
 ///
@@ -95,7 +102,15 @@ void _setAudioConstraintValue(Object cons, int kind, ForeignValue value) {
       cons.deviceId = value.toDart() as String;
     case AudioConstraintKind.autoGainControl:
       cons.autoGainControl = value.toDart() as bool;
-      break;
+    case AudioConstraintKind.noiseSuppression:
+      cons.noiseSuppression = value.toDart() as bool;
+    case AudioConstraintKind.noiseSuppressionLevel:
+      cons.noiseSuppressionLevel =
+          webrtc.NoiseSuppressionLevel.values[value.toDart() as int];
+    case AudioConstraintKind.highPassFilter:
+      cons.highPassFilter = value.toDart() as bool;
+    case AudioConstraintKind.echoCancellation:
+      cons.echoCancellation = value.toDart() as bool;
   }
 }
 
