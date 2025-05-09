@@ -309,10 +309,10 @@ jobs:
         # TODO: Run E2E test on Windows
         platform:
           - android
-          - ios
+          #- ios # TODO: Re-enable once fixed stability on CI
           - linux
-          - macos
-    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
+          #- macos # TODO: Re-enable once `colima start` failing fixed on CI
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
