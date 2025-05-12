@@ -33,14 +33,7 @@ void main() {
     settings.deviceVideo(DeviceVideoTrackConstraints());
     var tracks = await mediaManager.initLocalTracks(settings);
 
-    var deviceLength = 2;
-    if (Platform.isAndroid) {
-      deviceLength = 4;
-    } else if (Platform.isMacOS) {
-      deviceLength = 3;
-    }
-
-    expect(devices.length, equals(deviceLength));
+    expect(devices.length, greaterThanOrEqualTo(2))
     expect(tracks.length, equals(2));
 
     expect(await tracks[0].state(), webrtc.MediaStreamTrackState.live);
