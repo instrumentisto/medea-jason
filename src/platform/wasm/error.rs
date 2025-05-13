@@ -1,6 +1,6 @@
 //! More convenient wrapper for [`js_sys::Error`].
 
-use derive_more::with_trait::Display;
+use derive_more::with_trait::{Display, From};
 use wasm_bindgen::{
     JsCast as _, JsValue,
     convert::{IntoWasmAbi, OptionIntoWasmAbi},
@@ -8,7 +8,7 @@ use wasm_bindgen::{
 };
 
 /// Wrapper for JS value which returned from JS side as error.
-#[derive(Clone, Debug, Display, Eq, PartialEq)]
+#[derive(Clone, Debug, Display, Eq, PartialEq, From)]
 #[display("{}", _0.to_string())] // this method is not `ToString::to_string()`
 pub struct Error(js_sys::Error);
 

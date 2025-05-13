@@ -6,7 +6,7 @@ use std::{cell::RefCell, rc::Rc, time::Duration};
 
 use derive_more::{Debug, with_trait::AsRef};
 use futures::{StreamExt as _, future, stream::LocalBoxStream};
-use js_sys::Reflect;
+use js_sys::{Error as JsError, Reflect};
 use medea_reactive::ObservableCell;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
@@ -16,8 +16,7 @@ use crate::{
         FacingMode, MediaKind, MediaSourceKind, NoiseSuppressionLevel,
         track::MediaStreamTrackState,
     },
-    platform,
-    platform::{Error, wasm::utils::EventListener},
+    platform::{self, wasm::utils::EventListener},
 };
 
 /// Wrapper around [MediaStreamTrack][1] received from a
@@ -385,8 +384,12 @@ impl MediaStreamTrack {
         let fut = self
             .sys_track
             .apply_constraints_with_constraints(&caps)
-            .map_err(Error::from)?;
-        JsFuture::from(fut).await.map_err(Error::from)?;
+            .map_err(platform::Error::from)?;
+        JsFuture::from(fut).await.map_err(platform::Error::from)?;
+
+        if self.is_noise_suppression_enabled().await? != enabled {
+            return Err(JsError::new("not supported").into());
+        }
 
         Ok(())
     }
@@ -406,8 +409,13 @@ impl MediaStreamTrack {
         let fut = self
             .sys_track
             .apply_constraints_with_constraints(&caps)
-            .map_err(Error::from)?;
-        JsFuture::from(fut).await.map_err(Error::from)?;
+            .map_err(platform::Error::from)?;
+        JsFuture::from(fut).await.map_err(platform::Error::from)?;
+
+        // This might not have worked, so we are checking to make sure
+        if self.is_auto_gain_control_enabled().await? != enabled {
+            return Err(JsError::new("not supported").into());
+        }
 
         Ok(())
     }
@@ -428,8 +436,13 @@ impl MediaStreamTrack {
         let fut = self
             .sys_track
             .apply_constraints_with_constraints(&caps)
-            .map_err(Error::from)?;
-        JsFuture::from(fut).await.map_err(Error::from)?;
+            .map_err(platform::Error::from)?;
+        JsFuture::from(fut).await.map_err(platform::Error::from)?;
+
+        // This might not have worked, so we are checking to make sure
+        if self.is_echo_cancellation_enabled().await? != enabled {
+            return Err(JsError::new("not supported").into());
+        }
 
         Ok(())
     }

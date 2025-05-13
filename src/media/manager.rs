@@ -171,7 +171,7 @@ impl From<LocalTrackIsEndedError> for GetDisplayMediaError {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct MediaManager(Rc<InnerMediaManager>);
 
 /// Actual data of [`MediaManager`].

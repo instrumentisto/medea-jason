@@ -73,8 +73,27 @@ class WebLocalMediaTrack implements LocalMediaTrack {
 
   @override
   Future<void> setEchoCancellationEnabled(bool enabled) async {
-    // TODO: implement setEchoCancellationEnabled
-    throw UnimplementedError();
+    await fallibleFuture(obj.set_echo_cancellation_enabled(enabled).toDart);
+  }
+
+  @override
+  Future<void> setNoiseSuppressionEnabled(bool enabled) async {
+    await fallibleFuture(obj.set_noise_suppression_enabled(enabled).toDart);
+  }
+
+  @override
+  Future<bool> isAutoGainControlEnabled() async {
+    return (await fallibleFuture(obj.is_auto_gain_control_enabled().toDart)).toDart;
+  }
+
+  @override
+  Future<bool> isEchoCancellationEnabled() async {
+    return (await fallibleFuture(obj.is_echo_cancellation_enabled().toDart)).toDart;
+  }
+
+  @override
+  Future<bool> isNoiseSuppressionEnabled() async {
+    return (await fallibleFuture(obj.is_noise_suppression_enabled().toDart)).toDart;
   }
 
   @override
@@ -82,13 +101,6 @@ class WebLocalMediaTrack implements LocalMediaTrack {
     // TODO: implement setHighPassFilterEnabled
     throw UnimplementedError();
   }
-
-  @override
-  Future<void> setNoiseSuppressionEnabled(bool enabled) async {
-    // TODO: implement setNoiseSuppressionEnabled
-    throw UnimplementedError();
-  }
-
   @override
   Future<void> setNoiseSuppressionLevel(NoiseSuppressionLevel enabled) async {
     // TODO: implement setNoiseSuppressionLevel
@@ -100,28 +112,9 @@ class WebLocalMediaTrack implements LocalMediaTrack {
     // TODO: implement getNoiseSuppressionLevel
     throw UnimplementedError();
   }
-
-  @override
-  Future<bool> isAutoGainControlEnabled() async {
-    // TODO: implement isAutoGainControlEnabled
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> isEchoCancellationEnabled() async {
-    // TODO: implement isEchoCancellationEnabled
-    throw UnimplementedError();
-  }
-
   @override
   Future<bool> isHighPassFilterEnabled() async {
     // TODO: implement isHighPassFilterEnabled
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> isNoiseSuppressionEnabled() async {
-    // TODO: implement isNoiseSuppressionEnabled
     throw UnimplementedError();
   }
 }

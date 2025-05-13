@@ -215,60 +215,30 @@
   <div class="remote-videos d-flex flex-row flex-wrap justify-content-center">
   </div>
 
-  <div class="footer container">
-    <div id="local-video" class="local-video video"></div>
-    <div class="col-sm">
+  <div class="footer m-3">
+    <div id="local-video" class="local-video video">
+    </div>
+    <div class="mb-3">
       <button id="control__disable_audio_send" class="btn btn-secondary">Disable audio send</button>
       <button id="control__disable_video_send" class="btn btn-secondary">Disable video send</button>
     </div>
-    <div class="col-sm">
+    <div class="mb-3">
       <button id="control__disable_audio_recv" class="btn btn-secondary">Disable audio recv</button>
       <button id="control__disable_video_recv" class="btn btn-secondary">Disable video recv</button>
-    </div>
-    <div class="col-sm">
       <button id="control__disable_display_video_recv" class="btn btn-secondary">Disable display video recv</button>
       <button id="control__disable_camera_video_recv" class="btn btn-secondary">Disable camera video recv</button>
     </div>
-    <div class="col-sm">
+    <div class="mb-3">
       <button id="control__mute_audio_send" class="btn btn-secondary">Mute audio send</button>
       <button id="control__mute_video_send" class="btn btn-secondary">Mute video send</button>
     </div>
-    <div class="col-sm">
-      <button type="button"
-              class="btn btn-secondary"
-              data-toggle="modal"
-              data-target="#devices-settings">
-        Devices
-      </button>
-      <button id="control__close_app" class="btn btn-danger">Dispose</button>
-    </div>
-    <div class="col-sm">
-      <div>
-        <input class="form-check-input" type="checkbox" id="checkbox1">
-        <label class="form-check-label" for="checkbox1">
-          Option 1
-        </label>
-      </div>
-      <div>
-        <input class="form-check-input" type="checkbox" id="checkbox2">
-        <label class="form-check-label" for="checkbox2">
-          Option 2
-        </label>
-      </div>
-      <div>
-        <input class="form-check-input" type="checkbox" id="checkbox3">
-        <label class="form-check-label" for="checkbox3">
-          Option 3
-        </label>
-      </div>
-      <div>
-        <input class="form-check-input" type="checkbox" id="checkbox4">
-        <label class="form-check-label" for="checkbox4">
-          Option 4
-        </label>
-      </div>
-    </div>
-
+    <button type="button"
+            class="btn btn-secondary"
+            data-toggle="modal"
+            data-target="#devices-settings">
+      Devices
+    </button>
+    <button id="control__close_app" class="btn btn-danger">Dispose</button>
   </div>
 
   <div class="modal fade"
