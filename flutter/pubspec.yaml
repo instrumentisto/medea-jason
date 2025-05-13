@@ -1,6 +1,6 @@
 name: medea_jason
 description: Cross-platform client library of Medea media server for Flutter.
-version: 0.9.1
+version: 0.9.2-dev
 homepage: https://github.com/instrumentisto/medea-jason/blob/master/flutter
 
 environment:
@@ -17,6 +17,7 @@ dependencies:
   js_interop_utils: ^1.0.7
   json_annotation: ^4.9.0
   medea_flutter_webrtc: 0.13.4-dev+rev.170d6d8c73a72e0012a3c0c578c4b259021ca1fb
+  plugin_platform_interface: ^2.0.2
   retry: ^3.1.2
   tuple: ^2.0.2
   uuid: ^4.4.2
@@ -56,6 +57,6 @@ flutter:
       macos:
         pluginClass: MedeaJasonPlugin
       windows:
-        pluginClass: MedeaJasonPlugin
+        pluginClass: MedeaJasonPluginCApi
   assets:
     - assets/pkg/
