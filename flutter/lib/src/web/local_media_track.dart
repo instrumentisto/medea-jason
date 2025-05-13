@@ -83,38 +83,42 @@ class WebLocalMediaTrack implements LocalMediaTrack {
 
   @override
   Future<bool> isAutoGainControlEnabled() async {
-    return (await fallibleFuture(obj.is_auto_gain_control_enabled().toDart)).toDart;
+    return (await fallibleFuture(
+      obj.is_auto_gain_control_enabled().toDart,
+    )).toDart;
   }
 
   @override
   Future<bool> isEchoCancellationEnabled() async {
-    return (await fallibleFuture(obj.is_echo_cancellation_enabled().toDart)).toDart;
+    return (await fallibleFuture(
+      obj.is_echo_cancellation_enabled().toDart,
+    )).toDart;
   }
 
   @override
   Future<bool> isNoiseSuppressionEnabled() async {
-    return (await fallibleFuture(obj.is_noise_suppression_enabled().toDart)).toDart;
+    return (await fallibleFuture(
+      obj.is_noise_suppression_enabled().toDart,
+    )).toDart;
   }
 
   @override
-  Future<void> setHighPassFilterEnabled(bool enabled) async {
-    // TODO: implement setHighPassFilterEnabled
-    throw UnimplementedError();
-  }
-  @override
   Future<void> setNoiseSuppressionLevel(NoiseSuppressionLevel enabled) async {
-    // TODO: implement setNoiseSuppressionLevel
-    throw UnimplementedError();
+    throw UnsupportedError('setNoiseSuppressionLevel in not supported on web');
   }
 
   @override
   Future<NoiseSuppressionLevel> getNoiseSuppressionLevel() async {
-    // TODO: implement getNoiseSuppressionLevel
-    throw UnimplementedError();
+    throw UnsupportedError('getNoiseSuppressionLevel in not supported on web');
   }
+
+  @override
+  Future<void> setHighPassFilterEnabled(bool enabled) async {
+    throw UnsupportedError('setHighPassFilterEnabled in not supported on web');
+  }
+
   @override
   Future<bool> isHighPassFilterEnabled() async {
-    // TODO: implement isHighPassFilterEnabled
-    throw UnimplementedError();
+    throw UnsupportedError('isHighPassFilterEnabled in not supported on web');
   }
 }
