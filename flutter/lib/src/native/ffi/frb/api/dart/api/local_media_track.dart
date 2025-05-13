@@ -46,7 +46,8 @@ abstract class LocalMediaTrack implements RustOpaqueInterface, ForeignClass {
   /// Indicates whether audio processing-related function are supported for
   /// this [`LocalMediaTrack`].
   ///
-  /// Only supported for local audio [MediaStreamTrack]s on web and desktop platforms.
+  /// Only supported for local audio [MediaStreamTrack]s on web and desktop
+  /// platforms.
   bool isAudioProcessingAvailable();
 
   /// Indicates whether automatic gain control is enabled for this

@@ -5709,7 +5709,8 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
   /// Indicates whether audio processing-related function are supported for
   /// this [`LocalMediaTrack`].
   ///
-  /// Only supported for local audio [MediaStreamTrack]s on web and desktop platforms.
+  /// Only supported for local audio [MediaStreamTrack]s on web and desktop
+  /// platforms.
   bool isAudioProcessingAvailable() => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackIsAudioProcessingAvailable(
         that: this,

@@ -77,3 +77,18 @@ enum MediaSourceKind {
   /// Media is obtained with screen-capture.
   display,
 }
+
+/// Audio processing noise suppression aggressiveness.
+enum NoiseSuppressionLevel {
+  /// Minimal noise suppression.
+  low,
+
+  /// Moderate level of suppression.
+  moderate,
+
+  /// Aggressive noise suppression.
+  high,
+
+  /// Maximum suppression.
+  veryHigh,
+}

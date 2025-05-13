@@ -1085,7 +1085,6 @@ impl AudioTrackConstraints {
     /// if some constraints are not set on these ones, then they will be applied
     /// from `another`.
     pub fn merge(&mut self, another: Self) {
-        // asdasdasdasdasdasd
         if self.device_id.is_none() && another.device_id.is_some() {
             self.device_id = another.device_id;
         }

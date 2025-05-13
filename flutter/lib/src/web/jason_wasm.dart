@@ -119,7 +119,7 @@ extension type MediaDeviceDetails._(JSObject _) implements JSObject {
 extension type InternalException._(JSObject _) implements JSObject {
   external void free();
   external String message();
-  external String cause();
+  external JSObject cause();
   external String trace();
 }
 

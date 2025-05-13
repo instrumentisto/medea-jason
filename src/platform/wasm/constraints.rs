@@ -58,10 +58,9 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
             constraints
                 .set_device_id(&ConstrainDomStringParameters::from(&device_id));
         }
-        if let Some(auto_gain_control) = track_constraints.auto_gain_control {
-            constraints.set_auto_gain_control(
-                &ConstrainBooleanParameters::from(auto_gain_control),
-            );
+        if let Some(agc) = track_constraints.auto_gain_control {
+            constraints
+                .set_auto_gain_control(&ConstrainBooleanParameters::from(agc));
         }
         if let Some(aec) = track_constraints.echo_cancellation {
             constraints
