@@ -67,40 +67,54 @@ abstract class LocalMediaTrack implements MediaTrack {
 
   /// Indicates whether updating audio processing configuration is supported
   /// for this [LocalMediaTrack], which is done via following functions:
+  /// - [LocalMediaTrack.isNoiseSuppressionEnabled]
   /// - [LocalMediaTrack.setNoiseSuppressionEnabled]
+  /// - [LocalMediaTrack.getNoiseSuppressionLevel]
   /// - [LocalMediaTrack.setNoiseSuppressionLevel]
+  /// - [LocalMediaTrack.isEchoCancellationEnabled]
   /// - [LocalMediaTrack.setEchoCancellationEnabled]
+  /// - [LocalMediaTrack.isAutoGainControlEnabled]
   /// - [LocalMediaTrack.setAutoGainControlEnabled]
+  /// - [LocalMediaTrack.isHighPassFilterEnabled]
   /// - [LocalMediaTrack.setHighPassFilterEnabled]
+  ///
+  /// This is only available for local audio tracks on web and desktop. Noise
+  /// suppression level and high pass filter are only available on desktop.
+  ///
+  /// Additionally, updating echo cancellation, noise suppression and auto gain
+  /// control in runtime is unsupported by Chromium-based agents (as of v136).
+  /// So [RoomHandle.setLocalMediaSettings] should be used in this case. Safari
+  /// and Firefox are fine.
   bool isAudioProcessingAvailable();
 
   /// Enabled or disables noise suppression for this [LocalMediaTrack].
   ///
-  /// Throws an [InternalException] on unexpected platform error.
+  /// Throws an [InternalException] on unexpected platform error. Not supported
+  /// by Chromium-based agents (as of v136).
   Future<void> setNoiseSuppressionEnabled(bool enabled);
 
   /// Configures disables noise suppression level for this [LocalMediaTrack].
   ///
-  /// Not supported on WEB but won't throw if called.
-  ///
-  /// Throws an [InternalException] on unexpected platform error.
+  /// Throws an [InternalException] on unexpected platform error. __Always__
+  /// throws on web.
   Future<void> setNoiseSuppressionLevel(NoiseSuppressionLevel level);
 
   /// Enabled or disables acoustic echo cancellation for this [LocalMediaTrack].
   ///
-  /// Throws an [InternalException] on unexpected platform error.
+  /// Throws an [InternalException] on unexpected platform error. Not supported
+  /// by Chromium-based agents (as of v136).
   Future<void> setEchoCancellationEnabled(bool enabled);
 
   /// Enabled or disables automatic gain control for this [LocalMediaTrack].
   ///
-  /// Throws an [InternalException] on unexpected platform error.
+  /// Throws an [InternalException] on unexpected platform error. Not supported
+  /// by Chromium-based agents (as of v136).
   Future<void> setAutoGainControlEnabled(bool enabled);
 
   /// Enabled or disables high pass filter for this [LocalMediaTrack].
   ///
-  /// Not supported on WEB but won't throw if called.
-  ///
-  /// Throws an [InternalException] on unexpected platform error.
+  /// Throws an [InternalException] on unexpected platform error. __Always__
+  /// throws on web.
   Future<void> setHighPassFilterEnabled(bool enabled);
 
   /// Enabled or disables noise suppression for this [LocalMediaTrack].
@@ -109,15 +123,25 @@ abstract class LocalMediaTrack implements MediaTrack {
   Future<bool> isNoiseSuppressionEnabled();
 
   /// Configures disables noise suppression level for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error. __Always__
+  /// throws on web.
   Future<NoiseSuppressionLevel> getNoiseSuppressionLevel();
 
   /// Enabled or disables acoustic echo cancellation for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
   Future<bool> isEchoCancellationEnabled();
 
   /// Enabled or disables automatic gain control for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
   Future<bool> isAutoGainControlEnabled();
 
   /// Enabled or disables high pass filter for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error. __Always__
+  /// throws on web.
   Future<bool> isHighPassFilterEnabled();
 }
 

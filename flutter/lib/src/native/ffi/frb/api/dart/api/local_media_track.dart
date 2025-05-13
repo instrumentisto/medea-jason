@@ -34,6 +34,7 @@ abstract class LocalMediaTrack implements RustOpaqueInterface, ForeignClass {
   static LocalMediaTrack fromPtr({required int ptr}) => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackFromPtr(ptr: ptr);
 
+  /// Returns configured noise suppression level for this [`LocalMediaTrack`].
   Object getNoiseSuppressionLevel();
 
   /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of the
@@ -42,23 +43,26 @@ abstract class LocalMediaTrack implements RustOpaqueInterface, ForeignClass {
   /// [`MediaStreamTrack`]: platform::MediaStreamTrack
   Object getTrack();
 
-  /// Indicates whether the following function are supported for this
-  /// [`LocalMediaTrack`]:
-  /// - [`LocalMediaTrack::set_noise_suppression_enabled`]
-  /// - [`LocalMediaTrack::set_noise_suppression_level`]
-  /// - [`LocalMediaTrack::set_echo_cancellation_enabled`]
-  /// - [`LocalMediaTrack::set_auto_gain_control_enabled`]
-  /// - [`LocalMediaTrack::set_high_pass_filter_enabled`]
+  /// Indicates whether audio processing-related function are supported for
+  /// this [`LocalMediaTrack`].
   ///
-  /// Only supported for local audio [MediaStreamTrack]s on desktop platforms.
+  /// Only supported for local audio [MediaStreamTrack]s on web and desktop platforms.
   bool isAudioProcessingAvailable();
 
+  /// Indicates whether automatic gain control is enabled for this
+  /// [`LocalMediaTrack`].
   Object isAutoGainControlEnabled();
 
+  /// Indicates whether echo cancellation is enabled for this
+  /// [`LocalMediaTrack`].
   Object isEchoCancellationEnabled();
 
+  /// Indicates whether high pass filter is enabled for this
+  /// [`LocalMediaTrack`].
   Object isHighPassFilterEnabled();
 
+  /// Indicates whether noise suppression is enabled for this
+  /// [`LocalMediaTrack`].
   Object isNoiseSuppressionEnabled();
 
   /// Indicates whether an `OnAudioLevelChangedCallback` is supported for this

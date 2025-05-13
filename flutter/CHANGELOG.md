@@ -6,6 +6,30 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [master] · unreleased
+[master]: https://github.com/instrumentisto/medea-jason/tree/master/flutter
+
+See also [`medea-jason` crate `master` changes](https://github.com/instrumentisto/medea-jason/tree/master/CHANGELOG.md).
+
+### Added
+
+- Options to configure audio processing when creating local audio track: ([#206])
+    - `AudioTrackConstraints.exactEchoCancellation`, `AudioTrackConstraints.idealEchoCancellation` to configure echo cancellation;
+    - `AudioTrackConstraints.exactNoiseSuppression`, `AudioTrackConstraints.idealNoiseSuppression`, `AudioTrackConstraints.noiseSuppressionLevel` to configure noise suppression;
+    - `AudioTrackConstraints.exactHighPassFilter`, `AudioTrackConstraints.idealHighPassFilter` to configure high pass filter.
+- Ability to inspect and configure audio processing for a local audio track in runtime: ([#206])
+    - `LocalMediaTrack.isAudioProcessingAvailable` to check if audio processing is available for the given track;
+    - `LocalMediaTrack.setNoiseSuppressionEnabled`, `LocalMediaTrack.isNoiseSuppressionEnabled` to inspect and enable/disable noise suppression (supported on web and desktop platforms);
+    - `LocalMediaTrack.setEchoCancellationEnabled`, `LocalMediaTrack.isEchoCancellationEnabled` to inspect and enable/disable echo cancellation (supported on web and desktop platforms);
+    - `LocalMediaTrack.setAutoGainControlEnabled`, `LocalMediaTrack.isAutoGainControlEnabled` to inspect and enable/disable automatic gain control (supported on web and desktop platforms);
+    - `LocalMediaTrack.setNoiseSuppressionLevel`, `LocalMediaTrack.getNoiseSuppressionLevel` to inspect and configure noise suppression level (only supported on desktop platforms);
+    - `LocalMediaTrack.setHighPassFilterEnabled`, `LocalMediaTrack.isHighPassFilterEnabled` to inspect and enable/disable high pass filter (only supported on desktop platforms).
+
+[#206]: https://github.com/instrumentisto/medea-jason/pull/206
+
+
+
+
 ## [0.9.1] · 2025-04-11
 [0.9.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.9.1/flutter
 

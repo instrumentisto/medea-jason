@@ -41,12 +41,6 @@ class AudioTrackConstraints implements base.AudioTrackConstraints {
     fallibleFunction(() => obj.exact_noise_suppression(noiseSuppression));
   }
 
-  @moveSemantics
-  @override
-  void free() {
-    obj.free();
-  }
-
   @override
   void exactHighPassFilter(bool autoGainControl) {
     // Not supported on web.
@@ -60,5 +54,11 @@ class AudioTrackConstraints implements base.AudioTrackConstraints {
   @override
   void noiseSuppressionLevel(base.NoiseSuppressionLevel noiseSuppressionLevel) {
     // Not supported on web.
+  }
+
+  @moveSemantics
+  @override
+  void free() {
+    obj.free();
   }
 }

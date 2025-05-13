@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
 
 use crate::{
-    api::{self, MediaKind, MediaSourceKind},
+    api::{self, LocalMediaTrack, MediaKind, MediaSourceKind},
     media::track::local,
 };
 
@@ -86,13 +86,11 @@ impl LocalMediaTrack {
             .map_err(Into::into)
     }
 
-    /// Indicates whether the following function are supported for this
-    /// [LocalMediaTrack]:
-    /// - [`LocalMediaTrack::set_noise_suppression_enabled`]
-    /// - [`LocalMediaTrack::set_echo_cancellation_enabled`]
-    /// - [`LocalMediaTrack::set_auto_gain_control_enabled`]
+    /// Indicates whether audio processing-related function are supported for
+    /// this [`LocalMediaTrack`].
     ///
-    /// Only supported for local audio [MediaStreamTrack]s on desktop platforms.
+    /// Only supported for local audio [MediaStreamTrack]s on web and desktop
+    /// platforms.
     #[must_use]
     pub fn is_audio_processing_available(&self) -> bool {
         self.0.is_audio_processing_available()

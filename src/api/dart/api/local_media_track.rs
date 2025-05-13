@@ -114,15 +114,11 @@ impl LocalMediaTrack {
         self.0.media_source_kind()
     }
 
-    /// Indicates whether the following function are supported for this
-    /// [`LocalMediaTrack`]:
-    /// - [`LocalMediaTrack::set_noise_suppression_enabled`]
-    /// - [`LocalMediaTrack::set_noise_suppression_level`]
-    /// - [`LocalMediaTrack::set_echo_cancellation_enabled`]
-    /// - [`LocalMediaTrack::set_auto_gain_control_enabled`]
-    /// - [`LocalMediaTrack::set_high_pass_filter_enabled`]
+    /// Indicates whether audio processing-related function are supported for
+    /// this [`LocalMediaTrack`].
     ///
-    /// Only supported for local audio [MediaStreamTrack]s on desktop platforms.
+    /// Only supported for local audio [MediaStreamTrack]s on web and desktop
+    /// platforms.
     #[frb(sync)]
     pub fn is_audio_processing_available(&self) -> bool {
         self.0.is_audio_processing_available()
@@ -195,6 +191,8 @@ impl LocalMediaTrack {
         .into_dart_opaque()
     }
 
+    /// Indicates whether noise suppression is enabled for this
+    /// [`LocalMediaTrack`].
     #[frb(sync)]
     pub fn is_noise_suppression_enabled(&self) -> DartOpaque {
         let this = self.0.clone();
@@ -207,6 +205,7 @@ impl LocalMediaTrack {
         .into_dart_opaque()
     }
 
+    /// Returns configured noise suppression level for this [`LocalMediaTrack`].
     #[frb(sync)]
     pub fn get_noise_suppression_level(&self) -> DartOpaque {
         let this = self.0.clone();
@@ -222,6 +221,8 @@ impl LocalMediaTrack {
         .into_dart_opaque()
     }
 
+    /// Indicates whether automatic gain control is enabled for this
+    /// [`LocalMediaTrack`].
     #[frb(sync)]
     pub fn is_auto_gain_control_enabled(&self) -> DartOpaque {
         let this = self.0.clone();
@@ -234,6 +235,8 @@ impl LocalMediaTrack {
         .into_dart_opaque()
     }
 
+    /// Indicates whether echo cancellation is enabled for this
+    /// [`LocalMediaTrack`].
     #[frb(sync)]
     pub fn is_echo_cancellation_enabled(&self) -> DartOpaque {
         let this = self.0.clone();
@@ -246,6 +249,8 @@ impl LocalMediaTrack {
         .into_dart_opaque()
     }
 
+    /// Indicates whether high pass filter is enabled for this
+    /// [`LocalMediaTrack`].
     #[frb(sync)]
     pub fn is_high_pass_filter_enabled(&self) -> DartOpaque {
         let this = self.0.clone();

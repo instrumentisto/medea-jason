@@ -40,20 +40,18 @@ abstract class AudioTrackConstraints implements SyncPlatformHandle {
   /// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-noisesuppression
   void idealNoiseSuppression(bool noiseSuppression);
 
-  /// Sets an exact [noiseSuppression][1] level constraint.
+  /// Constrains [`NoiseSuppressionLevel`].
   ///
-  /// __NOTE__: This is only supported on desktop platforms.
-  ///
-  /// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-noisesuppression
+  /// __NOTE__: Only supported on desktop platforms, ignored otherwise.
   void noiseSuppressionLevel(NoiseSuppressionLevel noiseSuppressionLevel);
 
-  /// Sets an exact [autoGainControl][1] constraint.
+  /// Sets an exact high pass filter constraint.
   ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
+  /// __NOTE__: Only supported on desktop platforms, ignored otherwise.
   void exactHighPassFilter(bool autoGainControl);
 
-  /// Sets an ideal [autoGainControl][1] constraint.
+  /// Sets an ideal high pass filter constraint.
   ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
+  /// __NOTE__: Only supported on desktop platforms, ignored otherwise.
   void idealHighPassFilter(bool autoGainControl);
 }
