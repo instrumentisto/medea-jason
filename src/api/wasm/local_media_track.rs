@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
 
 use crate::{
-    api::{self, LocalMediaTrack, MediaKind, MediaSourceKind},
+    api::{self, MediaKind, MediaSourceKind},
     media::track::local,
 };
 
