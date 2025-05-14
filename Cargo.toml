@@ -100,7 +100,7 @@ wasm-logger = "0.2"
         "DisplayMediaStreamConstraints",
         "Event", "EventTarget",
         "MediaDevices","MediaDeviceInfo", "MediaDeviceKind",
-        "MediaTrackConstraints", "MediaTrackSettings", "MediaTrackCapabilities",
+        "MediaTrackCapabilities", "MediaTrackConstraints", "MediaTrackSettings",
         "MediaStream", "MediaStreamConstraints",
         "MediaStreamAudioSourceNode",
         "MediaStreamTrack", "MediaStreamTrackState",

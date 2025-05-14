@@ -6,24 +6,23 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [master] · unreleased
-[master]: https://github.com/instrumentisto/medea-jason/tree/master/flutter
+## master
 
 See also [`medea-jason` crate `master` changes](https://github.com/instrumentisto/medea-jason/tree/master/CHANGELOG.md).
 
 ### Added
 
 - Options to configure audio processing when creating local audio track: ([#206])
-    - `AudioTrackConstraints.exactEchoCancellation`, `AudioTrackConstraints.idealEchoCancellation` to configure echo cancellation;
-    - `AudioTrackConstraints.exactNoiseSuppression`, `AudioTrackConstraints.idealNoiseSuppression`, `AudioTrackConstraints.noiseSuppressionLevel` to configure noise suppression;
-    - `AudioTrackConstraints.exactHighPassFilter`, `AudioTrackConstraints.idealHighPassFilter` to configure high pass filter.
-- Ability to inspect and configure audio processing for a local audio track in runtime: ([#206])
-    - `LocalMediaTrack.isAudioProcessingAvailable` to check if audio processing is available for the given track;
-    - `LocalMediaTrack.setNoiseSuppressionEnabled`, `LocalMediaTrack.isNoiseSuppressionEnabled` to inspect and enable/disable noise suppression (supported on web and desktop platforms);
-    - `LocalMediaTrack.setEchoCancellationEnabled`, `LocalMediaTrack.isEchoCancellationEnabled` to inspect and enable/disable echo cancellation (supported on web and desktop platforms);
-    - `LocalMediaTrack.setAutoGainControlEnabled`, `LocalMediaTrack.isAutoGainControlEnabled` to inspect and enable/disable automatic gain control (supported on web and desktop platforms);
-    - `LocalMediaTrack.setNoiseSuppressionLevel`, `LocalMediaTrack.getNoiseSuppressionLevel` to inspect and configure noise suppression level (only supported on desktop platforms);
-    - `LocalMediaTrack.setHighPassFilterEnabled`, `LocalMediaTrack.isHighPassFilterEnabled` to inspect and enable/disable high pass filter (only supported on desktop platforms).
+    - `AudioTrackConstraints.exactEchoCancellation`, `AudioTrackConstraints.idealEchoCancellation` to configure echo cancellation.
+    - `AudioTrackConstraints.exactNoiseSuppression`, `AudioTrackConstraints.idealNoiseSuppression`, `AudioTrackConstraints.noiseSuppressionLevel` to configure noise suppression.
+    - `AudioTrackConstraints.exactHighPassFilter`, `AudioTrackConstraints.idealHighPassFilter` to configure high-pass filter.
+- Ability to inspect and configure audio processing for a audio `LocalMediaTrack` in runtime: ([#206])
+    - `LocalMediaTrack.isAudioProcessingAvailable()` indicating if audio processing is available.
+    - `LocalMediaTrack.setNoiseSuppressionEnabled()`, `LocalMediaTrack.isNoiseSuppressionEnabled()` to inspect and toggle noise suppression (supported on web and desktop platforms).
+    - `LocalMediaTrack.setEchoCancellationEnabled()`, `LocalMediaTrack.isEchoCancellationEnabled()` to inspect and toggle echo cancellation (supported on web and desktop platforms).
+    - `LocalMediaTrack.setAutoGainControlEnabled()`, `LocalMediaTrack.isAutoGainControlEnabled()` to inspect and toggle auto gain control (supported on web and desktop platforms).
+    - `LocalMediaTrack.setNoiseSuppressionLevel()`, `LocalMediaTrack.getNoiseSuppressionLevel()` to inspect and configure noise suppression level (only supported on desktop platforms).
+    - `LocalMediaTrack.setHighPassFilterEnabled()`, `LocalMediaTrack.isHighPassFilterEnabledO()` to inspect and toggle high-pass filter (only supported on desktop platforms).
 
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
 

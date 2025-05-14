@@ -143,16 +143,16 @@ mod audio_processing {
 
     #[wasm_bindgen_test]
     async fn check_chromium_apply_constraints() {
-        // Check that MediaStreamTrack.applyConstraints cannot update audio
-        // processing in Chrome. So when this test will fail it will mean that
-        // it is fixed in Chrome.
+        // Check that `MediaStreamTrack.applyConstraints()` cannot update audio
+        // processing in Chrome. So, once this test fails it will mean that it's
+        // fixed in Chrome.
 
-        // TODO: Add tests for changing audio processing in Runtime when any of
+        // TODO: Add tests for changing audio processing in runtime when any of
         //       this happens:
         //       - we will run tests in Safari
         //       - Firefox fixes audio processing with fake media
-        //       - Chrome implements MediaStreamTrack.applyConstraints for
-        //         audio processing.
+        //       - Chrome implements `MediaStreamTrack.applyConstraints()` for
+        //         audio processing
 
         if !is_chromium() {
             return;
@@ -191,8 +191,8 @@ mod audio_processing {
     async fn ap_with_default_caps() {
         if is_firefox() {
             // We usually run Firefox with fake audio/video
-            // (media.navigator.streams.fake) and this makes firefox to disable
-            // audio processing by default for whatever reason.
+            // (`media.navigator.streams.fake`) and this makes Firefox to
+            // disable audio processing by default for whatever reason.
             return;
         }
 
@@ -249,8 +249,8 @@ mod audio_processing {
     async fn ap_enabled_via_ideal_caps() {
         if is_firefox() {
             // We usually run Firefox with fake audio/video
-            // (media.navigator.streams.fake) and this makes firefox to disable
-            // audio processing by default for whatever reason.
+            // (`media.navigator.streams.fake`) and this makes Firefox to
+            // disable audio processing by default for whatever reason.
             return;
         }
 
@@ -312,8 +312,8 @@ mod audio_processing {
     async fn ap_enabled_via_exact_caps() {
         if is_firefox() {
             // We usually run Firefox with fake audio/video
-            // (media.navigator.streams.fake) and this makes firefox to disable
-            // audio processing by default for whatever reason.
+            // (`media.navigator.streams.fake`) and this makes Firefox to
+            // disable audio processing by default for whatever reason.
             return;
         }
 
@@ -347,8 +347,8 @@ mod audio_processing {
     async fn new_track_when_different_ap_constraints() {
         if is_firefox() {
             // We usually run Firefox with fake audio/video
-            // (media.navigator.streams.fake) and this makes firefox to disable
-            // audio processing by default for whatever reason.
+            // (`media.navigator.streams.fake`) and this makes Firefox to
+            // disable audio processing by default for whatever reason.
             return;
         }
 

@@ -202,23 +202,24 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Indicates whether the following function are supported for this
-    /// [`LocalMediaTrack`]:
-    /// - [`LocalMediaTrack::set_noise_suppression_enabled`]
-    /// - [`LocalMediaTrack::set_noise_suppression_level`]
-    /// - [`LocalMediaTrack::set_echo_cancellation_enabled`]
-    /// - [`LocalMediaTrack::set_auto_gain_control_enabled`]
-    /// - [`LocalMediaTrack::set_high_pass_filter_enabled`]
-    /// - [`LocalMediaTrack::is_noise_suppression_enabled`]
-    /// - [`LocalMediaTrack::is_echo_cancellation_enabled`]
-    /// - [`LocalMediaTrack::is_auto_gain_control_enabled`]
-    /// - [`LocalMediaTrack::is_high_pass_filter_enabled`]
+    /// Indicates whether this [`LocalMediaTrack`] supports audio processing
+    /// functions:
+    /// - [`LocalMediaTrack::is_noise_suppression_enabled()`]
+    /// - [`LocalMediaTrack::set_noise_suppression_enabled()`]
+    /// - [`LocalMediaTrack::get_noise_suppression_level()`]
+    /// - [`LocalMediaTrack::set_noise_suppression_level()`]
+    /// - [`LocalMediaTrack::is_echo_cancellation_enabled()`]
+    /// - [`LocalMediaTrack::set_echo_cancellation_enabled()`]
+    /// - [`LocalMediaTrack::is_auto_gain_control_enabled()`]
+    /// - [`LocalMediaTrack::set_auto_gain_control_enabled()`]
+    /// - [`LocalMediaTrack::is_high_pass_filter_enabled()`]
+    /// - [`LocalMediaTrack::set_high_pass_filter_enabled()`]
     #[must_use]
     pub fn is_audio_processing_available(&self) -> bool {
         self.0.track.is_audio_processing_available()
     }
 
-    /// Enables or disables noise suppression for this [`LocalMediaTrack`].
+    /// Toggles noise suppression for this [`LocalMediaTrack`].
     ///
     /// # Errors
     ///
@@ -235,7 +236,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Sets [`NoiseSuppressionLevel`] for this [`LocalMediaTrack`].
+    /// Configures a [`NoiseSuppressionLevel`] for this [`LocalMediaTrack`].
     ///
     /// # Errors
     ///
@@ -252,8 +253,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Enables or disables acoustic echo cancellation for this
-    /// [`LocalMediaTrack`].
+    /// Toggles acoustic echo cancellation for this [`LocalMediaTrack`].
     ///
     /// # Errors
     ///
@@ -270,7 +270,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Enables or disables auto gain control for this [`LocalMediaTrack`].
+    /// Toggles auto gain control for this [`LocalMediaTrack`].
     ///
     /// # Errors
     ///
@@ -287,7 +287,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Enables or disables high pass filter for this [`LocalMediaTrack`].
+    /// Toggles high-pass filter for this [`LocalMediaTrack`].
     ///
     /// # Errors
     ///
@@ -321,7 +321,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Returns configured [`NoiseSuppressionLevel`] for this
+    /// Returns the current configured [`NoiseSuppressionLevel`] of this
     /// [`LocalMediaTrack`].
     ///
     /// # Errors
@@ -338,7 +338,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Indicates whether automatic gain control is enabled for this
+    /// Indicates whether auto gain control is enabled for this
     /// [`LocalMediaTrack`].
     ///
     /// # Errors
@@ -372,7 +372,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Indicates whether high pass filter is enabled for this
+    /// Indicates whether high-pass filter is enabled for this
     /// [`LocalMediaTrack`].
     ///
     /// # Errors

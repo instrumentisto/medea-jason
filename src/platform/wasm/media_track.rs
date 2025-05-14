@@ -330,19 +330,20 @@ impl MediaStreamTrack {
         Ok(())
     }
 
-    /// Indicates whether the following function are supported for this
-    /// [`MediaStreamTrack`]:
-    /// - [`MediaStreamTrack::set_noise_suppression_enabled`]
-    /// - [`MediaStreamTrack::set_echo_cancellation_enabled`]
-    /// - [`MediaStreamTrack::set_auto_gain_control_enabled`]
-    /// - [`MediaStreamTrack::is_noise_suppression_enabled`]
-    /// - [`MediaStreamTrack::is_echo_cancellation_enabled`]
-    /// - [`MediaStreamTrack::is_auto_gain_control_enabled`]
+    /// Indicates whether this [`MediaStreamTrack`] supports audio processing
+    /// functions:
+    /// - [`MediaStreamTrack::is_noise_suppression_enabled()`]
+    /// - [`MediaStreamTrack::set_noise_suppression_enabled()`]
+    /// - [`MediaStreamTrack::is_echo_cancellation_enabled()`]
+    /// - [`MediaStreamTrack::set_echo_cancellation_enabled()`]
+    /// - [`MediaStreamTrack::is_auto_gain_control_enabled()`]
+    /// - [`MediaStreamTrack::set_auto_gain_control_enabled()`]
     ///
-    /// These function are unavailable on web and always return error:
-    /// - [`MediaStreamTrack::set_noise_suppression_level`]
-    /// - [`MediaStreamTrack::set_high_pass_filter_enabled`]
-    /// - [`MediaStreamTrack::is_high_pass_filter_enabled`]
+    /// These functions are unavailable and always error:
+    /// - [`MediaStreamTrack::get_noise_suppression_level()`]
+    /// - [`MediaStreamTrack::set_noise_suppression_level()`]
+    /// - [`MediaStreamTrack::is_high_pass_filter_enabled()`]
+    /// - [`MediaStreamTrack::set_high_pass_filter_enabled()`]
     pub fn is_audio_processing_available(&self) -> bool {
         if Reflect::get(&self.sys_track, &JsValue::from_str("getCapabilities"))
             .map_or(None, |val| (!val.is_undefined()).then_some(val))
@@ -369,11 +370,11 @@ impl MediaStreamTrack {
             && caps.get_auto_gain_control().is_some()
     }
 
-    /// Enables or disables noise suppression for this [`MediaStreamTrack`].
+    /// Toggles noise suppression for this [`MediaStreamTrack`].
     ///
     /// # Errors
     ///
-    /// With an [`platform::Error`] if platform call errors.
+    /// With a [`platform::Error`] if platform call errors.
     pub async fn set_noise_suppression_enabled(
         &self,
         enabled: bool,
@@ -394,11 +395,11 @@ impl MediaStreamTrack {
         Ok(())
     }
 
-    /// Enables or disables auto gain control for this [`MediaStreamTrack`].
+    /// Toggles auto gain control for this [`MediaStreamTrack`].
     ///
     /// # Errors
     ///
-    /// With an [`platform::Error`] if platform call errors.
+    /// With a [`platform::Error`] if platform call errors.
     pub async fn set_auto_gain_control_enabled(
         &self,
         enabled: bool,
@@ -420,12 +421,11 @@ impl MediaStreamTrack {
         Ok(())
     }
 
-    /// Enables or disables acoustic echo cancellation for this
-    /// [`MediaStreamTrack`].
+    /// Toggles acoustic echo cancellation for this [`MediaStreamTrack`].
     ///
     /// # Errors
     ///
-    /// With an [`platform::Error`] if platform call errors.
+    /// With a [`platform::Error`] if platform call errors.
     pub async fn set_echo_cancellation_enabled(
         &self,
         enabled: bool,
@@ -447,11 +447,13 @@ impl MediaStreamTrack {
         Ok(())
     }
 
-    /// Sets [`NoiseSuppressionLevel`] for this [`MediaStreamTrack`].
+    /// Configures a [`NoiseSuppressionLevel`] for this [`MediaStreamTrack`].
+    ///
+    /// __NOTE__: Does nothing, as is not supported.
     ///
     /// # Errors
     ///
-    /// With an [`platform::Error`] if platform call errors.
+    /// With a [`platform::Error`] if platform call errors.
     #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn set_noise_suppression_level(
         &self,
@@ -462,17 +464,19 @@ impl MediaStreamTrack {
         Ok(())
     }
 
-    /// Enables or disables high pass filter for this [`MediaStreamTrack`].
+    /// Toggles high-pass filter for this [`MediaStreamTrack`].
+    ///
+    /// __NOTE__: Does nothing, as is not supported.
     ///
     /// # Errors
     ///
-    /// With an [`platform::Error`] if platform call errors.
+    /// With a [`platform::Error`] if platform call errors.
     #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn set_high_pass_filter_enabled(
         &self,
         _: bool,
     ) -> Result<(), platform::Error> {
-        log::error!("Changing high pass filter is not available on web");
+        log::error!("Changing high-pass filter is not available on web");
 
         Ok(())
     }
@@ -482,7 +486,7 @@ impl MediaStreamTrack {
     ///
     /// # Errors
     ///
-    /// With an [`platform::Error`] if platform call errors.
+    /// With a [`platform::Error`] if platform call errors.
     #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn is_noise_suppression_enabled(
         &self,
@@ -497,7 +501,7 @@ impl MediaStreamTrack {
     ///
     /// # Errors
     ///
-    /// With an [`platform::Error`] if platform call errors.
+    /// With a [`platform::Error`] if platform call errors.
     #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn is_echo_cancellation_enabled(
         &self,
@@ -507,12 +511,12 @@ impl MediaStreamTrack {
         Ok(settings.get_echo_cancellation().unwrap_or_default())
     }
 
-    /// Indicates whether automatic gain control is enabled for this
+    /// Indicates whether auto gain control is enabled for this
     /// [`MediaStreamTrack`].
     ///
     /// # Errors
     ///
-    /// With an [`platform::Error`] if platform call errors.
+    /// With a [`platform::Error`] if platform call errors.
     #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn is_auto_gain_control_enabled(
         &self,
@@ -522,30 +526,44 @@ impl MediaStreamTrack {
         Ok(settings.get_auto_gain_control().unwrap_or_default())
     }
 
-    /// Returns configured [`NoiseSuppressionLevel`] for this
+    /// Returns the current configured [`NoiseSuppressionLevel`] of this
     /// [`MediaStreamTrack`].
+    ///
+    /// __NOTE__: Panics, as is not supported.
     ///
     /// # Errors
     ///
-    /// With an [`platform::Error`] if platform call errors.
+    /// With a [`platform::Error`] if platform call errors.
+    ///
+    /// # Panics
+    ///
+    /// Always panics as [`unimplemented`].
     #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn get_noise_suppression_level(
         &self,
     ) -> Result<NoiseSuppressionLevel, platform::Error> {
-        unimplemented!()
+        unimplemented!(
+            "getting noise suppression level is not available on web",
+        )
     }
 
-    /// Indicates whether high pass filter is enabled for this
+    /// Indicates whether high-pass filter is enabled for this
     /// [`MediaStreamTrack`].
+    ///
+    /// __NOTE__: Panics, as is not supported.
     ///
     /// # Errors
     ///
-    /// With an [`platform::Error`] if platform call errors.
+    /// With a [`platform::Error`] if platform call errors.
+    ///
+    /// # Panics
+    ///
+    /// Always panics as [`unimplemented`].
     #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn is_high_pass_filter_enabled(
         &self,
     ) -> Result<bool, platform::Error> {
-        unimplemented!()
+        unimplemented!("getting high-pass filter is not available on web")
     }
 }
 

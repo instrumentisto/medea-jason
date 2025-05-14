@@ -45,12 +45,12 @@ abstract class AudioTrackConstraints implements SyncPlatformHandle {
   /// __NOTE__: Only supported on desktop platforms, ignored otherwise.
   void noiseSuppressionLevel(NoiseSuppressionLevel noiseSuppressionLevel);
 
-  /// Sets an exact high pass filter constraint.
+  /// Sets an exact high-pass filter constraint.
   ///
   /// __NOTE__: Only supported on desktop platforms, ignored otherwise.
   void exactHighPassFilter(bool autoGainControl);
 
-  /// Sets an ideal high pass filter constraint.
+  /// Sets an ideal high-pass filter constraint.
   ///
   /// __NOTE__: Only supported on desktop platforms, ignored otherwise.
   void idealHighPassFilter(bool autoGainControl);

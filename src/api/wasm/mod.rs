@@ -203,47 +203,6 @@ impl From<FacingMode> for media::FacingMode {
     }
 }
 
-/// Audio processing noise suppression aggressiveness.
-#[wasm_bindgen]
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum NoiseSuppressionLevel {
-    /// Minimal noise suppression.
-    Low,
-
-    /// Moderate level of suppression.
-    Moderate,
-
-    /// Aggressive noise suppression.
-    High,
-
-    /// Maximum suppression.
-    VeryHigh,
-}
-
-impl From<media::NoiseSuppressionLevel> for NoiseSuppressionLevel {
-    fn from(that: media::NoiseSuppressionLevel) -> Self {
-        use media::NoiseSuppressionLevel as L;
-
-        match that {
-            L::Low => Self::Low,
-            L::Moderate => Self::Moderate,
-            L::High => Self::High,
-            L::VeryHigh => Self::VeryHigh,
-        }
-    }
-}
-
-impl From<NoiseSuppressionLevel> for media::NoiseSuppressionLevel {
-    fn from(val: NoiseSuppressionLevel) -> Self {
-        match val {
-            NoiseSuppressionLevel::Low => Self::Low,
-            NoiseSuppressionLevel::Moderate => Self::Moderate,
-            NoiseSuppressionLevel::High => Self::High,
-            NoiseSuppressionLevel::VeryHigh => Self::VeryHigh,
-        }
-    }
-}
-
 /// Media exchange direction of a `Track`.
 #[wasm_bindgen]
 #[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]

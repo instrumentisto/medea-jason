@@ -160,26 +160,26 @@ pub struct ApiAudioConstraints {
     #[frb(non_final)]
     pub auto_gain_control: Option<ConstrainBoolean>,
 
-    /// Indicator whether to enable noise suppression to reduce background
+    /// Indicator whether to enable noise suppression for reducing background
     /// sounds.
     #[frb(non_final)]
     pub noise_suppression: Option<ConstrainBoolean>,
 
-    /// Sets the level of aggressiveness for noise suppression if enabled.
+    /// Level of aggressiveness for noise suppression, if enabled.
     ///
-    /// __NOTE__: This is only supported on desktop platforms.
+    /// __NOTE__: Only supported on desktop platforms.
     #[frb(non_final)]
     pub noise_suppression_level: Option<NoiseSuppressionLevel>,
 
-    /// Indicator whether to automatically enable echo cancellation to prevent
-    /// feedback.
+    /// Indicator whether to automatically enable echo cancellation for
+    /// preventing feedback.
     #[frb(non_final)]
     pub echo_cancellation: Option<ConstrainBoolean>,
 
-    /// Indicator whether to enable a high-pass filter to eliminate
+    /// Indicator whether to enable a high-pass filter for eliminating
     /// low-frequency noise.
     ///
-    /// __NOTE__: This is only supported on desktop platforms.
+    /// __NOTE__: Only supported on desktop platforms.
     #[frb(non_final)]
     pub high_pass_filter: Option<ConstrainBoolean>,
 }

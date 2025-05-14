@@ -86,17 +86,24 @@ impl LocalMediaTrack {
             .map_err(Into::into)
     }
 
-    /// Indicates whether audio processing-related function are supported for
-    /// this [`LocalMediaTrack`].
-    ///
-    /// Only supported for local audio [MediaStreamTrack]s on web and desktop
-    /// platforms.
+    /// Indicates whether this [`LocalMediaTrack`] supports audio processing
+    /// functions:
+    /// - [`LocalMediaTrack::is_noise_suppression_enabled()`]
+    /// - [`LocalMediaTrack::set_noise_suppression_enabled()`]
+    /// - [`LocalMediaTrack::get_noise_suppression_level()`]
+    /// - [`LocalMediaTrack::set_noise_suppression_level()`]
+    /// - [`LocalMediaTrack::is_echo_cancellation_enabled()`]
+    /// - [`LocalMediaTrack::set_echo_cancellation_enabled()`]
+    /// - [`LocalMediaTrack::is_auto_gain_control_enabled()`]
+    /// - [`LocalMediaTrack::set_auto_gain_control_enabled()`]
+    /// - [`LocalMediaTrack::is_high_pass_filter_enabled()`]
+    /// - [`LocalMediaTrack::set_high_pass_filter_enabled()`]
     #[must_use]
     pub fn is_audio_processing_available(&self) -> bool {
         self.0.is_audio_processing_available()
     }
 
-    /// Enables or disables noise suppression for this [`LocalMediaTrack`].
+    /// Toggles noise suppression for this [`LocalMediaTrack`].
     pub fn set_noise_suppression_enabled(&self, enabled: bool) -> Promise {
         let this = self.0.clone();
         future_to_promise(async move {
@@ -107,8 +114,7 @@ impl LocalMediaTrack {
         })
     }
 
-    /// Enables or disables acoustic echo cancellation for this
-    /// [`LocalMediaTrack`].
+    /// Toggles acoustic echo cancellation for this [`LocalMediaTrack`].
     pub fn set_echo_cancellation_enabled(&self, enabled: bool) -> Promise {
         let this = self.0.clone();
         future_to_promise(async move {
@@ -119,7 +125,7 @@ impl LocalMediaTrack {
         })
     }
 
-    /// Enables or disables auto gain control for this [`LocalMediaTrack`].
+    /// Toggles auto gain control for this [`LocalMediaTrack`].
     pub fn set_auto_gain_control_enabled(&self, enabled: bool) -> Promise {
         let this = self.0.clone();
         future_to_promise(async move {
@@ -143,7 +149,7 @@ impl LocalMediaTrack {
         })
     }
 
-    /// Indicates whether automatic gain control is enabled for this
+    /// Indicates whether auto gain control is enabled for this
     /// [`LocalMediaTrack`].
     pub fn is_auto_gain_control_enabled(&self) -> Promise {
         let this = self.0.clone();

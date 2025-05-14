@@ -75,42 +75,42 @@ impl AudioTrackConstraints {
 
     /// Sets an exact [autoGainControl][1] constraint.
     ///
-    /// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-autogaincontrol
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-autogaincontrol
     pub fn exact_auto_gain_control(&mut self, agc: bool) {
         self.0.auto_gain_control = Some(ConstrainBoolean::Exact(agc));
     }
 
     /// Sets an ideal [autoGainControl][1] constraint.
     ///
-    /// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-autogaincontrol
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-autogaincontrol
     pub fn ideal_auto_gain_control(&mut self, agc: bool) {
         self.0.auto_gain_control = Some(ConstrainBoolean::Ideal(agc));
     }
 
     /// Sets an exact [noiseSuppression][1] constraint.
     ///
-    /// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-noisesuppression
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-noisesuppression
     pub fn exact_noise_suppression(&mut self, ns: bool) {
         self.0.noise_suppression = Some(ConstrainBoolean::Exact(ns));
     }
 
     /// Sets an ideal [noiseSuppression][1] constraint.
     ///
-    /// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-noisesuppression
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-noisesuppression
     pub fn ideal_noise_suppression(&mut self, ns: bool) {
         self.0.noise_suppression = Some(ConstrainBoolean::Ideal(ns));
     }
 
     /// Sets an exact [echoCancellation][1] constraint.
     ///
-    /// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-echocancellation
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-echocancellation
     pub fn exact_echo_cancellation(&mut self, aec: bool) {
         self.0.echo_cancellation = Some(ConstrainBoolean::Exact(aec));
     }
 
     /// Sets an ideal [echoCancellation][1] constraint.
     ///
-    /// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-echocancellation
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-echocancellation
     pub fn ideal_echo_cancellation(&mut self, aec: bool) {
         self.0.echo_cancellation = Some(ConstrainBoolean::Ideal(aec));
     }

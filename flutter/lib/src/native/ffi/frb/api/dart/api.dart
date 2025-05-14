@@ -56,23 +56,23 @@ class ApiAudioConstraints {
   /// maintain a steady overall volume level.
   ConstrainBoolean? autoGainControl;
 
-  /// Indicator whether to enable noise suppression to reduce background
+  /// Indicator whether to enable noise suppression for reducing background
   /// sounds.
   ConstrainBoolean? noiseSuppression;
 
-  /// Sets the level of aggressiveness for noise suppression if enabled.
+  /// Level of aggressiveness for noise suppression, if enabled.
   ///
-  /// __NOTE__: This is only supported on desktop platforms.
+  /// __NOTE__: Only supported on desktop platforms.
   NoiseSuppressionLevel? noiseSuppressionLevel;
 
-  /// Indicator whether to automatically enable echo cancellation to prevent
-  /// feedback.
+  /// Indicator whether to automatically enable echo cancellation for
+  /// preventing feedback.
   ConstrainBoolean? echoCancellation;
 
-  /// Indicator whether to enable a high-pass filter to eliminate
+  /// Indicator whether to enable a high-pass filter for eliminating
   /// low-frequency noise.
   ///
-  /// __NOTE__: This is only supported on desktop platforms.
+  /// __NOTE__: Only supported on desktop platforms.
   ConstrainBoolean? highPassFilter;
 
   ApiAudioConstraints({

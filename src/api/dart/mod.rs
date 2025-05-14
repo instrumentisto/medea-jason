@@ -615,12 +615,12 @@ impl TryFrom<DartValueArg<Self>> for bool {
     fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {
         match value.0 {
             DartValue::Bool(num) => Ok(num),
-            DartValue::Ptr(_)
+            DartValue::Ptr(..)
             | DartValue::None
-            | DartValue::Handle(_)
+            | DartValue::Handle(..)
             | DartValue::String(..)
-            | DartValue::Int(_)
-            | DartValue::Float(_) => {
+            | DartValue::Int(..)
+            | DartValue::Float(..) => {
                 Err(DartValueCastError { expectation: "bool", value: value.0 })
             }
         }

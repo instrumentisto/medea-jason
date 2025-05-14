@@ -49,7 +49,7 @@ impl Default for MediaStreamConstraints {
 impl From<AudioTrackConstraints> for MediaTrackConstraints {
     fn from(track_constraints: AudioTrackConstraints) -> Self {
         // Noise suppression level cannot be set via web API, and
-        // "googHighPassFilter" has been removed:
+        // `googHighPassFilter` has been removed:
         // https://chromium.googlesource.com/chromium/src/+/4a7eeb8c
 
         let constraints = Self::new();

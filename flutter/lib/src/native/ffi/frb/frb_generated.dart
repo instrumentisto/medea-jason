@@ -5693,7 +5693,10 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
   Object free() => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackFree(that: this);
 
-  /// Returns configured noise suppression level for this [`LocalMediaTrack`].
+  /// Returns the current configured [`NoiseSuppressionLevel`] of this
+  /// [`LocalMediaTrack`].
+  ///
+  /// __NOTE__: Only supported on desktop platforms.
   Object getNoiseSuppressionLevel() => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackGetNoiseSuppressionLevel(
         that: this,
@@ -5706,17 +5709,24 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
   Object getTrack() => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackGetTrack(that: this);
 
-  /// Indicates whether audio processing-related function are supported for
-  /// this [`LocalMediaTrack`].
-  ///
-  /// Only supported for local audio [MediaStreamTrack]s on web and desktop
-  /// platforms.
+  /// Indicates whether this [`LocalMediaTrack`] supports audio processing
+  /// functions:
+  /// - [`LocalMediaTrack::is_noise_suppression_enabled()`]
+  /// - [`LocalMediaTrack::set_noise_suppression_enabled()`]
+  /// - [`LocalMediaTrack::get_noise_suppression_level()`]
+  /// - [`LocalMediaTrack::set_noise_suppression_level()`]
+  /// - [`LocalMediaTrack::is_echo_cancellation_enabled()`]
+  /// - [`LocalMediaTrack::set_echo_cancellation_enabled()`]
+  /// - [`LocalMediaTrack::is_auto_gain_control_enabled()`]
+  /// - [`LocalMediaTrack::set_auto_gain_control_enabled()`]
+  /// - [`LocalMediaTrack::is_high_pass_filter_enabled()`]
+  /// - [`LocalMediaTrack::set_high_pass_filter_enabled()`]
   bool isAudioProcessingAvailable() => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackIsAudioProcessingAvailable(
         that: this,
       );
 
-  /// Indicates whether automatic gain control is enabled for this
+  /// Indicates whether auto gain control is enabled for this
   /// [`LocalMediaTrack`].
   Object isAutoGainControlEnabled() => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackIsAutoGainControlEnabled(
@@ -5730,8 +5740,10 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
         that: this,
       );
 
-  /// Indicates whether high pass filter is enabled for this
+  /// Indicates whether high-pass filter is enabled for this
   /// [`LocalMediaTrack`].
+  ///
+  /// __NOTE__: Only supported on desktop platforms.
   Object isHighPassFilterEnabled() => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackIsHighPassFilterEnabled(
         that: this,
@@ -5781,7 +5793,7 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
   void onEnded({required Object f}) => RustLib.instance.api
       .crateApiDartApiLocalMediaTrackLocalMediaTrackOnEnded(that: this, f: f);
 
-  /// Enables or disables auto gain control for this [`LocalMediaTrack`].
+  /// Toggles auto gain control for this [`LocalMediaTrack`].
   Object setAutoGainControlEnabled({required bool enabled}) => RustLib
       .instance
       .api
@@ -5790,8 +5802,7 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
         enabled: enabled,
       );
 
-  /// Enables or disables acoustic echo cancellation for this
-  /// [`LocalMediaTrack`].
+  /// Toggles acoustic echo cancellation for this [`LocalMediaTrack`].
   Object setEchoCancellationEnabled({required bool enabled}) => RustLib
       .instance
       .api
@@ -5800,7 +5811,9 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
         enabled: enabled,
       );
 
-  /// Enables or disables high pass filter for this [`LocalMediaTrack`].
+  /// Toggles high-pass filter for this [`LocalMediaTrack`].
+  ///
+  /// __NOTE__: Only supported on desktop platforms.
   Object setHighPassFilterEnabled({required bool enabled}) => RustLib
       .instance
       .api
@@ -5809,7 +5822,7 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
         enabled: enabled,
       );
 
-  /// Enables or disables noise suppression for this [`LocalMediaTrack`].
+  /// Toggles noise suppression for this [`LocalMediaTrack`].
   Object setNoiseSuppressionEnabled({required bool enabled}) => RustLib
       .instance
       .api
@@ -5818,7 +5831,9 @@ class LocalMediaTrackImpl extends RustOpaque implements LocalMediaTrack {
         enabled: enabled,
       );
 
-  /// Sets [`NoiseSuppressionLevel`] for this [`LocalMediaTrack`].
+  /// Configures a [`NoiseSuppressionLevel`] for this [`LocalMediaTrack`].
+  ///
+  /// __NOTE__: Only supported on desktop platforms.
   Object setNoiseSuppressionLevel({
     required NoiseSuppressionLevel level,
   }) => RustLib.instance.api

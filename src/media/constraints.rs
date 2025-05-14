@@ -991,7 +991,7 @@ pub struct AudioTrackConstraints {
 
     /// Sets the level of aggressiveness for noise suppression if enabled.
     ///
-    /// __NOTE__: This is only supported on desktop platforms.
+    /// __NOTE__: Only supported on desktop platforms.
     pub noise_suppression_level: Option<NoiseSuppressionLevel>,
 
     /// Indicator whether to automatically enable echo cancellation to prevent
@@ -1001,7 +1001,7 @@ pub struct AudioTrackConstraints {
     /// Indicator whether to enable a high-pass filter to eliminate
     /// low-frequency noise.
     ///
-    /// __NOTE__: This is only supported on desktop platforms.
+    /// __NOTE__: Only supported on desktop platforms.
     pub high_pass_filter: Option<ConstrainBoolean>,
 }
 
@@ -1019,7 +1019,7 @@ impl AudioTrackConstraints {
         self.device_id = Some(ConstrainString::Exact(device_id));
     }
 
-    /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
+    /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies the
     /// contained constraints.
     pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
