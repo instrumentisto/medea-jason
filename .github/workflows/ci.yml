@@ -63,7 +63,6 @@ jobs:
           - workspace
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
               || (matrix.platform == 'windows' &&           'windows-latest')
-              || (matrix.platform == 'linux' &&             'ubuntu-22.04')
               ||                                            'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
@@ -312,7 +311,7 @@ jobs:
           - ios
           - linux
           - macos
-    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-13')
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
@@ -455,7 +454,7 @@ jobs:
           - linux
           - macos
           - windows
-    runs-on: ${{ (contains('android linux', matrix.platform) && 'ubuntu-22.04')
+    runs-on: ${{ (contains('android linux', matrix.platform) && 'ubuntu-latest')
               || (matrix.platform == 'windows'               && 'windows-latest')
               ||                                                'macos-latest' }}
     steps:
