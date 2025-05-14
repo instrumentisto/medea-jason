@@ -842,12 +842,13 @@ endif
 # Runs Flutter plugin integration tests on an attached device.
 #
 # Usage:
-#	make test.flutter [device=<device-id>]
+#	make test.flutter [device=<device-id>] [debug=(no|yes)]
 
 test.flutter:
 	cd flutter/example/ && \
 	flutter drive --driver=test_driver/integration_test.dart \
 	              --target=integration_test/jason.dart \
+	              $(if $(call eq,$(debug),yes),--debug,--profile) \
 	              $(if $(call eq,$(device),),,-d $(device))
 
 

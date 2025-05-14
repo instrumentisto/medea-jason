@@ -48,8 +48,20 @@ void main() {
       isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)),
     );
 
+    var video = tracks.where((element) => element.kind() == MediaKind.video);
+    expect(video.isNotEmpty, isTrue);
+    expect(video.first.mediaSourceKind(), equals(MediaSourceKind.device));
+
+    await tracks.first.free();
+    expect(() => tracks.first.kind(), throwsA(isA<StateError>()));
+
+    if (Platform.isIOS) {
+      // iOS simulator have no camera
+      return;
+    }
+
     var videoDevice = devices.firstWhere(
-      (d) => d.kind() == MediaDeviceKind.videoInput,
+          (d) => d.kind() == MediaDeviceKind.videoInput,
     );
 
     if (!Platform.isAndroid) {
@@ -59,12 +71,6 @@ void main() {
     }
 
     videoDevice.free();
-    var video = tracks.where((element) => element.kind() == MediaKind.video);
-    expect(video.isNotEmpty, isTrue);
-    expect(video.first.mediaSourceKind(), equals(MediaSourceKind.device));
-
-    await tracks.first.free();
-    expect(() => tracks.first.kind(), throwsA(isA<StateError>()));
   });
 
   testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {
