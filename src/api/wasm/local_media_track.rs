@@ -85,4 +85,93 @@ impl LocalMediaTrack {
             .map_err(api::Error::from)
             .map_err(Into::into)
     }
+
+    /// Indicates whether this [`LocalMediaTrack`] supports audio processing
+    /// functions:
+    /// - [`LocalMediaTrack::is_noise_suppression_enabled()`]
+    /// - [`LocalMediaTrack::set_noise_suppression_enabled()`]
+    /// - [`LocalMediaTrack::get_noise_suppression_level()`]
+    /// - [`LocalMediaTrack::set_noise_suppression_level()`]
+    /// - [`LocalMediaTrack::is_echo_cancellation_enabled()`]
+    /// - [`LocalMediaTrack::set_echo_cancellation_enabled()`]
+    /// - [`LocalMediaTrack::is_auto_gain_control_enabled()`]
+    /// - [`LocalMediaTrack::set_auto_gain_control_enabled()`]
+    /// - [`LocalMediaTrack::is_high_pass_filter_enabled()`]
+    /// - [`LocalMediaTrack::set_high_pass_filter_enabled()`]
+    #[must_use]
+    pub fn is_audio_processing_available(&self) -> bool {
+        self.0.is_audio_processing_available()
+    }
+
+    /// Toggles noise suppression for this [`LocalMediaTrack`].
+    pub fn set_noise_suppression_enabled(&self, enabled: bool) -> Promise {
+        let this = self.0.clone();
+        future_to_promise(async move {
+            this.set_noise_suppression_enabled(enabled)
+                .await
+                .map_err(api::Error::from)?;
+            Ok(JsValue::UNDEFINED)
+        })
+    }
+
+    /// Toggles acoustic echo cancellation for this [`LocalMediaTrack`].
+    pub fn set_echo_cancellation_enabled(&self, enabled: bool) -> Promise {
+        let this = self.0.clone();
+        future_to_promise(async move {
+            this.set_echo_cancellation_enabled(enabled)
+                .await
+                .map_err(api::Error::from)?;
+            Ok(JsValue::UNDEFINED)
+        })
+    }
+
+    /// Toggles auto gain control for this [`LocalMediaTrack`].
+    pub fn set_auto_gain_control_enabled(&self, enabled: bool) -> Promise {
+        let this = self.0.clone();
+        future_to_promise(async move {
+            this.set_auto_gain_control_enabled(enabled)
+                .await
+                .map_err(api::Error::from)?;
+            Ok(JsValue::UNDEFINED)
+        })
+    }
+
+    /// Indicates whether noise suppression is enabled for this
+    /// [`LocalMediaTrack`].
+    pub fn is_noise_suppression_enabled(&self) -> Promise {
+        let this = self.0.clone();
+        future_to_promise(async move {
+            let enabled = this
+                .is_noise_suppression_enabled()
+                .await
+                .map_err(api::Error::from)?;
+            Ok(JsValue::from(enabled))
+        })
+    }
+
+    /// Indicates whether auto gain control is enabled for this
+    /// [`LocalMediaTrack`].
+    pub fn is_auto_gain_control_enabled(&self) -> Promise {
+        let this = self.0.clone();
+        future_to_promise(async move {
+            let enabled = this
+                .is_auto_gain_control_enabled()
+                .await
+                .map_err(api::Error::from)?;
+            Ok(JsValue::from(enabled))
+        })
+    }
+
+    /// Indicates whether echo cancellation is enabled for this
+    /// [`LocalMediaTrack`].
+    pub fn is_echo_cancellation_enabled(&self) -> Promise {
+        let this = self.0.clone();
+        future_to_promise(async move {
+            let enabled = this
+                .is_echo_cancellation_enabled()
+                .await
+                .map_err(api::Error::from)?;
+            Ok(JsValue::from(enabled))
+        })
+    }
 }

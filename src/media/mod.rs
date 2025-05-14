@@ -15,8 +15,8 @@ pub use self::{
         AudioMediaTracksSettings, AudioTrackConstraints,
         DeviceVideoTrackConstraints, DisplayVideoTrackConstraints, FacingMode,
         LocalTracksConstraints, MediaStreamSettings,
-        MultiSourceTracksConstraints, RecvConstraints, TrackConstraints,
-        VideoSource, VideoTrackConstraints,
+        MultiSourceTracksConstraints, NoiseSuppressionLevel, RecvConstraints,
+        TrackConstraints, VideoSource, VideoTrackConstraints,
     },
     manager::{
         EnumerateDevicesError, EnumerateDisplaysError, GetDisplayMediaError,
@@ -25,8 +25,8 @@ pub use self::{
         MicVolumeError,
     },
     track::{
-        AudioLevelError, MediaSourceKind, MediaStreamTrackState,
-        remote::MediaDirection,
+        AudioLevelError, AudioProcessingError, MediaSourceKind,
+        MediaStreamTrackState, remote::MediaDirection,
     },
 };
 

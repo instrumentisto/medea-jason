@@ -117,6 +117,10 @@ enum VideoConstraintKind {
 enum AudioConstraintKind {
     DeviceId = 0,
     AutoGainControl = 1,
+    NoiseSuppression = 2,
+    NoiseSuppressionLevel = 3,
+    HighPassFilter = 4,
+    EchoCancellation = 5,
 }
 
 /// Indicator of necessity of a [MediaStreamConstraints] setting.
@@ -287,27 +291,12 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
                 unsafe { constraints::new_audio_constraints() }.unwrap();
             unsafe { DartHandle::new(audio) }
         };
-
-        if let Some(auto_gain_control) = from.auto_gain_control {
-            match auto_gain_control {
-                ConstrainBoolean::Exact(auto_gain_control) => unsafe {
-                    constraints::set_audio_constraint_value(
-                        mandatory.get(),
-                        AudioConstraintKind::AutoGainControl as i64,
-                        DartValue::from(auto_gain_control),
-                    )
-                }
-                .unwrap(),
-                ConstrainBoolean::Ideal(auto_gain_control) => unsafe {
-                    constraints::set_audio_constraint_value(
-                        optional.get(),
-                        AudioConstraintKind::AutoGainControl as i64,
-                        DartValue::from(auto_gain_control),
-                    )
-                }
-                .unwrap(),
+        let parse_bool_const = |c: ConstrainBoolean| -> (&DartHandle, bool) {
+            match c {
+                ConstrainBoolean::Exact(val) => (&mandatory, val),
+                ConstrainBoolean::Ideal(val) => (&optional, val),
             }
-        }
+        };
 
         if let Some(device_id) = from.device_id {
             match device_id {
@@ -327,6 +316,64 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
                     )
                 }
                 .unwrap(),
+            }
+        }
+        if let Some(agc) = from.auto_gain_control {
+            let (kind, val) = parse_bool_const(agc);
+
+            unsafe {
+                constraints::set_audio_constraint_value(
+                    kind.get(),
+                    AudioConstraintKind::AutoGainControl as i64,
+                    DartValue::from(val),
+                )
+                .unwrap();
+            };
+        }
+        if let Some(aec) = from.echo_cancellation {
+            let (kind, val) = parse_bool_const(aec);
+
+            unsafe {
+                constraints::set_audio_constraint_value(
+                    kind.get(),
+                    AudioConstraintKind::EchoCancellation as i64,
+                    DartValue::from(val),
+                )
+                .unwrap();
+            }
+        }
+        if let Some(hpf) = from.high_pass_filter {
+            let (kind, val) = parse_bool_const(hpf);
+
+            unsafe {
+                constraints::set_audio_constraint_value(
+                    kind.get(),
+                    AudioConstraintKind::HighPassFilter as i64,
+                    DartValue::from(val),
+                )
+                .unwrap();
+            }
+        }
+        if let Some(ns) = from.noise_suppression {
+            let (kind, val) = parse_bool_const(ns);
+
+            unsafe {
+                constraints::set_audio_constraint_value(
+                    kind.get(),
+                    AudioConstraintKind::NoiseSuppression as i64,
+                    DartValue::from(val),
+                )
+                .unwrap();
+            }
+        }
+        if let Some(nsl) = from.noise_suppression_level {
+            unsafe {
+                constraints::set_audio_constraint_value(
+                    optional.get(),
+                    AudioConstraintKind::NoiseSuppressionLevel as i64,
+                    DartValue::from(nsl as i64),
+                )
+                .unwrap();
             }
         }
 

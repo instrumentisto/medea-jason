@@ -374,6 +374,190 @@ void main() {
       expect(err is UnsupportedError, true);
     }
   });
+
+  testWidgets('AudioProcessing with getUserMedia', (WidgetTester tester) async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      // Audio processing is only supported on desktop.
+      return;
+    }
+
+    var jason = await Jason.init();
+    var mediaManager = jason.mediaManager();
+
+    {
+      // all enabled by default
+      var settings = MediaStreamSettings();
+      settings.audio(AudioTrackConstraints());
+      var track = (await mediaManager.initLocalTracks(settings))[0];
+
+      expect(track.isAudioProcessingAvailable(), isTrue);
+      expect(await track.isNoiseSuppressionEnabled(), isTrue);
+      expect(await track.isHighPassFilterEnabled(), isTrue);
+      expect(await track.isAutoGainControlEnabled(), isTrue);
+      expect(await track.isEchoCancellationEnabled(), isTrue);
+      expect(
+        await track.getNoiseSuppressionLevel(),
+        NoiseSuppressionLevel.veryHigh,
+      );
+
+      await track.free();
+    }
+
+    {
+      // disable via gum
+      var audio = AudioTrackConstraints();
+      audio.exactAutoGainControl(false);
+      audio.exactEchoCancellation(false);
+      audio.exactHighPassFilter(false);
+      audio.exactNoiseSuppression(false);
+      audio.noiseSuppressionLevel(NoiseSuppressionLevel.low);
+      var settings = MediaStreamSettings();
+      settings.audio(audio);
+      var track = (await mediaManager.initLocalTracks(settings))[0];
+
+      expect(track.isAudioProcessingAvailable(), isTrue);
+      expect(await track.isNoiseSuppressionEnabled(), isFalse);
+      expect(await track.isHighPassFilterEnabled(), isFalse);
+      expect(await track.isAutoGainControlEnabled(), isFalse);
+      expect(await track.isEchoCancellationEnabled(), isFalse);
+      expect(await track.getNoiseSuppressionLevel(), NoiseSuppressionLevel.low);
+
+      await track.free();
+    }
+
+    {
+      // new track if different config
+      var settings1 = MediaStreamSettings();
+      settings1.audio(AudioTrackConstraints());
+      var track1 = (await mediaManager.initLocalTracks(settings1))[0];
+
+      expect(await track1.isNoiseSuppressionEnabled(), isTrue);
+
+      var settings2 = MediaStreamSettings();
+      var audio = AudioTrackConstraints();
+      audio.exactNoiseSuppression(false);
+      settings2.audio(audio);
+      var track2 = (await mediaManager.initLocalTracks(settings2))[0];
+
+      expect(await track2.isNoiseSuppressionEnabled(), isFalse);
+      expect(track1.getTrack().id(), isNot(equals(track2.getTrack().id())));
+
+      await track1.free();
+      await track2.free();
+    }
+
+    {
+      // same track if same config
+      var settings1 = MediaStreamSettings();
+      var audio1 = AudioTrackConstraints();
+      audio1.exactNoiseSuppression(false);
+      settings1.audio(audio1);
+      var track1 = (await mediaManager.initLocalTracks(settings1))[0];
+
+      expect(await track1.isNoiseSuppressionEnabled(), isFalse);
+
+      var settings2 = MediaStreamSettings();
+      var audio2 = AudioTrackConstraints();
+      audio2.exactNoiseSuppression(false);
+      settings2.audio(audio2);
+      var track2 = (await mediaManager.initLocalTracks(settings2))[0];
+
+      expect(await track2.isNoiseSuppressionEnabled(), isFalse);
+      expect(track1.getTrack().id(), equals(track2.getTrack().id()));
+
+      await track1.free();
+      await track2.free();
+    }
+
+    {
+      // same track if ideal config changed
+      var settings1 = MediaStreamSettings();
+      settings1.audio(AudioTrackConstraints());
+      var track1 = (await mediaManager.initLocalTracks(settings1))[0];
+
+      expect(await track1.isNoiseSuppressionEnabled(), isTrue);
+
+      var settings2 = MediaStreamSettings();
+      var audio = AudioTrackConstraints();
+      audio.idealNoiseSuppression(false);
+      settings2.audio(audio);
+      var track2 = (await mediaManager.initLocalTracks(settings2))[0];
+
+      expect(await track2.isNoiseSuppressionEnabled(), isTrue);
+      expect(track1.getTrack().id(), equals(track2.getTrack().id()));
+
+      await track1.free();
+      await track2.free();
+    }
+
+    jason.free();
+    mediaManager.free();
+  });
+
+  testWidgets('AudioProcessing in runtime', (WidgetTester tester) async {
+    var jason = await Jason.init();
+    var mediaManager = jason.mediaManager();
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      // Audio processing is only supported on desktop.
+      return;
+    }
+
+    var settings = MediaStreamSettings();
+    settings.audio(AudioTrackConstraints());
+    var track = (await mediaManager.initLocalTracks(settings))[0];
+
+    expect(track.isAudioProcessingAvailable(), isTrue);
+
+    expect(await track.isNoiseSuppressionEnabled(), isTrue);
+    expect(await track.isHighPassFilterEnabled(), isTrue);
+    expect(await track.isAutoGainControlEnabled(), isTrue);
+    expect(await track.isEchoCancellationEnabled(), isTrue);
+    expect(
+      await track.getNoiseSuppressionLevel(),
+      NoiseSuppressionLevel.veryHigh,
+    );
+
+    await track.setNoiseSuppressionEnabled(false);
+    expect(await track.isNoiseSuppressionEnabled(), isFalse);
+
+    await track.setHighPassFilterEnabled(false);
+    expect(await track.isHighPassFilterEnabled(), isFalse);
+
+    await track.setAutoGainControlEnabled(false);
+    expect(await track.isAutoGainControlEnabled(), isFalse);
+
+    await track.setEchoCancellationEnabled(false);
+    expect(await track.isEchoCancellationEnabled(), isFalse);
+
+    await track.setNoiseSuppressionLevel(NoiseSuppressionLevel.high);
+    expect(await track.getNoiseSuppressionLevel(), NoiseSuppressionLevel.high);
+
+    await track.setNoiseSuppressionLevel(NoiseSuppressionLevel.moderate);
+    expect(
+      await track.getNoiseSuppressionLevel(),
+      NoiseSuppressionLevel.moderate,
+    );
+
+    await track.setNoiseSuppressionLevel(NoiseSuppressionLevel.low);
+    expect(await track.getNoiseSuppressionLevel(), NoiseSuppressionLevel.low);
+
+    await track.setNoiseSuppressionEnabled(true);
+    expect(await track.isNoiseSuppressionEnabled(), isTrue);
+
+    await track.setHighPassFilterEnabled(true);
+    expect(await track.isHighPassFilterEnabled(), isTrue);
+
+    await track.setAutoGainControlEnabled(true);
+    expect(await track.isAutoGainControlEnabled(), isTrue);
+
+    await track.setEchoCancellationEnabled(true);
+    expect(await track.isEchoCancellationEnabled(), isTrue);
+
+    await track.free();
+    jason.free();
+    mediaManager.free();
+  });
 }
 
 class TestObj {

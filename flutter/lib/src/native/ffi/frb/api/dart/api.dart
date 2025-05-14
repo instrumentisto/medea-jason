@@ -56,10 +56,42 @@ class ApiAudioConstraints {
   /// maintain a steady overall volume level.
   ConstrainBoolean? autoGainControl;
 
-  ApiAudioConstraints({this.deviceId, this.autoGainControl});
+  /// Indicator whether to enable noise suppression for reducing background
+  /// sounds.
+  ConstrainBoolean? noiseSuppression;
+
+  /// Level of aggressiveness for noise suppression, if enabled.
+  ///
+  /// __NOTE__: Only supported on desktop platforms.
+  NoiseSuppressionLevel? noiseSuppressionLevel;
+
+  /// Indicator whether to automatically enable echo cancellation for
+  /// preventing feedback.
+  ConstrainBoolean? echoCancellation;
+
+  /// Indicator whether to enable a high-pass filter for eliminating
+  /// low-frequency noise.
+  ///
+  /// __NOTE__: Only supported on desktop platforms.
+  ConstrainBoolean? highPassFilter;
+
+  ApiAudioConstraints({
+    this.deviceId,
+    this.autoGainControl,
+    this.noiseSuppression,
+    this.noiseSuppressionLevel,
+    this.echoCancellation,
+    this.highPassFilter,
+  });
 
   @override
-  int get hashCode => deviceId.hashCode ^ autoGainControl.hashCode;
+  int get hashCode =>
+      deviceId.hashCode ^
+      autoGainControl.hashCode ^
+      noiseSuppression.hashCode ^
+      noiseSuppressionLevel.hashCode ^
+      echoCancellation.hashCode ^
+      highPassFilter.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -67,7 +99,11 @@ class ApiAudioConstraints {
       other is ApiAudioConstraints &&
           runtimeType == other.runtimeType &&
           deviceId == other.deviceId &&
-          autoGainControl == other.autoGainControl;
+          autoGainControl == other.autoGainControl &&
+          noiseSuppression == other.noiseSuppression &&
+          noiseSuppressionLevel == other.noiseSuppressionLevel &&
+          echoCancellation == other.echoCancellation &&
+          highPassFilter == other.highPassFilter;
 }
 
 @freezed

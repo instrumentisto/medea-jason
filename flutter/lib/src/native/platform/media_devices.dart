@@ -108,9 +108,9 @@ Future<void> Function() _setMicrophoneVolume(int level) {
 }
 
 /// Indicates whether it's possible to access microphone volume settings.
-Future<int> Function() _microphoneVolumeIsAvailable() {
+Future<bool> Function() _microphoneVolumeIsAvailable() {
   return () async {
-    return await webrtc.microphoneVolumeIsAvailable() ? 1 : 0;
+    return await webrtc.microphoneVolumeIsAvailable();
   };
 }
 

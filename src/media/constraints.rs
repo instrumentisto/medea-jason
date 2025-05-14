@@ -44,6 +44,23 @@ pub enum FacingMode {
     Right = 3,
 }
 
+/// Audio processing noise suppression aggressiveness.
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[repr(u8)]
+pub enum NoiseSuppressionLevel {
+    /// Minimal noise suppression.
+    Low = 0,
+
+    /// Moderate level of suppression.
+    Moderate = 1,
+
+    /// Aggressive noise suppression.
+    High = 2,
+
+    /// Maximum suppression.
+    VeryHigh = 3,
+}
+
 /// Local media stream for injecting into new created [`PeerConnection`]s.
 ///
 /// [`PeerConnection`]: crate::peer::PeerConnection
@@ -958,15 +975,34 @@ pub struct AudioTrackConstraints {
     /// Identifier of the device generating the content for the media track.
     pub device_id: Option<ConstrainString<String>>,
 
-    /// Automatically manages changes in the volume of its source media to
-    /// maintain a steady overall volume level.
-    pub auto_gain_control: Option<ConstrainBoolean>,
-
     /// Importance of this [`AudioTrackConstraints`].
     ///
     /// If `true` then without this [`AudioTrackConstraints`] call session
     /// can't be started.
     pub required: bool,
+
+    /// Automatically manages changes in the volume of its source media to
+    /// maintain a steady overall volume level.
+    pub auto_gain_control: Option<ConstrainBoolean>,
+
+    /// Indicator whether to enable noise suppression to reduce background
+    /// sounds.
+    pub noise_suppression: Option<ConstrainBoolean>,
+
+    /// Sets the level of aggressiveness for noise suppression if enabled.
+    ///
+    /// __NOTE__: Only supported on desktop platforms.
+    pub noise_suppression_level: Option<NoiseSuppressionLevel>,
+
+    /// Indicator whether to automatically enable echo cancellation to prevent
+    /// feedback.
+    pub echo_cancellation: Option<ConstrainBoolean>,
+
+    /// Indicator whether to enable a high-pass filter to eliminate
+    /// low-frequency noise.
+    ///
+    /// __NOTE__: Only supported on desktop platforms.
+    pub high_pass_filter: Option<ConstrainBoolean>,
 }
 
 impl AudioTrackConstraints {
@@ -983,35 +1019,66 @@ impl AudioTrackConstraints {
         self.device_id = Some(ConstrainString::Exact(device_id));
     }
 
-    /// Sets an exact [autoGainControl][1] constraint.
-    ///
-    /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
-    pub const fn exact_auto_gain_control(&mut self, auto_gain_control: bool) {
-        self.auto_gain_control =
-            Some(ConstrainBoolean::Exact(auto_gain_control));
-    }
-
-    /// Sets an ideal [autoGainControl][1] constraint.
-    ///
-    /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
-    pub const fn ideal_auto_gain_control(&mut self, auto_gain_control: bool) {
-        self.auto_gain_control =
-            Some(ConstrainBoolean::Ideal(auto_gain_control));
-    }
-
-    /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
+    /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies the
     /// contained constraints.
     pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
         track: T,
     ) -> bool {
         let track = track.as_ref();
-        satisfies_track(track, MediaKind::Audio).await
-            && ConstrainString::satisfies(
-                self.device_id.as_ref(),
-                track.device_id().as_ref(),
-            )
-        // TODO returns Result<bool, Error>
+
+        if !satisfies_track(track, MediaKind::Audio).await {
+            return false;
+        }
+
+        if !ConstrainString::satisfies(
+            self.device_id.as_ref(),
+            track.device_id().as_ref(),
+        ) {
+            return false;
+        }
+        if !track.is_audio_processing_available() {
+            // We assume that if audio processing is not available for this
+            // track, then it's not available at all.
+            return true;
+        }
+
+        if let Some(ConstrainBoolean::Exact(ns_caps)) = &self.noise_suppression
+        {
+            if let Ok(ns_enabled) = track.is_noise_suppression_enabled().await {
+                if *ns_caps != ns_enabled {
+                    return false;
+                }
+            }
+        }
+        if let Some(ConstrainBoolean::Exact(aec_caps)) = &self.echo_cancellation
+        {
+            if let Ok(aec_enabled) = track.is_echo_cancellation_enabled().await
+            {
+                if *aec_caps != aec_enabled {
+                    return false;
+                }
+            }
+        }
+        if let Some(ConstrainBoolean::Exact(agc_caps)) = &self.auto_gain_control
+        {
+            if let Ok(agc_enabled) = track.is_auto_gain_control_enabled().await
+            {
+                if *agc_caps != agc_enabled {
+                    return false;
+                }
+            }
+        }
+        if let Some(ConstrainBoolean::Exact(hpf_caps)) = &self.high_pass_filter
+        {
+            if let Ok(hpf_enabled) = track.is_high_pass_filter_enabled().await {
+                if *hpf_caps != hpf_enabled {
+                    return false;
+                }
+            }
+        }
+
+        true
     }
 
     /// Merges these [`AudioTrackConstraints`] with `another` ones, meaning that
@@ -1042,6 +1109,10 @@ impl From<ProtoAudioConstraints> for AudioTrackConstraints {
             required: caps.required,
             device_id: None,
             auto_gain_control: None,
+            noise_suppression: None,
+            noise_suppression_level: None,
+            echo_cancellation: None,
+            high_pass_filter: None,
         }
     }
 }

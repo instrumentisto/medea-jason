@@ -22,6 +22,17 @@ Object Function(Object)? _clone;
 Object Function(Object)? _dispose;
 bool Function(Object)? _isOnAudioLevelAvailable;
 void Function(Object, Object)? _onAudioLevelChanged;
+bool Function(Object)? _isAudioProcessingAvailable;
+Object Function(Object, bool)? _setNoiseSuppressionEnabled;
+Object Function(Object, int)? _setNoiseSuppressionLevel;
+Object Function(Object, bool)? _setEchoCancellationEnabled;
+Object Function(Object, bool)? _setAutoGainControlEnabled;
+Object Function(Object, bool)? _setHighPassFilterEnabled;
+Object Function(Object)? _isNoiseSuppressionEnabled;
+Object Function(Object)? _getNoiseSuppressionLevel;
+Object Function(Object)? _isAutoGainControlEnabled;
+Object Function(Object)? _isEchoCancellationEnabled;
+Object Function(Object)? _isHighPassFilterEnabled;
 
 _ErrorSetterFnDart? _media_stream_track__id__set_error;
 _ErrorSetterFnDart? _media_stream_track__device_id__set_error;
@@ -38,6 +49,25 @@ _ErrorSetterFnDart? _media_stream_track__clone__set_error;
 _ErrorSetterFnDart? _media_stream_track__dispose__set_error;
 _ErrorSetterFnDart? _media_stream_track__is_on_audio_level_available__set_error;
 _ErrorSetterFnDart? _media_stream_track__on_audio_level_changed__set_error;
+_ErrorSetterFnDart?
+_media_stream_track__is_audio_processing_available__set_error;
+_ErrorSetterFnDart?
+_media_stream_track__set_noise_suppression_enabled__set_error;
+_ErrorSetterFnDart? _media_stream_track__set_noise_suppression_level__set_error;
+_ErrorSetterFnDart?
+_media_stream_track__set_echo_cancellation_enabled__set_error;
+_ErrorSetterFnDart?
+_media_stream_track__set_auto_gain_control_enabled__set_error;
+_ErrorSetterFnDart?
+_media_stream_track__set_high_pass_filter_enabled__set_error;
+_ErrorSetterFnDart?
+_media_stream_track__is_noise_suppression_enabled__set_error;
+_ErrorSetterFnDart? _media_stream_track__get_noise_suppression_level__set_error;
+_ErrorSetterFnDart?
+_media_stream_track__is_auto_gain_control_enabled__set_error;
+_ErrorSetterFnDart?
+_media_stream_track__is_echo_cancellation_enabled__set_error;
+_ErrorSetterFnDart? _media_stream_track__is_high_pass_filter_enabled__set_error;
 
 void registerFunction(
   DynamicLibrary dl, {
@@ -56,6 +86,17 @@ void registerFunction(
   required Object Function(Object) dispose,
   required bool Function(Object) isOnAudioLevelAvailable,
   required void Function(Object, Object) onAudioLevelChanged,
+  required bool Function(Object) isAudioProcessingAvailable,
+  required Object Function(Object, bool) setNoiseSuppressionEnabled,
+  required Object Function(Object, int) setNoiseSuppressionLevel,
+  required Object Function(Object, bool) setEchoCancellationEnabled,
+  required Object Function(Object, bool) setAutoGainControlEnabled,
+  required Object Function(Object, bool) setHighPassFilterEnabled,
+  required Object Function(Object) isNoiseSuppressionEnabled,
+  required Object Function(Object) getNoiseSuppressionLevel,
+  required Object Function(Object) isAutoGainControlEnabled,
+  required Object Function(Object) isEchoCancellationEnabled,
+  required Object Function(Object) isHighPassFilterEnabled,
 }) {
   _id = id;
   _deviceId = deviceId;
@@ -72,6 +113,17 @@ void registerFunction(
   _dispose = dispose;
   _isOnAudioLevelAvailable = isOnAudioLevelAvailable;
   _onAudioLevelChanged = onAudioLevelChanged;
+  _isAudioProcessingAvailable = isAudioProcessingAvailable;
+  _setNoiseSuppressionEnabled = setNoiseSuppressionEnabled;
+  _setNoiseSuppressionLevel = setNoiseSuppressionLevel;
+  _setEchoCancellationEnabled = setEchoCancellationEnabled;
+  _setAutoGainControlEnabled = setAutoGainControlEnabled;
+  _setHighPassFilterEnabled = setHighPassFilterEnabled;
+  _isNoiseSuppressionEnabled = isNoiseSuppressionEnabled;
+  _getNoiseSuppressionLevel = getNoiseSuppressionLevel;
+  _isAutoGainControlEnabled = isAutoGainControlEnabled;
+  _isEchoCancellationEnabled = isEchoCancellationEnabled;
+  _isHighPassFilterEnabled = isHighPassFilterEnabled;
 
   _media_stream_track__id__set_error = dl
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
@@ -133,6 +185,50 @@ void registerFunction(
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
         'media_stream_track__on_audio_level_changed__set_error',
       );
+  _media_stream_track__is_audio_processing_available__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__is_audio_processing_available__set_error',
+      );
+  _media_stream_track__set_noise_suppression_enabled__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__set_noise_suppression_enabled__set_error',
+      );
+  _media_stream_track__set_noise_suppression_level__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__set_noise_suppression_level__set_error',
+      );
+  _media_stream_track__set_echo_cancellation_enabled__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__set_echo_cancellation_enabled__set_error',
+      );
+  _media_stream_track__set_auto_gain_control_enabled__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__set_auto_gain_control_enabled__set_error',
+      );
+  _media_stream_track__set_high_pass_filter_enabled__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__set_high_pass_filter_enabled__set_error',
+      );
+  _media_stream_track__is_noise_suppression_enabled__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__is_noise_suppression_enabled__set_error',
+      );
+  _media_stream_track__get_noise_suppression_level__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__get_noise_suppression_level__set_error',
+      );
+  _media_stream_track__is_auto_gain_control_enabled__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__is_auto_gain_control_enabled__set_error',
+      );
+  _media_stream_track__is_echo_cancellation_enabled__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__is_echo_cancellation_enabled__set_error',
+      );
+  _media_stream_track__is_high_pass_filter_enabled__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_stream_track__is_high_pass_filter_enabled__set_error',
+      );
 
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> id_native =
       Pointer.fromFunction(_idProxy);
@@ -167,9 +263,65 @@ void registerFunction(
   );
   Pointer<NativeFunction<Void Function(Handle, Handle)>>
   onAudioLevelChanged_native = Pointer.fromFunction(_onAudioLevelChangedProxy);
+  Pointer<NativeFunction<Bool Function(Handle)>>
+  isAudioProcessingAvailable_native = Pointer.fromFunction(
+    _isAudioProcessingAvailableProxy,
+    false,
+  );
+  Pointer<NativeFunction<Handle Function(Handle, Bool)>>
+  setNoiseSuppressionEnabled_native = Pointer.fromFunction(
+    _setNoiseSuppressionEnabledProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle, Int64)>>
+  setNoiseSuppressionLevel_native = Pointer.fromFunction(
+    _setNoiseSuppressionLevelProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle, Bool)>>
+  setEchoCancellationEnabled_native = Pointer.fromFunction(
+    _setEchoCancellationEnabledProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle, Bool)>>
+  setAutoGainControlEnabled_native = Pointer.fromFunction(
+    _setAutoGainControlEnabledProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle, Bool)>>
+  setHighPassFilterEnabled_native = Pointer.fromFunction(
+    _setHighPassFilterEnabledProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle)>>
+  isNoiseSuppressionEnabled_native = Pointer.fromFunction(
+    _isNoiseSuppressionEnabledProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle)>>
+  getNoiseSuppressionLevel_native = Pointer.fromFunction(
+    _getNoiseSuppressionLevelProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle)>>
+  isAutoGainControlEnabled_native = Pointer.fromFunction(
+    _isAutoGainControlEnabledProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle)>>
+  isEchoCancellationEnabled_native = Pointer.fromFunction(
+    _isEchoCancellationEnabledProxy,
+  );
+  Pointer<NativeFunction<Handle Function(Handle)>>
+  isHighPassFilterEnabled_native = Pointer.fromFunction(
+    _isHighPassFilterEnabledProxy,
+  );
 
   dl.lookupFunction<
     Void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
       Pointer,
       Pointer,
       Pointer,
@@ -202,6 +354,17 @@ void registerFunction(
       Pointer,
       Pointer,
       Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
     )
   >('register_media_stream_track')(
     id_native,
@@ -219,6 +382,17 @@ void registerFunction(
     dispose_native,
     isOnAudioLevelAvailable_native,
     onAudioLevelChanged_native,
+    isAudioProcessingAvailable_native,
+    setNoiseSuppressionEnabled_native,
+    setNoiseSuppressionLevel_native,
+    setEchoCancellationEnabled_native,
+    setAutoGainControlEnabled_native,
+    setHighPassFilterEnabled_native,
+    isNoiseSuppressionEnabled_native,
+    getNoiseSuppressionLevel_native,
+    isAutoGainControlEnabled_native,
+    isEchoCancellationEnabled_native,
+    isHighPassFilterEnabled_native,
   );
 }
 
@@ -354,5 +528,104 @@ void _onAudioLevelChangedProxy(Object arg0, Object arg1) {
   } catch (e) {
     _media_stream_track__on_audio_level_changed__set_error!(e);
     return;
+  }
+}
+
+bool _isAudioProcessingAvailableProxy(Object arg0) {
+  try {
+    return _isAudioProcessingAvailable!(arg0);
+  } catch (e) {
+    _media_stream_track__is_audio_processing_available__set_error!(e);
+    return false;
+  }
+}
+
+Object _setNoiseSuppressionEnabledProxy(Object arg0, bool arg1) {
+  try {
+    return _setNoiseSuppressionEnabled!(arg0, arg1);
+  } catch (e) {
+    _media_stream_track__set_noise_suppression_enabled__set_error!(e);
+    return 0;
+  }
+}
+
+Object _setNoiseSuppressionLevelProxy(Object arg0, int arg1) {
+  try {
+    return _setNoiseSuppressionLevel!(arg0, arg1);
+  } catch (e) {
+    _media_stream_track__set_noise_suppression_level__set_error!(e);
+    return 0;
+  }
+}
+
+Object _setEchoCancellationEnabledProxy(Object arg0, bool arg1) {
+  try {
+    return _setEchoCancellationEnabled!(arg0, arg1);
+  } catch (e) {
+    _media_stream_track__set_echo_cancellation_enabled__set_error!(e);
+    return 0;
+  }
+}
+
+Object _setAutoGainControlEnabledProxy(Object arg0, bool arg1) {
+  try {
+    return _setAutoGainControlEnabled!(arg0, arg1);
+  } catch (e) {
+    _media_stream_track__set_auto_gain_control_enabled__set_error!(e);
+    return 0;
+  }
+}
+
+Object _setHighPassFilterEnabledProxy(Object arg0, bool arg1) {
+  try {
+    return _setHighPassFilterEnabled!(arg0, arg1);
+  } catch (e) {
+    _media_stream_track__set_high_pass_filter_enabled__set_error!(e);
+    return 0;
+  }
+}
+
+Object _isNoiseSuppressionEnabledProxy(Object arg0) {
+  try {
+    return _isNoiseSuppressionEnabled!(arg0);
+  } catch (e) {
+    _media_stream_track__is_noise_suppression_enabled__set_error!(e);
+    return 0;
+  }
+}
+
+Object _getNoiseSuppressionLevelProxy(Object arg0) {
+  try {
+    return _getNoiseSuppressionLevel!(arg0);
+  } catch (e) {
+    _media_stream_track__get_noise_suppression_level__set_error!(e);
+    return 0;
+  }
+}
+
+Object _isAutoGainControlEnabledProxy(Object arg0) {
+  try {
+    return _isAutoGainControlEnabled!(arg0);
+  } catch (e) {
+    _media_stream_track__is_auto_gain_control_enabled__set_error!(e);
+    return 0;
+  }
+}
+
+Object _isEchoCancellationEnabledProxy(Object arg0) {
+  try {
+    return _isEchoCancellationEnabled!(arg0);
+  } catch (e) {
+    _media_stream_track__is_echo_cancellation_enabled__set_error!(e);
+    return 0;
+  }
+}
+
+Object _isHighPassFilterEnabledProxy(Object arg0) {
+  try {
+    return _isHighPassFilterEnabled!(arg0);
+  } catch (e) {
+    _media_stream_track__is_high_pass_filter_enabled__set_error!(e);
+    return 0;
   }
 }
