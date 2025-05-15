@@ -61,7 +61,7 @@ void main() {
     }
 
     var videoDevice = devices.firstWhere(
-          (d) => d.kind() == MediaDeviceKind.videoInput,
+      (d) => d.kind() == MediaDeviceKind.videoInput,
     );
 
     if (!Platform.isAndroid) {
