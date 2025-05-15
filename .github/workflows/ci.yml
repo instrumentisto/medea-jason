@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: ["master", "add-platform-to-test-on-ci"]
+    branches: ["master"]
     tags: ["medea-*"]
   pull_request:
     branches: ["master"]
