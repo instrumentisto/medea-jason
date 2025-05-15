@@ -305,13 +305,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # TODO: Run E2E test on Windows
         platform:
           - android
-          - ios
+          #- ios # TODO: Very flaky and runs for few hours. Try re-enabling when
+          #              github actions support nested virtualization on Apple
+          #              Silicon (M3 and macos-15+).
           - linux
           - macos
-          - windows
+          #- windows # TODO: Fix "windows cannot load linux image on windows"
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-13')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
