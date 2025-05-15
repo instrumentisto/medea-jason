@@ -54,3 +54,18 @@ enum FacingMode {
   /// Facing to the right of a user.
   right,
 }
+
+/// Audio processing noise suppression aggressiveness.
+enum NoiseSuppressionLevel {
+  /// Minimal noise suppression.
+  low,
+
+  /// Moderate level of suppression.
+  moderate,
+
+  /// Aggressive noise suppression.
+  high,
+
+  /// Maximum suppression.
+  veryHigh,
+}

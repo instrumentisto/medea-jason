@@ -44,7 +44,10 @@ pub use self::{
 pub use crate::media::MediaDirection;
 use crate::{
     api::{api::ForeignClass, dart::err::new_panic_error},
-    media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
+    media::{
+        FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind,
+        NoiseSuppressionLevel,
+    },
     platform::utils::{
         c_str_into_string, dart_api, free_dart_native_string,
         handle::DartHandle, string_into_c_str,
@@ -85,7 +88,7 @@ pub enum MemoryOwner {
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Dart.
 #[derive(Debug)]
-#[repr(u8)]
+#[repr(C, u8)]
 pub enum DartValue {
     /// No value. It can mean `()`, `void` or [`Option::None`] basing on the
     /// contexts.
@@ -606,6 +609,24 @@ impl TryFrom<DartValueArg<Self>> for Option<bool> {
     }
 }
 
+impl TryFrom<DartValueArg<Self>> for bool {
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::Bool(num) => Ok(num),
+            DartValue::Ptr(..)
+            | DartValue::None
+            | DartValue::Handle(..)
+            | DartValue::String(..)
+            | DartValue::Int(..)
+            | DartValue::Float(..) => {
+                Err(DartValueCastError { expectation: "bool", value: value.0 })
+            }
+        }
+    }
+}
+
 /// Error of converting a [`DartValue`] to the concrete type.
 #[derive(Debug, Display)]
 #[display("expected `{expectation}`, but got: `{value:?}`")]
@@ -619,6 +640,7 @@ pub struct DartValueCastError {
 
 impl PrimitiveEnum for MediaSourceKind {}
 impl PrimitiveEnum for FacingMode {}
+impl PrimitiveEnum for NoiseSuppressionLevel {}
 impl PrimitiveEnum for MediaDirection {}
 
 impl TryFrom<i64> for MediaSourceKind {
@@ -642,6 +664,20 @@ impl TryFrom<i64> for FacingMode {
             1 => Ok(Self::Environment),
             2 => Ok(Self::Left),
             3 => Ok(Self::Right),
+            _ => Err(value),
+        }
+    }
+}
+
+impl TryFrom<i64> for NoiseSuppressionLevel {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Low),
+            1 => Ok(Self::Moderate),
+            2 => Ok(Self::High),
+            3 => Ok(Self::VeryHigh),
             _ => Err(value),
         }
     }

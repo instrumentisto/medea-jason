@@ -55,8 +55,8 @@ use crate::{
         new_frb_handler,
     },
     media::{
-        self, MediaDeviceKind,
-        constraints::{ConstrainBoolean, ConstrainU32},
+        self, MediaDeviceKind, NoiseSuppressionLevel,
+        constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
     },
     platform::{self},
     utils::str_eq,
@@ -159,21 +159,42 @@ pub struct ApiAudioConstraints {
     /// maintain a steady overall volume level.
     #[frb(non_final)]
     pub auto_gain_control: Option<ConstrainBoolean>,
+
+    /// Indicator whether to enable noise suppression for reducing background
+    /// sounds.
+    #[frb(non_final)]
+    pub noise_suppression: Option<ConstrainBoolean>,
+
+    /// Level of aggressiveness for noise suppression, if enabled.
+    ///
+    /// __NOTE__: Only supported on desktop platforms.
+    #[frb(non_final)]
+    pub noise_suppression_level: Option<NoiseSuppressionLevel>,
+
+    /// Indicator whether to automatically enable echo cancellation for
+    /// preventing feedback.
+    #[frb(non_final)]
+    pub echo_cancellation: Option<ConstrainBoolean>,
+
+    /// Indicator whether to enable a high-pass filter for eliminating
+    /// low-frequency noise.
+    ///
+    /// __NOTE__: Only supported on desktop platforms.
+    #[frb(non_final)]
+    pub high_pass_filter: Option<ConstrainBoolean>,
 }
 
 impl From<ApiAudioConstraints> for media::AudioTrackConstraints {
-    fn from(value: ApiAudioConstraints) -> Self {
-        let mut res = Self::new();
-        if let Some(id) = value.device_id {
-            res.device_id(id);
+    fn from(v: ApiAudioConstraints) -> Self {
+        Self {
+            device_id: v.device_id.map(ConstrainString::Exact),
+            required: false,
+            auto_gain_control: v.auto_gain_control,
+            noise_suppression: v.noise_suppression,
+            noise_suppression_level: v.noise_suppression_level,
+            echo_cancellation: v.echo_cancellation,
+            high_pass_filter: v.high_pass_filter,
         }
-        if let Some(auto_gain_control) = value.auto_gain_control {
-            match auto_gain_control {
-                ConstrainBoolean::Exact(e) => res.exact_auto_gain_control(e),
-                ConstrainBoolean::Ideal(i) => res.ideal_auto_gain_control(i),
-            }
-        }
-        res
     }
 }
 

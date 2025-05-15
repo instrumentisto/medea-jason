@@ -405,3 +405,12 @@ pub fn window() -> web_sys::Window {
 extern "C" {
     fn is_firefox() -> bool;
 }
+
+#[wasm_bindgen(inline_js = "\
+    export function is_chromium() { \
+        return navigator.vendor == 'Google Inc.'; \
+    }\
+")]
+extern "C" {
+    fn is_chromium() -> bool;
+}

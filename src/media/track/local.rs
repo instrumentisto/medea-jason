@@ -10,9 +10,11 @@ use derive_more::with_trait::AsRef;
 use medea_client_api_proto as proto;
 use tracerr::Traced;
 
-use super::MediaStreamTrackState;
 use crate::{
-    media::{AudioLevelError, MediaKind, MediaSourceKind},
+    media::{
+        AudioLevelError, AudioProcessingError, MediaKind, MediaSourceKind,
+        MediaStreamTrackState, NoiseSuppressionLevel,
+    },
     platform,
 };
 
@@ -197,6 +199,193 @@ impl LocalMediaTrack {
             .track
             .on_audio_level_changed(move |v| callback.call1(v))
             .map_err(AudioLevelError::from)
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Indicates whether this [`LocalMediaTrack`] supports audio processing
+    /// functions:
+    /// - [`LocalMediaTrack::is_noise_suppression_enabled()`]
+    /// - [`LocalMediaTrack::set_noise_suppression_enabled()`]
+    /// - [`LocalMediaTrack::get_noise_suppression_level()`]
+    /// - [`LocalMediaTrack::set_noise_suppression_level()`]
+    /// - [`LocalMediaTrack::is_echo_cancellation_enabled()`]
+    /// - [`LocalMediaTrack::set_echo_cancellation_enabled()`]
+    /// - [`LocalMediaTrack::is_auto_gain_control_enabled()`]
+    /// - [`LocalMediaTrack::set_auto_gain_control_enabled()`]
+    /// - [`LocalMediaTrack::is_high_pass_filter_enabled()`]
+    /// - [`LocalMediaTrack::set_high_pass_filter_enabled()`]
+    #[must_use]
+    pub fn is_audio_processing_available(&self) -> bool {
+        self.0.track.is_audio_processing_available()
+    }
+
+    /// Toggles noise suppression for this [`LocalMediaTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`AudioProcessingError`] if platform call errors.
+    pub async fn set_noise_suppression_enabled(
+        &self,
+        enabled: bool,
+    ) -> Result<(), Traced<AudioProcessingError>> {
+        self.0
+            .track
+            .set_noise_suppression_enabled(enabled)
+            .await
+            .map_err(AudioProcessingError::from)
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Configures a [`NoiseSuppressionLevel`] for this [`LocalMediaTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`AudioProcessingError`] if platform call errors.
+    pub async fn set_noise_suppression_level(
+        &self,
+        level: NoiseSuppressionLevel,
+    ) -> Result<(), Traced<AudioProcessingError>> {
+        self.0
+            .track
+            .set_noise_suppression_level(level)
+            .await
+            .map_err(AudioProcessingError::from)
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Toggles acoustic echo cancellation for this [`LocalMediaTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`AudioProcessingError`] if platform call errors.
+    pub async fn set_echo_cancellation_enabled(
+        &self,
+        enabled: bool,
+    ) -> Result<(), Traced<AudioProcessingError>> {
+        self.0
+            .track
+            .set_echo_cancellation_enabled(enabled)
+            .await
+            .map_err(AudioProcessingError::from)
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Toggles auto gain control for this [`LocalMediaTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`AudioProcessingError`] if platform call errors.
+    pub async fn set_auto_gain_control_enabled(
+        &self,
+        enabled: bool,
+    ) -> Result<(), Traced<AudioProcessingError>> {
+        self.0
+            .track
+            .set_auto_gain_control_enabled(enabled)
+            .await
+            .map_err(AudioProcessingError::from)
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Toggles high-pass filter for this [`LocalMediaTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`AudioProcessingError`] if platform call errors.
+    pub async fn set_high_pass_filter_enabled(
+        &self,
+        enabled: bool,
+    ) -> Result<(), Traced<AudioProcessingError>> {
+        self.0
+            .track
+            .set_high_pass_filter_enabled(enabled)
+            .await
+            .map_err(AudioProcessingError::from)
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Indicates whether noise suppression is enabled for this
+    /// [`LocalMediaTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`AudioProcessingError`] if platform call errors.
+    pub async fn is_noise_suppression_enabled(
+        &self,
+    ) -> Result<bool, Traced<AudioProcessingError>> {
+        self.0
+            .track
+            .is_noise_suppression_enabled()
+            .await
+            .map_err(AudioProcessingError::from)
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Returns the current configured [`NoiseSuppressionLevel`] of this
+    /// [`LocalMediaTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`AudioProcessingError`] if platform call errors.
+    pub async fn get_noise_suppression_level(
+        &self,
+    ) -> Result<NoiseSuppressionLevel, Traced<AudioProcessingError>> {
+        self.0
+            .track
+            .get_noise_suppression_level()
+            .await
+            .map_err(AudioProcessingError::from)
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Indicates whether auto gain control is enabled for this
+    /// [`LocalMediaTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`AudioProcessingError`] if platform call errors.
+    pub async fn is_auto_gain_control_enabled(
+        &self,
+    ) -> Result<bool, Traced<AudioProcessingError>> {
+        self.0
+            .track
+            .is_auto_gain_control_enabled()
+            .await
+            .map_err(AudioProcessingError::from)
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Indicates whether echo cancellation is enabled for this
+    /// [`LocalMediaTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`AudioProcessingError`] if platform call errors.
+    pub async fn is_echo_cancellation_enabled(
+        &self,
+    ) -> Result<bool, Traced<AudioProcessingError>> {
+        self.0
+            .track
+            .is_echo_cancellation_enabled()
+            .await
+            .map_err(AudioProcessingError::from)
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Indicates whether high-pass filter is enabled for this
+    /// [`LocalMediaTrack`].
+    ///
+    /// # Errors
+    ///
+    /// With an [`AudioProcessingError`] if platform call errors.
+    pub async fn is_high_pass_filter_enabled(
+        &self,
+    ) -> Result<bool, Traced<AudioProcessingError>> {
+        self.0
+            .track
+            .is_high_pass_filter_enabled()
+            .await
+            .map_err(AudioProcessingError::from)
             .map_err(tracerr::wrap!())
     }
 

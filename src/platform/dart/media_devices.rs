@@ -243,10 +243,8 @@ impl MediaDevices {
     pub async fn microphone_volume_is_available(&self) -> bool {
         let fut =
             unsafe { media_devices::microphone_volume_is_available() }.unwrap();
-        let result =
-            unsafe { FutureFromDart::execute::<i64>(fut) }.await.unwrap();
 
-        result == 1
+        unsafe { FutureFromDart::execute::<bool>(fut) }.await.unwrap()
     }
 
     /// Returns the current microphone volume level in percents.

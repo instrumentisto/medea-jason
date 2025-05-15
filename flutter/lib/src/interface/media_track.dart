@@ -3,9 +3,14 @@ import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import '../util/rust_handles_storage.dart';
 
 import 'enums.dart'
-    show MediaDirection, MediaKind, MediaSourceKind, MediaStreamTrackState;
+    show
+        MediaDirection,
+        MediaKind,
+        MediaSourceKind,
+        MediaStreamTrackState,
+        NoiseSuppressionLevel;
 
-export 'enums.dart' show MediaKind, MediaSourceKind;
+export 'enums.dart' show MediaKind, MediaSourceKind, NoiseSuppressionLevel;
 
 typedef TrackMediaDirection = MediaDirection;
 
@@ -59,6 +64,87 @@ abstract class LocalMediaTrack implements MediaTrack {
   /// Returns a [MediaStreamTrackState.live] if this [LocalMediaTrack] is
   /// active, or a [MediaStreamTrackState.ended] if it has ended.
   Future<MediaStreamTrackState> state();
+
+  /// Indicates whether this [LocalMediaTrack] supports audio processing
+  /// functions:
+  /// - [LocalMediaTrack.isNoiseSuppressionEnabled]
+  /// - [LocalMediaTrack.setNoiseSuppressionEnabled]
+  /// - [LocalMediaTrack.getNoiseSuppressionLevel]
+  /// - [LocalMediaTrack.setNoiseSuppressionLevel]
+  /// - [LocalMediaTrack.isEchoCancellationEnabled]
+  /// - [LocalMediaTrack.setEchoCancellationEnabled]
+  /// - [LocalMediaTrack.isAutoGainControlEnabled]
+  /// - [LocalMediaTrack.setAutoGainControlEnabled]
+  /// - [LocalMediaTrack.isHighPassFilterEnabled]
+  /// - [LocalMediaTrack.setHighPassFilterEnabled]
+  ///
+  /// This is only available for local audio tracks on web and desktop. Noise
+  /// suppression level and high-pass filter are only available on desktop.
+  ///
+  /// Additionally, updating echo cancellation, noise suppression and auto gain
+  /// control in runtime is unsupported by Chromium-based agents (as of v136).
+  /// So, [RoomHandle.setLocalMediaSettings] should be used in this case. Safari
+  /// and Firefox are fine.
+  bool isAudioProcessingAvailable();
+
+  /// Toggles noise suppression for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error. Not supported
+  /// by Chromium-based agents (as of v136).
+  Future<void> setNoiseSuppressionEnabled(bool enabled);
+
+  /// Configures a noise suppression level for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error. __Always__
+  /// throws on web.
+  Future<void> setNoiseSuppressionLevel(NoiseSuppressionLevel level);
+
+  /// Toggles acoustic echo cancellation for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error. Not supported
+  /// by Chromium-based agents (as of v136).
+  Future<void> setEchoCancellationEnabled(bool enabled);
+
+  /// Toggles automatic gain control for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error. Not supported
+  /// by Chromium-based agents (as of v136).
+  Future<void> setAutoGainControlEnabled(bool enabled);
+
+  /// Toggles high-pass filter for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error. __Always__
+  /// throws on web.
+  Future<void> setHighPassFilterEnabled(bool enabled);
+
+  /// Indicates whether noise suppression is enabled for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
+  Future<bool> isNoiseSuppressionEnabled();
+
+  /// Returns the current configured noise suppression level of this
+  /// [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error. __Always__
+  /// throws on web.
+  Future<NoiseSuppressionLevel> getNoiseSuppressionLevel();
+
+  /// Indicates whether acoustic echo cancellation is enabled for this
+  /// [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
+  Future<bool> isEchoCancellationEnabled();
+
+  /// Indicates whether auto gain control is enabled for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error.
+  Future<bool> isAutoGainControlEnabled();
+
+  /// Indicates whether high-pass filter is enabled for this [LocalMediaTrack].
+  ///
+  /// Throws an [InternalException] on unexpected platform error. __Always__
+  /// throws on web.
+  Future<bool> isHighPassFilterEnabled();
 }
 
 /// Representation of a received remote [`MediaStreamTrack`][1].
