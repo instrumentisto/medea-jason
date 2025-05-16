@@ -87,7 +87,13 @@ Future<List<webrtc.MediaStreamTrack>> Function() _getUserMedia(
 
 /// Returns all the available media devices.
 Future<List<webrtc.MediaDeviceInfo>> Function() _enumerateDevices() {
-  return () => webrtc.enumerateDevices();
+  print('_enumerateDevices 000');
+  return () async {
+    print('_enumerateDevices 111');
+    var s = webrtc.enumerateDevices();
+    print('_enumerateDevices 222');
+    return s;
+  };
 }
 
 /// Returns all the available media displays.
