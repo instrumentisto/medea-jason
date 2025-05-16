@@ -456,7 +456,7 @@ jobs:
           - linux
           - macos
           - windows
-    runs-on: ${{ (contains('android linux', matrix.platform) && 'ubuntu-latest')
+    runs-on: ${{ (contains('android linux', matrix.platform) && 'ubuntu-22.04')
               || (matrix.platform == 'windows'               && 'windows-latest')
               ||                                                'macos-latest' }}
     steps:
