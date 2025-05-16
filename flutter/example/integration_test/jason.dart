@@ -16,29 +16,32 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
+    print('setUpAll 0000000');
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       await webrtc.initFfiBridge();
       await webrtc.enableFakeMedia();
     }
+    print('setUpAll 1111111111');
   });
 
   testWidgets('MediaManager', (WidgetTester tester) async {
+    print('MediaManager 0000000');
     var jason = await Jason.init();
     var mediaManager = jason.mediaManager();
-
+    print('MediaManager 11111111');
     var devices = await mediaManager.enumerateDevices();
-
+    print('MediaManager 2222222');
     var settings = MediaStreamSettings();
     settings.audio(AudioTrackConstraints());
     settings.deviceVideo(DeviceVideoTrackConstraints());
     var tracks = await mediaManager.initLocalTracks(settings);
-
+    print('MediaManager 3333333');
     expect(devices.length, greaterThanOrEqualTo(2));
     expect(tracks.length, equals(2));
-
+    print('MediaManager 444444');
     expect(await tracks[0].state(), webrtc.MediaStreamTrackState.live);
     expect(await tracks[1].state(), webrtc.MediaStreamTrackState.live);
-
+    print('MediaManager 555555');
     expect(
       (devices.first as NativeMediaDeviceDetails),
       isNot(equals((devices.last as NativeMediaDeviceDetails))),
@@ -47,33 +50,38 @@ void main() {
       (tracks.first as NativeLocalMediaTrack).opaque,
       isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)),
     );
-
+    print('MediaManager 6666666');
     var video = tracks.where((element) => element.kind() == MediaKind.video);
     expect(video.isNotEmpty, isTrue);
     expect(video.first.mediaSourceKind(), equals(MediaSourceKind.device));
-
+    print('MediaManager 777777');
     await tracks.first.free();
     expect(() => tracks.first.kind(), throwsA(isA<StateError>()));
-
+    print('MediaManager 8888888');
     if (Platform.isIOS) {
       // iOS simulator have no camera
       return;
     }
-
+    print('MediaManager 9999999');
     var videoDevice = devices.firstWhere(
       (d) => d.kind() == MediaDeviceKind.videoInput,
     );
 
     if (!Platform.isAndroid) {
+      print('MediaManager 10 10 10 10 10');
       expect(videoDevice.deviceId(), equals('fake camera id'));
       expect(videoDevice.groupId(), isNull);
       expect(videoDevice.label(), equals('fake camera'));
+      print('MediaManager 11 11 11 11 11');
     }
 
+    print('MediaManager 12 12 12 12 12');
     videoDevice.free();
+    print('MediaManager 13 13 13 13 13');
   });
 
   testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {
+    print('DeviceVideoTrackConstraints 0000000');
     var constraints = DeviceVideoTrackConstraints();
     constraints.deviceId('deviceId');
     constraints.exactFacingMode(FacingMode.user);
@@ -101,9 +109,11 @@ void main() {
     var settings = MediaStreamSettings();
     constraints2.deviceId('deviceId');
     settings.deviceVideo(constraints2);
+    print('DeviceVideoTrackConstraints 11111111');
   });
 
   testWidgets('RoomHandle', (WidgetTester tester) async {
+    print('RoomHandle 0000000');
     var jason = await Jason.init();
     var room = jason.initRoom();
     room.onFailedLocalMedia((_) {});
@@ -142,6 +152,7 @@ void main() {
     jason.closeRoom(room);
     jason.free();
     room.free();
+    print('RoomHandle 1111111111111');
   });
 
   testWidgets('Primitive arguments Callback validation', (
