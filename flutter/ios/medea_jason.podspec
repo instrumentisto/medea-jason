@@ -21,11 +21,9 @@ Pod::Spec.new do |s|
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 arm64',
-    'OTHER_LDFLAGS[arch=x86_64]' => "-force_load $(PODS_TARGET_SRCROOT)/lib/MedeaJason.xcframework/ios-x86_64-simulator/libmedea_jason.a",
-    'OTHER_LDFLAGS[arch=arm64]' => "-force_load $(PODS_TARGET_SRCROOT)/lib/MedeaJason.xcframework/ios-arm64/libmedea_jason.a",
-    'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64',
-    'VALID_ARCHS[sdk=iphoneos*]' => 'arm64 x86_64',
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
+    'OTHER_LDFLAGS[sdk=iphonesimulator*]' => "-force_load $(PODS_TARGET_SRCROOT)/lib/MedeaJason.xcframework/ios-arm64_x86_64-simulator/libmedea_jason.a",
+    'OTHER_LDFLAGS[sdk=iphoneos*]' => "-force_load $(PODS_TARGET_SRCROOT)/lib/MedeaJason.xcframework/ios-arm64/libmedea_jason.a",
     'OTHER_LDFLAGS' => '-ObjC'
   }
 

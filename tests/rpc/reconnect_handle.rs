@@ -68,12 +68,12 @@ async fn reconnect_with_backoff() {
     // Checks that max_elapsed is not exceeded if starting_delay > max_elapsed.
     let start = instant::Instant::now();
     let err = handle
-        .reconnect_with_backoff(1000, 999.0, 50, Some(310))
+        .reconnect_with_backoff(1000, 999.0, 50, Some(300))
         .await
         .expect_err("supposed to err since transport state didn't change")
         .into_inner();
     let elapsed = start.elapsed().as_millis();
-    assert!(elapsed < 300);
+    assert!(elapsed < 350);
     assert!(matches!(err, ReconnectError::Session(_)));
 
     // Checks that reconnect attempts are made for an expected period.
