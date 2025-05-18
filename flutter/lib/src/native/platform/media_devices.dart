@@ -90,7 +90,7 @@ Future<List<webrtc.MediaDeviceInfo>> Function() _enumerateDevices() {
   print('_enumerateDevices 000');
   return () async {
     print('_enumerateDevices 111');
-    var s = webrtc.enumerateDevices();
+    var s = await webrtc.enumerateDevices();
     print('_enumerateDevices 222');
     return s;
   };

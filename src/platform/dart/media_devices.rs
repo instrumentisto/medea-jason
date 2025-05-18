@@ -118,12 +118,15 @@ impl MediaDevices {
     pub async fn enumerate_devices(
         &self,
     ) -> Result<Vec<MediaDeviceInfo>, Traced<Error>> {
+        println!("RUST enumerate_devices 000");
+        log::error!("RUST enumerate_devices 000");
         let fut = unsafe { media_devices::enumerate_devices() }.unwrap();
         let devices = unsafe { FutureFromDart::execute::<DartHandle>(fut) }
             .await
             .map(DartList::from)
             .map_err(tracerr::wrap!())?;
-
+        println!("RUST enumerate_devices 111");
+        log::error!("RUST enumerate_devices 111");
         let len = devices.length();
         let mut result = Vec::with_capacity(len);
         for i in 0..len {
@@ -132,6 +135,8 @@ impl MediaDevices {
                 result.push(v);
             }
         }
+        println!("RUST enumerate_devices 222");
+        log::error!("RUST enumerate_devices 222");
         Ok(result)
     }
 
