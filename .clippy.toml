@@ -13,6 +13,8 @@ absolute-paths-allowed-crates = [
     "web_sys",
 ]
 
+allow-expect-in-tests = true
+
 doc-valid-idents = [
     "KiB", "MiB", "GiB", "TiB", "PiB", "EiB",
     "DirectX", "ECMAScript",

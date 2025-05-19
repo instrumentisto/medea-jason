@@ -13,19 +13,11 @@ readme = "README.md"
 keywords = ["medea", "jason", "webrtc", "client", "browser"]
 categories = ["multimedia", "api-bindings", "web-programming", "wasm"]
 include = ["/src/", "/build.rs", "/CHANGELOG.md", "/LICENSE.md"]
-# TODO: Remove once rustwasm/wasm-pack#1441 is resolved:
-#       https://github.com/rustwasm/wasm-pack/issues/1441
-wasm-opt = false
 
-[workspace]
-members = [
-    "crates/medea-macro",
-    "crates/medea-reactive",
-    "mock/control-api",
-    "proto/client-api",
-    "proto/control-api",
-    "e2e",
-]
+# TODO: Try remove once rustwasm/wasm-pack#1441 is resolved:
+#       https://github.com/rustwasm/wasm-pack/issues/1441#issuecomment-2886461752
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["--enable-bulk-memory", "--enable-nontrapping-float-to-int"]
 
 [lib]
 crate-type = ["cdylib", "rlib", "staticlib"]
@@ -136,3 +128,13 @@ cc = "1.1"
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 instant = { version = "0.1", features = ["wasm-bindgen"] }
 wasm-bindgen-test = "0.3"
+
+[workspace]
+members = [
+    "crates/medea-macro",
+    "crates/medea-reactive",
+    "mock/control-api",
+    "proto/client-api",
+    "proto/control-api",
+    "e2e",
+]

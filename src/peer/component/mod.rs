@@ -30,10 +30,10 @@ use crate::{
     utils::{AsProtoState, SynchronizableState, Updatable, component},
 };
 
-/// Synchronization state of a [`Component`].
+/// Possible synchronization phases of [`Component`]'s state.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum SyncState {
-    /// State desynced, and should be synced on a RPC reconnection.
+pub enum SyncPhase {
+    /// State is desynced and should be synced on RPC reconnection.
     Desynced,
 
     /// State syncs with a Media Server state.
@@ -43,7 +43,7 @@ pub enum SyncState {
     Synced,
 }
 
-/// Negotiation state of the [`Component`].
+/// Possible negotiation phases of a [`Component`].
 ///
 /// ```ignore
 ///           +--------+
@@ -77,7 +77,7 @@ pub enum SyncState {
 ///               +----------------+
 /// ```
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum NegotiationState {
+enum NegotiationPhase {
     /// [`Component`] is new or negotiation is completed.
     Stable,
 
@@ -119,8 +119,8 @@ pub struct State {
     /// Current [`NegotiationRole`] of this [`Component`].
     negotiation_role: ProgressableCell<Option<NegotiationRole>>,
 
-    /// Negotiation state of this [`Component`].
-    negotiation_state: ObservableCell<NegotiationState>,
+    /// [`NegotiationPhase`] of this [`Component`].
+    negotiation_phase: ObservableCell<NegotiationPhase>,
 
     /// Local session description of this [`Component`].
     local_sdp: LocalSdp,
@@ -145,8 +145,8 @@ pub struct State {
     maybe_update_connections:
         ObservableCell<Option<(TrackId, HashSet<MemberId>)>>,
 
-    /// Synchronization state of this [`Component`].
-    sync_state: ObservableCell<SyncState>,
+    /// [`SyncPhase`] of this [`Component`].
+    sync_phase: ObservableCell<SyncPhase>,
 }
 
 impl State {
@@ -169,12 +169,12 @@ impl State {
             remote_sdp: ProgressableCell::new(None),
             local_sdp: LocalSdp::new(),
             negotiation_role: ProgressableCell::new(negotiation_role),
-            negotiation_state: ObservableCell::new(NegotiationState::Stable),
+            negotiation_phase: ObservableCell::new(NegotiationPhase::Stable),
             restart_ice: Cell::new(false),
             ice_candidates: IceCandidates::new(),
             maybe_update_local_stream: ObservableCell::new(false),
             maybe_update_connections: ObservableCell::new(None),
-            sync_state: ObservableCell::new(SyncState::Synced),
+            sync_phase: ObservableCell::new(SyncPhase::Synced),
         }
     }
 
@@ -516,14 +516,14 @@ impl SynchronizableState for State {
         if let Some(sdp_offer) = input.local_sdp {
             self.local_sdp.approved_set(sdp_offer);
         } else {
-            self.negotiation_state.set(NegotiationState::WaitLocalSdp);
+            self.negotiation_phase.set(NegotiationPhase::WaitLocalSdp);
         }
         self.remote_sdp.set(input.remote_sdp);
         self.ice_candidates.apply(input.ice_candidates, send_cons);
         self.senders.apply(input.senders, send_cons);
         self.receivers.apply(input.receivers, send_cons);
 
-        self.sync_state.set(SyncState::Synced);
+        self.sync_phase.set(SyncPhase::Synced);
     }
 }
 
@@ -543,13 +543,13 @@ impl Updatable for State {
     }
 
     fn connection_lost(&self) {
-        self.sync_state.set(SyncState::Desynced);
+        self.sync_phase.set(SyncPhase::Desynced);
         self.senders.connection_lost();
         self.receivers.connection_lost();
     }
 
     fn connection_recovered(&self) {
-        self.sync_state.set(SyncState::Syncing);
+        self.sync_phase.set(SyncPhase::Syncing);
         self.senders.connection_recovered();
         self.receivers.connection_recovered();
     }
@@ -567,7 +567,7 @@ impl State {
 
     /// Resets a [`NegotiationRole`] of this [`State`] to [`None`].
     pub fn reset_negotiation_role(&self) {
-        self.negotiation_state.set(NegotiationState::Stable);
+        self.negotiation_phase.set(NegotiationPhase::Stable);
         self.negotiation_role.set(None);
     }
 
@@ -583,8 +583,8 @@ impl State {
     ) -> impl Future<Output = ()> + use<> {
         use futures::FutureExt as _;
 
-        self.negotiation_state
-            .when_eq(NegotiationState::WaitLocalSdpApprove)
+        self.negotiation_phase
+            .when_eq(NegotiationPhase::WaitLocalSdpApprove)
             .map(drop)
     }
 
@@ -611,10 +611,10 @@ impl State {
         .await;
     }
 
-    /// Sets [`State::sync_state`] to the [`SyncState::Synced`].
+    /// Sets [`State::sync_phase`] to the [`SyncPhase::Synced`].
     pub fn synced(&self) {
         self.senders.synced();
         self.receivers.synced();
-        self.sync_state.set(SyncState::Synced);
+        self.sync_phase.set(SyncPhase::Synced);
     }
 }

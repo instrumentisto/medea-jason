@@ -81,7 +81,7 @@ pub struct Sender {
     send_constraints: LocalTracksConstraints,
 
     /// Channel for sending [`TrackEvent`]s to the actual [`local::Track`].
-    track_events_sender: mpsc::UnboundedSender<TrackEvent>,
+    track_events_tx: mpsc::UnboundedSender<TrackEvent>,
 }
 
 impl Sender {
@@ -103,7 +103,7 @@ impl Sender {
         state: &State,
         media_connections: &MediaConnections,
         send_constraints: LocalTracksConstraints,
-        track_events_sender: mpsc::UnboundedSender<TrackEvent>,
+        track_events_tx: mpsc::UnboundedSender<TrackEvent>,
     ) -> Result<Rc<Self>, Traced<CreateError>> {
         let enabled_in_cons = send_constraints.enabled(state.media_type());
         let muted_in_cons = send_constraints.muted(state.media_type());
@@ -162,7 +162,7 @@ impl Sender {
             enabled_general: Cell::new(state.is_enabled_general()),
             enabled_individual: Cell::new(state.is_enabled_individual()),
             muted: Cell::new(state.is_muted()),
-            track_events_sender,
+            track_events_tx,
             send_constraints,
             track: RefCell::new(None),
         });
@@ -277,7 +277,7 @@ impl Sender {
         &self,
         state: media_exchange_state::Transition,
     ) {
-        _ = self.track_events_sender.unbounded_send(
+        _ = self.track_events_tx.unbounded_send(
             TrackEvent::MediaExchangeIntention {
                 id: self.track_id,
                 enabled: matches!(
@@ -291,7 +291,7 @@ impl Sender {
     /// Sends [`TrackEvent::MuteUpdateIntention`] with the provided
     /// [`mute_state`].
     pub fn send_mute_state_intention(&self, state: mute_state::Transition) {
-        _ = self.track_events_sender.unbounded_send(
+        _ = self.track_events_tx.unbounded_send(
             TrackEvent::MuteUpdateIntention {
                 id: self.track_id,
                 muted: matches!(state, mute_state::Transition::Muting(_)),

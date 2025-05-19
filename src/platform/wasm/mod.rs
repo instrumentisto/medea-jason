@@ -45,6 +45,7 @@ pub type MediaDisplayInfo = ();
 ///
 /// The runtime environment must be single-threaded WASM.
 #[global_allocator]
+// SAFETY: Runtime environment is assumed to be single-threaded WASM.
 static ALLOCATOR: talc::TalckWasm = unsafe { talc::TalckWasm::new_global() };
 
 /// When the `console_error_panic_hook` feature is enabled, we can call the

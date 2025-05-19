@@ -30,7 +30,7 @@ use crate::{
 pub struct Track {
     /// Actual [`platform::MediaStreamTrack`].
     #[as_ref]
-    track: platform::MediaStreamTrack,
+    inner: platform::MediaStreamTrack,
 
     /// Underlying [`platform::MediaStreamTrack`] source kind.
     source_kind: proto::MediaSourceKind,
@@ -52,13 +52,13 @@ impl Track {
         track: platform::MediaStreamTrack,
         source_kind: proto::MediaSourceKind,
     ) -> Self {
-        Self { track, source_kind, _parent: None }
+        Self { inner: track, source_kind, _parent: None }
     }
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
     #[must_use]
     pub const fn platform_track(&self) -> &platform::MediaStreamTrack {
-        &self.track
+        &self.inner
     }
 
     /// Changes [`enabled`][1] attribute on the underlying
@@ -67,7 +67,7 @@ impl Track {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     pub fn set_enabled(&self, enabled: bool) {
-        self.track.set_enabled(enabled);
+        self.inner.set_enabled(enabled);
     }
 
     /// Returns [`id`] of underlying [MediaStreamTrack][2].
@@ -76,7 +76,7 @@ impl Track {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn id(&self) -> String {
-        self.track.id()
+        self.inner.id()
     }
 
     /// Returns this [`Track`]'s media source kind.
@@ -92,18 +92,18 @@ impl Track {
     )]
     #[must_use]
     pub fn kind(&self) -> MediaKind {
-        self.track.kind()
+        self.inner.kind()
     }
 
     /// Sets a callback to invoke when this [`Track`] is ended.
     pub fn on_ended(&self, callback: platform::Function<()>) {
-        self.track.on_ended(Some(move || callback.call0()));
+        self.inner.on_ended(Some(move || callback.call0()));
     }
 
     /// Returns a [`MediaStreamTrackState::Live`] if this [`Track`] is active,
     /// or a [`MediaStreamTrackState::Ended`] if it has ended.
     pub async fn state(&self) -> MediaStreamTrackState {
-        self.track.ready_state().await
+        self.inner.ready_state().await
     }
 
     /// Forks this [`Track`].
@@ -116,21 +116,25 @@ impl Track {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
     pub async fn fork(self: &Rc<Self>) -> Self {
         let parent = Rc::clone(self);
-        let track = self.track.fork().await;
-        Self { track, source_kind: self.source_kind, _parent: Some(parent) }
+        let track = self.inner.fork().await;
+        Self {
+            inner: track,
+            source_kind: self.source_kind,
+            _parent: Some(parent),
+        }
     }
 
     /// [Stops][1] this [`Track`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
     pub async fn stop(&self) {
-        self.track.stop().await;
+        self.inner.stop().await;
     }
 }
 
 impl Drop for Track {
     fn drop(&mut self) {
-        platform::spawn(Box::pin(self.track.stop()));
+        platform::spawn(Box::pin(self.inner.stop()));
     }
 }
 
@@ -151,10 +155,9 @@ impl LocalMediaTrack {
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this
     /// [`LocalMediaTrack`].
-    #[expect(clippy::missing_const_for_fn, reason = "non-const deref coercion")]
     #[must_use]
     pub fn get_track(&self) -> &platform::MediaStreamTrack {
-        &self.0.track
+        &self.0.inner
     }
 
     /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
@@ -179,7 +182,7 @@ impl LocalMediaTrack {
     /// [`LocalMediaTrack`].
     #[must_use]
     pub fn is_on_audio_level_available(&self) -> bool {
-        self.0.track.is_on_audio_level_available()
+        self.0.inner.is_on_audio_level_available()
     }
 
     /// Sets the provided `OnAudioLevelChangedCallback` for this
@@ -196,7 +199,7 @@ impl LocalMediaTrack {
         callback: platform::Function<i32>,
     ) -> Result<(), Traced<AudioLevelError>> {
         self.0
-            .track
+            .inner
             .on_audio_level_changed(move |v| callback.call1(v))
             .map_err(AudioLevelError::from)
             .map_err(tracerr::wrap!())
@@ -216,7 +219,7 @@ impl LocalMediaTrack {
     /// - [`LocalMediaTrack::set_high_pass_filter_enabled()`]
     #[must_use]
     pub fn is_audio_processing_available(&self) -> bool {
-        self.0.track.is_audio_processing_available()
+        self.0.inner.is_audio_processing_available()
     }
 
     /// Toggles noise suppression for this [`LocalMediaTrack`].
@@ -229,7 +232,7 @@ impl LocalMediaTrack {
         enabled: bool,
     ) -> Result<(), Traced<AudioProcessingError>> {
         self.0
-            .track
+            .inner
             .set_noise_suppression_enabled(enabled)
             .await
             .map_err(AudioProcessingError::from)
@@ -246,7 +249,7 @@ impl LocalMediaTrack {
         level: NoiseSuppressionLevel,
     ) -> Result<(), Traced<AudioProcessingError>> {
         self.0
-            .track
+            .inner
             .set_noise_suppression_level(level)
             .await
             .map_err(AudioProcessingError::from)
@@ -263,7 +266,7 @@ impl LocalMediaTrack {
         enabled: bool,
     ) -> Result<(), Traced<AudioProcessingError>> {
         self.0
-            .track
+            .inner
             .set_echo_cancellation_enabled(enabled)
             .await
             .map_err(AudioProcessingError::from)
@@ -280,7 +283,7 @@ impl LocalMediaTrack {
         enabled: bool,
     ) -> Result<(), Traced<AudioProcessingError>> {
         self.0
-            .track
+            .inner
             .set_auto_gain_control_enabled(enabled)
             .await
             .map_err(AudioProcessingError::from)
@@ -297,7 +300,7 @@ impl LocalMediaTrack {
         enabled: bool,
     ) -> Result<(), Traced<AudioProcessingError>> {
         self.0
-            .track
+            .inner
             .set_high_pass_filter_enabled(enabled)
             .await
             .map_err(AudioProcessingError::from)
@@ -314,7 +317,7 @@ impl LocalMediaTrack {
         &self,
     ) -> Result<bool, Traced<AudioProcessingError>> {
         self.0
-            .track
+            .inner
             .is_noise_suppression_enabled()
             .await
             .map_err(AudioProcessingError::from)
@@ -331,7 +334,7 @@ impl LocalMediaTrack {
         &self,
     ) -> Result<NoiseSuppressionLevel, Traced<AudioProcessingError>> {
         self.0
-            .track
+            .inner
             .get_noise_suppression_level()
             .await
             .map_err(AudioProcessingError::from)
@@ -348,7 +351,7 @@ impl LocalMediaTrack {
         &self,
     ) -> Result<bool, Traced<AudioProcessingError>> {
         self.0
-            .track
+            .inner
             .is_auto_gain_control_enabled()
             .await
             .map_err(AudioProcessingError::from)
@@ -365,7 +368,7 @@ impl LocalMediaTrack {
         &self,
     ) -> Result<bool, Traced<AudioProcessingError>> {
         self.0
-            .track
+            .inner
             .is_echo_cancellation_enabled()
             .await
             .map_err(AudioProcessingError::from)
@@ -382,7 +385,7 @@ impl LocalMediaTrack {
         &self,
     ) -> Result<bool, Traced<AudioProcessingError>> {
         self.0
-            .track
+            .inner
             .is_high_pass_filter_enabled()
             .await
             .map_err(AudioProcessingError::from)
