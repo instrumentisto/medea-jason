@@ -16,6 +16,9 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
+
+    await Future.delayed(Duration(seconds: 5));
+
     print('setUpAll 0000000');
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       await webrtc.initFfiBridge();
