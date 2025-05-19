@@ -18,10 +18,16 @@ Future<void> main() async {
         'android.permission.$permission',
       ]);
 
-      print('PERMISSIONS: STDOUT: ${result.stdout}, STDERR: ${result.stderr}');
+      print('PERMISSIONS: PID: ${result.pid}, EXIT_CODE: ${result.exitCode}, STDOUT: ${result.stdout}, STDERR: ${result.stderr}');
+
     }
 
   }
+
+  var result = await Process.run('adb', ['devices']);
+
+  print('PERMISSIONS: PID: ${result.pid}, EXIT_CODE: ${result.exitCode}, STDOUT: ${result.stdout}, STDERR: ${result.stderr}');
+
   await integrationDriver(driver: driver);
   print('PERMISSIONS END');
 }
