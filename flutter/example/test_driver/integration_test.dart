@@ -8,9 +8,11 @@ const List<String> _androidPermissions = ['CAMERA', 'RECORD_AUDIO'];
 
 Future<void> main() async {
   var driver = await FlutterDriver.connect();
-
+  print('PERMISSIONS 000');
   if ((await driver.serviceClient.getVM()).operatingSystem == 'android') {
+    print('PERMISSIONS 111');
     for (var permission in _androidPermissions) {
+      print('PERMISSIONS 2222');
       await Process.run('adb', [
         'shell',
         'pm',
@@ -19,7 +21,9 @@ Future<void> main() async {
         'android.permission.$permission',
       ]);
     }
+    print('PERMISSIONS 3333');
   }
-
+  print('PERMISSIONS 44444');
   await integrationDriver(driver: driver);
+  print('PERMISSIONS 5555');
 }
