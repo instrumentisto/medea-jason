@@ -142,13 +142,6 @@ impl Track {
     }
 
     /// Returns this [`Track`]'s kind (audio/video).
-    #[cfg_attr(
-        target_family = "wasm",
-        expect( // non-const deref coercion
-            clippy::missing_const_for_fn,
-            reason = "non-const deref coercion"
-        )
-    )]
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.0.track.kind()
@@ -171,7 +164,6 @@ impl Track {
     }
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
-    #[expect(clippy::missing_const_for_fn, reason = "non-const deref coercion")]
     #[must_use]
     pub fn get_track(&self) -> &platform::MediaStreamTrack {
         &self.0.track

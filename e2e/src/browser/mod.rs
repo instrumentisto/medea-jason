@@ -74,7 +74,7 @@ pub struct Window {
 
     /// Handle of the browser window in which this [`Window`] should execute
     /// everything.
-    window: WindowHandle,
+    handle: WindowHandle,
 
     /// Count of this [`Window`] references.
     ///
@@ -87,7 +87,7 @@ impl Clone for Window {
         _ = self.rc.fetch_add(1, Ordering::SeqCst);
         Self {
             client: self.client.clone(),
-            window: self.window.clone(),
+            handle: self.handle.clone(),
             rc: Arc::clone(&self.rc),
         }
     }
@@ -96,7 +96,7 @@ impl Clone for Window {
 impl Drop for Window {
     fn drop(&mut self) {
         if self.rc.fetch_sub(1, Ordering::SeqCst) == 1 {
-            self.client.blocking_window_close(self.window.clone());
+            self.client.blocking_window_close(self.handle.clone());
         }
     }
 }
@@ -106,7 +106,8 @@ impl Window {
     async fn new(client: WebDriverClient) -> Self {
         let window = client.new_window().await.unwrap();
 
-        let this = Self { client, window, rc: Arc::new(AtomicUsize::new(1)) };
+        let this =
+            Self { client, handle: window, rc: Arc::new(AtomicUsize::new(1)) };
         mock::instantiate_mocks(&this).await;
         this
     }
@@ -119,7 +120,7 @@ impl Window {
     /// - If failed to execute JS statement.
     pub async fn execute(&self, exec: Statement) -> Result<Json> {
         self.client
-            .switch_to_window_and_execute(self.window.clone(), exec)
+            .switch_to_window_and_execute(self.handle.clone(), exec)
             .await
     }
 }

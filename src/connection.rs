@@ -61,13 +61,13 @@ type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 #[derive(Debug)]
 pub struct Connections {
     /// [`TrackId`] to remote [`MemberId`].
-    tracks: RefCell<HashMap<TrackId, HashSet<MemberId>>>,
+    tracks_to_members: RefCell<HashMap<TrackId, HashSet<MemberId>>>,
 
     /// Remote [`MemberId`] to [`TrackId`].
     members_to_tracks: RefCell<HashMap<MemberId, HashSet<TrackId>>>,
 
     /// Remote [`MemberId`] to [`Connection`] with that `Member`.
-    connections: RefCell<HashMap<MemberId, Connection>>,
+    members_to_conns: RefCell<HashMap<MemberId, Connection>>,
 
     /// Global constraints to the [`remote::Track`]s of the Jason.
     room_recv_constraints: Rc<RecvConstraints>,
@@ -80,9 +80,9 @@ impl Connections {
     /// Creates new [`Connections`].
     pub fn new(room_recv_constraints: Rc<RecvConstraints>) -> Self {
         Self {
-            tracks: RefCell::default(),
+            tracks_to_members: RefCell::default(),
             members_to_tracks: RefCell::default(),
-            connections: RefCell::default(),
+            members_to_conns: RefCell::default(),
             room_recv_constraints,
             on_new_connection: platform::Callback::default(),
         }
@@ -110,8 +110,10 @@ impl Connections {
         track_id: &TrackId,
         partner_members: HashSet<MemberId>,
     ) -> Vec<Connection> {
-        if let Some(partners) = self.tracks.borrow_mut().get_mut(track_id) {
-            let mut connections = self.connections.borrow_mut();
+        if let Some(partners) =
+            self.tracks_to_members.borrow_mut().get_mut(track_id)
+        {
+            let mut connections = self.members_to_conns.borrow_mut();
             let mut members_to_tracks = self.members_to_tracks.borrow_mut();
 
             // No changes.
@@ -187,7 +189,7 @@ impl Connections {
         track_id: TrackId,
         partner_members: &HashSet<MemberId>,
     ) -> Vec<Connection> {
-        let mut connections = self.connections.borrow_mut();
+        let mut connections = self.members_to_conns.borrow_mut();
 
         #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for partner in partner_members {
@@ -208,7 +210,7 @@ impl Connections {
         }
 
         drop(
-            self.tracks.borrow_mut().insert(
+            self.tracks_to_members.borrow_mut().insert(
                 track_id,
                 partner_members.clone().into_iter().collect(),
             ),
@@ -221,11 +223,11 @@ impl Connections {
     }
 
     /// Removes information about [`Track`] with the provided [`TrackId`]. Then
-    /// [`Connections`] can decides to delete the related [`Connection`].
+    /// [`Connections`] can decide to delete the related [`Connection`].
     ///
     /// [`Track`]: medea_client_api_proto::Track
     pub fn remove_track(&self, track_id: &TrackId) {
-        let mut tracks = self.tracks.borrow_mut();
+        let mut tracks = self.tracks_to_members.borrow_mut();
 
         if let Some(partners) = tracks.remove(track_id) {
             #[expect(clippy::iter_over_hash_type, reason = "doesn't matter")]
@@ -237,7 +239,7 @@ impl Connections {
 
                     if member_tracks.is_empty() {
                         _ = self
-                            .connections
+                            .members_to_conns
                             .borrow_mut()
                             .remove(&p)
                             .map(|conn| conn.0.on_close.call0());
@@ -249,7 +251,7 @@ impl Connections {
 
     /// Lookups a [`Connection`] by the provided remote [`MemberId`].
     pub fn get(&self, remote_member_id: &MemberId) -> Option<Connection> {
-        self.connections.borrow().get(remote_member_id).cloned()
+        self.members_to_conns.borrow().get(remote_member_id).cloned()
     }
 
     /// Updates this [`Connection`] with the provided [`proto::state::Room`].
@@ -257,7 +259,9 @@ impl Connections {
         #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for peer in new_state.peers.values() {
             for (track_id, sender) in &peer.senders {
-                if let Some(partners) = self.tracks.borrow().get(track_id) {
+                if let Some(partners) =
+                    self.tracks_to_members.borrow().get(track_id)
+                {
                     for member in partners {
                         if let Some(member_tracks) =
                             self.members_to_tracks.borrow_mut().get_mut(member)

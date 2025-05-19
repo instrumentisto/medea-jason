@@ -69,27 +69,31 @@ pub struct LocalTracksConstraints(Rc<RefCell<MediaStreamSettings>>);
 
 /// Constraints to the media received from remote. Used to disable or enable
 /// media receiving.
+#[expect( // intended: all fields have the same postfix `enabled`
+    clippy::struct_field_names,
+    reason = "intended: all fields have the same postfix `enabled`"
+)]
 #[derive(Debug)]
 pub struct RecvConstraints {
-    /// Is audio receiving enabled.
-    is_audio_enabled: ObservableCell<bool>,
+    /// Indicator whether audio receiving is enabled.
+    audio_enabled: ObservableCell<bool>,
 
-    /// Is device video receiving enabled.
-    is_video_device_enabled: ObservableCell<bool>,
+    /// Indicator whether device video receiving is enabled.
+    video_device_enabled: ObservableCell<bool>,
 
-    /// Is display video receiving enabled.
-    is_video_display_enabled: ObservableCell<bool>,
+    /// Indicator whether display video receiving is enabled.
+    video_display_enabled: ObservableCell<bool>,
 }
 
 impl Clone for RecvConstraints {
     fn clone(&self) -> Self {
         Self {
-            is_audio_enabled: ObservableCell::new(self.is_audio_enabled.get()),
-            is_video_device_enabled: ObservableCell::new(
-                self.is_video_device_enabled.get(),
+            audio_enabled: ObservableCell::new(self.audio_enabled.get()),
+            video_device_enabled: ObservableCell::new(
+                self.video_device_enabled.get(),
             ),
-            is_video_display_enabled: ObservableCell::new(
-                self.is_video_display_enabled.get(),
+            video_display_enabled: ObservableCell::new(
+                self.video_display_enabled.get(),
             ),
         }
     }
@@ -98,9 +102,9 @@ impl Clone for RecvConstraints {
 impl Default for RecvConstraints {
     fn default() -> Self {
         Self {
-            is_audio_enabled: ObservableCell::new(true),
-            is_video_device_enabled: ObservableCell::new(true),
-            is_video_display_enabled: ObservableCell::new(true),
+            audio_enabled: ObservableCell::new(true),
+            video_device_enabled: ObservableCell::new(true),
+            video_display_enabled: ObservableCell::new(true),
         }
     }
 }
@@ -115,60 +119,66 @@ impl RecvConstraints {
     ) {
         match kind {
             MediaKind::Audio => {
-                self.is_audio_enabled.set(enabled);
+                self.audio_enabled.set(enabled);
             }
             MediaKind::Video => source_kind.map_or_else(
                 || {
-                    self.is_video_device_enabled.set(enabled);
-                    self.is_video_display_enabled.set(enabled);
+                    self.video_device_enabled.set(enabled);
+                    self.video_display_enabled.set(enabled);
                 },
                 |sk| match sk {
                     MediaSourceKind::Device => {
-                        self.is_video_device_enabled.set(enabled);
+                        self.video_device_enabled.set(enabled);
                     }
                     MediaSourceKind::Display => {
-                        self.is_video_display_enabled.set(enabled);
+                        self.video_display_enabled.set(enabled);
                     }
                 },
             ),
         }
     }
 
-    /// Returns is audio receiving enabled.
+    /// Indicates whether audio receiving is enabled.
     pub fn is_audio_enabled(&self) -> bool {
-        self.is_audio_enabled.get()
+        self.audio_enabled.get()
     }
 
-    /// Returns is device video receiving enabled.
+    /// Indicates whether device video receiving is enabled.
     pub fn is_video_device_enabled(&self) -> bool {
-        self.is_video_device_enabled.get()
+        self.video_device_enabled.get()
     }
 
-    /// Returns is display video receiving enabled.
+    /// Indicates whether display video receiving is enabled.
     pub fn is_video_display_enabled(&self) -> bool {
-        self.is_video_display_enabled.get()
+        self.video_display_enabled.get()
     }
 
-    /// Returns [`LocalBoxStream`] into which all `is_audio_enabled` updates
+    /// Returns [`LocalBoxStream`] into which all [`is_audio_enabled`] updates
     /// will be sent.
+    ///
+    /// [`is_audio_enabled`]: RecvConstraints::is_audio_enabled()
     pub fn on_audio_enabled_change(&self) -> LocalBoxStream<'static, bool> {
-        self.is_audio_enabled.subscribe()
+        self.audio_enabled.subscribe()
     }
 
-    /// Returns [`LocalBoxStream`] into which all `is_video_device_enabled`
+    /// Returns [`LocalBoxStream`] into which all [`is_video_device_enabled`]
     /// updates will be sent.
+    ///
+    /// [`is_video_device_enabled`]: RecvConstraints::is_video_device_enabled()
     pub fn on_video_device_enabled_change(
         &self,
     ) -> LocalBoxStream<'static, bool> {
-        self.is_video_device_enabled.subscribe()
+        self.video_device_enabled.subscribe()
     }
 
-    /// Returns [`LocalBoxStream`] into which all `is_video_display_enabled`
+    /// Returns [`LocalBoxStream`] into which all [`is_video_display_enabled`]
     /// updates will be sent.
+    ///
+    /// [`is_video_display_enabled`]: RecvConstraints::is_video_display_enabled
     pub fn on_video_display_enabled_change(
         &self,
     ) -> LocalBoxStream<'static, bool> {
-        self.is_video_display_enabled.subscribe()
+        self.video_display_enabled.subscribe()
     }
 }
 

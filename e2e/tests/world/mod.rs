@@ -52,7 +52,7 @@ type Result<T> = std::result::Result<T, Error>;
 /// [`World`][1] used by all E2E tests.
 ///
 /// [1]: cucumber::World
-#[derive(cucumber::World, Debug)]
+#[derive(Debug, cucumber::World)]
 #[world(init = Self::try_new)]
 pub struct World {
     /// ID of the `Room` created for this [`World`].

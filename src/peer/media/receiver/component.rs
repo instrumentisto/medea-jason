@@ -20,7 +20,7 @@ use crate::{
     peer::{
         MediaExchangeState, MediaExchangeStateController,
         MediaStateControllable, MuteStateController, TransceiverSide,
-        component::SyncState,
+        component::SyncPhase,
         media::{InTransition as _, transitable_state::media_exchange_state},
     },
     utils::{AsProtoState, SynchronizableState, Updatable, component},
@@ -81,8 +81,8 @@ pub struct State {
     /// [SFU]: https://webrtcglossary.com/sfu
     connection_mode: ConnectionMode,
 
-    /// Synchronization state of the [`Component`].
-    sync_state: ObservableCell<SyncState>,
+    /// [`SyncPhase`] of the [`Component`].
+    sync_phase: ObservableCell<SyncPhase>,
 }
 
 impl AsProtoState for State {
@@ -123,7 +123,7 @@ impl SynchronizableState for State {
             muted: ObservableCell::new(input.muted),
             media_direction: ObservableCell::new(input.media_direction.into()),
             connection_mode: input.connection_mode,
-            sync_state: ObservableCell::new(SyncState::Synced),
+            sync_phase: ObservableCell::new(SyncPhase::Synced),
         }
     }
 
@@ -147,7 +147,7 @@ impl SynchronizableState for State {
         ));
         self.media_direction.set(input.media_direction.into());
 
-        self.sync_state.set(SyncState::Synced);
+        self.sync_phase.set(SyncPhase::Synced);
     }
 }
 
@@ -178,12 +178,12 @@ impl Updatable for State {
 
     /// Notifies [`State`] about a RPC connection loss.
     fn connection_lost(&self) {
-        self.sync_state.set(SyncState::Desynced);
+        self.sync_phase.set(SyncPhase::Desynced);
     }
 
     /// Notifies [`State`] about a RPC connection restore.
     fn connection_recovered(&self) {
-        self.sync_state.set(SyncState::Syncing);
+        self.sync_phase.set(SyncPhase::Syncing);
     }
 }
 
@@ -225,7 +225,7 @@ impl State {
                 media_direction.is_enabled_general().into(),
             ),
             muted: ObservableCell::new(muted),
-            sync_state: ObservableCell::new(SyncState::Synced),
+            sync_phase: ObservableCell::new(SyncPhase::Synced),
             connection_mode,
             media_direction: ObservableCell::new(media_direction.into()),
         }
@@ -387,18 +387,18 @@ impl Component {
         }
     }
 
-    /// Stops transition timeouts on [`SyncState::Desynced`].
+    /// Stops transition timeouts on [`SyncPhase::Desynced`].
     ///
     /// Sends media state intentions and resets transition timeouts on
-    /// [`SyncState::Synced`].
-    #[watch(self.sync_state.subscribe().skip(1))]
-    fn sync_state_watcher(
+    /// [`SyncPhase::Synced`].
+    #[watch(self.sync_phase.subscribe().skip(1))]
+    fn sync_phase_watcher(
         receiver: &Receiver,
         state: &State,
-        sync_state: SyncState,
+        sync_phase: SyncPhase,
     ) {
-        match sync_state {
-            SyncState::Synced => {
+        match sync_phase {
+            SyncPhase::Synced => {
                 if let MediaExchangeState::Transition(transition) =
                     state.enabled_individual.state()
                 {
@@ -406,10 +406,10 @@ impl Component {
                 }
                 state.enabled_individual.reset_transition_timeout();
             }
-            SyncState::Desynced => {
+            SyncPhase::Desynced => {
                 state.enabled_individual.stop_transition_timeout();
             }
-            SyncState::Syncing => (),
+            SyncPhase::Syncing => (),
         }
     }
 
@@ -486,8 +486,8 @@ impl State {
         }
     }
 
-    /// Sets the [`State::sync_state`] to a [`SyncState::Synced`].
+    /// Sets the [`State::sync_phase`] to a [`SyncPhase::Synced`].
     pub fn synced(&self) {
-        self.sync_state.set(SyncState::Synced);
+        self.sync_phase.set(SyncPhase::Synced);
     }
 }
