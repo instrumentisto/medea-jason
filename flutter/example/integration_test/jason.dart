@@ -24,8 +24,11 @@ void main() {
     if (Platform.isAndroid) {
       DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
       final androidInfo = await deviceInfoPlugin.androidInfo;
-      if (androidInfo.version.sdkInt == 24) {
-        // TODO: add docs if this works
+      if (androidInfo.version.sdkInt < 25) {
+        // Wait for adb grant permission. Emulator running an old SDK wont
+        // grant permission if the UI prompt is already up. So we wait for a
+        // little bit to let it run before calling any camera/mic functions
+        // that will trigger the prompt.
         await Future.delayed(Duration(seconds: 5));
       }
     }
