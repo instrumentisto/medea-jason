@@ -42,16 +42,12 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
 
   @override
   Future<List<MediaDeviceDetails>> enumerateDevices() async {
-    print('NativeMediaManagerHandle.enumerateDevices 000');
     Pointer devices;
     devices = await (opaque.inner.enumerateDevices() as Future);
-    print('NativeMediaManagerHandle.enumerateDevices 111');
-    var res = frb
+    return frb
         .vecMediaDeviceDetailsFromRaw(ptr: devices.address)
         .map((info) => NativeMediaDeviceDetails(info))
         .toList();
-    print('NativeMediaManagerHandle.enumerateDevices 222');
-    return res;
   }
 
   @override

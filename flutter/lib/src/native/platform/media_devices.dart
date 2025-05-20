@@ -74,26 +74,13 @@ class MockMediaDevices {
 Future<List<webrtc.MediaStreamTrack>> Function() _getUserMedia(
   Object constraints,
 ) {
-  print('_getUserMedia 000');
   constraints as webrtc.DeviceConstraints;
-  return () async {
-    print('_getUserMedia 111');
-    var s = await webrtc.getUserMedia(constraints);
-    print('_getUserMedia 222');
-
-    return s;
-  };
+  return () => webrtc.getUserMedia(constraints);
 }
 
 /// Returns all the available media devices.
 Future<List<webrtc.MediaDeviceInfo>> Function() _enumerateDevices() {
-  print('_enumerateDevices 000');
-  return () async {
-    print('_enumerateDevices 111');
-    var s = await webrtc.enumerateDevices();
-    print('_enumerateDevices 222');
-    return s;
-  };
+  return () => webrtc.enumerateDevices();
 }
 
 /// Returns all the available media displays.
