@@ -3,4 +3,5 @@
 # Intermediate binaries that are later bundled into an XCFramework.
 /lib/aarch64-apple-ios/libmedea_jason.a
 /lib/aarch64-apple-ios-sim/libmedea_jason.a
+/lib/ios-arm64_x86_64-simulator/libmedea_jason.a
 /lib/x86_64-apple-ios/libmedea_jason.a
