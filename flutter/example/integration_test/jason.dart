@@ -25,8 +25,8 @@ void main() {
       DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
       final androidInfo = await deviceInfoPlugin.androidInfo;
       if (androidInfo.version.sdkInt < 25) {
-        // Wait for adb grant permission. Emulator running an old SDK wont
-        // grant permission if the UI prompt is already up. So we wait for a
+        // Wait for `adb` grant permissions. Emulator running an old SDK won't
+        // grant permissions if the UI prompt is already up. So we wait for a
         // little bit to let it run before calling any camera/mic functions
         // that will trigger the prompt.
         await Future.delayed(Duration(seconds: 5));
@@ -67,7 +67,7 @@ void main() {
     expect(() => tracks.first.kind(), throwsA(isA<StateError>()));
 
     if (Platform.isIOS) {
-      // iOS simulator have no camera
+      // iOS simulator has no camera.
       return;
     }
     var videoDevice = devices.firstWhere(

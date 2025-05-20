@@ -307,12 +307,12 @@ jobs:
       matrix:
         platform:
           - android
-          #- ios # TODO: Very flaky and runs for few hours. Try re-enabling when
-          #              github actions support nested virtualization on Apple
+          #- ios # TODO: Very flaky and runs for few hours. Try re-enabling once
+          #              GitHub Actions support nested virtualization on Apple
           #              Silicon (M3 and macos-15+).
           - linux
           - macos
-          #- windows # TODO: Fix "windows cannot load linux image on windows"
+          #- windows # TODO: Fix "windows cannot load linux image on windows".
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-13')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
@@ -552,7 +552,7 @@ jobs:
           wait_for_boot: true
         if: ${{ matrix.platform == 'ios' }}
 
-      - name: Test on `${{ matrix.platform }}` platform with simulator
+      - name: Test on iOS simulator
         run: make test.flutter device=${{ steps.simulator.outputs.udid }}
                                debug=yes
         if: ${{ matrix.platform == 'ios' }}
