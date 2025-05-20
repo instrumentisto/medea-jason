@@ -63,7 +63,6 @@ jobs:
           - workspace
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
               || (matrix.platform == 'windows' &&           'windows-latest')
-              || (matrix.platform == 'linux' &&             'ubuntu-22.04')
               ||                                            'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
@@ -306,13 +305,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # TODO: Run E2E test on Windows
         platform:
           - android
-          #- ios # TODO: Re-enable once fixed stability on CI
+          #- ios # TODO: Very flaky and runs for few hours. Try re-enabling once
+          #              GitHub Actions support nested virtualization on Apple
+          #              Silicon (M3 and macos-15+).
           - linux
-          #- macos # TODO: Re-enable once `colima start` failing fixed on CI
-    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
+          - macos
+          #- windows # TODO: Fix "windows cannot load linux image on windows".
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-13')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
@@ -451,12 +452,13 @@ jobs:
       matrix:
         platform:
           - android
+          - ios
           - linux
           - macos
           - windows
     runs-on: ${{ (contains('android linux', matrix.platform) && 'ubuntu-22.04')
               || (matrix.platform == 'windows'               && 'windows-latest')
-              ||                                                'macos-13' }}
+              ||                                                'macos-latest' }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
@@ -540,6 +542,20 @@ jobs:
               ||                                '' }}
              make test.flutter device=${{ matrix.platform }}
         if: ${{ contains('linux macos windows', matrix.platform) }}
+
+      - name: Start iOS simulator
+        id: simulator
+        uses: futureware-tech/simulator-action@v4
+        with:
+          os_version: '>=13.0'
+          os: iOS
+          wait_for_boot: true
+        if: ${{ matrix.platform == 'ios' }}
+
+      - name: Test on iOS simulator
+        run: make test.flutter device=${{ steps.simulator.outputs.udid }}
+                               debug=yes
+        if: ${{ matrix.platform == 'ios' }}
 
 
 

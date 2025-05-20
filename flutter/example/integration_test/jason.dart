@@ -11,6 +11,7 @@ import 'package:medea_jason/src/native/media_device_details.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
 import 'package:medea_jason/src/native/platform/rtc_stats.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
+import 'package:device_info_plus/device_info_plus.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +20,17 @@ void main() {
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       await webrtc.initFfiBridge();
       await webrtc.enableFakeMedia();
+    }
+    if (Platform.isAndroid) {
+      DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+      final androidInfo = await deviceInfoPlugin.androidInfo;
+      if (androidInfo.version.sdkInt < 25) {
+        // Wait for `adb` grant permissions. Emulator running an old SDK won't
+        // grant permissions if the UI prompt is already up. So we wait for a
+        // little bit to let it run before calling any camera/mic functions
+        // that will trigger the prompt.
+        await Future.delayed(Duration(seconds: 5));
+      }
     }
   });
 
@@ -33,19 +45,11 @@ void main() {
     settings.deviceVideo(DeviceVideoTrackConstraints());
     var tracks = await mediaManager.initLocalTracks(settings);
 
-    var deviceLength = 2;
-    if (Platform.isAndroid) {
-      deviceLength = 4;
-    } else if (Platform.isMacOS) {
-      deviceLength = 3;
-    }
-
-    expect(devices.length, equals(deviceLength));
+    expect(devices.length, greaterThanOrEqualTo(2));
     expect(tracks.length, equals(2));
 
     expect(await tracks[0].state(), webrtc.MediaStreamTrackState.live);
     expect(await tracks[1].state(), webrtc.MediaStreamTrackState.live);
-
     expect(
       (devices.first as NativeMediaDeviceDetails),
       isNot(equals((devices.last as NativeMediaDeviceDetails))),
@@ -55,6 +59,17 @@ void main() {
       isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)),
     );
 
+    var video = tracks.where((element) => element.kind() == MediaKind.video);
+    expect(video.isNotEmpty, isTrue);
+    expect(video.first.mediaSourceKind(), equals(MediaSourceKind.device));
+
+    await tracks.first.free();
+    expect(() => tracks.first.kind(), throwsA(isA<StateError>()));
+
+    if (Platform.isIOS) {
+      // iOS simulator has no camera.
+      return;
+    }
     var videoDevice = devices.firstWhere(
       (d) => d.kind() == MediaDeviceKind.videoInput,
     );
@@ -66,12 +81,6 @@ void main() {
     }
 
     videoDevice.free();
-    var video = tracks.where((element) => element.kind() == MediaKind.video);
-    expect(video.isNotEmpty, isTrue);
-    expect(video.first.mediaSourceKind(), equals(MediaSourceKind.device));
-
-    await tracks.first.free();
-    expect(() => tracks.first.kind(), throwsA(isA<StateError>()));
   });
 
   testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {

@@ -39,7 +39,8 @@ FLUTTER_RUST_BRIDGE_VER ?= $(strip \
 	$(shell grep -A1 'name = "flutter_rust_bridge"' Cargo.lock \
 	        | grep -v 'flutter_rust_bridge' \
 	        | cut -d'"' -f2))
-IOS_TARGETS := aarch64-apple-ios x86_64-apple-ios
+IOS_TARGETS := aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim
+IOS_SIMULATOR_TARGETS := x86_64-apple-ios aarch64-apple-ios-sim
 LINUX_TARGETS := x86_64-unknown-linux-gnu
 MACOS_TARGETS := aarch64-apple-darwin x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
@@ -292,15 +293,27 @@ ifeq ($(cargo-build-platform),android)
 		$(call cargo.build.medea-jason.android,$(target),$(debug)))
 endif
 ifeq ($(cargo-build-platform),ios)
+	$(eval targets-ios-simulator := $(strip \
+		$(foreach t,$(subst $(comma), ,$(cargo-build-targets-ios)),\
+			$(if $(filter $(t),$(IOS_SIMULATOR_TARGETS)),$(t)))))
+	$(eval targets-ios-no-simulator := $(strip \
+		$(foreach t,$(subst $(comma), ,$(cargo-build-targets-ios)),\
+			$(if $(filter $(t),$(targets-ios-simulator)),,$(t)))))
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-ios)),\
 		$(call cargo.build.medea-jason.ios,$(target),$(debug)))
 	$(eval build := $(if $(call eq,$(debug),no),release,debug))
 	@rm -rf flutter/ios/lib/MedeaJason.xcframework
-	@mkdir -p flutter/ios/lib/
+	@mkdir -p flutter/ios/lib/ios-arm64_x86_64-simulator/
+	lipo -create \
+		$(foreach t,$(targets-ios-simulator),\
+			target/$(t)/$(build)/libmedea_jason.a) \
+		-output ./flutter/ios/lib/ios-arm64_x86_64-simulator/libmedea_jason.a
 	xcodebuild -create-xcframework \
-	           $(foreach t,$(subst $(comma), ,$(cargo-build-targets-ios)),\
-	           -library target/$(t)/$(build)/libmedea_jason.a) \
-	           -output flutter/ios/lib/MedeaJason.xcframework
+		$(foreach t,$(targets-ios-no-simulator),\
+			-library target/$(t)/$(build)/libmedea_jason.a) \
+		$(if $(targets-ios-simulator),\
+			-library flutter/ios/lib/ios-arm64_x86_64-simulator/libmedea_jason.a,) \
+		-output flutter/ios/lib/MedeaJason.xcframework
 endif
 ifeq ($(cargo-build-platform),linux)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\
@@ -836,12 +849,13 @@ endif
 # Runs Flutter plugin integration tests on an attached device.
 #
 # Usage:
-#	make test.flutter [device=<device-id>]
+#	make test.flutter [device=<device-id>] [debug=(no|yes)]
 
 test.flutter:
 	cd flutter/example/ && \
 	flutter drive --driver=test_driver/integration_test.dart \
 	              --target=integration_test/jason.dart \
+	              $(if $(call eq,$(debug),yes),--debug,--profile) \
 	              $(if $(call eq,$(device),),,-d $(device))
 
 
