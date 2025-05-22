@@ -1,15 +1,18 @@
 PODS:
+  - device_info_plus (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
   - instrumentisto-libwebrtc-bin (136.0.7103.92)
   - integration_test (0.0.1):
     - Flutter
-  - medea_flutter_webrtc (0.13.4-dev):
+  - medea_flutter_webrtc (0.14.0):
     - Flutter
     - instrumentisto-libwebrtc-bin (= 136.0.7103.92)
   - medea_jason (0.9.1):
     - Flutter
 
 DEPENDENCIES:
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - medea_flutter_webrtc (from `.symlinks/plugins/medea_flutter_webrtc/ios`)
@@ -20,6 +23,8 @@ SPEC REPOS:
     - instrumentisto-libwebrtc-bin
 
 EXTERNAL SOURCES:
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
   Flutter:
     :path: Flutter
   integration_test:
@@ -30,10 +35,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/medea_jason/ios"
 
 SPEC CHECKSUMS:
+  device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   instrumentisto-libwebrtc-bin: 16b8b2d319afc89fbc4527275ad3726a8ae3e201
   integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
-  medea_flutter_webrtc: 952b06e72810eeec189d9700849069cd2fe7deeb
+  medea_flutter_webrtc: 1c875671aab6b84edfd874d20e3a4c83ac622eba
   medea_jason: 62cdc045762d2a71025c0bd59b2be25139ce24ac
 
 PODFILE CHECKSUM: f3734cf2c64ab93db34ebd0461528389a119c1e8
