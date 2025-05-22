@@ -427,14 +427,12 @@ class Member {
       // All transceivers are always `sendrecv` in SFU mode.
       return const Tuple2<int, int>(3, 3);
     }
-    var sendCount =
-        sendState.entries
-            .where((element) => other.recvState[element.key]! && element.value)
-            .length;
-    var recvCount =
-        recvState.entries
-            .where((element) => other.sendState[element.key]! && element.value)
-            .length;
+    var sendCount = sendState.entries
+        .where((element) => other.recvState[element.key]! && element.value)
+        .length;
+    var recvCount = recvState.entries
+        .where((element) => other.sendState[element.key]! && element.value)
+        .length;
     return Tuple2<int, int>(sendCount, recvCount);
   }
 

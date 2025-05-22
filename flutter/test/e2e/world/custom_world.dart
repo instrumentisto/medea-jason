@@ -52,25 +52,22 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (builder.isSend) {
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-              MediaKind.audio,
-              MediaSourceKind.device,
-            ):
-            true,
+          MediaKind.audio,
+          MediaSourceKind.device,
+        ): true,
       });
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-              MediaKind.video,
-              MediaSourceKind.device,
-            ):
-            true,
+          MediaKind.video,
+          MediaSourceKind.device,
+        ): true,
       });
       if (isSfu) {
         sendState.addAll({
           const Tuple2<MediaKind, MediaSourceKind>(
-                MediaKind.video,
-                MediaSourceKind.display,
-              ):
-              true,
+            MediaKind.video,
+            MediaSourceKind.display,
+          ): true,
         });
       }
 
@@ -85,26 +82,23 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (builder.isRecv) {
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-              MediaKind.audio,
-              MediaSourceKind.device,
-            ):
-            true,
+          MediaKind.audio,
+          MediaSourceKind.device,
+        ): true,
       });
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-              MediaKind.video,
-              MediaSourceKind.device,
-            ):
-            true,
+          MediaKind.video,
+          MediaSourceKind.device,
+        ): true,
       });
 
       if (isSfu) {
         recvState.addAll({
           const Tuple2<MediaKind, MediaSourceKind>(
-                MediaKind.video,
-                MediaSourceKind.display,
-              ):
-              true,
+            MediaKind.video,
+            MediaSourceKind.display,
+          ): true,
         });
       }
 
@@ -132,8 +126,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     await controlClient.create('$roomId/$builderId', createMember);
 
     if (builder.isSend) {
-      var recvEndpoints =
-          members.entries.where((element) => element.value.isRecv).map((e) {
+      var recvEndpoints = members.entries
+          .where((element) => element.value.isRecv)
+          .map((e) {
             var endpointId = 'play-$builderId';
             var mId = e.value.id;
             var id = '$roomId/$mId/$endpointId';
@@ -142,7 +137,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
               'local://$roomId/$builderId/publish',
             );
             return Tuple2(id, elem);
-          }).toList();
+          })
+          .toList();
 
       for (var element in recvEndpoints) {
         await controlClient.create(element.item1, element.item2);
@@ -265,15 +261,14 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   /// Waits until a [Member] with the provided ID will connect with his
   /// responders.
   Future<void> waitForInterconnection(String memberId) async {
-    var interconnectedMembers =
-        members.entries
-            .where(
-              (element) =>
-                  element.value.isJoined &&
-                  element.value.id != memberId &&
-                  (element.value.isRecv || element.value.isSend),
-            )
-            .toList();
+    var interconnectedMembers = members.entries
+        .where(
+          (element) =>
+              element.value.isJoined &&
+              element.value.id != memberId &&
+              (element.value.isRecv || element.value.isSend),
+        )
+        .toList();
     var member = members[memberId]!;
 
     for (var i = 0; i < interconnectedMembers.length; ++i) {
@@ -291,12 +286,10 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
       if (isSfu) {
         if (!otherMember.enabledAudio) {
-          for (var track in member
-              .connectionStore
-              .remoteTracks[element.key]!
-              .values
-              .map((e) => e.last)
-              .where((element) => element.kind() == MediaKind.audio)) {
+          for (var track
+              in member.connectionStore.remoteTracks[element.key]!.values
+                  .map((e) => e.last)
+                  .where((element) => element.kind() == MediaKind.audio)) {
             await member.waitMediaDirectionTrack(
               MediaDirection.recvOnly,
               track,
@@ -305,12 +298,10 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         }
 
         if (!otherMember.enabledVideo) {
-          for (var track in member
-              .connectionStore
-              .remoteTracks[element.key]!
-              .values
-              .map((e) => e.last)
-              .where((element) => element.kind() == MediaKind.video)) {
+          for (var track
+              in member.connectionStore.remoteTracks[element.key]!.values
+                  .map((e) => e.last)
+                  .where((element) => element.kind() == MediaKind.video)) {
             await member.waitMediaDirectionTrack(
               MediaDirection.recvOnly,
               track,
@@ -318,12 +309,10 @@ class CustomWorld extends FlutterWidgetTesterWorld {
           }
         }
         if (!member.enabledAudio) {
-          for (var track in otherMember
-              .connectionStore
-              .remoteTracks[memberId]!
-              .values
-              .map((e) => e.last)
-              .where((element) => element.kind() == MediaKind.audio)) {
+          for (var track
+              in otherMember.connectionStore.remoteTracks[memberId]!.values
+                  .map((e) => e.last)
+                  .where((element) => element.kind() == MediaKind.audio)) {
             await otherMember.waitMediaDirectionTrack(
               MediaDirection.recvOnly,
               track,
@@ -332,12 +321,10 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         }
 
         if (!member.enabledVideo) {
-          for (var track in otherMember
-              .connectionStore
-              .remoteTracks[memberId]!
-              .values
-              .map((e) => e.last)
-              .where((element) => element.kind() == MediaKind.video)) {
+          for (var track
+              in otherMember.connectionStore.remoteTracks[memberId]!.values
+                  .map((e) => e.last)
+                  .where((element) => element.kind() == MediaKind.video)) {
             await otherMember.waitMediaDirectionTrack(
               MediaDirection.recvOnly,
               track,

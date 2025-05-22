@@ -85,11 +85,10 @@ class _$ConstrainBooleanCopyWithImpl<$Res, $Val extends ConstrainBoolean>
   $Res call({Object? field0 = null}) {
     return _then(
       _value.copyWith(
-            field0:
-                null == field0
-                    ? _value.field0
-                    : field0 // ignore: cast_nullable_to_non_nullable
-                        as bool,
+            field0: null == field0
+                ? _value.field0
+                : field0 // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -127,7 +126,7 @@ class __$$ConstrainBoolean_ExactImplCopyWithImpl<$Res>
         null == field0
             ? _value.field0
             : field0 // ignore: cast_nullable_to_non_nullable
-                as bool,
+                  as bool,
       ),
     );
   }
@@ -279,7 +278,7 @@ class __$$ConstrainBoolean_IdealImplCopyWithImpl<$Res>
         null == field0
             ? _value.field0
             : field0 // ignore: cast_nullable_to_non_nullable
-                as bool,
+                  as bool,
       ),
     );
   }
@@ -476,11 +475,10 @@ class _$ConstrainU32CopyWithImpl<$Res, $Val extends ConstrainU32>
   $Res call({Object? field0 = null}) {
     return _then(
       _value.copyWith(
-            field0:
-                null == field0
-                    ? _value.field0
-                    : field0 // ignore: cast_nullable_to_non_nullable
-                        as int,
+            field0: null == field0
+                ? _value.field0
+                : field0 // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -518,7 +516,7 @@ class __$$ConstrainU32_ExactImplCopyWithImpl<$Res>
         null == field0
             ? _value.field0
             : field0 // ignore: cast_nullable_to_non_nullable
-                as int,
+                  as int,
       ),
     );
   }
@@ -674,7 +672,7 @@ class __$$ConstrainU32_IdealImplCopyWithImpl<$Res>
         null == field0
             ? _value.field0
             : field0 // ignore: cast_nullable_to_non_nullable
-                as int,
+                  as int,
       ),
     );
   }
@@ -830,11 +828,11 @@ class __$$ConstrainU32_RangeImplCopyWithImpl<$Res>
         null == field0
             ? _value.field0
             : field0 // ignore: cast_nullable_to_non_nullable
-                as int,
+                  as int,
         null == field1
             ? _value.field1
             : field1 // ignore: cast_nullable_to_non_nullable
-                as int,
+                  as int,
       ),
     );
   }

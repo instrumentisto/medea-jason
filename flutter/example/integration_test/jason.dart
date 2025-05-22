@@ -157,22 +157,26 @@ void main() {
   testWidgets('Primitive arguments Callback validation', (
     WidgetTester widgetTester,
   ) async {
-    final intListener = dl.lookupFunction<
-      Handle Function(ForeignValue),
-      Object Function(ForeignValue)
-    >('test_callback_listener_int');
-    final stringListener = dl.lookupFunction<
-      Handle Function(ForeignValue),
-      Object Function(ForeignValue)
-    >('test_callback_listener_string');
-    final optionalIntListener = dl.lookupFunction<
-      Handle Function(ForeignValue),
-      Object Function(ForeignValue)
-    >('test_callback_listener_optional_int');
-    final optionalStringListener = dl.lookupFunction<
-      Handle Function(ForeignValue),
-      Object Function(ForeignValue)
-    >('test_callback_listener_optional_string');
+    final intListener = dl
+        .lookupFunction<
+          Handle Function(ForeignValue),
+          Object Function(ForeignValue)
+        >('test_callback_listener_int');
+    final stringListener = dl
+        .lookupFunction<
+          Handle Function(ForeignValue),
+          Object Function(ForeignValue)
+        >('test_callback_listener_string');
+    final optionalIntListener = dl
+        .lookupFunction<
+          Handle Function(ForeignValue),
+          Object Function(ForeignValue)
+        >('test_callback_listener_optional_int');
+    final optionalStringListener = dl
+        .lookupFunction<
+          Handle Function(ForeignValue),
+          Object Function(ForeignValue)
+        >('test_callback_listener_optional_string');
 
     var intVal = ForeignValue.fromInt(45);
     var stringVal = ForeignValue.fromString('test string');
@@ -239,10 +243,11 @@ void main() {
   });
 
   testWidgets('GetStats() works', (WidgetTester widgetTester) async {
-    final testRtcStatsParse = dl.lookupFunction<
-      Uint64 Function(ForeignValue),
-      int Function(ForeignValue)
-    >('test_rtc_stats_parse');
+    final testRtcStatsParse = dl
+        .lookupFunction<
+          Uint64 Function(ForeignValue),
+          int Function(ForeignValue)
+        >('test_rtc_stats_parse');
 
     var pc1 = await webrtc.PeerConnection.create(
       webrtc.IceTransportType.all,
