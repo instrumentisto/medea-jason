@@ -53,8 +53,9 @@ class ConnectWidgets {
     List<Widget> buttons = toggleButtons;
     res.addAll(buttons);
 
-    List<Widget> videos =
-        videoTracks.values.map((video) => Expanded(child: video)).toList();
+    List<Widget> videos = videoTracks.values
+        .map((video) => Expanded(child: video))
+        .toList();
     res.addAll(videos);
 
     return res;
@@ -336,14 +337,13 @@ class _CallState extends State<CallRoute> {
               ),
               Expanded(
                 child: Row(
-                  children:
-                      _widgets.values
-                          .map(
-                            (videoMap) => Expanded(
-                              child: Column(children: videoMap.all().toList()),
-                            ),
-                          )
-                          .toList(),
+                  children: _widgets.values
+                      .map(
+                        (videoMap) => Expanded(
+                          child: Column(children: videoMap.all().toList()),
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
             ],
@@ -413,19 +413,18 @@ Future<void> showCallbacks(BuildContext context, Call call) async {
           width: double.maxFinite,
           child: ListView(
             shrinkWrap: true,
-            children:
-                cbs
-                    .map(
-                      (cb) => Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Expanded(child: Text(cb.event.toJson().toString())),
-                          Expanded(child: Text(cb.at)),
-                          Expanded(child: Text(cb.fid)),
-                        ],
-                      ),
-                    )
-                    .toList(),
+            children: cbs
+                .map(
+                  (cb) => Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(child: Text(cb.event.toJson().toString())),
+                      Expanded(child: Text(cb.at)),
+                      Expanded(child: Text(cb.fid)),
+                    ],
+                  ),
+                )
+                .toList(),
           ),
         ),
       );
@@ -582,18 +581,12 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
   final displayList = await call.enumerateDisplay();
 
   final deviceList = await call.enumerateDevice();
-  final videoDevices =
-      deviceList
-          .where(
-            (element) => element.kind() == jason.MediaDeviceKind.videoInput,
-          )
-          .toList();
-  final audioDevices =
-      deviceList
-          .where(
-            (element) => element.kind() == jason.MediaDeviceKind.audioInput,
-          )
-          .toList();
+  final videoDevices = deviceList
+      .where((element) => element.kind() == jason.MediaDeviceKind.videoInput)
+      .toList();
+  final audioDevices = deviceList
+      .where((element) => element.kind() == jason.MediaDeviceKind.audioInput)
+      .toList();
 
   await showDialog<void>(
     context: context,
@@ -607,10 +600,9 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                 SwitchListTile(
                   title: const Text('Screen share'),
                   value: call.screenShare,
-                  onChanged:
-                      (v) => setStateSb(() {
-                        call.screenShare = v;
-                      }),
+                  onChanged: (v) => setStateSb(() {
+                    call.screenShare = v;
+                  }),
                 ),
                 DropdownButton<String>(
                   value: call.videoDisplayId,
@@ -627,23 +619,21 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                       call.videoDisplayId = value!;
                     });
                   },
-                  items:
-                      displayList.map<DropdownMenuItem<String>>((value) {
-                        return DropdownMenuItem<String>(
-                          value: value.deviceId(),
-                          child: Text(
-                            value.title() == null
-                                ? value.deviceId()
-                                : value.title()!,
-                          ),
-                        );
-                      }).toList(),
+                  items: displayList.map<DropdownMenuItem<String>>((value) {
+                    return DropdownMenuItem<String>(
+                      value: value.deviceId(),
+                      child: Text(
+                        value.title() == null
+                            ? value.deviceId()
+                            : value.title()!,
+                      ),
+                    );
+                  }).toList(),
                 ),
                 TextFormField(
-                  initialValue:
-                      call.selectedDisplayFrameRate == null
-                          ? '30'
-                          : call.selectedDisplayFrameRate.toString(),
+                  initialValue: call.selectedDisplayFrameRate == null
+                      ? '30'
+                      : call.selectedDisplayFrameRate.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -655,10 +645,9 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                   decoration: const InputDecoration(labelText: 'Display FPS'),
                 ),
                 TextFormField(
-                  initialValue:
-                      call.selectedDisplayWidth == null
-                          ? '640'
-                          : call.selectedDisplayWidth.toString(),
+                  initialValue: call.selectedDisplayWidth == null
+                      ? '640'
+                      : call.selectedDisplayWidth.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -670,10 +659,9 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                   decoration: const InputDecoration(labelText: 'Display width'),
                 ),
                 TextFormField(
-                  initialValue:
-                      call.selectedDisplayHeight == null
-                          ? '480'
-                          : call.selectedDisplayHeight.toString(),
+                  initialValue: call.selectedDisplayHeight == null
+                      ? '480'
+                      : call.selectedDisplayHeight.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -701,13 +689,12 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                       call.videoDeviceId = value;
                     });
                   },
-                  items:
-                      videoDevices.map<DropdownMenuItem<String>>((value) {
-                        return DropdownMenuItem<String>(
-                          value: value.deviceId(),
-                          child: Text(value.label()),
-                        );
-                      }).toList(),
+                  items: videoDevices.map<DropdownMenuItem<String>>((value) {
+                    return DropdownMenuItem<String>(
+                      value: value.deviceId(),
+                      child: Text(value.label()),
+                    );
+                  }).toList(),
                 ),
                 DropdownButton<String>(
                   value: call.audioDeviceId,
@@ -724,19 +711,17 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                       call.audioDeviceId = value;
                     });
                   },
-                  items:
-                      audioDevices.map<DropdownMenuItem<String>>((value) {
-                        return DropdownMenuItem<String>(
-                          value: value.deviceId(),
-                          child: Text(value.label()),
-                        );
-                      }).toList(),
+                  items: audioDevices.map<DropdownMenuItem<String>>((value) {
+                    return DropdownMenuItem<String>(
+                      value: value.deviceId(),
+                      child: Text(value.label()),
+                    );
+                  }).toList(),
                 ),
                 TextFormField(
-                  initialValue:
-                      call.selectedDeviceWidth == null
-                          ? '640'
-                          : call.selectedDeviceWidth.toString(),
+                  initialValue: call.selectedDeviceWidth == null
+                      ? '640'
+                      : call.selectedDeviceWidth.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -748,10 +733,9 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                   decoration: const InputDecoration(labelText: 'Device width'),
                 ),
                 TextFormField(
-                  initialValue:
-                      call.selectedDeviceHeight == null
-                          ? '480'
-                          : call.selectedDeviceHeight.toString(),
+                  initialValue: call.selectedDeviceHeight == null
+                      ? '480'
+                      : call.selectedDeviceHeight.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -1168,16 +1152,14 @@ Future<void> controlApiCreateEndpointDialog(BuildContext context, Call call) {
                     onChanged: (String? value) {
                       endpointType = value!;
                     },
-                    items:
-                        [
-                          'PlayEndpoint',
-                          'PublishEndpoint',
-                        ].map<DropdownMenuItem<String>>((value) {
+                    items: ['PlayEndpoint', 'PublishEndpoint']
+                        .map<DropdownMenuItem<String>>((value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
                           );
-                        }).toList(),
+                        })
+                        .toList(),
                   ),
                 ),
                 const SizedBox(height: 10),

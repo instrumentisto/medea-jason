@@ -99,19 +99,18 @@ final testConfigs = FlutterTestConfiguration(
       media_state.steps() +
       websocket.steps() +
       given.steps(),
-  createWorld:
-      (config) => Future.sync(() async {
-        await clearWorld();
-        if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-          await webrtc.initFfiBridge();
-          await webrtc.enableFakeMedia();
-        }
+  createWorld: (config) => Future.sync(() async {
+    await clearWorld();
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      await webrtc.initFfiBridge();
+      await webrtc.enableFakeMedia();
+    }
 
-        var world = CustomWorld();
-        oldWorld = world;
-        await world.controlClient.create(world.roomId, Room(world.roomId, {}));
-        return world;
-      }),
+    var world = CustomWorld();
+    oldWorld = world;
+    await world.controlClient.create(world.roomId, Room(world.roomId, {}));
+    return world;
+  }),
   defaultTimeout: const Duration(seconds: 30),
   tagExpression: 'not @${isSfu ? 'mesh' : 'sfu'}',
   hooks: [ExitOnFailureHook()],

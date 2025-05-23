@@ -24,7 +24,13 @@ See also [`medea-jason` crate `master` changes](https://github.com/instrumentist
     - `LocalMediaTrack.setNoiseSuppressionLevel()`, `LocalMediaTrack.getNoiseSuppressionLevel()` to inspect and configure noise suppression level (only supported on desktop platforms).
     - `LocalMediaTrack.setHighPassFilterEnabled()`, `LocalMediaTrack.isHighPassFilterEnabledO()` to inspect and toggle high-pass filter (only supported on desktop platforms).
 
+### Upgraded
+
+- Dependencies:
+    - [`flutter_rust_bridge`] to 2.10.0 version. ([#208])
+
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
+[#208]: https://github.com/instrumentisto/medea-jason/pull/208
 
 
 

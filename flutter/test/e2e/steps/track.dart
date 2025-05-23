@@ -96,30 +96,28 @@ StepDefinitionGeneric thenDoesntHaveRemoteTrack =
         await member.waitForConnect(partnerId);
         var parsedKind = parseMediaKind(kind);
 
-        var tracks =
-            member.connectionStore.remoteTracks[partnerId]!.values
-                .where((element) => element.isNotEmpty)
-                .map((e) => e.last)
-                .where(
-                  (element) =>
-                      element.kind() == parsedKind.item1 &&
-                      element.mediaSourceKind() == parsedKind.item2,
-                )
-                .toList();
+        var tracks = member.connectionStore.remoteTracks[partnerId]!.values
+            .where((element) => element.isNotEmpty)
+            .map((e) => e.last)
+            .where(
+              (element) =>
+                  element.kind() == parsedKind.item1 &&
+                  element.mediaSourceKind() == parsedKind.item2,
+            )
+            .toList();
 
         if (isSfu && live.isNotEmpty) {
           await retry(() async {
-            var length =
-                tracks
-                    .where(
-                      (element) =>
-                          !member.connectionStore.remoteTrackIsStopped(
-                            partnerId,
-                            element.getTrack().id(),
-                          ) &&
-                          element.mediaDirection() == MediaDirection.sendRecv,
-                    )
-                    .length;
+            var length = tracks
+                .where(
+                  (element) =>
+                      !member.connectionStore.remoteTrackIsStopped(
+                        partnerId,
+                        element.getTrack().id(),
+                      ) &&
+                      element.mediaDirection() == MediaDirection.sendRecv,
+                )
+                .length;
             expect(length, 0);
           });
         } else {

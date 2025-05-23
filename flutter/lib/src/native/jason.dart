@@ -62,22 +62,21 @@ ExternalLibrary _dlLoad() {
   }
 
   const base = 'medea_jason';
-  final path =
-      Platform.isWindows
-          ? '$base.dll'
-          : Platform.isLinux || Platform.isAndroid
-          ? 'lib$base.so'
-          : 'lib$base.dylib';
-  final el =
-      Platform.isIOS
-          ? ExternalLibrary.process(iKnowHowToUseIt: true)
-          : ExternalLibrary.open(path);
+  final path = Platform.isWindows
+      ? '$base.dll'
+      : Platform.isLinux || Platform.isAndroid
+      ? 'lib$base.so'
+      : 'lib$base.dylib';
+  final el = Platform.isIOS
+      ? ExternalLibrary.process(iKnowHowToUseIt: true)
+      : ExternalLibrary.open(path);
   final dl = el.ffiDynamicLibrary;
 
-  var initResult = dl.lookupFunction<
-    IntPtr Function(Pointer<Void>),
-    int Function(Pointer<Void>)
-  >('init_jason_dart_api_dl')(NativeApi.initializeApiDLData);
+  var initResult = dl
+      .lookupFunction<
+        IntPtr Function(Pointer<Void>),
+        int Function(Pointer<Void>)
+      >('init_jason_dart_api_dl')(NativeApi.initializeApiDLData);
 
   if (initResult != 0) {
     throw 'Failed to initialize Dart API. Code: $initResult';

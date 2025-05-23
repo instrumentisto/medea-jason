@@ -88,11 +88,10 @@ class _$ApiConstrainFacingModeCopyWithImpl<
   $Res call({Object? field0 = null}) {
     return _then(
       _value.copyWith(
-            field0:
-                null == field0
-                    ? _value.field0
-                    : field0 // ignore: cast_nullable_to_non_nullable
-                        as FacingMode,
+            field0: null == field0
+                ? _value.field0
+                : field0 // ignore: cast_nullable_to_non_nullable
+                      as FacingMode,
           )
           as $Val,
     );
@@ -134,7 +133,7 @@ class __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>
         null == field0
             ? _value.field0
             : field0 // ignore: cast_nullable_to_non_nullable
-                as FacingMode,
+                  as FacingMode,
       ),
     );
   }
@@ -172,9 +171,10 @@ class _$ApiConstrainFacingMode_ExactImpl extends ApiConstrainFacingMode_Exact {
   _$$ApiConstrainFacingMode_ExactImplCopyWith<
     _$ApiConstrainFacingMode_ExactImpl
   >
-  get copyWith => __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<
-    _$ApiConstrainFacingMode_ExactImpl
-  >(this, _$identity);
+  get copyWith =>
+      __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<
+        _$ApiConstrainFacingMode_ExactImpl
+      >(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -292,7 +292,7 @@ class __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>
         null == field0
             ? _value.field0
             : field0 // ignore: cast_nullable_to_non_nullable
-                as FacingMode,
+                  as FacingMode,
       ),
     );
   }
@@ -330,9 +330,10 @@ class _$ApiConstrainFacingMode_IdealImpl extends ApiConstrainFacingMode_Ideal {
   _$$ApiConstrainFacingMode_IdealImplCopyWith<
     _$ApiConstrainFacingMode_IdealImpl
   >
-  get copyWith => __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<
-    _$ApiConstrainFacingMode_IdealImpl
-  >(this, _$identity);
+  get copyWith =>
+      __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<
+        _$ApiConstrainFacingMode_IdealImpl
+      >(this, _$identity);
 
   @override
   @optionalTypeArgs

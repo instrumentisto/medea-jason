@@ -587,10 +587,10 @@ flutter:
 #	make flutter.fmt [check=(no|yes)]
 
 flutter.fmt:
-	dart format $(if $(call eq,$(check),yes), --set-exit-if-changed,) flutter/
-ifeq ($(wildcard flutter/.packages),)
+ifeq ($(wildcard flutter/.dart_tool),)
 	@make flutter cmd='pub get'
 endif
+	dart format $(if $(call eq,$(check),yes), --set-exit-if-changed,) flutter/
 	@make flutter cmd='pub run import_sorter:main --no-comments \
 	                   $(if $(call eq,$(check),yes),--exit-if-changed,)'
 
