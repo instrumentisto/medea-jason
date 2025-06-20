@@ -519,7 +519,7 @@ impl RoomHandle {
             TrackDirection::Send,
             None,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Unmutes outbound audio in this [`Room`].
@@ -541,7 +541,7 @@ impl RoomHandle {
             TrackDirection::Send,
             None,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Mutes outbound video in this [`Room`].
@@ -564,7 +564,7 @@ impl RoomHandle {
             TrackDirection::Send,
             source_kind,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Unmutes outbound video in this [`Room`].
@@ -587,7 +587,7 @@ impl RoomHandle {
             TrackDirection::Send,
             source_kind,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Disables outbound audio in this [`Room`].
@@ -612,7 +612,7 @@ impl RoomHandle {
             TrackDirection::Send,
             None,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Enables outbound audio in this [`Room`].
@@ -637,7 +637,7 @@ impl RoomHandle {
             TrackDirection::Send,
             None,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Disables outbound video.
@@ -665,7 +665,7 @@ impl RoomHandle {
             TrackDirection::Send,
             source_kind,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Enables outbound video.
@@ -693,7 +693,7 @@ impl RoomHandle {
             TrackDirection::Send,
             source_kind,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Disables inbound audio in this [`Room`].
@@ -715,7 +715,7 @@ impl RoomHandle {
             TrackDirection::Recv,
             None,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Disables inbound video in this [`Room`].
@@ -740,7 +740,7 @@ impl RoomHandle {
             TrackDirection::Recv,
             source_kind,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Enables inbound audio in this [`Room`].
@@ -762,7 +762,7 @@ impl RoomHandle {
             TrackDirection::Recv,
             None,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Enables inbound video in this [`Room`].
@@ -787,7 +787,7 @@ impl RoomHandle {
             TrackDirection::Recv,
             source_kind,
         )
-            .map_err(tracerr::map_from_and_wrap!())
+        .map_err(tracerr::map_from_and_wrap!())
     }
 }
 
@@ -1222,7 +1222,7 @@ impl InnerRoom {
                                     media_exchange_state::Stable::Enabled
                                 )
                             )
-                                .then_some(*track_id)
+                            .then_some(*track_id)
                         })
                         .collect(),
                 )
@@ -1259,9 +1259,9 @@ impl InnerRoom {
                 .collect::<Result<Vec<_>, Traced<ProhibitedStateError>>>()
                 .map_err(tracerr::map_from_and_wrap!())?,
         )
-            .await
-            .map(drop)
-            .map_err(tracerr::from_and_wrap!())?;
+        .await
+        .map(drop)
+        .map_err(tracerr::from_and_wrap!())?;
 
         future::try_join_all(stream_upd_sub.into_iter().filter_map(
             |(id, tracks_ids)| {
@@ -1273,10 +1273,10 @@ impl InnerRoom {
                 )
             },
         ))
-            .map(|r| r.map(drop))
-            .await
-            .map_err(tracerr::map_from_and_wrap!())
-            .map(drop)
+        .map(|r| r.map(drop))
+        .await
+        .map_err(tracerr::map_from_and_wrap!())
+        .map(drop)
     }
 
     /// Returns [`local::Track`]s for the provided [`MediaKind`] and
@@ -1454,12 +1454,12 @@ impl InnerRoom {
                             stop_first,
                             false,
                         )
-                            .await
-                            .map_err(|err| {
-                                err.recovery_failed(tracerr::map_from_and_wrap!()(
-                                    e.clone(),
-                                ))
-                            })?;
+                        .await
+                        .map_err(|err| {
+                            err.recovery_failed(tracerr::map_from_and_wrap!()(
+                                e.clone(),
+                            ))
+                        })?;
 
                         E::recovered(tracerr::map_from_and_wrap!()(e.clone()))
                     } else if stop_first {
@@ -1468,17 +1468,17 @@ impl InnerRoom {
                             criteria_kinds_diff,
                             states_update,
                         )
-                            .await
-                            .map_err(|err| {
-                                E::RecoverFailed {
-                                    recover_reason: tracerr::map_from_and_new!(
+                        .await
+                        .map_err(|err| {
+                            E::RecoverFailed {
+                                recover_reason: tracerr::map_from_and_new!(
                                     e.clone()
                                 ),
-                                    recover_fail_reasons: vec![
-                                        tracerr::map_from_and_new!(err),
-                                    ],
-                                }
-                            })?;
+                                recover_fail_reasons: vec![
+                                    tracerr::map_from_and_new!(err),
+                                ],
+                            }
+                        })?;
 
                         E::errored(tracerr::map_from_and_wrap!()(e.clone()))
                     } else {

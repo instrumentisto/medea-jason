@@ -365,8 +365,8 @@ impl PeerConnection {
                 state.ice_servers().clone(),
                 state.force_relay(),
             )
-                .await
-                .map_err(tracerr::map_from_and_wrap!())?,
+            .await
+            .map_err(tracerr::map_from_and_wrap!())?,
         );
         let (track_events_sender, mut track_events_rx) = mpsc::unbounded();
         let media_connections = Rc::new(MediaConnections::new(
@@ -454,7 +454,8 @@ impl PeerConnection {
             self.peer.on_connection_state_change(Some(
                 move |peer_connection_state| {
                     if let Some(sender) = weak_sender.upgrade() {
-                        let member_ids = connections.upgrade()
+                        let member_ids = connections
+                            .upgrade()
                             .map(|connections| connections.member_ids())
                             .unwrap_or_default();
 
@@ -984,7 +985,7 @@ impl PeerConnection {
                             candidate.sdp_m_line_index,
                             &candidate.sdp_mid,
                         )
-                            .await
+                        .await
                     }
                 },
             ),
