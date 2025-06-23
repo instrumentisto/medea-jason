@@ -678,31 +678,35 @@ impl Connection {
 
     /// Updates [`PeerConnectionState`] of this [`Connection`].
     pub fn update_peer_state(&self, state: PeerConnectionState) {
-        // We are interested only in Disconnected and Connected state here.
-        let is_valid_transition = state == PeerConnectionState::Disconnected
-            || state == PeerConnectionState::Connected;
-
-        if !is_valid_transition {
-            return;
-        }
-
         let previous_state = self.0.peer_state.replace(Some(state));
 
         if previous_state == Some(state) {
             return;
         }
 
-        if state == PeerConnectionState::Disconnected {
-            self.0.on_quality_score_update.call1(DISCONNECTED_QUALITY_SCORE);
-
-            return;
-        }
-
-        if previous_state == Some(PeerConnectionState::Disconnected) {
-            if let Some(score) = self.0.quality_score.get() {
-                #[expect(clippy::as_conversions, reason = "needs refactoring")]
-                self.0.on_quality_score_update.call1(score as u8);
+        match state {
+            PeerConnectionState::Disconnected => {
+                self.0
+                    .on_quality_score_update
+                    .call1(DISCONNECTED_QUALITY_SCORE);
             }
+            PeerConnectionState::Connected => {
+                if previous_state.is_none() {
+                    return;
+                }
+
+                if let Some(score) = self.0.quality_score.get() {
+                    #[expect(
+                        clippy::as_conversions,
+                        reason = "needs refactoring"
+                    )]
+                    self.0.on_quality_score_update.call1(score as u8);
+                }
+            }
+            PeerConnectionState::New
+            | PeerConnectionState::Connecting
+            | PeerConnectionState::Failed
+            | PeerConnectionState::Closed => (),
         }
     }
 }
