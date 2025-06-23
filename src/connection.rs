@@ -295,6 +295,36 @@ pub struct HandleDetachedError;
 #[derive(Clone, Debug)]
 pub struct ConnectionHandle(Weak<InnerConnection>);
 
+/// Estimated connection quality on client side.
+#[derive(Clone, Copy, Debug, Display, Eq, Ord, PartialEq, PartialOrd)]
+pub enum ClientConnectionQualityScore {
+    /// Connection is lost.
+    Disconnected = 0,
+
+    /// Nearly all users dissatisfied.
+    Poor = 1,
+
+    /// Many users dissatisfied.
+    Low = 2,
+
+    /// Some users dissatisfied.
+    Medium = 3,
+
+    /// Satisfied.
+    High = 4,
+}
+
+impl From<ConnectionQualityScore> for ClientConnectionQualityScore {
+    fn from(score: ConnectionQualityScore) -> Self {
+        match score {
+            ConnectionQualityScore::Poor => Self::Poor,
+            ConnectionQualityScore::Low => Self::Low,
+            ConnectionQualityScore::Medium => Self::Medium,
+            ConnectionQualityScore::High => Self::High,
+        }
+    }
+}
+
 /// Actual data of a connection with a specific remote `Member`.
 ///
 /// Shared between external [`ConnectionHandle`] and Rust side [`Connection`].
@@ -305,6 +335,9 @@ struct InnerConnection {
 
     /// Current [`ConnectionQualityScore`] of this [`Connection`].
     quality_score: Cell<Option<ConnectionQualityScore>>,
+
+    /// Current [`ClientConnectionQualityScore`] of this [`Connection`].
+    client_quality_score: Cell<Option<ClientConnectionQualityScore>>,
 
     /// Current [`PeerConnectionState`] of this [`Connection`].
     peer_state: Cell<Option<PeerConnectionState>>,
@@ -552,9 +585,6 @@ impl ConnectionHandle {
 #[derive(Clone, Debug)]
 pub struct Connection(Rc<InnerConnection>);
 
-/// `Disconnected` value for [`ConnectionQualityScore`] used in FFI.
-const DISCONNECTED_QUALITY_SCORE: u8 = 0;
-
 impl Connection {
     /// Instantiates a new [`Connection`] for the given `Member`.
     ///
@@ -591,6 +621,7 @@ impl Connection {
             ],
             remote_id,
             quality_score: Cell::default(),
+            client_quality_score: Cell::default(),
             peer_state: Cell::default(),
             on_quality_score_update: platform::Callback::default(),
             recv_constraints,
@@ -661,52 +692,67 @@ impl Connection {
 
     /// Updates [`ConnectionQualityScore`] of this [`Connection`].
     pub fn update_quality_score(&self, score: ConnectionQualityScore) {
-        let previous_score = self.0.quality_score.replace(Some(score));
-
-        if previous_score == Some(score) {
+        if self.0.quality_score.replace(Some(score)) == Some(score) {
             return;
         }
 
-        let peer_state = self.0.peer_state.get();
+        let client_score =
+            self.new_client_quality_score(self.0.peer_state.get(), Some(score));
 
-        if peer_state != Some(PeerConnectionState::Disconnected) {
-            // TODO: Replace with derive?
-            #[expect(clippy::as_conversions, reason = "needs refactoring")]
-            self.0.on_quality_score_update.call1(score as u8);
+        if let Some(client_score) = client_score {
+            self.on_quality_score_update(client_score);
         }
     }
 
     /// Updates [`PeerConnectionState`] of this [`Connection`].
     pub fn update_peer_state(&self, state: PeerConnectionState) {
-        let previous_state = self.0.peer_state.replace(Some(state));
-
-        if previous_state == Some(state) {
+        if self.0.peer_state.replace(Some(state)) == Some(state) {
             return;
         }
 
-        match state {
-            PeerConnectionState::Disconnected => {
-                self.0
-                    .on_quality_score_update
-                    .call1(DISCONNECTED_QUALITY_SCORE);
-            }
-            PeerConnectionState::Connected => {
-                if previous_state.is_none() {
-                    return;
-                }
+        let client_score = self
+            .new_client_quality_score(Some(state), self.0.quality_score.get());
 
-                if let Some(score) = self.0.quality_score.get() {
-                    #[expect(
-                        clippy::as_conversions,
-                        reason = "needs refactoring"
-                    )]
-                    self.0.on_quality_score_update.call1(score as u8);
-                }
-            }
-            PeerConnectionState::New
-            | PeerConnectionState::Connecting
-            | PeerConnectionState::Failed
-            | PeerConnectionState::Closed => (),
+        if let Some(client_score) = client_score {
+            self.on_quality_score_update(client_score);
         }
+    }
+
+    /// Creates new [`ClientConnectionQualityScore`] if it's changed.
+    fn new_client_quality_score(
+        &self,
+        state: Option<PeerConnectionState>,
+        quality_score: Option<ConnectionQualityScore>,
+    ) -> Option<ClientConnectionQualityScore> {
+        let score = match (state, quality_score) {
+            (
+                Some(
+                    PeerConnectionState::Disconnected
+                    | PeerConnectionState::Failed,
+                ),
+                _,
+            ) => Some(ClientConnectionQualityScore::Disconnected),
+            (
+                Some(
+                    PeerConnectionState::New | PeerConnectionState::Connecting,
+                ),
+                _,
+            ) => self.0.client_quality_score.get(),
+            (_, Some(quality_score)) => Some(quality_score.into()),
+            _ => None,
+        };
+
+        if self.0.client_quality_score.replace(score) == score {
+            return None;
+        }
+
+        score
+    }
+
+    /// Notifies subscriber about [`ClientConnectionQualityScore`] change.
+    fn on_quality_score_update(&self, score: ClientConnectionQualityScore) {
+        // TODO: Replace with derive?
+        #[expect(clippy::as_conversions, reason = "needs refactoring")]
+        self.0.on_quality_score_update.call1(score as u8);
     }
 }
