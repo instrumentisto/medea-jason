@@ -696,12 +696,7 @@ impl Connection {
             return;
         }
 
-        let client_score =
-            self.new_client_quality_score(self.0.peer_state.get(), Some(score));
-
-        if let Some(client_score) = client_score {
-            self.on_quality_score_update(client_score);
-        }
+        self.update_client_quality_score();
     }
 
     /// Updates [`PeerConnectionState`] of this [`Connection`].
@@ -710,20 +705,14 @@ impl Connection {
             return;
         }
 
-        let client_score = self
-            .new_client_quality_score(Some(state), self.0.quality_score.get());
-
-        if let Some(client_score) = client_score {
-            self.on_quality_score_update(client_score);
-        }
+        self.update_client_quality_score();
     }
 
-    /// Creates new [`ClientConnectionQualityScore`] if it's changed.
-    fn new_client_quality_score(
-        &self,
-        state: Option<PeerConnectionState>,
-        quality_score: Option<ConnectionQualityScore>,
-    ) -> Option<ClientConnectionQualityScore> {
+    /// Updates [`ClientConnectionQualityScore`] of this [`Connection`].
+    fn update_client_quality_score(&self) {
+        let state = self.0.peer_state.get();
+        let quality_score = self.0.quality_score.get();
+
         let score = match (state, quality_score) {
             (
                 Some(
@@ -731,26 +720,21 @@ impl Connection {
                     | PeerConnectionState::Failed,
                 ),
                 _,
-            ) => Some(ClientConnectionQualityScore::Disconnected),
+            ) => ClientConnectionQualityScore::Disconnected,
             (
                 Some(
                     PeerConnectionState::New | PeerConnectionState::Connecting,
                 ),
                 _,
-            ) => self.0.client_quality_score.get(),
-            (_, Some(quality_score)) => Some(quality_score.into()),
-            _ => None,
+            ) => return,
+            (_, Some(quality_score)) => quality_score.into(),
+            _ => return,
         };
 
-        if self.0.client_quality_score.replace(score) == score {
-            return None;
+        if self.0.client_quality_score.replace(Some(score)) == Some(score) {
+            return;
         }
 
-        score
-    }
-
-    /// Notifies subscriber about [`ClientConnectionQualityScore`] change.
-    fn on_quality_score_update(&self, score: ClientConnectionQualityScore) {
         // TODO: Replace with derive?
         #[expect(clippy::as_conversions, reason = "needs refactoring")]
         self.0.on_quality_score_update.call1(score as u8);
