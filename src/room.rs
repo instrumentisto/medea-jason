@@ -1796,7 +1796,7 @@ impl PeerEventHandler for InnerRoom {
         &self,
         peer_id: PeerId,
         peer_connection_state: PeerConnectionState,
-        _member_ids: Vec<MemberId>,
+        member_ids: Vec<MemberId>,
     ) -> Self::Output {
         self.rpc.send_command(Command::AddPeerConnectionMetrics {
             peer_id,
@@ -1808,6 +1808,13 @@ impl PeerEventHandler for InnerRoom {
                 peer.scrape_and_send_peer_stats().await;
             }
         }
+
+        for member_id in member_ids {
+            if let Some(connection) = self.connections.get(&member_id) {
+                connection.update_peer_state(peer_connection_state);
+            }
+        }
+
         Ok(())
     }
 

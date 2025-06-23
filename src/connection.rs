@@ -12,7 +12,8 @@ use futures::{
     stream::LocalBoxStream,
 };
 use medea_client_api_proto::{
-    self as proto, ConnectionQualityScore, MemberId, TrackId,
+    self as proto, ConnectionQualityScore, MemberId, PeerConnectionState,
+    TrackId,
 };
 use tracerr::Traced;
 
@@ -305,6 +306,9 @@ struct InnerConnection {
     /// Current [`ConnectionQualityScore`] of this [`Connection`].
     quality_score: Cell<Option<ConnectionQualityScore>>,
 
+    /// Current [`PeerConnectionState`] of this [`Connection`].
+    peer_state: Cell<Option<PeerConnectionState>>,
+
     /// Callback invoked when a [`remote::Track`] is received.
     on_remote_track_added: platform::Callback<api::RemoteMediaTrack>,
 
@@ -548,6 +552,9 @@ impl ConnectionHandle {
 #[derive(Clone, Debug)]
 pub struct Connection(Rc<InnerConnection>);
 
+/// `Disconnected` value for [`ConnectionQualityScore`] used in FFI.
+const DISCONNECTED_QUALITY_SCORE: u8 = 0;
+
 impl Connection {
     /// Instantiates a new [`Connection`] for the given `Member`.
     ///
@@ -584,6 +591,7 @@ impl Connection {
             ],
             remote_id,
             quality_score: Cell::default(),
+            peer_state: Cell::default(),
             on_quality_score_update: platform::Callback::default(),
             recv_constraints,
             on_close: platform::Callback::default(),
@@ -653,10 +661,48 @@ impl Connection {
 
     /// Updates [`ConnectionQualityScore`] of this [`Connection`].
     pub fn update_quality_score(&self, score: ConnectionQualityScore) {
-        if self.0.quality_score.replace(Some(score)) != Some(score) {
+        let previous_score = self.0.quality_score.replace(Some(score));
+
+        if previous_score == Some(score) {
+            return;
+        }
+
+        let peer_state = self.0.peer_state.get();
+
+        if peer_state != Some(PeerConnectionState::Disconnected) {
             // TODO: Replace with derive?
             #[expect(clippy::as_conversions, reason = "needs refactoring")]
             self.0.on_quality_score_update.call1(score as u8);
+        }
+    }
+
+    /// Updates [`PeerConnectionState`] of this [`Connection`].
+    pub fn update_peer_state(&self, state: PeerConnectionState) {
+        // We are interested only in Disconnected and Connected state here.
+        let is_valid_transition = state == PeerConnectionState::Disconnected
+            || state == PeerConnectionState::Connected;
+
+        if !is_valid_transition {
+            return;
+        }
+
+        let previous_state = self.0.peer_state.replace(Some(state));
+
+        if previous_state == Some(state) {
+            return;
+        }
+
+        if state == PeerConnectionState::Disconnected {
+            self.0.on_quality_score_update.call1(DISCONNECTED_QUALITY_SCORE);
+
+            return;
+        }
+
+        if previous_state == Some(PeerConnectionState::Disconnected) {
+            if let Some(score) = self.0.quality_score.get() {
+                #[expect(clippy::as_conversions, reason = "needs refactoring")]
+                self.0.on_quality_score_update.call1(score as u8);
+            }
         }
     }
 }
