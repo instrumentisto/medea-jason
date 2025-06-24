@@ -325,6 +325,19 @@ impl From<ConnectionQualityScore> for ClientConnectionQualityScore {
     }
 }
 
+/// [`Connection`]'s state.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum MemberConnectionState {
+    /// State in P2P mode.
+    P2P(PeerConnectionState),
+}
+
+impl From<PeerConnectionState> for MemberConnectionState {
+    fn from(state: PeerConnectionState) -> Self {
+        Self::P2P(state)
+    }
+}
+
 /// Actual data of a connection with a specific remote `Member`.
 ///
 /// Shared between external [`ConnectionHandle`] and Rust side [`Connection`].
@@ -339,8 +352,8 @@ struct InnerConnection {
     /// Current [`ClientConnectionQualityScore`] of this [`Connection`].
     client_quality_score: Cell<Option<ClientConnectionQualityScore>>,
 
-    /// Current [`PeerConnectionState`] of this [`Connection`].
-    peer_state: Cell<Option<PeerConnectionState>>,
+    /// Current [`MemberConnectionState`] of this [`Connection`].
+    state: Cell<Option<MemberConnectionState>>,
 
     /// Callback invoked when a [`remote::Track`] is received.
     on_remote_track_added: platform::Callback<api::RemoteMediaTrack>,
@@ -353,6 +366,9 @@ struct InnerConnection {
 
     /// Callback invoked when a [`ConnectionQualityScore`] is updated.
     on_quality_score_update: platform::Callback<u8>,
+
+    /// Callback invoked when a [`MemberConnectionState`] is updated.
+    on_state_change: platform::Callback<api::MemberConnectionState>,
 
     /// Callback invoked when this [`Connection`] is closed.
     on_close: platform::Callback<()>,
@@ -439,6 +455,36 @@ impl ConnectionHandle {
             .upgrade()
             .ok_or_else(|| tracerr::new!(HandleDetachedError))
             .map(|inner| inner.remote_id.0.clone())
+    }
+
+    /// Returns [`MemberConnectionState`] if it's known.
+    ///
+    /// # Errors
+    ///
+    /// See [`HandleDetachedError`] for details.
+    pub fn get_state(
+        &self,
+    ) -> Result<Option<MemberConnectionState>, Traced<HandleDetachedError>>
+    {
+        self.0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(HandleDetachedError))
+            .map(|inner| inner.state.get())
+    }
+
+    /// Sets callback, invoked when a new [`MemberConnectionState`] is set in this [`Connection`].
+    ///
+    /// # Errors
+    ///
+    /// See [`HandleDetachedError`] for details.
+    pub fn on_state_change(
+        &self,
+        f: platform::Function<api::MemberConnectionState>,
+    ) -> Result<(), Traced<HandleDetachedError>> {
+        self.0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(HandleDetachedError))
+            .map(|inner| inner.on_state_change.set_func(f))
     }
 
     /// Sets callback, invoked when a new [`remote::Track`] is added to this
@@ -622,8 +668,9 @@ impl Connection {
             remote_id,
             quality_score: Cell::default(),
             client_quality_score: Cell::default(),
-            peer_state: Cell::default(),
+            state: Cell::default(),
             on_quality_score_update: platform::Callback::default(),
+            on_state_change: platform::Callback::default(),
             recv_constraints,
             on_close: platform::Callback::default(),
             on_remote_track_added: platform::Callback::default(),
@@ -701,30 +748,36 @@ impl Connection {
 
     /// Updates [`PeerConnectionState`] of this [`Connection`].
     pub fn update_peer_state(&self, state: PeerConnectionState) {
-        if self.0.peer_state.replace(Some(state)) == Some(state) {
+        let state = state.into();
+
+        if self.0.state.replace(Some(state)) == Some(state) {
             return;
         }
 
         self.update_client_quality_score();
+
+        self.0
+            .on_state_change
+            .call1::<api::MemberConnectionState>(state.into());
     }
 
     /// Updates [`ClientConnectionQualityScore`] of this [`Connection`].
     fn update_client_quality_score(&self) {
-        let state = self.0.peer_state.get();
+        let state = self.0.state.get();
         let quality_score = self.0.quality_score.get();
 
         let score = match (state, quality_score) {
             (
-                Some(
+                Some(MemberConnectionState::P2P(
                     PeerConnectionState::Disconnected
                     | PeerConnectionState::Failed,
-                ),
+                )),
                 _,
             ) => ClientConnectionQualityScore::Disconnected,
             (
-                Some(
+                Some(MemberConnectionState::P2P(
                     PeerConnectionState::New | PeerConnectionState::Connecting,
-                ),
+                )),
                 _,
             ) => return,
             (_, Some(quality_score)) => quality_score.into(),
