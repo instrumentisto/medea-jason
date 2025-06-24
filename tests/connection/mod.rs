@@ -35,7 +35,10 @@ async fn p2p_connection_state_accessible() {
     let state = connection_handle.get_state().unwrap().unwrap();
 
     assert_eq!(state.kind(), api::MemberConnectionStateKind::P2P);
-    assert_eq!(state.value(), JsValue::from(2.0));
+    assert_eq!(
+        state.value(),
+        JsValue::from(api::PeerConnectionState::Connecting as u8)
+    );
 }
 
 #[wasm_bindgen_test]
@@ -62,5 +65,8 @@ async fn callback_fires_on_p2p_state_change() {
     let state = state.get().unwrap();
 
     assert_eq!(state.kind(), api::MemberConnectionStateKind::P2P);
-    assert_eq!(state.value(), JsValue::from(3.0));
+    assert_eq!(
+        state.value(),
+        JsValue::from(api::PeerConnectionState::Connected as u8)
+    );
 }

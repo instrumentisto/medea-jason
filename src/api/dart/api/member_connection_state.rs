@@ -2,9 +2,63 @@
 
 #[cfg(doc)]
 use crate::connection::Connection;
-use medea_client_api_proto::PeerConnectionState;
+use medea_client_api_proto as proto;
+#[cfg(doc)]
+use medea_client_api_proto::IceConnectionState;
 
 use crate::{api::dart::api::ForeignClass, connection as core};
+
+/// `PeerConnection`'s connection state.
+#[derive(Clone, Copy, Debug)]
+pub enum PeerConnectionState {
+    /// At least one of the connection's ICE transports are in the
+    /// [`IceConnectionState::New`] state, and none of them are in one
+    /// of the following states: [`IceConnectionState::Checking`],
+    /// [`IceConnectionState::Failed`], or
+    /// [`IceConnectionState::Disconnected`], or all of the connection's
+    /// transports are in the [`IceConnectionState::Closed`] state.
+    New = 1,
+
+    /// One or more of the ICE transports are currently in the process of
+    /// establishing a connection; that is, their [`IceConnectionState`] is
+    /// either [`IceConnectionState::Checking`] or
+    /// [`IceConnectionState::Connected`], and no transports are in the
+    /// [`IceConnectionState::Failed`] state.
+    Connecting = 2,
+
+    /// Every ICE transport used by the connection is either in use (state
+    /// [`IceConnectionState::Connected`] or [`IceConnectionState::Completed`])
+    /// or is closed ([`IceConnectionState::Closed`]); in addition,
+    /// at least one transport is either [`IceConnectionState::Connected`] or
+    /// [`IceConnectionState::Completed`].
+    Connected = 3,
+
+    /// At least one of the ICE transports for the connection is in the
+    /// [`IceConnectionState::Disconnected`] state and none of the other
+    /// transports are in the state [`IceConnectionState::Failed`] or
+    /// [`IceConnectionState::Checking`].
+    Disconnected = 4,
+
+    /// One or more of the ICE transports on the connection is in the
+    /// [`IceConnectionState::Failed`] state.
+    Failed = 5,
+
+    /// The `PeerConnection` is closed.
+    Closed = 6,
+}
+
+impl From<proto::PeerConnectionState> for PeerConnectionState {
+    fn from(r: proto::PeerConnectionState) -> Self {
+        match r {
+            proto::PeerConnectionState::New => Self::New,
+            proto::PeerConnectionState::Connecting => Self::Connecting,
+            proto::PeerConnectionState::Connected => Self::Connected,
+            proto::PeerConnectionState::Disconnected => Self::Disconnected,
+            proto::PeerConnectionState::Failed => Self::Failed,
+            proto::PeerConnectionState::Closed => Self::Closed,
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug)]
 pub enum MemberConnectionState {
@@ -15,7 +69,7 @@ pub enum MemberConnectionState {
 impl From<core::MemberConnectionState> for MemberConnectionState {
     fn from(r: core::MemberConnectionState) -> Self {
         match r {
-            core::MemberConnectionState::P2P(state) => Self::P2P(state),
+            core::MemberConnectionState::P2P(state) => Self::P2P(state.into()),
         }
     }
 }

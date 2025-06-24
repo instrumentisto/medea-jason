@@ -32,6 +32,7 @@ pub use self::{
     },
     member_connection_state::MemberConnectionState,
     member_connection_state::MemberConnectionStateKind,
+    member_connection_state::PeerConnectionState,
     reconnect_handle::ReconnectHandle,
     remote_media_track::RemoteMediaTrack,
     room_close_reason::RoomCloseReason,
