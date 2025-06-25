@@ -10,6 +10,10 @@ All user visible changes to this project will be documented in this file. This p
 
 See also [`medea-jason` crate `master` changes](https://github.com/instrumentisto/medea-jason/tree/master/CHANGELOG.md).
 
+## BC Breaks
+
+- Bumped up [macOS] deployment target to 10.15. ([#214])
+
 ### Added
 
 - Options to configure audio processing when creating local audio track: ([#206])
@@ -85,7 +89,7 @@ See also [`medea-jason` crate 0.8.0 changes](https://github.com/instrumentisto/m
 
 ### Fixed
 
-- Segfault when closing [Flutter] application on macOS. ([#201])
+- Segfault when closing [Flutter] application on [macOS]. ([#201])
 
 [#200]: https://github.com/instrumentisto/medea-jason/pull/200
 [#201]: https://github.com/instrumentisto/medea-jason/pull/201
@@ -245,9 +249,10 @@ See also [`medea-jason` crate 0.5.0 changes](https://github.com/instrumentisto/m
 
 
 
-[`flutter_rust_bridge`]: https://pub.dev/packages/flutter_rust_bridge
-[`medea_flutter_webrtc`]: https://pub.dev/packages/medea_flutter_webrtc
-[`medea-jason`]: https://docs.rs/medea-jason
 [Flutter]: https://flutter.dev
-[Semantic Versioning 2.0.0]: https://semver.org
 [SFU]: https://webrtcglossary.com/sfu
+[Semantic Versioning 2.0.0]: https://semver.org
+[`flutter_rust_bridge`]: https://pub.dev/packages/flutter_rust_bridge
+[`medea-jason`]: https://docs.rs/medea-jason
+[`medea_flutter_webrtc`]: https://pub.dev/packages/medea_flutter_webrtc
+[macOS]: https://www.apple.com/macos
