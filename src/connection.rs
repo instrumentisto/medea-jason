@@ -696,7 +696,7 @@ impl Connection {
             return;
         }
 
-        self.update_client_quality_score();
+        self.refresh_client_conn_quality_score();
     }
 
     /// Updates [`PeerConnectionState`] of this [`Connection`].
@@ -705,38 +705,31 @@ impl Connection {
             return;
         }
 
-        self.update_client_quality_score();
+        self.refresh_client_conn_quality_score();
     }
 
-    /// Updates [`ClientConnectionQualityScore`] of this [`Connection`].
-    fn update_client_quality_score(&self) {
+    /// Refreshes [`ClientConnectionQualityScore`] of this [`Connection`].
+    fn refresh_client_conn_quality_score(&self) {
+        use PeerConnectionState as S;
+
         let state = self.0.peer_state.get();
         let quality_score = self.0.quality_score.get();
-
         let score = match (state, quality_score) {
-            (
-                Some(
-                    PeerConnectionState::Disconnected
-                    | PeerConnectionState::Failed,
-                ),
-                _,
-            ) => ClientConnectionQualityScore::Disconnected,
-            (
-                Some(
-                    PeerConnectionState::New | PeerConnectionState::Connecting,
-                ),
-                _,
-            ) => return,
-            (_, Some(quality_score)) => quality_score.into(),
-            _ => return,
+            (Some(S::Connected), Some(quality_score)) => quality_score.into(),
+            (Some(S::Disconnected | S::Failed | S::Closed), _) => {
+                ClientConnectionQualityScore::Disconnected
+            }
+            (Some(S::Connecting | S::New), _)
+            | (None, _)
+            | (Some(S::Connected), None) => return,
         };
 
-        if self.0.client_quality_score.replace(Some(score)) == Some(score) {
-            return;
+        let is_score_changed =
+            self.0.client_quality_score.replace(Some(score)) != Some(score);
+        if is_score_changed {
+            // TODO: Replace with derive?
+            #[expect(clippy::as_conversions, reason = "needs refactoring")]
+            self.0.on_quality_score_update.call1(score as u8);
         }
-
-        // TODO: Replace with derive?
-        #[expect(clippy::as_conversions, reason = "needs refactoring")]
-        self.0.on_quality_score_update.call1(score as u8);
     }
 }
