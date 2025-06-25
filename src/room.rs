@@ -1809,11 +1809,10 @@ impl PeerEventHandler for InnerRoom {
             }
         }
 
-        for member_id in member_ids {
-            if let Some(connection) = self.connections.get(&member_id) {
-                connection.update_peer_state(peer_connection_state);
-            }
-        }
+        member_ids
+            .into_iter()
+            .filter_map(|id| self.connections.get(&id))
+            .for_each(|conn| conn.update_peer_state(peer_connection_state));
 
         Ok(())
     }
