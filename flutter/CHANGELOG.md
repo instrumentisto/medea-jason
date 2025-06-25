@@ -28,6 +28,7 @@ See also [`medea-jason` crate `master` changes](https://github.com/instrumentist
 
 - Dependencies:
     - [`flutter_rust_bridge`] to 2.10.0 version. ([#208])
+    - [`medea_flutter_webrtc`] to 0.15.0 version. ([todo])
 
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
 [#208]: https://github.com/instrumentisto/medea-jason/pull/208
