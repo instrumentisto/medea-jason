@@ -719,7 +719,8 @@ impl Connection {
             (Some(S::Disconnected | S::Failed | S::Closed), _) => {
                 ClientConnectionQualityScore::Disconnected
             }
-            (Some(S::Connecting | S::New) | None, _) | (Some(S::Connected), None) => return,
+            (Some(S::Connecting | S::New) | None, _)
+            | (Some(S::Connected), None) => return,
         };
 
         let is_score_changed =
