@@ -16,7 +16,7 @@ dependencies:
   http: ">=0.13.6 <2.0.0"
   js_interop_utils: ^1.0.7
   json_annotation: ^4.9.0
-  medea_flutter_webrtc: 0.14.1-dev+rev.e6542e79cd05a459e49585ef98809ade96b07770
+  medea_flutter_webrtc: 0.15.0
   plugin_platform_interface: ^2.0.2
   retry: ^3.1.2
   tuple: ^2.0.2
