@@ -255,9 +255,19 @@ impl Connections {
         self.members_to_conns.borrow().get(remote_member_id).cloned()
     }
 
-    /// Lists all member IDs of [`Connections`].
-    pub fn member_ids(&self) -> Vec<MemberId> {
-        self.members_to_conns.borrow().keys().cloned().collect()
+    /// Lists connections by [`TrackId`].
+    pub fn track_connections(
+        &self,
+        track_id: &TrackId,
+    ) -> Option<Vec<Connection>> {
+        self.tracks_to_members.borrow().get(track_id).map(|member_ids| {
+            member_ids
+                .iter()
+                .filter_map(|member_id| {
+                    self.members_to_conns.borrow().get(member_id).cloned()
+                })
+                .collect()
+        })
     }
 
     /// Updates this [`Connection`] with the provided [`proto::state::Room`].

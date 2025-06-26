@@ -227,9 +227,6 @@ pub enum PeerEvent {
 
         /// New [`PeerConnectionState`].
         peer_connection_state: PeerConnectionState,
-
-        /// List of member IDs associated with [`PeerConnection`].
-        member_ids: Vec<MemberId>,
     },
 
     /// [`platform::RtcPeerConnection`]'s [`platform::RtcStats`] update.
@@ -450,20 +447,13 @@ impl PeerConnection {
         {
             let id = self.id;
             let weak_sender = Rc::downgrade(&self.peer_events_sender);
-            let connections = Rc::downgrade(&self.connections);
             self.peer.on_connection_state_change(Some(
                 move |peer_connection_state| {
                     if let Some(sender) = weak_sender.upgrade() {
-                        let member_ids = connections
-                            .upgrade()
-                            .map(|connections| connections.member_ids())
-                            .unwrap_or_default();
-
                         Self::on_connection_state_changed(
                             id,
                             &sender,
                             peer_connection_state,
-                            member_ids,
                         );
                     }
                 },
@@ -670,12 +660,10 @@ impl PeerConnection {
         peer_id: Id,
         sender: &mpsc::UnboundedSender<PeerEvent>,
         peer_connection_state: PeerConnectionState,
-        member_ids: Vec<MemberId>,
     ) {
         drop(sender.unbounded_send(PeerEvent::PeerConnectionStateChanged {
             peer_id,
             peer_connection_state,
-            member_ids,
         }));
     }
 
@@ -692,7 +680,6 @@ impl PeerConnection {
             self.id,
             &self.peer_events_sender,
             self.peer.connection_state(),
-            self.connections.member_ids(),
         );
     }
 
