@@ -255,6 +255,21 @@ impl Connections {
         self.members_to_conns.borrow().get(remote_member_id).cloned()
     }
 
+    /// Lists connections by [`TrackId`].
+    pub fn track_connections(
+        &self,
+        track_id: &TrackId,
+    ) -> Option<Vec<Connection>> {
+        self.tracks_to_members.borrow().get(track_id).map(|member_ids| {
+            member_ids
+                .iter()
+                .filter_map(|member_id| {
+                    self.members_to_conns.borrow().get(member_id).cloned()
+                })
+                .collect()
+        })
+    }
+
     /// Updates this [`Connection`] with the provided [`proto::state::Room`].
     pub fn apply(&self, new_state: &proto::state::Room) {
         #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
