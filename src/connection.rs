@@ -255,11 +255,6 @@ impl Connections {
         self.members_to_conns.borrow().get(remote_member_id).cloned()
     }
 
-    /// Lists all member IDs of [`Connections`].
-    pub fn member_ids(&self) -> Vec<MemberId> {
-        self.members_to_conns.borrow().keys().cloned().collect()
-    }
-
     /// Updates this [`Connection`] with the provided [`proto::state::Room`].
     pub fn apply(&self, new_state: &proto::state::Room) {
         #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
