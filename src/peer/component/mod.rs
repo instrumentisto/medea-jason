@@ -242,7 +242,7 @@ impl State {
     }
 
     /// Returns all [`TrackId`]s of the peer.
-    pub fn get_tracks(&self) -> Vec<TrackId> {
+    pub fn get_tracks_ids(&self) -> Vec<TrackId> {
         self.senders.ids().into_iter().chain(self.receivers.ids()).collect()
     }
 

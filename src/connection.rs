@@ -256,7 +256,7 @@ impl Connections {
     }
 
     /// Lists connections by [`TrackId`].
-    pub fn track_connections(
+    pub fn get_by_track_id(
         &self,
         track_id: &TrackId,
     ) -> Option<Vec<Connection>> {
