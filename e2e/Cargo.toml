@@ -25,7 +25,7 @@ tests = [
 async-recursion = { version = "1.0", optional = true }
 cucumber = { version = "0.21", features = ["libtest"], optional = true }
 derive_more = { version = "2.0", features = ["display", "error", "from"] }
-fantoccini = { version = "0.21", features = ["rustls-tls"], default-features = false }
+fantoccini = { version = "0.22", features = ["rustls-tls"], default-features = false }
 futures = "0.3"
 medea-control-api-mock = { path = "../mock/control-api", optional = true }
 reqwest = { version = "0.12", features = ["json"], optional = true }
