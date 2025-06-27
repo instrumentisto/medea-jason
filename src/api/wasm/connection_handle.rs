@@ -54,6 +54,49 @@ impl ConnectionHandle {
             .map_err(Into::into)
     }
 
+    /// Returns `MemberConnectionState` of the [`Connection`].
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    /// a [`RoomHandle`] that implicitly owns native object behind this
+    /// [`ConnectionHandle`].
+    ///
+    /// [`Connection`]: connection::Connection
+    /// [`Jason`]: api::Jason
+    /// [`RoomHandle`]: api::RoomHandle
+    /// [`StateError`]: crate::api::err::StateError
+    pub fn get_state(
+        &self,
+    ) -> Result<Option<api::MemberConnectionState>, JsValue> {
+        self.0
+            .get_state()
+            .map(|state| state.map(Into::into))
+            .map_err(api::Error::from)
+            .map_err(Into::into)
+    }
+
+    /// Sets a callback to be invoked once a state of associated [`Connection`] is changed.
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    /// a [`RoomHandle`] that implicitly owns native object behind this
+    /// [`ConnectionHandle`].
+    ///
+    /// [`Connection`]: connection::Connection
+    /// [`Jason`]: api::Jason
+    /// [`RoomHandle`]: api::RoomHandle
+    /// [`StateError`]: crate::api::err::StateError
+    pub fn on_state_change(&self, cb: js_sys::Function) -> Result<(), JsValue> {
+        self.0
+            .on_state_change(cb.into())
+            .map_err(api::Error::from)
+            .map_err(Into::into)
+    }
+
     /// Sets callback, invoked when a new [`RemoteMediaTrack`] is added to this
     /// [`Connection`].
     ///

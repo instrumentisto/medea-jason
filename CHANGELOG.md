@@ -21,11 +21,18 @@ All user visible changes to this project will be documented in this file. This p
     - `LocalMediaTrack.setAutoGainControlEnabled()`, `LocalMediaTrack.isAutoGainControlEnabled()` to inspect and toggle auto gain control (supported on web and desktop platforms).
     - `LocalMediaTrack.setNoiseSuppressionLevel()`, `LocalMediaTrack.getNoiseSuppressionLevel()` to inspect and configure noise suppression level (only supported on desktop platforms).
     - `LocalMediaTrack.setHighPassFilterEnabled()`, `LocalMediaTrack.isHighPassFilterEnabledO()` to inspect and toggle high-pass filter (only supported on desktop platforms).
+- Library API:
+    - `ConnectionHandle.get_state()` method ([#213])
+    - `ConnectionHandle.on_state_change()` callback for state updates triggered by P2P state changes. ([#213])
+
+### Changed
+
+- Library API:
+    - `ConnectionHandle.on_quality_score_update` callback now receives new `0` quality score if peer is disconnected. ([#212])
 
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
-
-
-
+[#212]: https://github.com/instrumentisto/medea-jason/pull/212
+[#213]: https://github.com/instrumentisto/medea-jason/pull/213
 
 ## [0.9.1] · 2025-04-11
 [0.9.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.9.1

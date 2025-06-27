@@ -218,7 +218,7 @@ pub enum PeerEvent {
     /// [`platform::RtcPeerConnection`]'s [connection][1] state changed.
     ///
     /// [1]: https://w3.org/TR/webrtc#dfn-ice-connection-state
-    ConnectionStateChanged {
+    PeerConnectionStateChanged {
         /// ID of the [`PeerConnection`] that sends
         /// [`connectionstatechange`][1] event.
         ///
@@ -654,14 +654,14 @@ impl PeerConnection {
     }
 
     /// Handles `connectionstatechange` event from the underlying peer emitting
-    /// [`PeerEvent::ConnectionStateChanged`] event into this peers
+    /// [`PeerEvent::PeerConnectionStateChanged`] event into this peers
     /// `peer_events_sender`.
     fn on_connection_state_changed(
         peer_id: Id,
         sender: &mpsc::UnboundedSender<PeerEvent>,
         peer_connection_state: PeerConnectionState,
     ) {
-        drop(sender.unbounded_send(PeerEvent::ConnectionStateChanged {
+        drop(sender.unbounded_send(PeerEvent::PeerConnectionStateChanged {
             peer_id,
             peer_connection_state,
         }));
