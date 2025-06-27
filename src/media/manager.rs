@@ -301,8 +301,8 @@ impl InnerMediaManager {
         let storage: Vec<_> = self
             .tracks
             .borrow()
-            .iter()
-            .map(|(_, track)| Weak::upgrade(track).unwrap())
+            .values()
+            .map(|track| Weak::upgrade(track).unwrap())
             .collect();
 
         let mut tracks = Vec::new();
