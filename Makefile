@@ -381,6 +381,19 @@ define cargo.build.medea-jason.windows
 endef
 
 
+# Show CHANGELOG date of a concrete version of project's Cargo crate.
+#
+# Usage:
+#	make cargo.changelog.date [crate=(medea-jason|<crate-name>)]
+#	                          [ver=($(crate-ver)|<version>)]
+
+cargo-changelog-date-ver = $(if $(call eq,$(ver),),$(crate-ver),$(ver))
+
+cargo.changelog.date:
+	@grep -E '^## \[$(cargo-changelog-date-ver)\] ·' $(crate-dir)/CHANGELOG.md \
+		| cut -d' ' -f4 | tr -d ' '
+
+
 # Show permalink to CHANGELOG of a concrete version of project's Cargo crate.
 #
 # Usage:
@@ -1446,8 +1459,8 @@ endef
 ##################
 
 .PHONY: build build.jason \
-        cargo cargo.build.jason cargo.changelog.link cargo.fmt cargo.gen \
-        	cargo.gen.bridge cargo.lint cargo.version \
+        cargo cargo.build.jason cargo.changelog.date cargo.changelog.link \
+        	cargo.fmt cargo.gen cargo.gen.bridge cargo.lint cargo.version \
         docker.build \
         	docker.down.control docker.down.demo docker.down.e2e \
         	docker.down.medea docker.down.webdriver  \
