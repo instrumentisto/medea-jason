@@ -251,23 +251,26 @@ impl Connections {
     }
 
     /// Lookups a [`Connection`] by the provided remote [`MemberId`].
+    #[must_use]
     pub fn get(&self, remote_member_id: &MemberId) -> Option<Connection> {
         self.members_to_conns.borrow().get(remote_member_id).cloned()
     }
 
-    /// Lists connections by [`TrackId`].
-    pub fn get_by_track_id(
+    /// Iterates over all the [`Connection`]s of the provided [`TrackId`].
+    pub fn iter_by_track(
         &self,
         track_id: &TrackId,
-    ) -> Option<Vec<Connection>> {
-        self.tracks_to_members.borrow().get(track_id).map(|member_ids| {
-            member_ids
-                .iter()
-                .filter_map(|member_id| {
-                    self.members_to_conns.borrow().get(member_id).cloned()
+    ) -> impl Iterator<Item = Connection> + use<'_> {
+        self.tracks_to_members
+            .borrow()
+            .get(track_id)
+            .cloned()
+            .into_iter()
+            .flat_map(|member_ids| {
+                member_ids.into_iter().filter_map(|member_id| {
+                    self.members_to_conns.borrow().get(&member_id).cloned()
                 })
-                .collect()
-        })
+            })
     }
 
     /// Updates this [`Connection`] with the provided [`proto::state::Room`].
@@ -305,32 +308,25 @@ pub struct HandleDetachedError;
 #[derive(Clone, Debug)]
 pub struct ConnectionHandle(Weak<InnerConnection>);
 
-/// Estimated connection quality on client side.
-#[derive(Clone, Copy, Debug, Display, Eq, Ord, PartialEq, PartialOrd)]
+/// Estimated [`Connection`]'s quality on the client side only.
+#[derive(Clone, Copy, Debug, Display, Eq, From, Ord, PartialEq, PartialOrd)]
 pub enum ClientConnectionQualityScore {
-    /// Connection is lost.
-    Disconnected = 0,
+    /// [`Connection`] is lost.
+    Disconnected,
 
-    /// Nearly all users dissatisfied.
-    Poor = 1,
-
-    /// Many users dissatisfied.
-    Low = 2,
-
-    /// Some users dissatisfied.
-    Medium = 3,
-
-    /// Satisfied.
-    High = 4,
+    /// [`Connection`] is established and scored.
+    Connected(ConnectionQualityScore),
 }
 
-impl From<ConnectionQualityScore> for ClientConnectionQualityScore {
-    fn from(score: ConnectionQualityScore) -> Self {
-        match score {
-            ConnectionQualityScore::Poor => Self::Poor,
-            ConnectionQualityScore::Low => Self::Low,
-            ConnectionQualityScore::Medium => Self::Medium,
-            ConnectionQualityScore::High => Self::High,
+impl ClientConnectionQualityScore {
+    /// Converts this [`ClientConnectionQualityScore`] into a [`u8`] number.
+    #[must_use]
+    pub const fn into_u8(self) -> u8 {
+        match self {
+            Self::Disconnected => 0,
+            // TODO: Replace with derive?
+            #[expect(clippy::as_conversions, reason = "needs refactoring")]
+            Self::Connected(score) => score as u8,
         }
     }
 }
@@ -700,7 +696,7 @@ impl Connection {
         ConnectionHandle(Rc::downgrade(&self.0))
     }
 
-    /// Updates [`ConnectionQualityScore`] of this [`Connection`].
+    /// Updates the [`ConnectionQualityScore`] of this [`Connection`].
     pub fn update_quality_score(&self, score: ConnectionQualityScore) {
         if self.0.quality_score.replace(Some(score)) == Some(score) {
             return;
@@ -709,7 +705,7 @@ impl Connection {
         self.refresh_client_conn_quality_score();
     }
 
-    /// Updates [`PeerConnectionState`] of this [`Connection`].
+    /// Updates the [`PeerConnectionState`] of this [`Connection`].
     pub fn update_peer_state(&self, state: PeerConnectionState) {
         if self.0.peer_state.replace(Some(state)) == Some(state) {
             return;
@@ -718,7 +714,7 @@ impl Connection {
         self.refresh_client_conn_quality_score();
     }
 
-    /// Refreshes [`ClientConnectionQualityScore`] of this [`Connection`].
+    /// Refreshes the [`ClientConnectionQualityScore`] of this [`Connection`].
     fn refresh_client_conn_quality_score(&self) {
         use PeerConnectionState as S;
 
@@ -736,9 +732,7 @@ impl Connection {
         let is_score_changed =
             self.0.client_quality_score.replace(Some(score)) != Some(score);
         if is_score_changed {
-            // TODO: Replace with derive?
-            #[expect(clippy::as_conversions, reason = "needs refactoring")]
-            self.0.on_quality_score_update.call1(score as u8);
+            self.0.on_quality_score_update.call1(score.into_u8());
         }
     }
 }

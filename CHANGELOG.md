@@ -24,11 +24,13 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Changed
 
-- Library API:
-    - `ConnectionHandle.on_quality_score_update` callback now receives new `0` quality score if peer is disconnected. ([#212])
+- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
 [#212]: https://github.com/instrumentisto/medea-jason/pull/212
+
+
+
 
 ## [0.9.1] · 2025-04-11
 [0.9.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.9.1
@@ -528,7 +530,7 @@ See [`medea_jason` pub package 0.9.1 changes](https://github.com/instrumentisto/
         - `MediaStreamHandle.get_media_stream()`;
         - `ConnectionHandle.on_remote_stream` callback;
         - `Jason.on_local_stream` callback.
-    
+
 [#18]: https://github.com/instrumentisto/medea/pull/18
 [#20]: https://github.com/instrumentisto/medea/pull/20
 [#22]: https://github.com/instrumentisto/medea/pull/22

@@ -1810,12 +1810,9 @@ impl PeerEventHandler for InnerRoom {
 
         if let Some(peer_state) = self.peers.state().get(peer_id) {
             peer_state
-                .get_tracks_ids()
+                .get_tracks()
                 .into_iter()
-                .filter_map(|track_id| {
-                    self.connections.get_by_track_id(&track_id)
-                })
-                .flatten()
+                .flat_map(|track_id| self.connections.iter_by_track(&track_id))
                 .for_each(|conn| {
                     conn.update_peer_state(peer_connection_state);
                 });
