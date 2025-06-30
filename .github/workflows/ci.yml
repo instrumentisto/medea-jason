@@ -6,6 +6,7 @@ on:
     tags: ["medea-*"]
   pull_request:
     branches: ["master"]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
