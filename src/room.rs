@@ -1812,13 +1812,9 @@ impl PeerEventHandler for InnerRoom {
             peer_state
                 .get_tracks()
                 .into_iter()
-                .flat_map(|track_id| {
-                    self.connections
-                        .track_connections(&track_id)
-                        .unwrap_or_default()
-                })
-                .for_each(|connection| {
-                    connection.update_peer_state(peer_connection_state);
+                .flat_map(|track_id| self.connections.iter_by_track(&track_id))
+                .for_each(|conn| {
+                    conn.update_peer_state(peer_connection_state);
                 });
         }
 

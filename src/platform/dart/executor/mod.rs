@@ -77,7 +77,7 @@ fn task_wake(task: Arc<Task>) {
     };
 
     let enqueued =
-        unsafe { dart_api::post_c_object(wake_port, &mut task_addr) };
+        unsafe { dart_api::post_c_object(wake_port, &raw mut task_addr) };
     if !enqueued {
         log::warn!("Could not send message to Dart's native port");
         unsafe {
