@@ -24,6 +24,10 @@ See also [`medea-jason` crate `master` changes](https://github.com/instrumentist
     - `LocalMediaTrack.setNoiseSuppressionLevel()`, `LocalMediaTrack.getNoiseSuppressionLevel()` to inspect and configure noise suppression level (only supported on desktop platforms).
     - `LocalMediaTrack.setHighPassFilterEnabled()`, `LocalMediaTrack.isHighPassFilterEnabledO()` to inspect and toggle high-pass filter (only supported on desktop platforms).
 
+### Changed
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
+
 ### Upgraded
 
 - Dependencies:
@@ -31,6 +35,7 @@ See also [`medea-jason` crate `master` changes](https://github.com/instrumentist
 
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
 [#208]: https://github.com/instrumentisto/medea-jason/pull/208
+[#212]: https://github.com/instrumentisto/medea-jason/pull/212
 
 
 
