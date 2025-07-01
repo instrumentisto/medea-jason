@@ -5879,7 +5879,8 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
         f: f,
       );
 
-  /// Sets a callback to be invoked once a state of associated [`Connection`] is changed.
+  /// Sets a callback to be invoked once a state of associated [`Connection`]
+  /// is changed.
   ///
   /// # Errors
   ///

@@ -80,7 +80,8 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
   /// [`remote::Track`]: media::track::remote::Track
   void onRemoteTrackAdded({required Object f});
 
-  /// Sets a callback to be invoked once a state of associated [`Connection`] is changed.
+  /// Sets a callback to be invoked once a state of associated [`Connection`]
+  /// is changed.
   ///
   /// # Errors
   ///
