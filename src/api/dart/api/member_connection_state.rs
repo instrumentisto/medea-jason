@@ -1,11 +1,11 @@
 //! State of a member [`Connection`].
 
-#[cfg(doc)]
-use crate::connection::Connection;
 use medea_client_api_proto as proto;
 #[cfg(doc)]
 use medea_client_api_proto::IceConnectionState;
 
+#[cfg(doc)]
+use crate::connection::Connection;
 use crate::{api::dart::api::ForeignClass, connection as core};
 
 /// `PeerConnection`'s connection state.

@@ -30,9 +30,9 @@ pub use self::{
         AudioTrackConstraints, DeviceVideoTrackConstraints,
         DisplayVideoTrackConstraints, MediaStreamSettings,
     },
-    member_connection_state::MemberConnectionState,
-    member_connection_state::MemberConnectionStateKind,
-    member_connection_state::PeerConnectionState,
+    member_connection_state::{
+        MemberConnectionState, MemberConnectionStateKind, PeerConnectionState,
+    },
     reconnect_handle::ReconnectHandle,
     remote_media_track::RemoteMediaTrack,
     room_close_reason::RoomCloseReason,

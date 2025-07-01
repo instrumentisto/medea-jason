@@ -478,7 +478,8 @@ impl ConnectionHandle {
             .map(|inner| inner.state.get())
     }
 
-    /// Sets callback, invoked when a new [`MemberConnectionState`] is set in this [`Connection`].
+    /// Sets callback, invoked when a new [`MemberConnectionState`] is set in
+    /// this [`Connection`].
     ///
     /// # Errors
     ///
@@ -775,7 +776,9 @@ impl Connection {
         let state = self.0.state.get();
         let quality_score = self.0.quality_score.get();
         let score = match (state, quality_score) {
-            (Some(M::P2P(S::Connected)), Some(quality_score)) => quality_score.into(),
+            (Some(M::P2P(S::Connected)), Some(quality_score)) => {
+                quality_score.into()
+            }
             (Some(M::P2P(S::Disconnected | S::Failed | S::Closed)), _) => {
                 ClientConnectionQualityScore::Disconnected
             }

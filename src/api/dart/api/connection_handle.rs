@@ -108,7 +108,8 @@ impl ConnectionHandle {
             .map_err(Into::into)
     }
 
-    /// Sets a callback to be invoked once a state of associated [`Connection`] is changed.
+    /// Sets a callback to be invoked once a state of associated [`Connection`]
+    /// is changed.
     ///
     /// # Errors
     ///

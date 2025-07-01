@@ -1,10 +1,9 @@
+use std::{cell::Cell, rc::Rc};
+
 use medea_client_api_proto::{MemberId, PeerConnectionState};
 use medea_jason::{api, connection::Connection, media::RecvConstraints};
 use wasm_bindgen::{JsValue, closure::Closure};
 use wasm_bindgen_test::*;
-
-use std::cell::Cell;
-use std::rc::Rc;
 
 wasm_bindgen_test_configure!(run_in_browser);
 
