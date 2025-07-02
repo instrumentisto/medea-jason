@@ -218,7 +218,7 @@ pub enum PeerEvent {
     /// [`platform::RtcPeerConnection`]'s [connection][1] state changed.
     ///
     /// [1]: https://w3.org/TR/webrtc#dfn-ice-connection-state
-    ConnectionStateChanged {
+    PeerConnectionStateChanged {
         /// ID of the [`PeerConnection`] that sends
         /// [`connectionstatechange`][1] event.
         ///
@@ -337,7 +337,7 @@ pub struct PeerConnection {
 }
 
 impl PeerConnection {
-    /// Creates new [`PeerConnection`].
+    /// Creates a new [`PeerConnection`].
     ///
     /// Provided `peer_events_sender` will be used to emit [`PeerEvent`]s from
     /// this peer.
@@ -600,13 +600,13 @@ impl PeerConnection {
         )
     }
 
-    /// Returns [`PeerId`] of this [`PeerConnection`].
+    /// Returns the [`PeerId`] of this [`PeerConnection`].
     pub const fn id(&self) -> PeerId {
         self.id
     }
 
-    /// Handle `icecandidate` event from underlying peer emitting
-    /// [`PeerEvent::IceCandidateDiscovered`] event into this peers
+    /// Handle `icecandidate` event from the underlying peer emitting
+    /// [`PeerEvent::IceCandidateDiscovered`] event into this peer's
     /// `peer_events_sender`.
     fn on_ice_candidate(
         id: Id,
@@ -621,8 +621,8 @@ impl PeerConnection {
         }));
     }
 
-    /// Handle `icecandidateerror` event from underlying peer emitting
-    /// [`PeerEvent::IceCandidateError`] event into this peers
+    /// Handle `icecandidateerror` event from the underlying peer emitting
+    /// [`PeerEvent::IceCandidateError`] event into this peer's
     /// `peer_events_sender`.
     fn on_ice_candidate_error(
         id: Id,
@@ -639,8 +639,8 @@ impl PeerConnection {
         }));
     }
 
-    /// Handle `iceconnectionstatechange` event from underlying peer emitting
-    /// [`PeerEvent::IceConnectionStateChanged`] event into this peers
+    /// Handle `iceconnectionstatechange` event from the underlying peer
+    /// emitting [`PeerEvent::IceConnectionStateChanged`] event into this peer's
     /// `peer_events_sender`.
     fn on_ice_connection_state_changed(
         peer_id: Id,
@@ -654,14 +654,14 @@ impl PeerConnection {
     }
 
     /// Handles `connectionstatechange` event from the underlying peer emitting
-    /// [`PeerEvent::ConnectionStateChanged`] event into this peers
+    /// [`PeerEvent::PeerConnectionStateChanged`] event into this peer's
     /// `peer_events_sender`.
     fn on_connection_state_changed(
         peer_id: Id,
         sender: &mpsc::UnboundedSender<PeerEvent>,
         peer_connection_state: PeerConnectionState,
     ) {
-        drop(sender.unbounded_send(PeerEvent::ConnectionStateChanged {
+        drop(sender.unbounded_send(PeerEvent::PeerConnectionStateChanged {
             peer_id,
             peer_connection_state,
         }));

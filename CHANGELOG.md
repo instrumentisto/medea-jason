@@ -22,7 +22,12 @@ All user visible changes to this project will be documented in this file. This p
     - `LocalMediaTrack.setNoiseSuppressionLevel()`, `LocalMediaTrack.getNoiseSuppressionLevel()` to inspect and configure noise suppression level (only supported on desktop platforms).
     - `LocalMediaTrack.setHighPassFilterEnabled()`, `LocalMediaTrack.isHighPassFilterEnabledO()` to inspect and toggle high-pass filter (only supported on desktop platforms).
 
+### Changed
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
+
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
+[#212]: https://github.com/instrumentisto/medea-jason/pull/212
 
 
 
@@ -525,7 +530,7 @@ See [`medea_jason` pub package 0.9.1 changes](https://github.com/instrumentisto/
         - `MediaStreamHandle.get_media_stream()`;
         - `ConnectionHandle.on_remote_stream` callback;
         - `Jason.on_local_stream` callback.
-    
+
 [#18]: https://github.com/instrumentisto/medea/pull/18
 [#20]: https://github.com/instrumentisto/medea/pull/20
 [#22]: https://github.com/instrumentisto/medea/pull/22
