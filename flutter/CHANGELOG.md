@@ -6,9 +6,10 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.10.0] · 2025-07-05
+[0.10.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.10.0/flutter
 
-See also [`medea-jason` crate `master` changes](https://github.com/instrumentisto/medea-jason/tree/master/CHANGELOG.md).
+See also [`medea-jason` crate 0.10.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.10.0/CHANGELOG.md).
 
 ### Added
 

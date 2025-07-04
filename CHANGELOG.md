@@ -6,7 +6,10 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.10.0] · 2025-07-05
+[0.10.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.10.0
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.9.1...medea-jason-0.10.0)
 
 ### Added
 
@@ -525,7 +528,7 @@ See [`medea_jason` pub package 0.9.1 changes](https://github.com/instrumentisto/
         - `MediaStreamHandle.get_media_stream()`;
         - `ConnectionHandle.on_remote_stream` callback;
         - `Jason.on_local_stream` callback.
-    
+
 [#18]: https://github.com/instrumentisto/medea/pull/18
 [#20]: https://github.com/instrumentisto/medea/pull/20
 [#22]: https://github.com/instrumentisto/medea/pull/22
