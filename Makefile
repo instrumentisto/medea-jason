@@ -20,9 +20,9 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.87
-CHROME_VERSION := 136.0-chromedriver-136.0
-FIREFOX_VERSION := 138.0.3-driver0.36.0
+RUST_VER := 1.88
+CHROME_VERSION := 137.0-chromedriver-137.0
+FIREFOX_VERSION := 140.0.1-driver0.36.0
 
 CARGO_NDK_VER := 3.5.4-ndkr28b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
@@ -379,6 +379,19 @@ define cargo.build.medea-jason.windows
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
 	      ./flutter/windows/lib/$(target)/medea_jason.dll
 endef
+
+
+# Show CHANGELOG date of a concrete version of project's Cargo crate.
+#
+# Usage:
+#	make cargo.changelog.date [crate=(medea-jason|<crate-name>)]
+#	                          [ver=($(crate-ver)|<version>)]
+
+cargo-changelog-date-ver = $(if $(call eq,$(ver),),$(crate-ver),$(ver))
+
+cargo.changelog.date:
+	@grep -E '^## \[$(cargo-changelog-date-ver)\] ·' $(crate-dir)/CHANGELOG.md \
+		| cut -d' ' -f4 | tr -d ' '
 
 
 # Show permalink to CHANGELOG of a concrete version of project's Cargo crate.
@@ -1446,8 +1459,8 @@ endef
 ##################
 
 .PHONY: build build.jason \
-        cargo cargo.build.jason cargo.changelog.link cargo.fmt cargo.gen \
-        	cargo.gen.bridge cargo.lint cargo.version \
+        cargo cargo.build.jason cargo.changelog.date cargo.changelog.link \
+        	cargo.fmt cargo.gen cargo.gen.bridge cargo.lint cargo.version \
         docker.build \
         	docker.down.control docker.down.demo docker.down.e2e \
         	docker.down.medea docker.down.webdriver  \

@@ -179,7 +179,6 @@ where
     /// values and values that will be inserted.
     ///
     /// [`Stream`]: futures::Stream
-    #[expect(clippy::needless_collect, reason = "false positive: lifetimes")]
     pub fn replay_on_insert(&self) -> LocalBoxStream<'static, O> {
         Box::pin(stream::iter(
             self.store

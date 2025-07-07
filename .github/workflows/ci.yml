@@ -1162,6 +1162,15 @@ jobs:
             == $(make yarn.version pkg=${{ steps.release.outputs.group1 }})
         if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
 
+      - name: Ensure CHANGELOG date is today
+        run: |
+          today="$(date '+%Y-%m-%d')"
+          changelog="$(make cargo.changelog.date \
+                            crate=${{ steps.release.outputs.group1 }} \
+                            ver=${{ steps.release.outputs.group2 }})"
+          echo "Changelog: $changelog"
+          echo "Today: $today"
+          [ "$changelog" = "$today" ]
       - name: Parse CHANGELOG link
         id: changelog
         run: echo "link=$(make cargo.changelog.link
