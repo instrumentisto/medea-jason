@@ -156,7 +156,14 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@v1
         with:
+          toolchain: nightly
+          components: rustfmt
+        if: ${{ matrix.crate == 'medea-control-api-proto' }}
+
+      - uses: dtolnay/rust-toolchain@v1
+        with:
           toolchain: stable
+        if: ${{ matrix.crate == 'medea-jason' }}
 
       - run: make rustup.targets only=android
         if: ${{ matrix.crate == 'medea-jason' }}
@@ -182,6 +189,10 @@ jobs:
       - run: make cargo.gen crate=${{ matrix.crate }}
 
       - run: make flutter.fmt
+        if: ${{ matrix.crate == 'medea-jason' }}
+
+      - run: make cargo.fmt
+        if: ${{ matrix.crate == 'medea-control-api-proto' }}
 
       - run: git status --short | (! read -t 1 -N 1)
 
