@@ -136,6 +136,37 @@ jobs:
 
       - run: make cargo.fmt check=yes
 
+  codegen:
+    strategy:
+      matrix:
+        include:
+          - crate: medea-control-api-proto
+
+          - crate: medea-jason
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+      - uses: arduino/setup-protoc@v3
+        with:
+          version: ${{ env.PROTOC_VER }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Linux dependencies
+        run: |
+          apt update
+          apt install -y clang curl make xz-utils
+
+      - run: cargo install cargo-expand
+
+      - run: make cargo.gen crate=${{ matrix.crate }} dockerized=yes
+
+      - run: make flutter.fmt
+
+      - run: git status --short | (! read -t 1 -N 1)
 
 
 
