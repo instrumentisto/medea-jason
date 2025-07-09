@@ -1722,7 +1722,6 @@ mod patches_generation {
         .await;
 
         let room_handle = api::RoomHandle::from(room.new_handle());
-        room_handle.on_failed_local_media();
 
         spawn_local(async move {
             JsFuture::from(
