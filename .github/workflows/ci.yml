@@ -147,22 +147,39 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
-      - uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: stable
+
       - uses: arduino/setup-protoc@v3
         with:
           version: ${{ env.PROTOC_VER }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ matrix.crate == 'medea-control-api-proto' }}
 
-      - name: Install Linux dependencies
-        run: |
-          apt update
-          apt install -y clang curl make xz-utils
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
 
-      - run: cargo install cargo-expand
+      - run: make rustup.targets only=android
+        if: ${{ matrix.crate == 'medea-jason' }}
 
-      - run: make cargo.gen crate=${{ matrix.crate }} dockerized=yes
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-ndk
+          use-tool-cache: true
+        if: ${{ matrix.crate == 'medea-jason' }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin  # Temurin is cached on GitHub Actions Runners.
+          java-version: 17
+          cache: gradle
+        if: ${{ matrix.crate == 'medea-jason' }}
+
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-expand
+          use-tool-cache: true
+
+      - run: make cargo.gen crate=${{ matrix.crate }}
 
       - run: make flutter.fmt
 
