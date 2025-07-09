@@ -1722,6 +1722,7 @@ mod patches_generation {
         .await;
 
         let room_handle = api::RoomHandle::from(room.new_handle());
+        room_handle.on_failed_local_media();
 
         spawn_local(async move {
             JsFuture::from(
@@ -1807,7 +1808,8 @@ mod patches_generation {
         if let Ok(Ok(local_media_fail)) =
             timeout(5000, Box::pin(media_fail_rx)).await
         {
-            // TODO: this callback can be removed after debugging of this flaky test will be done.
+            // TODO: this callback can be removed after debugging of this flaky
+            //       test will be done.
             // See PR: https://github.com/instrumentisto/medea-jason/pull/212
             panic!(
                 "on_failed_local_media() triggered with error: {}",
