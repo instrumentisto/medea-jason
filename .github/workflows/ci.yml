@@ -146,7 +146,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: subosito/flutter-action@v2
+        if: ${{ matrix.crate == 'medea-jason' }}
 
       - uses: arduino/setup-protoc@v3
         with:
