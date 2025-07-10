@@ -6,6 +6,19 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.10.0...master)
+
+### Changed
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
+
+[#212]: https://github.com/instrumentisto/medea-jason/pull/212
+
+
+
+
 ## [0.10.0] · 2025-07-05
 [0.10.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.10.0
 
@@ -30,7 +43,6 @@ All user visible changes to this project will be documented in this file. This p
 - `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
-[#212]: https://github.com/instrumentisto/medea-jason/pull/212
 
 
 
