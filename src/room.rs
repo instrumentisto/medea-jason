@@ -1790,9 +1790,9 @@ impl PeerEventHandler for InnerRoom {
         Ok(())
     }
 
-    /// Handles [`PeerEvent::ConnectionStateChanged`] event and sends new
+    /// Handles [`PeerEvent::PeerConnectionStateChanged`] event and sends new
     /// state to the RPC server.
-    async fn on_connection_state_changed(
+    async fn on_peer_connection_state_changed(
         &self,
         peer_id: PeerId,
         peer_connection_state: PeerConnectionState,
@@ -1807,6 +1807,17 @@ impl PeerEventHandler for InnerRoom {
                 peer.scrape_and_send_peer_stats().await;
             }
         }
+
+        if let Some(peer_state) = self.peers.state().get(peer_id) {
+            peer_state
+                .get_tracks()
+                .into_iter()
+                .flat_map(|track_id| self.connections.iter_by_track(&track_id))
+                .for_each(|conn| {
+                    conn.update_peer_state(peer_connection_state);
+                });
+        }
+
         Ok(())
     }
 

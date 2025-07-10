@@ -12,7 +12,8 @@ use futures::{
     stream::LocalBoxStream,
 };
 use medea_client_api_proto::{
-    self as proto, ConnectionQualityScore, MemberId, TrackId,
+    self as proto, ConnectionQualityScore, MemberId, PeerConnectionState,
+    TrackId,
 };
 use tracerr::Traced;
 
@@ -250,8 +251,26 @@ impl Connections {
     }
 
     /// Lookups a [`Connection`] by the provided remote [`MemberId`].
+    #[must_use]
     pub fn get(&self, remote_member_id: &MemberId) -> Option<Connection> {
         self.members_to_conns.borrow().get(remote_member_id).cloned()
+    }
+
+    /// Iterates over all the [`Connection`]s of the provided [`TrackId`].
+    pub fn iter_by_track(
+        &self,
+        track_id: &TrackId,
+    ) -> impl Iterator<Item = Connection> + use<'_> {
+        self.tracks_to_members
+            .borrow()
+            .get(track_id)
+            .cloned()
+            .into_iter()
+            .flat_map(|member_ids| {
+                member_ids.into_iter().filter_map(|member_id| {
+                    self.members_to_conns.borrow().get(&member_id).cloned()
+                })
+            })
     }
 
     /// Updates this [`Connection`] with the provided [`proto::state::Room`].
@@ -289,6 +308,29 @@ pub struct HandleDetachedError;
 #[derive(Clone, Debug)]
 pub struct ConnectionHandle(Weak<InnerConnection>);
 
+/// Estimated [`Connection`]'s quality on the client side only.
+#[derive(Clone, Copy, Debug, Display, Eq, From, Ord, PartialEq, PartialOrd)]
+pub enum ClientConnectionQualityScore {
+    /// [`Connection`] is lost.
+    Disconnected,
+
+    /// [`Connection`] is established and scored.
+    Connected(ConnectionQualityScore),
+}
+
+impl ClientConnectionQualityScore {
+    /// Converts this [`ClientConnectionQualityScore`] into a [`u8`] number.
+    #[must_use]
+    pub const fn into_u8(self) -> u8 {
+        match self {
+            Self::Disconnected => 0,
+            // TODO: Replace with derive?
+            #[expect(clippy::as_conversions, reason = "needs refactoring")]
+            Self::Connected(score) => score as u8,
+        }
+    }
+}
+
 /// Actual data of a connection with a specific remote `Member`.
 ///
 /// Shared between external [`ConnectionHandle`] and Rust side [`Connection`].
@@ -299,6 +341,12 @@ struct InnerConnection {
 
     /// Current [`ConnectionQualityScore`] of this [`Connection`].
     quality_score: Cell<Option<ConnectionQualityScore>>,
+
+    /// Current [`ClientConnectionQualityScore`] of this [`Connection`].
+    client_quality_score: Cell<Option<ClientConnectionQualityScore>>,
+
+    /// Current [`PeerConnectionState`] of this [`Connection`].
+    peer_state: Cell<Option<PeerConnectionState>>,
 
     /// Callback invoked when a [`remote::Track`] is received.
     on_remote_track_added: platform::Callback<api::RemoteMediaTrack>,
@@ -579,6 +627,8 @@ impl Connection {
             ],
             remote_id,
             quality_score: Cell::default(),
+            client_quality_score: Cell::default(),
+            peer_state: Cell::default(),
             on_quality_score_update: platform::Callback::default(),
             recv_constraints,
             on_close: platform::Callback::default(),
@@ -646,12 +696,43 @@ impl Connection {
         ConnectionHandle(Rc::downgrade(&self.0))
     }
 
-    /// Updates [`ConnectionQualityScore`] of this [`Connection`].
+    /// Updates the [`ConnectionQualityScore`] of this [`Connection`].
     pub fn update_quality_score(&self, score: ConnectionQualityScore) {
-        if self.0.quality_score.replace(Some(score)) != Some(score) {
-            // TODO: Replace with derive?
-            #[expect(clippy::as_conversions, reason = "needs refactoring")]
-            self.0.on_quality_score_update.call1(score as u8);
+        if self.0.quality_score.replace(Some(score)) == Some(score) {
+            return;
+        }
+
+        self.refresh_client_conn_quality_score();
+    }
+
+    /// Updates the [`PeerConnectionState`] of this [`Connection`].
+    pub fn update_peer_state(&self, state: PeerConnectionState) {
+        if self.0.peer_state.replace(Some(state)) == Some(state) {
+            return;
+        }
+
+        self.refresh_client_conn_quality_score();
+    }
+
+    /// Refreshes the [`ClientConnectionQualityScore`] of this [`Connection`].
+    fn refresh_client_conn_quality_score(&self) {
+        use PeerConnectionState as S;
+
+        let state = self.0.peer_state.get();
+        let quality_score = self.0.quality_score.get();
+        let score = match (state, quality_score) {
+            (Some(S::Connected), Some(quality_score)) => quality_score.into(),
+            (Some(S::Disconnected | S::Failed | S::Closed), _) => {
+                ClientConnectionQualityScore::Disconnected
+            }
+            (Some(S::Connecting | S::New) | None, _)
+            | (Some(S::Connected), None) => return,
+        };
+
+        let is_score_changed =
+            self.0.client_quality_score.replace(Some(score)) != Some(score);
+        if is_score_changed {
+            self.0.on_quality_score_update.call1(score.into_u8());
         }
     }
 }
