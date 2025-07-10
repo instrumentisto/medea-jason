@@ -231,14 +231,22 @@ impl State {
         self.receivers.get(track_id)
     }
 
-    /// Returns IDs of all the send [`TrackId`]s.
+    /// Returns all the send [`TrackId`]s of the peer.
     pub fn get_send_tracks(&self) -> Vec<TrackId> {
         self.senders.ids()
     }
 
-    /// Returns IDs of all the receive [`TrackId`]s.
+    /// Returns all the receive [`TrackId`]s of the peer.
     pub fn get_recv_tracks(&self) -> Vec<TrackId> {
         self.receivers.ids()
+    }
+
+    /// Returns all the [`TrackId`]s (sand and receiver) of the peer.
+    pub fn get_tracks(&self) -> Vec<TrackId> {
+        self.get_send_tracks()
+            .into_iter()
+            .chain(self.get_recv_tracks())
+            .collect()
     }
 
     /// Sets [`NegotiationRole`] of this [`State`] to the provided one.
