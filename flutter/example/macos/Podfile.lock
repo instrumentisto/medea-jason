@@ -27,7 +27,7 @@ SPEC CHECKSUMS:
   device_info_plus: 1b14eed9bf95428983aed283a8d51cce3d8c4215
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   medea_flutter_webrtc: bf26a8e065ed6b67773835cb97755ad8c1714b7b
-  medea_jason: 91775c7f346130bf5b230af67064940442a434f6
+  medea_jason: bff63f4d1f7ed2448c607dad6aac845cacddb933
 
 PODFILE CHECKSUM: 1b29b575031b812e1e7a7cf698aec84e8b2cab1e
 
