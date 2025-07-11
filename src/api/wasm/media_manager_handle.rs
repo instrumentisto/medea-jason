@@ -32,7 +32,7 @@ use crate::{
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 #[wasm_bindgen]
 #[derive(Debug, From)]
-pub struct MediaManagerHandle(media::MediaManagerHandle);
+pub struct MediaManagerHandle(media::MediaManagerHandleImpl);
 
 #[wasm_bindgen]
 impl MediaManagerHandle {
