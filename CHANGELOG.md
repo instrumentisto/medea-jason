@@ -8,6 +8,22 @@ All user visible changes to this project will be documented in this file. This p
 
 ## master
 
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.10.0...master)
+
+### Changed
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
+
+[#212]: https://github.com/instrumentisto/medea-jason/pull/212
+
+
+
+
+## [0.10.0] · 2025-07-05
+[0.10.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.10.0
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.9.1...medea-jason-0.10.0)
+
 ### Added
 
 - Options to configure audio processing when creating local audio track: ([#206])
@@ -24,6 +40,10 @@ All user visible changes to this project will be documented in this file. This p
 - Library API:
     - `ConnectionHandle.get_state()` method ([#213])
     - `ConnectionHandle.on_state_change()` callback for state updates triggered by P2P state changes. ([#213])
+
+### Changed
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 ### Changed
 
