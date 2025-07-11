@@ -45,7 +45,7 @@ struct Inner {
 impl JasonImpl {
     /// Instantiates a new [`JasonImpl`] interface to interact with this
     /// library.
-    /// 
+    ///
     /// If a [`WebSocketRpcClient`] is provided, then [`JasonImpl`] will reuse
     /// it for all the [`Room`]s created in this [`JasonImpl`].
     ///
