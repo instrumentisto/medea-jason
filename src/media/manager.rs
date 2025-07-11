@@ -20,7 +20,8 @@ use crate::{
     utils::Caused,
 };
 
-/// Errors returned from the [`MediaManagerHandle::enumerate_devices()`] method.
+/// Errors returned from the [`MediaManagerHandleImpl::enumerate_devices()`]
+/// method.
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = platform::Error)]
 pub enum EnumerateDevicesError {
@@ -28,12 +29,12 @@ pub enum EnumerateDevicesError {
     #[display("MediaDevices.enumerateDevices() failed: {_0}")]
     Failed(platform::Error),
 
-    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
+    /// [`MediaManagerHandleImpl`]'s inner [`Weak`] pointer cannot be upgraded.
     #[display("MediaManagerHandle is in detached state")]
     Detached,
 }
 
-/// Errors returned from the [`MediaManagerHandle::enumerate_displays()`]
+/// Errors returned from the [`MediaManagerHandleImpl::enumerate_displays()`]
 /// method.
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = platform::Error)]
@@ -42,16 +43,18 @@ pub enum EnumerateDisplaysError {
     #[display("MediaDevices.enumerateDisplays() failed: {_0}")]
     Failed(platform::Error),
 
-    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
+    /// [`MediaManagerHandleImpl`]'s inner [`Weak`] pointer cannot be upgraded.
     #[display("MediaManagerHandle is in detached state")]
     Detached,
 }
 
-/// Errors returned from the [`MediaManagerHandle::init_local_tracks()`] method.
+/// Errors returned from the [`MediaManagerHandleImpl::init_local_tracks()`]
+/// method.
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = platform::Error)]
 pub enum InitLocalTracksError {
-    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer could not be upgraded.
+    /// [`MediaManagerHandleImpl`]'s inner [`Weak`] pointer could not be
+    /// upgraded.
     #[display("MediaManagerHandle is in detached state")]
     Detached,
 
@@ -68,15 +71,16 @@ pub enum InitLocalTracksError {
     GetDisplayMediaFailed(#[cause] GetDisplayMediaError),
 }
 
-/// Error returned from the [`MediaManagerHandle::set_output_audio_id`] method.
+/// Error returned from the [`MediaManagerHandleImpl::set_output_audio_id`]
+/// method.
 ///
 /// Occurs if the provided audio output device ID is incorrect.
 #[derive(Clone, Copy, Debug, Display)]
 #[display("Invalid audio device ID provided")]
 pub struct InvalidOutputAudioDeviceIdError;
 
-/// Error returned from the [`MediaManagerHandle::microphone_volume()`] or
-/// [`MediaManagerHandle::set_microphone_volume()`] methods.
+/// Error returned from the [`MediaManagerHandleImpl::microphone_volume()`] or
+/// [`MediaManagerHandleImpl::set_microphone_volume()`] methods.
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = platform::Error)]
 pub enum MicVolumeError {
@@ -84,12 +88,12 @@ pub enum MicVolumeError {
     #[display("Error accessing microphone volume settings: {_0}")]
     MicVolumeError(platform::Error),
 
-    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
+    /// [`MediaManagerHandleImpl`]'s inner [`Weak`] pointer cannot be upgraded.
     #[display("`MediaManagerHandle` is in detached state")]
     Detached,
 }
 
-/// Error indicating about a [`MediaManagerHandle`] in detached state.
+/// Error indicating about a [`MediaManagerHandleImpl`] in detached state.
 #[derive(Clone, Copy, Debug, Display)]
 #[display("MediaManagerHandle is in detached state")]
 pub struct HandleDetachedError;
@@ -485,10 +489,10 @@ impl MediaManager {
         self.0.get_tracks(caps.into()).await.map_err(tracerr::wrap!())
     }
 
-    /// Instantiates a new [`MediaManagerHandle`] for external usage.
+    /// Instantiates a new [`MediaManagerHandleImpl`] for external usage.
     #[must_use]
-    pub fn new_handle(&self) -> MediaManagerHandle {
-        MediaManagerHandle(Rc::downgrade(&self.0))
+    pub fn new_handle(&self) -> MediaManagerHandleImpl {
+        MediaManagerHandleImpl(Rc::downgrade(&self.0))
     }
 }
 
@@ -505,9 +509,9 @@ impl MediaManager {
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 #[derive(Clone, Debug)]
-pub struct MediaManagerHandle(Weak<InnerMediaManager>);
+pub struct MediaManagerHandleImpl(Weak<InnerMediaManager>);
 
-impl MediaManagerHandle {
+impl MediaManagerHandleImpl {
     /// Returns a list of [`platform::MediaDeviceInfo`] objects representing
     /// available media input and devices, such as microphones, cameras, and so
     /// forth.
@@ -614,7 +618,7 @@ impl MediaManagerHandle {
     ///
     /// # Errors
     ///
-    /// If the underlying [`MediaManagerHandle`] is dropped.
+    /// If the underlying [`MediaManagerHandleImpl`] is dropped.
     pub async fn microphone_volume_is_available(
         &self,
     ) -> Result<bool, Traced<HandleDetachedError>> {
@@ -640,11 +644,12 @@ impl MediaManagerHandle {
         this.microphone_volume().await.map_err(tracerr::map_from_and_wrap!())
     }
 
-    /// Subscribes onto the `devicechange` event of this [`MediaManagerHandle`].
+    /// Subscribes onto the `devicechange` event of this
+    /// [`MediaManagerHandleImpl`].
     ///
     /// # Errors
     ///
-    /// If the underlying [`MediaManagerHandle`] is dropped.
+    /// If the underlying [`MediaManagerHandleImpl`] is dropped.
     pub fn on_device_change(
         &self,
         cb: platform::Function<()>,

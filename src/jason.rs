@@ -5,7 +5,7 @@ use std::{cell::RefCell, rc::Rc, thread};
 use futures::FutureExt as _;
 
 use crate::{
-    media::{MediaManager, MediaManagerHandle},
+    media::{MediaManager, MediaManagerHandleImpl},
     platform,
     room::{Room, RoomHandle},
     rpc::{
@@ -77,9 +77,9 @@ impl Jason {
         self.inner_init_room(WebSocketRpcSession::new(rpc))
     }
 
-    /// Returns a [`MediaManagerHandle`].
+    /// Returns a [`MediaManagerHandleImpl`].
     #[must_use]
-    pub fn media_manager(&self) -> MediaManagerHandle {
+    pub fn media_manager(&self) -> MediaManagerHandleImpl {
         self.0.borrow().media_manager.new_handle()
     }
 
