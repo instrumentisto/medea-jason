@@ -10,11 +10,17 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.10.0...master)
 
+### BC Breaks
+
+- Library API:
+    - Renamed `Jason` to `JasonImpl` ([#218]).
+
 ### Changed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 [#212]: https://github.com/instrumentisto/medea-jason/pull/212
+[#218]: https://github.com/instrumentisto/medea-jason/pull/218
 
 
 

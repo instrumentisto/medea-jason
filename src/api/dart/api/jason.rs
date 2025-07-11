@@ -14,10 +14,10 @@ use crate::{
 /// initialization.
 #[derive(Debug)]
 #[frb(opaque)]
-pub struct Jason(SendWrapper<jason::Jason>);
+pub struct Jason(SendWrapper<jason::JasonImpl>);
 
-impl From<jason::Jason> for Jason {
-    fn from(value: jason::Jason) -> Self {
+impl From<jason::JasonImpl> for Jason {
+    fn from(value: jason::JasonImpl) -> Self {
         Self(SendWrapper::new(value))
     }
 }
@@ -27,7 +27,7 @@ impl Jason {
     #[frb(sync)]
     #[must_use]
     pub fn new() -> Self {
-        Self(SendWrapper::new(jason::Jason::new(None)))
+        Self(SendWrapper::new(jason::JasonImpl::new(None)))
     }
 
     /// Creates a new [`Room`] and returns its [`RoomHandle`].
