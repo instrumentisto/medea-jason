@@ -970,7 +970,7 @@ struct InnerRoom {
     /// [`Connection`]: crate::connection::Connection
     connections: Rc<Connections>,
 
-    /// Callback invoked when a new local [`local::LocalMediaTrack`] will be
+    /// Callback invoked when a new local [`local::LocalMediaTrackImpl`] will be
     /// added to this [`Room`].
     on_local_track: platform::Callback<api::LocalMediaTrack>,
 
@@ -1317,8 +1317,9 @@ impl InnerRoom {
                 .map_err(tracerr::map_from_and_wrap!())?;
             for (track, is_new) in tracks {
                 if is_new {
-                    self.on_local_track
-                        .call1(local::LocalMediaTrack::new(Rc::clone(&track)));
+                    self.on_local_track.call1(local::LocalMediaTrackImpl::new(
+                        Rc::clone(&track),
+                    ));
                 }
                 result.push(track);
             }
@@ -1772,7 +1773,7 @@ impl PeerEventHandler for InnerRoom {
         &self,
         local_track: Rc<local::Track>,
     ) -> Self::Output {
-        self.on_local_track.call1(local::LocalMediaTrack::new(local_track));
+        self.on_local_track.call1(local::LocalMediaTrackImpl::new(local_track));
         Ok(())
     }
 

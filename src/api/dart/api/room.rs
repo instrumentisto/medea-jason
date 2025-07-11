@@ -11,7 +11,7 @@ use crate::{
     room as core,
 };
 #[cfg(doc)]
-use crate::{media::track::local::LocalMediaTrack, room::Room};
+use crate::{media::track::local::LocalMediaTrackImpl, room::Room};
 
 /// External handle to a [`Room`].
 #[derive(Debug)]
@@ -57,7 +57,7 @@ impl RoomHandle {
     /// [`on_failed_local_media`] callback.
     ///
     /// If the `stop_first` argument is [`true`], then affected
-    /// [`LocalMediaTrack`]s will be dropped before new
+    /// [`LocalMediaTrackImpl`]s will be dropped before new
     /// [`ApiMediaStreamSettings`] are applied. This is usually required when
     /// changing video source device due to hardware limitations, e.g. having an
     /// active track sourced from device `A` may hinder [getUserMedia()][1]
@@ -361,8 +361,8 @@ impl RoomHandle {
             .map_err(Into::into)
     }
 
-    /// Sets a callback to be invoked once a new [`LocalMediaTrack`] is added
-    /// to the provided [`Room`].
+    /// Sets a callback to be invoked once a new [`LocalMediaTrackImpl`] is
+    /// added to the provided [`Room`].
     ///
     /// This might happen in such cases:
     /// 1. Media server initiates a media request.
