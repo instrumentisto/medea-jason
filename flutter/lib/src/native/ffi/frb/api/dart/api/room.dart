@@ -105,8 +105,8 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// If the [`core::RoomHandle::on_failed_local_media()`] method errors.
   void onFailedLocalMedia({required Object cb});
 
-  /// Sets a callback to be invoked once a new [`LocalMediaTrack`] is added
-  /// to the provided [`Room`].
+  /// Sets a callback to be invoked once a new [`LocalMediaTrack`] is
+  /// added to the provided [`Room`].
   ///
   /// This might happen in such cases:
   /// 1. Media server initiates a media request.
