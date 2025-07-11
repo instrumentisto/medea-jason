@@ -7,7 +7,7 @@ use futures::FutureExt as _;
 use crate::{
     media::{MediaManager, MediaManagerHandle},
     platform,
-    room::{Room, RoomHandle},
+    room::{Room, RoomHandleImpl},
     rpc::{
         ClientDisconnect, RpcSession, WebSocketRpcClient, WebSocketRpcSession,
     },
@@ -66,9 +66,9 @@ impl Jason {
         })))
     }
 
-    /// Creates a new [`Room`] and returns its [`RoomHandle`].
+    /// Creates a new [`Room`] and returns its [`RoomHandleImpl`].
     #[must_use]
-    pub fn init_room(&self) -> RoomHandle {
+    pub fn init_room(&self) -> RoomHandleImpl {
         let rpc = self.0.borrow().rpc.clone().unwrap_or_else(|| {
             Rc::new(WebSocketRpcClient::new(Box::new(|| {
                 Rc::new(platform::WebSocketRpcTransport::new())
@@ -83,8 +83,8 @@ impl Jason {
         self.0.borrow().media_manager.new_handle()
     }
 
-    /// Closes the provided [`RoomHandle`].
-    pub fn close_room(&self, room_to_delete: &RoomHandle) {
+    /// Closes the provided [`RoomHandleImpl`].
+    pub fn close_room(&self, room_to_delete: &RoomHandleImpl) {
         let index = self
             .0
             .borrow()
@@ -112,8 +112,8 @@ impl Jason {
         });
     }
 
-    /// Returns a [`RoomHandle`] for an initialized  [`Room`].
-    fn inner_init_room(&self, rpc: Rc<dyn RpcSession>) -> RoomHandle {
+    /// Returns a [`RoomHandleImpl`] for an initialized  [`Room`].
+    fn inner_init_room(&self, rpc: Rc<dyn RpcSession>) -> RoomHandleImpl {
         let on_normal_close = rpc.on_normal_close();
         let room = Room::new(rpc, Rc::clone(&self.0.borrow().media_manager));
 
