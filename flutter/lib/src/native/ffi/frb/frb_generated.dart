@@ -5588,7 +5588,8 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::get_remote_member_id()`] method errors.
+  /// If the [`core::ConnectionHandleImpl::get_remote_member_id()`] method
+  /// errors.
   String getRemoteMemberId() => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleGetRemoteMemberId(
         that: this,
@@ -5599,7 +5600,7 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::on_close()`] method errors.
+  /// If the [`core::ConnectionHandleImpl::on_close()`] method errors.
   void onClose({required Object f}) => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleOnClose(that: this, f: f);
 
@@ -5608,7 +5609,7 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::on_quality_score_update()`] method
+  /// If the [`core::ConnectionHandleImpl::on_quality_score_update()`] method
   /// errors.
   void onQualityScoreUpdate({required Object f}) => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdate(
@@ -5621,7 +5622,7 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::on_remote_track_added()`] method
+  /// If the [`core::ConnectionHandleImpl::on_remote_track_added()`] method
   /// errors.
   ///
   /// [`remote::Track`]: media::track::remote::Track
