@@ -14,7 +14,7 @@ use crate::{api, connection};
 /// upgraded.
 #[wasm_bindgen]
 #[derive(Debug, From)]
-pub struct ConnectionHandle(connection::ConnectionHandle);
+pub struct ConnectionHandle(connection::ConnectionHandleImpl);
 
 #[wasm_bindgen]
 impl ConnectionHandle {

@@ -42,7 +42,8 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::get_remote_member_id()`] method errors.
+  /// If the [`core::ConnectionHandleImpl::get_remote_member_id()`] method
+  /// errors.
   String getRemoteMemberId();
 
   /// Sets a callback to be invoked once the associated [`Connection`] is
@@ -50,7 +51,7 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::on_close()`] method errors.
+  /// If the [`core::ConnectionHandleImpl::on_close()`] method errors.
   void onClose({required Object f});
 
   /// Sets a callback to be invoked once a quality score of the associated
@@ -58,7 +59,7 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::on_quality_score_update()`] method
+  /// If the [`core::ConnectionHandleImpl::on_quality_score_update()`] method
   /// errors.
   void onQualityScoreUpdate({required Object f});
 
@@ -67,7 +68,7 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::on_remote_track_added()`] method
+  /// If the [`core::ConnectionHandleImpl::on_remote_track_added()`] method
   /// errors.
   ///
   /// [`remote::Track`]: media::track::remote::Track

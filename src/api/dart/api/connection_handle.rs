@@ -16,10 +16,10 @@ use crate::{connection::Connection, media::track::remote};
 /// External handler to a [`Connection`] with a remote `Member`.
 #[derive(Debug)]
 #[frb(opaque)]
-pub struct ConnectionHandle(SendWrapper<core::ConnectionHandle>);
+pub struct ConnectionHandle(SendWrapper<core::ConnectionHandleImpl>);
 
-impl From<core::ConnectionHandle> for ConnectionHandle {
-    fn from(value: core::ConnectionHandle) -> Self {
+impl From<core::ConnectionHandleImpl> for ConnectionHandle {
+    fn from(value: core::ConnectionHandleImpl) -> Self {
         Self(SendWrapper::new(value))
     }
 }
@@ -32,7 +32,7 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// If the [`core::ConnectionHandle::on_close()`] method errors.
+    /// If the [`core::ConnectionHandleImpl::on_close()`] method errors.
     #[frb(sync)]
     pub fn on_close(&self, f: DartOpaque) -> Result<(), DartOpaque> {
         self.0
@@ -46,7 +46,7 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// If the [`core::ConnectionHandle::on_remote_track_added()`] method
+    /// If the [`core::ConnectionHandleImpl::on_remote_track_added()`] method
     /// errors.
     ///
     /// [`remote::Track`]: media::track::remote::Track
@@ -66,7 +66,7 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// If the [`core::ConnectionHandle::on_quality_score_update()`] method
+    /// If the [`core::ConnectionHandleImpl::on_quality_score_update()`] method
     /// errors.
     #[frb(sync)]
     pub fn on_quality_score_update(
@@ -83,7 +83,8 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// If the [`core::ConnectionHandle::get_remote_member_id()`] method errors.
+    /// If the [`core::ConnectionHandleImpl::get_remote_member_id()`] method
+    /// errors.
     #[frb(sync)]
     pub fn get_remote_member_id(&self) -> Result<String, DartOpaque> {
         self.0
