@@ -34,8 +34,8 @@ struct Inner {
 
     /// Connection with a media server.
     ///
-    /// [`JasonImpl`] will reuse this [`WebSocketRpcClient`] for each [`Room`] if
-    /// it's [`Some`].
+    /// [`JasonImpl`] will reuse this [`WebSocketRpcClient`] for each [`Room`]
+    /// if it's [`Some`].
     ///
     /// New [`WebSocketRpcClient`] will be created for each [`Room`] if it's
     /// [`None`].
@@ -43,10 +43,11 @@ struct Inner {
 }
 
 impl JasonImpl {
-    /// Instantiates a new [`JasonImpl`] interface to interact with this library.
-    ///
-    /// If a [`WebSocketRpcClient`] is provided, then [`JasonImpl`] will reuse it
-    /// for all the [`Room`]s created in this [`JasonImpl`].
+    /// Instantiates a new [`JasonImpl`] interface to interact with this
+    /// library.
+    /// 
+    /// If a [`WebSocketRpcClient`] is provided, then [`JasonImpl`] will reuse
+    /// it for all the [`Room`]s created in this [`JasonImpl`].
     ///
     /// If [`WebSocketRpcClient`] is not provided, then a new separate
     /// [`WebSocketRpcClient`] will be created for each [`Room`].
