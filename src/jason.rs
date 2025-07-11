@@ -18,23 +18,23 @@ use crate::{
 /// Responsible for managing shared transports, local media and room
 /// initialization.
 #[derive(Debug)]
-pub struct Jason(Rc<RefCell<Inner>>);
+pub struct JasonImpl(Rc<RefCell<Inner>>);
 
-/// Inner representation if a [`Jason`].
+/// Inner representation if a [`JasonImpl`].
 #[derive(Debug)]
 struct Inner {
-    /// [`Jason`]s [`MediaManager`].
+    /// [`JasonImpl`]s [`MediaManager`].
     ///
     /// It's shared across [`Room`]s since [`MediaManager`] contains media
     /// tracks that can be used by multiple [`Room`]s.
     media_manager: Rc<MediaManager>,
 
-    /// [`Room`]s maintained by this [`Jason`] instance.
+    /// [`Room`]s maintained by this [`JasonImpl`] instance.
     rooms: Vec<Room>,
 
     /// Connection with a media server.
     ///
-    /// [`Jason`] will reuse this [`WebSocketRpcClient`] for each [`Room`] if
+    /// [`JasonImpl`] will reuse this [`WebSocketRpcClient`] for each [`Room`] if
     /// it's [`Some`].
     ///
     /// New [`WebSocketRpcClient`] will be created for each [`Room`] if it's
@@ -42,11 +42,11 @@ struct Inner {
     rpc: Option<Rc<WebSocketRpcClient>>,
 }
 
-impl Jason {
-    /// Instantiates a new [`Jason`] interface to interact with this library.
+impl JasonImpl {
+    /// Instantiates a new [`JasonImpl`] interface to interact with this library.
     ///
-    /// If a [`WebSocketRpcClient`] is provided, then [`Jason`] will reuse it
-    /// for all the [`Room`]s created in this [`Jason`].
+    /// If a [`WebSocketRpcClient`] is provided, then [`JasonImpl`] will reuse it
+    /// for all the [`Room`]s created in this [`JasonImpl`].
     ///
     /// If [`WebSocketRpcClient`] is not provided, then a new separate
     /// [`WebSocketRpcClient`] will be created for each [`Room`].
@@ -102,9 +102,9 @@ impl Jason {
         }
     }
 
-    /// Drops this [`Jason`] API object, so all the related objects (rooms,
+    /// Drops this [`JasonImpl`] API object, so all the related objects (rooms,
     /// connections, streams, etc.) respectively. All objects related to this
-    /// [`Jason`] API object will be detached (you will still hold them, but
+    /// [`JasonImpl`] API object will be detached (you will still hold them, but
     /// unable to use).
     pub fn dispose(self) {
         self.0.borrow_mut().rooms.drain(..).for_each(|room| {
@@ -139,7 +139,7 @@ impl Jason {
     }
 }
 
-impl Default for Jason {
+impl Default for JasonImpl {
     fn default() -> Self {
         Self::new(None)
     }
