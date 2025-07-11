@@ -50,7 +50,7 @@ type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
 /// Reason of why [`Room`] has been closed.
 ///
-/// This struct is passed into [`RoomHandle::on_close`] callback.
+/// This struct is passed into [`RoomHandleImpl::on_close`] callback.
 #[derive(Debug, Into)]
 pub struct RoomCloseReason {
     /// Reason of closing.
@@ -108,11 +108,11 @@ impl RoomCloseReason {
     }
 }
 
-/// Errors occurring in [`RoomHandle::join()`] method.
+/// Errors occurring in [`RoomHandleImpl::join()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = platform::Error)]
 pub enum RoomJoinError {
-    /// [`RoomHandle`]'s [`Weak`] pointer is detached.
+    /// [`RoomHandleImpl`]'s [`Weak`] pointer is detached.
     #[display("RoomHandle is in detached state")]
     Detached,
 
@@ -130,7 +130,7 @@ pub enum RoomJoinError {
     SessionError(#[cause] SessionError),
 }
 
-/// Error of [`RoomHandle`]'s [`Weak`] pointer being detached.
+/// Error of [`RoomHandleImpl`]'s [`Weak`] pointer being detached.
 #[derive(Caused, Clone, Copy, Debug, Display, Eq, From, PartialEq)]
 #[cause(error = platform::Error)]
 pub struct HandleDetachedError;
@@ -142,7 +142,7 @@ pub struct HandleDetachedError;
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
-    /// [`RoomHandle`]'s [`Weak`] pointer is detached.
+    /// [`RoomHandleImpl`]'s [`Weak`] pointer is detached.
     #[display("`RoomHandle` is in detached state")]
     Detached,
 
@@ -220,9 +220,9 @@ macro_rules! upgrade_inner {
 
 /// External handle to a [`Room`].
 #[derive(Clone, Debug)]
-pub struct RoomHandle(Weak<InnerRoom>);
+pub struct RoomHandleImpl(Weak<InnerRoom>);
 
-impl RoomHandle {
+impl RoomHandleImpl {
     /// Connects to a media server and joins the [`Room`] with the provided
     /// authorization `token`.
     ///
@@ -508,8 +508,8 @@ impl RoomHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::unmute_audio()`] was called while muting or a media server
-    /// didn't approve this state transition.
+    /// [`RoomHandleImpl::unmute_audio()`] was called while muting or a media
+    /// server didn't approve this state transition.
     pub fn mute_audio(
         &self,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
@@ -530,8 +530,8 @@ impl RoomHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::mute_audio()`] was called while muting or a media server
-    /// didn't approve this state transition.
+    /// [`RoomHandleImpl::mute_audio()`] was called while muting or a media
+    /// server didn't approve this state transition.
     pub fn unmute_audio(
         &self,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
@@ -552,8 +552,8 @@ impl RoomHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::unmute_video()`] was called while muting or a media server
-    /// didn't approve this state transition.
+    /// [`RoomHandleImpl::unmute_video()`] was called while muting or a media
+    /// server didn't approve this state transition.
     pub fn mute_video(
         &self,
         source_kind: Option<MediaSourceKind>,
@@ -575,8 +575,8 @@ impl RoomHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::mute_video()`] was called while muting or a media server
-    /// didn't approve this state transition.
+    /// [`RoomHandleImpl::mute_video()`] was called while muting or a media
+    /// server didn't approve this state transition.
     pub fn unmute_video(
         &self,
         source_kind: Option<MediaSourceKind>,
@@ -601,7 +601,7 @@ impl RoomHandle {
     /// is configured as `required`.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::enable_audio()`] was called while disabling or a media
+    /// [`RoomHandleImpl::enable_audio()`] was called while disabling or a media
     /// server didn't approve this state transition.
     pub fn disable_audio(
         &self,
@@ -623,7 +623,7 @@ impl RoomHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::disable_audio()`] was called while enabling or a media
+    /// [`RoomHandleImpl::disable_audio()`] was called while enabling or a media
     /// server didn't approve this state transition.
     ///
     /// With [`ChangeMediaStateError::CouldNotGetLocalMedia`] if media
@@ -653,7 +653,7 @@ impl RoomHandle {
     /// configured as `required`.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::enable_video()`] was called while disabling or a media
+    /// [`RoomHandleImpl::enable_video()`] was called while disabling or a media
     /// server didn't approve this state transition.
     pub fn disable_video(
         &self,
@@ -678,7 +678,7 @@ impl RoomHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::disable_video()`] was called while enabling or a media
+    /// [`RoomHandleImpl::disable_video()`] was called while enabling or a media
     /// server didn't approve this state transition.
     ///
     /// With [`ChangeMediaStateError::CouldNotGetLocalMedia`] if media
@@ -704,8 +704,8 @@ impl RoomHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::enable_remote_audio()`] was called while disabling or a
-    /// media server didn't approve this state transition.
+    /// [`RoomHandleImpl::enable_remote_audio()`] was called while disabling or
+    /// a media server didn't approve this state transition.
     pub fn disable_remote_audio(
         &self,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
@@ -728,8 +728,8 @@ impl RoomHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::enable_remote_video()`] was called while disabling or a
-    /// media server didn't approve this state transition.
+    /// [`RoomHandleImpl::enable_remote_video()`] was called while disabling or
+    /// a media server didn't approve this state transition.
     pub fn disable_remote_video(
         &self,
         source_kind: Option<MediaSourceKind>,
@@ -751,8 +751,8 @@ impl RoomHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::disable_remote_audio()`] was called while enabling or a
-    /// media server didn't approve this state transition.
+    /// [`RoomHandleImpl::disable_remote_audio()`] was called while enabling or
+    /// a media server didn't approve this state transition.
     pub fn enable_remote_audio(
         &self,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
@@ -775,8 +775,8 @@ impl RoomHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`RoomHandle::disable_remote_video()`] was called while enabling or a
-    /// media server didn't approve this state transition.
+    /// [`RoomHandleImpl::disable_remote_video()`] was called while enabling or
+    /// a media server didn't approve this state transition.
     pub fn enable_remote_video(
         &self,
         source_kind: Option<MediaSourceKind>,
@@ -915,8 +915,8 @@ impl Room {
     /// Creates a new external handle to [`Room`]. You can create them as many
     /// as you need.
     #[must_use]
-    pub fn new_handle(&self) -> RoomHandle {
-        RoomHandle(Rc::downgrade(&self.0))
+    pub fn new_handle(&self) -> RoomHandleImpl {
+        RoomHandleImpl(Rc::downgrade(&self.0))
     }
 
     /// Indicates whether this [`Room`] reference is the same as the given
@@ -926,9 +926,9 @@ impl Room {
         Rc::ptr_eq(&self.0, &other.0)
     }
 
-    /// Checks [`RoomHandle`] equality by comparing inner pointers.
+    /// Checks [`RoomHandleImpl`] equality by comparing inner pointers.
     #[must_use]
-    pub fn inner_ptr_eq(&self, handle: &RoomHandle) -> bool {
+    pub fn inner_ptr_eq(&self, handle: &RoomHandleImpl) -> bool {
         handle
             .0
             .upgrade()
@@ -944,7 +944,7 @@ impl Room {
 
 /// Actual data of a [`Room`].
 ///
-/// Shared between an external [`RoomHandle`] and Rust side ([`Room`]).
+/// Shared between an external [`RoomHandleImpl`] and Rust side ([`Room`]).
 #[derive(Debug)]
 struct InnerRoom {
     /// Client to talk with media server via Client API RPC.
@@ -986,7 +986,7 @@ struct InnerRoom {
 
     /// Reason of [`Room`] closing.
     ///
-    /// This [`CloseReason`] will be provided into [`RoomHandle::on_close`]
+    /// This [`CloseReason`] will be provided into [`RoomHandleImpl::on_close`]
     /// callback.
     ///
     /// Note that `None` will be considered as error and `is_err` will be
@@ -994,7 +994,7 @@ struct InnerRoom {
     close_reason: RefCell<CloseReason>,
 }
 
-/// Errors occurring in [`RoomHandle::set_local_media_settings()`] method.
+/// Errors occurring in [`RoomHandleImpl::set_local_media_settings()`] method.
 #[derive(Debug, Display)]
 pub enum ConstraintsUpdateError {
     /// New [`MediaStreamSettings`] set failed and state was recovered

@@ -10,12 +10,17 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.10.0...master)
 
+### BC Breaks
+
+- Library API:
+    - Renamed `RoomHandle` to `RoomHandleImpl` ([#220]).
+
 ### Changed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 [#212]: https://github.com/instrumentisto/medea-jason/pull/212
-
+[#220]: https://github.com/instrumentisto/medea-jason/pull/220
 
 
 
