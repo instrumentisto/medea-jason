@@ -18,10 +18,10 @@ use crate::{
 /// [`Room::on_connection_loss`]: super::RoomHandle::on_connection_loss
 #[derive(Debug)]
 #[frb(opaque)]
-pub struct ReconnectHandle(SendWrapper<core::ReconnectHandle>);
+pub struct ReconnectHandle(SendWrapper<core::ReconnectHandleImpl>);
 
-impl From<core::ReconnectHandle> for ReconnectHandle {
-    fn from(value: core::ReconnectHandle) -> Self {
+impl From<core::ReconnectHandleImpl> for ReconnectHandle {
+    fn from(value: core::ReconnectHandleImpl) -> Self {
         Self(SendWrapper::new(value))
     }
 }
