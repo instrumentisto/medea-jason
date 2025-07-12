@@ -5,4 +5,5 @@ targets:
       - test/**
       - pubspec.*
       - lib/src/native/ffi/frb/api/dart/api.dart
+      - lib/src/native/ffi/frb/api/dart/api/member_connection_state.dart
       - lib/src/native/ffi/frb/media/constraints.dart
