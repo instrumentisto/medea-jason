@@ -12,7 +12,8 @@ part of 'member_connection_state.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 /// @nodoc
 mixin _$MemberConnectionState {
@@ -20,35 +21,29 @@ mixin _$MemberConnectionState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(PeerConnectionState field0) p2P,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(PeerConnectionState field0)? p2P,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(PeerConnectionState field0)? p2P,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(MemberConnectionState_P2P value) p2P,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(MemberConnectionState_P2P value)? p2P,
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(MemberConnectionState_P2P value)? p2P,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+  }) => throw _privateConstructorUsedError;
 
   /// Create a copy of MemberConnectionState
   /// with the given fields replaced by the non-null parameter values.
@@ -59,16 +54,19 @@ mixin _$MemberConnectionState {
 
 /// @nodoc
 abstract class $MemberConnectionStateCopyWith<$Res> {
-  factory $MemberConnectionStateCopyWith(MemberConnectionState value,
-          $Res Function(MemberConnectionState) then) =
-      _$MemberConnectionStateCopyWithImpl<$Res, MemberConnectionState>;
+  factory $MemberConnectionStateCopyWith(
+    MemberConnectionState value,
+    $Res Function(MemberConnectionState) then,
+  ) = _$MemberConnectionStateCopyWithImpl<$Res, MemberConnectionState>;
   @useResult
   $Res call({PeerConnectionState field0});
 }
 
 /// @nodoc
-class _$MemberConnectionStateCopyWithImpl<$Res,
-        $Val extends MemberConnectionState>
+class _$MemberConnectionStateCopyWithImpl<
+  $Res,
+  $Val extends MemberConnectionState
+>
     implements $MemberConnectionStateCopyWith<$Res> {
   _$MemberConnectionStateCopyWithImpl(this._value, this._then);
 
@@ -81,15 +79,16 @@ class _$MemberConnectionStateCopyWithImpl<$Res,
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_value.copyWith(
-      field0: null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as PeerConnectionState,
-    ) as $Val);
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _value.copyWith(
+            field0: null == field0
+                ? _value.field0
+                : field0 // ignore: cast_nullable_to_non_nullable
+                      as PeerConnectionState,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -97,9 +96,9 @@ class _$MemberConnectionStateCopyWithImpl<$Res,
 abstract class _$$MemberConnectionState_P2PImplCopyWith<$Res>
     implements $MemberConnectionStateCopyWith<$Res> {
   factory _$$MemberConnectionState_P2PImplCopyWith(
-          _$MemberConnectionState_P2PImpl value,
-          $Res Function(_$MemberConnectionState_P2PImpl) then) =
-      __$$MemberConnectionState_P2PImplCopyWithImpl<$Res>;
+    _$MemberConnectionState_P2PImpl value,
+    $Res Function(_$MemberConnectionState_P2PImpl) then,
+  ) = __$$MemberConnectionState_P2PImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({PeerConnectionState field0});
@@ -107,27 +106,30 @@ abstract class _$$MemberConnectionState_P2PImplCopyWith<$Res>
 
 /// @nodoc
 class __$$MemberConnectionState_P2PImplCopyWithImpl<$Res>
-    extends _$MemberConnectionStateCopyWithImpl<$Res,
-        _$MemberConnectionState_P2PImpl>
+    extends
+        _$MemberConnectionStateCopyWithImpl<
+          $Res,
+          _$MemberConnectionState_P2PImpl
+        >
     implements _$$MemberConnectionState_P2PImplCopyWith<$Res> {
   __$$MemberConnectionState_P2PImplCopyWithImpl(
-      _$MemberConnectionState_P2PImpl _value,
-      $Res Function(_$MemberConnectionState_P2PImpl) _then)
-      : super(_value, _then);
+    _$MemberConnectionState_P2PImpl _value,
+    $Res Function(_$MemberConnectionState_P2PImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of MemberConnectionState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(_$MemberConnectionState_P2PImpl(
-      null == field0
-          ? _value.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as PeerConnectionState,
-    ));
+  $Res call({Object? field0 = null}) {
+    return _then(
+      _$MemberConnectionState_P2PImpl(
+        null == field0
+            ? _value.field0
+            : field0 // ignore: cast_nullable_to_non_nullable
+                  as PeerConnectionState,
+      ),
+    );
   }
 }
 
@@ -161,8 +163,10 @@ class _$MemberConnectionState_P2PImpl extends MemberConnectionState_P2P {
   @override
   @pragma('vm:prefer-inline')
   _$$MemberConnectionState_P2PImplCopyWith<_$MemberConnectionState_P2PImpl>
-      get copyWith => __$$MemberConnectionState_P2PImplCopyWithImpl<
-          _$MemberConnectionState_P2PImpl>(this, _$identity);
+  get copyWith =>
+      __$$MemberConnectionState_P2PImplCopyWithImpl<
+        _$MemberConnectionState_P2PImpl
+      >(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -234,5 +238,5 @@ abstract class MemberConnectionState_P2P extends MemberConnectionState {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MemberConnectionState_P2PImplCopyWith<_$MemberConnectionState_P2PImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  get copyWith => throw _privateConstructorUsedError;
 }
