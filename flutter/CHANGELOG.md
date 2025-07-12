@@ -49,6 +49,7 @@ See also [`medea-jason` crate 0.10.0 changes](https://github.com/instrumentisto/
 
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
 [#208]: https://github.com/instrumentisto/medea-jason/pull/208
+[#212]: https://github.com/instrumentisto/medea-jason/pull/212
 
 
 
