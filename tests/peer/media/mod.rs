@@ -410,8 +410,6 @@ mod sender_patch {
 }
 
 mod receiver_patch {
-    use super::*;
-    use crate::MediaSourceKind;
     use medea_client_api_proto::{
         AudioSettings, MediaDirection, MediaType, MemberId,
     };
@@ -420,6 +418,9 @@ mod receiver_patch {
         peer::{MediaExchangeState, PeerEvent, receiver},
         utils::{AsProtoState, SynchronizableState},
     };
+
+    use super::*;
+    use crate::MediaSourceKind;
 
     const TRACK_ID: TrackId = TrackId(0);
     const MID: &str = "mid";
