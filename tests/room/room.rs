@@ -34,7 +34,7 @@ use medea_jason::{
     rpc::MockRpcSession,
     utils::Updatable,
 };
-use wasm_bindgen::JsValue;
+use wasm_bindgen::{JsValue, closure::Closure};
 use wasm_bindgen_futures::{JsFuture, spawn_local};
 use wasm_bindgen_test::*;
 
@@ -1777,6 +1777,23 @@ mod patches_generation {
 
         let room_handle = api::RoomHandle::from(room.new_handle());
 
+        let (media_fail_tx, media_fail_rx) =
+            futures::channel::oneshot::channel();
+        let cb = Closure::once_into_js(move |err: JsValue| {
+            let err = jsval_cast::<LocalMediaInitException>(
+                err,
+                "LocalMediaInitException",
+            );
+
+            let error_message = match err {
+                Ok(err) => err.message(),
+                Err(_) => "Got unexpected error".into(),
+            };
+
+            media_fail_tx.send(error_message).unwrap();
+        });
+        room_handle.on_failed_local_media(cb.into()).unwrap();
+
         spawn_local(async move {
             JsFuture::from(
                 room_handle.disable_video(Some(api::MediaSourceKind::Display)),
@@ -1786,6 +1803,19 @@ mod patches_generation {
         });
 
         let commands: Vec<_> = command_rx.take(2).collect().await;
+
+        if let Ok(Ok(local_media_fail)) =
+            timeout(5000, Box::pin(media_fail_rx)).await
+        {
+            // TODO: This callback can be removed after debugging of this flaky
+            //       test will be done. See PR:
+            //       https://github.com/instrumentisto/medea-jason/pull/212
+            panic!(
+                "on_failed_local_media() triggered with error: \
+                 {local_media_fail}",
+            );
+        }
+
         for command in commands {
             match command {
                 Command::UpdateTracks { tracks_patches, .. } => assert_eq!(
