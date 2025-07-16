@@ -209,6 +209,7 @@ pub fn get_test_tracks(
             muted: false,
             media_type: MediaType::Audio(AudioSettings {
                 required: is_audio_required,
+                source_kind: MediaSourceKind::Device,
             }),
         },
         Track {
@@ -242,7 +243,10 @@ pub fn get_test_recv_tracks() -> (Track, Track) {
             },
             media_direction: MediaDirection::SendRecv.into(),
             muted: false,
-            media_type: MediaType::Audio(AudioSettings { required: false }),
+            media_type: MediaType::Audio(AudioSettings {
+                required: false,
+                source_kind: MediaSourceKind::Device,
+            }),
         },
         Track {
             id: TrackId(1),

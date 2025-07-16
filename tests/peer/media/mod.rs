@@ -170,7 +170,11 @@ mod sender_patch {
     use super::*;
 
     async fn audio_sender() -> (sender::Component, TrackId, MediaConnections) {
-        build_sender(MediaType::Audio(AudioSettings { required: false })).await
+        build_sender(MediaType::Audio(AudioSettings {
+            required: false,
+            source_kind: MediaSourceKind::Device,
+        }))
+        .await
     }
 
     async fn video_sender(
@@ -406,6 +410,8 @@ mod sender_patch {
 }
 
 mod receiver_patch {
+    use super::*;
+    use crate::MediaSourceKind;
     use medea_client_api_proto::{
         AudioSettings, MediaDirection, MediaType, MemberId,
     };
@@ -414,8 +420,6 @@ mod receiver_patch {
         peer::{MediaExchangeState, PeerEvent, receiver},
         utils::{AsProtoState, SynchronizableState},
     };
-
-    use super::*;
 
     const TRACK_ID: TrackId = TrackId(0);
     const MID: &str = "mid";
@@ -431,7 +435,11 @@ mod receiver_patch {
         let recv = media_connections
             .create_receiver(
                 TRACK_ID,
-                MediaType::Audio(AudioSettings { required: true }).into(),
+                MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                })
+                .into(),
                 MediaDirection::SendRecv,
                 false,
                 Some(MID.to_string()),

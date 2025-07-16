@@ -334,6 +334,7 @@ mod disable_recv_tracks {
                         muted: false,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
+                            source_kind: MediaSourceKind::Device,
                         }),
                     },
                     Track {
@@ -360,6 +361,7 @@ mod disable_recv_tracks {
                         muted: false,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
+                            source_kind: MediaSourceKind::Device,
                         }),
                     },
                 ],
@@ -429,7 +431,10 @@ mod init_track_states {
                 },
                 media_direction: *media_direction,
                 muted: false,
-                media_type: MediaType::Audio(AudioSettings { required: true }),
+                media_type: MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
             })
             .collect();
 
@@ -487,7 +492,10 @@ mod init_track_states {
                 },
                 media_direction: *media_direction,
                 muted: false,
-                media_type: MediaType::Audio(AudioSettings { required: true }),
+                media_type: MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
             })
             .collect();
 
@@ -552,6 +560,7 @@ mod receivers_patch_send_tracks {
                     muted: false,
                     media_type: MediaType::Audio(AudioSettings {
                         required: true,
+                        source_kind: MediaSourceKind::Device,
                     }),
                 }]),
                 ice_servers: Vec::new(),
@@ -625,7 +634,7 @@ mod disable_send_tracks {
     };
 
     use super::*;
-    use crate::is_firefox;
+    use crate::{MediaSourceKind, is_firefox};
 
     #[wasm_bindgen_test]
     async fn disable_enable_audio() {
@@ -670,7 +679,10 @@ mod disable_send_tracks {
             },
             media_direction: MediaDirection::SendRecv,
             muted: false,
-            media_type: MediaType::Audio(AudioSettings { required }),
+            media_type: MediaType::Audio(AudioSettings {
+                required,
+                source_kind: MediaSourceKind::Device,
+            }),
         }
     }
 
@@ -1448,12 +1460,15 @@ mod patches_generation {
     use wasm_bindgen_futures::spawn_local;
 
     use super::*;
-    use crate::{is_firefox, timeout};
+    use crate::{MediaSourceKind, is_firefox, timeout};
 
     fn audio_and_device_video_tracks_content() -> Vec<(MediaType, Direction)> {
         vec![
             (
-                MediaType::Audio(AudioSettings { required: false }),
+                MediaType::Audio(AudioSettings {
+                    required: false,
+                    source_kind: MediaSourceKind::Device,
+                }),
                 Direction::Send { receivers: Vec::new(), mid: None },
             ),
             (
@@ -2864,7 +2879,7 @@ mod state_synchronization {
     };
     use wasm_bindgen_test::*;
 
-    use crate::{get_test_tracks, timeout};
+    use crate::{MediaSourceKind, get_test_tracks, timeout};
 
     /// Checks whether [`state::Room`] update can create a [`PeerConnection`]
     /// and its [`Sender`]s/[`Receiver`]s.
@@ -2896,7 +2911,10 @@ mod state_synchronization {
                 muted: false,
                 media_direction: MediaDirection::SendRecv,
                 receivers: vec![MemberId::from("Test")],
-                media_type: MediaType::Audio(AudioSettings { required: true }),
+                media_type: MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
                 mid: None,
                 connection_mode: ConnectionMode::Mesh,
             },
@@ -2909,7 +2927,10 @@ mod state_synchronization {
                 muted: false,
                 media_direction: MediaDirection::SendRecv,
                 sender_id: "".into(),
-                media_type: MediaType::Audio(AudioSettings { required: true }),
+                media_type: MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
                 mid: None,
                 connection_mode: ConnectionMode::Mesh,
             },
@@ -3196,6 +3217,7 @@ async fn sender_answerer() {
                     muted: false,
                     media_type: MediaType::Audio(AudioSettings {
                         required: true,
+                        source_kind: MediaSourceKind::Device,
                     }),
                 },
                 Track {
