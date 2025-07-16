@@ -159,7 +159,10 @@ impl Receiver {
         };
 
         let enabled_in_cons = match &state.media_type() {
-            proto::MediaType::Audio(_) => recv_constraints.is_audio_enabled(),
+            proto::MediaType::Audio(_) => {
+                recv_constraints.is_audio_device_enabled()
+                    || recv_constraints.is_audio_display_enabled()
+            }
             proto::MediaType::Video(_) => {
                 recv_constraints.is_video_device_enabled()
                     || recv_constraints.is_video_display_enabled()

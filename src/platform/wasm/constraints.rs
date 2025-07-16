@@ -166,6 +166,13 @@ impl DisplayMediaStreamConstraints {
     pub fn video(&self, video: DisplayVideoTrackConstraints) {
         self.0.set_video(&MediaTrackConstraints::from(video).into());
     }
+
+    /// Specifies the nature and settings of the `audio` [MediaStreamTrack][1].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
+    pub fn audio(&self, audio: AudioTrackConstraints) {
+        self.0.set_audio(&MediaTrackConstraints::from(audio).into());
+    }
 }
 
 impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {

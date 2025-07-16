@@ -620,9 +620,15 @@ impl Connection {
                 ),
                 Self::spawn_constraints_synchronizer(
                     Rc::clone(&recv_constraints),
-                    room_recv_constraints.on_audio_enabled_change(),
+                    room_recv_constraints.on_audio_device_enabled_change(),
                     MediaKind::Audio,
                     MediaSourceKind::Device,
+                ),
+                Self::spawn_constraints_synchronizer(
+                    Rc::clone(&recv_constraints),
+                    room_recv_constraints.on_audio_display_enabled_change(),
+                    MediaKind::Audio,
+                    MediaSourceKind::Display,
                 ),
             ],
             remote_id,
@@ -671,7 +677,10 @@ impl Connection {
     /// [`MediaExchangeState`]: crate::peer::MediaExchangeState
     pub fn add_receiver(&self, receiver: Rc<receiver::State>) {
         let enabled_in_cons = match &receiver.kind() {
-            MediaKind::Audio => self.0.recv_constraints.is_audio_enabled(),
+            MediaKind::Audio => {
+                self.0.recv_constraints.is_audio_device_enabled()
+                    || self.0.recv_constraints.is_audio_display_enabled()
+            }
             MediaKind::Video => {
                 self.0.recv_constraints.is_video_device_enabled()
                     || self.0.recv_constraints.is_video_display_enabled()

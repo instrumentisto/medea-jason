@@ -290,7 +290,8 @@ fn media_stream_settings(
 ) -> api::MediaStreamSettings {
     let mut settings = api::MediaStreamSettings::new();
     if is_audio_enabled {
-        settings.audio(api::AudioTrackConstraints::new());
+        settings.device_audio(api::AudioTrackConstraints::new());
+        settings.display_audio(api::AudioTrackConstraints::new());
     }
     if is_video_enabled {
         settings.device_video(api::DeviceVideoTrackConstraints::new());
@@ -353,7 +354,7 @@ async fn get_video_track() -> api::RemoteMediaTrack {
 async fn get_audio_track() -> api::RemoteMediaTrack {
     let manager = MediaManager::default();
     let mut settings = MediaStreamSettings::new();
-    settings.audio(AudioTrackConstraints::new());
+    settings.device_audio(AudioTrackConstraints::new());
     let mut tracks = manager.get_tracks(settings).await.unwrap();
     let track = tracks.pop().unwrap().0.as_ref().as_ref().fork().await;
     remote::Track::new(

@@ -69,7 +69,7 @@ async fn failed_get_user_media() {
     let media_manager = MediaManager::default();
     let constraints = {
         let mut constraints = api::MediaStreamSettings::new();
-        constraints.audio(api::AudioTrackConstraints::new());
+        constraints.device_audio(api::AudioTrackConstraints::new());
         constraints.device_video(api::DeviceVideoTrackConstraints::new());
         constraints
     };
@@ -115,7 +115,7 @@ async fn failed_get_user_media2() {
     let media_manager = MediaManager::default();
     let constraints = {
         let mut constraints = api::MediaStreamSettings::new();
-        constraints.audio(api::AudioTrackConstraints::new());
+        constraints.device_audio(api::AudioTrackConstraints::new());
         constraints.device_video(api::DeviceVideoTrackConstraints::new());
         constraints
     };
@@ -164,7 +164,7 @@ async fn same_track_for_same_constraints() {
     let media_manager = MediaManager::default();
     let constraints = {
         let mut constraints = MediaStreamSettings::new();
-        constraints.audio(AudioTrackConstraints::new());
+        constraints.device_audio(AudioTrackConstraints::new());
         constraints
     };
 
@@ -204,7 +204,7 @@ async fn new_track_if_previous_dropped() {
     let media_manager = MediaManager::default();
     let constraints = {
         let mut constraints = MediaStreamSettings::new();
-        constraints.audio(AudioTrackConstraints::new());
+        constraints.device_audio(AudioTrackConstraints::new());
         constraints
     };
 
@@ -247,7 +247,7 @@ async fn request_audio_video_then_audio_then_video() {
     let media_manager = MediaManager::default();
     let constraints = {
         let mut constraints = MediaStreamSettings::new();
-        constraints.audio(AudioTrackConstraints::new());
+        constraints.device_audio(AudioTrackConstraints::new());
         constraints.device_video(DeviceVideoTrackConstraints::new());
         constraints
     };
@@ -267,7 +267,7 @@ async fn request_audio_video_then_audio_then_video() {
     // request audio only
     let audio_constraints = {
         let mut constraints = MediaStreamSettings::new();
-        constraints.audio(AudioTrackConstraints::new());
+        constraints.device_audio(AudioTrackConstraints::new());
         constraints
     };
     let mut tracks = media_manager.get_tracks(audio_constraints).await.unwrap();
@@ -307,7 +307,7 @@ async fn display_track_is_cached() {
     let media_manager = MediaManager::default();
     let constraints = {
         let mut constraints = MediaStreamSettings::new();
-        constraints.audio(AudioTrackConstraints::new());
+        constraints.device_audio(AudioTrackConstraints::new());
         constraints.display_video(DisplayVideoTrackConstraints::new());
         constraints
     };
@@ -342,13 +342,80 @@ async fn display_track_is_cached() {
     mock_navigator.stop();
 }
 
+/// 1. Do `media_manager.get_stream({audio:display, video:display}})`;
+/// 2. Do `media_manager.get_stream({audio:display, video:display}})`;
+/// 3. Assert that tracks are the same, only one getDisplayMedia request
+///    were made, and no getUserMedia requests were made.
+#[wasm_bindgen_test]
+async fn display_audio_track_is_cached() {
+    if is_firefox() {
+        // getDisplayMedia is not mockable in ff atm
+        return;
+    }
+    let mock_navigator = MockNavigator::new();
+
+    let media_manager = MediaManager::default();
+    let constraints = {
+        let mut constraints = MediaStreamSettings::new();
+        constraints.display_audio(AudioTrackConstraints::new());
+        constraints.display_video(DisplayVideoTrackConstraints::new());
+        constraints
+    };
+
+    let tracks = media_manager.get_tracks(constraints).await.unwrap();
+
+    assert_eq!(tracks.len(), 2);
+
+    let (mut audio, mut video): (Vec<_>, Vec<_>) =
+        tracks.into_iter().partition(|(track, _)| match track.kind() {
+            MediaKind::Audio => true,
+            MediaKind::Video => false,
+        });
+
+    let (video_track, video_track_is_new) = video.pop().unwrap();
+    assert!(video_track_is_new);
+
+    let (audio_track, audio_track_is_new) = audio.pop().unwrap();
+    assert!(audio_track_is_new);
+
+    // do second request
+    let constraints = {
+        let mut constraints = MediaStreamSettings::new();
+        constraints.display_audio(AudioTrackConstraints::new());
+        constraints.display_video(DisplayVideoTrackConstraints::new());
+        constraints
+    };
+
+    let tracks = media_manager.get_tracks(constraints).await.unwrap();
+
+    assert_eq!(tracks.len(), 2);
+
+    let (mut audio, mut video): (Vec<_>, Vec<_>) =
+        tracks.into_iter().partition(|(track, _)| match track.kind() {
+            MediaKind::Audio => true,
+            MediaKind::Video => false,
+        });
+
+    let (video_track2, video_track2_is_new) = video.pop().unwrap();
+    assert!(!video_track2_is_new);
+    assert_eq!(video_track.id(), video_track2.id());
+
+    let (audio_track2, audio_track2_is_new) = audio.pop().unwrap();
+    assert!(!audio_track2_is_new);
+    assert_eq!(audio_track.id(), audio_track2.id());
+
+    assert_eq!(mock_navigator.get_display_media_requests_count(), 1);
+    assert_eq!(mock_navigator.get_user_media_requests_count(), 0);
+    mock_navigator.stop();
+}
+
 /// Check that error is thrown if stream obtained via gUM request contains ended
 /// track.
 #[wasm_bindgen_test]
 async fn new_tracks_should_be_live() {
     let media_manager = MediaManager::default();
     let mut constraints = MediaStreamSettings::new();
-    constraints.audio(AudioTrackConstraints::new());
+    constraints.device_audio(AudioTrackConstraints::new());
 
     let track: web_sys::MediaStreamTrack = Clone::clone(
         media_manager
