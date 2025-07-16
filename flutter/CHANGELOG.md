@@ -10,9 +10,19 @@ All user visible changes to this project will be documented in this file. This p
 
 See also [`medea-jason` crate `master` changes](https://github.com/instrumentisto/medea-jason/tree/master/CHANGELOG.md).
 
+## BC Breaks
+
+- Bumped up [macOS] deployment target to 10.15. ([#214])
+
 ### Changed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
+
+### Upgraded
+
+- Dependencies:
+  - [`flutter_rust_bridge`] to 2.11.1 version. ([#214])
+  - [`medea_flutter_webrtc`] to 0.15.1 version. ([#214])
 
 [#212]: https://github.com/instrumentisto/medea-jason/pull/212
 
@@ -23,10 +33,6 @@ See also [`medea-jason` crate `master` changes](https://github.com/instrumentist
 [0.10.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.10.0/flutter
 
 See also [`medea-jason` crate 0.10.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.10.0/CHANGELOG.md).
-
-## BC Breaks
-
-- Bumped up [macOS] deployment target to 10.15. ([#214])
 
 ### Added
 
@@ -50,11 +56,9 @@ See also [`medea-jason` crate 0.10.0 changes](https://github.com/instrumentisto/
 
 - Dependencies:
     - [`flutter_rust_bridge`] to 2.10.0 version. ([#208])
-    - [`medea_flutter_webrtc`] to 0.15.0 version. ([#214])
 
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
 [#208]: https://github.com/instrumentisto/medea-jason/pull/208
-[#214]: https://github.com/instrumentisto/medea-jason/pull/214
 
 
 
