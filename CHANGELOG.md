@@ -13,11 +13,17 @@ All user visible changes to this project will be documented in this file. This p
 
 See also [`medea_jason` pub package 0.11.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0/flutter/CHANGELOG.md).
 
+### BC Breaks
+
+- Library API:
+    - Renamed `LocalMediaTrack` to `LocalMediaTrackImpl` ([#219]).
+
 ### Changed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 [#212]: https://github.com/instrumentisto/medea-jason/pull/212
+[#219]: https://github.com/instrumentisto/medea-jason/pull/219
 
 
 

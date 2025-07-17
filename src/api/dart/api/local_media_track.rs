@@ -24,10 +24,10 @@ use crate::{
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
 #[derive(Debug)]
 #[frb(opaque)]
-pub struct LocalMediaTrack(SendWrapper<core::LocalMediaTrack>);
+pub struct LocalMediaTrack(SendWrapper<core::LocalMediaTrackImpl>);
 
-impl From<core::LocalMediaTrack> for LocalMediaTrack {
-    fn from(value: core::LocalMediaTrack) -> Self {
+impl From<core::LocalMediaTrackImpl> for LocalMediaTrack {
+    fn from(value: core::LocalMediaTrackImpl) -> Self {
         Self(SendWrapper::new(value))
     }
 }

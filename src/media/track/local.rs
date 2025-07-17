@@ -144,51 +144,53 @@ impl Drop for Track {
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 #[derive(Debug, Clone)]
-pub struct LocalMediaTrack(Rc<Track>);
+pub struct LocalMediaTrackImpl(Rc<Track>);
 
-impl LocalMediaTrack {
-    /// Creates a new [`LocalMediaTrack`] from the provided [`Track`].
+impl LocalMediaTrackImpl {
+    /// Creates a new [`LocalMediaTrackImpl`] from the provided [`Track`].
     #[must_use]
     pub const fn new(track: Rc<Track>) -> Self {
         Self(track)
     }
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this
-    /// [`LocalMediaTrack`].
+    /// [`LocalMediaTrackImpl`].
     #[must_use]
     pub fn get_track(&self) -> &platform::MediaStreamTrack {
         &self.0.inner
     }
 
-    /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
-    /// audio track, or a [`MediaKind::Video`] if it represents a video track.
+    /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrackImpl`]
+    /// represents an audio track, or a [`MediaKind::Video`] if it represents
+    /// a video track.
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.0.kind()
     }
 
-    /// Sets a callback to invoke when this [`LocalMediaTrack`] is ended.
+    /// Sets a callback to invoke when this [`LocalMediaTrackImpl`] is ended.
     pub fn on_ended(&self, callback: platform::Function<()>) {
         self.0.on_ended(callback);
     }
 
-    /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is
-    /// active, or a [`MediaStreamTrackState::Ended`] if it has ended.
+    /// Returns a [`MediaStreamTrackState::Live`] if
+    /// this [`LocalMediaTrackImpl`] is active, or
+    /// a [`MediaStreamTrackState::Ended`] if it has ended.
     pub async fn state(&self) -> MediaStreamTrackState {
         self.0.state().await
     }
 
     /// Indicates whether an `OnAudioLevelChangedCallback` is supported for this
-    /// [`LocalMediaTrack`].
+    /// [`LocalMediaTrackImpl`].
     #[must_use]
     pub fn is_on_audio_level_available(&self) -> bool {
         self.0.inner.is_on_audio_level_available()
     }
 
     /// Sets the provided `OnAudioLevelChangedCallback` for this
-    /// [`LocalMediaTrack`].
+    /// [`LocalMediaTrackImpl`].
     ///
-    /// It's called for live [`LocalMediaTrack`]s when their audio level
+    /// It's called for live [`LocalMediaTrackImpl`]s when their audio level
     /// changes.
     ///
     /// # Errors
@@ -205,24 +207,24 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Indicates whether this [`LocalMediaTrack`] supports audio processing
+    /// Indicates whether this [`LocalMediaTrackImpl`] supports audio processing
     /// functions:
-    /// - [`LocalMediaTrack::is_noise_suppression_enabled()`]
-    /// - [`LocalMediaTrack::set_noise_suppression_enabled()`]
-    /// - [`LocalMediaTrack::get_noise_suppression_level()`]
-    /// - [`LocalMediaTrack::set_noise_suppression_level()`]
-    /// - [`LocalMediaTrack::is_echo_cancellation_enabled()`]
-    /// - [`LocalMediaTrack::set_echo_cancellation_enabled()`]
-    /// - [`LocalMediaTrack::is_auto_gain_control_enabled()`]
-    /// - [`LocalMediaTrack::set_auto_gain_control_enabled()`]
-    /// - [`LocalMediaTrack::is_high_pass_filter_enabled()`]
-    /// - [`LocalMediaTrack::set_high_pass_filter_enabled()`]
+    /// - [`LocalMediaTrackImpl::is_noise_suppression_enabled()`]
+    /// - [`LocalMediaTrackImpl::set_noise_suppression_enabled()`]
+    /// - [`LocalMediaTrackImpl::get_noise_suppression_level()`]
+    /// - [`LocalMediaTrackImpl::set_noise_suppression_level()`]
+    /// - [`LocalMediaTrackImpl::is_echo_cancellation_enabled()`]
+    /// - [`LocalMediaTrackImpl::set_echo_cancellation_enabled()`]
+    /// - [`LocalMediaTrackImpl::is_auto_gain_control_enabled()`]
+    /// - [`LocalMediaTrackImpl::set_auto_gain_control_enabled()`]
+    /// - [`LocalMediaTrackImpl::is_high_pass_filter_enabled()`]
+    /// - [`LocalMediaTrackImpl::set_high_pass_filter_enabled()`]
     #[must_use]
     pub fn is_audio_processing_available(&self) -> bool {
         self.0.inner.is_audio_processing_available()
     }
 
-    /// Toggles noise suppression for this [`LocalMediaTrack`].
+    /// Toggles noise suppression for this [`LocalMediaTrackImpl`].
     ///
     /// # Errors
     ///
@@ -239,7 +241,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Configures a [`NoiseSuppressionLevel`] for this [`LocalMediaTrack`].
+    /// Configures a [`NoiseSuppressionLevel`] for this [`LocalMediaTrackImpl`].
     ///
     /// # Errors
     ///
@@ -256,7 +258,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Toggles acoustic echo cancellation for this [`LocalMediaTrack`].
+    /// Toggles acoustic echo cancellation for this [`LocalMediaTrackImpl`].
     ///
     /// # Errors
     ///
@@ -273,7 +275,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Toggles auto gain control for this [`LocalMediaTrack`].
+    /// Toggles auto gain control for this [`LocalMediaTrackImpl`].
     ///
     /// # Errors
     ///
@@ -290,7 +292,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Toggles high-pass filter for this [`LocalMediaTrack`].
+    /// Toggles high-pass filter for this [`LocalMediaTrackImpl`].
     ///
     /// # Errors
     ///
@@ -308,7 +310,7 @@ impl LocalMediaTrack {
     }
 
     /// Indicates whether noise suppression is enabled for this
-    /// [`LocalMediaTrack`].
+    /// [`LocalMediaTrackImpl`].
     ///
     /// # Errors
     ///
@@ -325,7 +327,7 @@ impl LocalMediaTrack {
     }
 
     /// Returns the current configured [`NoiseSuppressionLevel`] of this
-    /// [`LocalMediaTrack`].
+    /// [`LocalMediaTrackImpl`].
     ///
     /// # Errors
     ///
@@ -342,7 +344,7 @@ impl LocalMediaTrack {
     }
 
     /// Indicates whether auto gain control is enabled for this
-    /// [`LocalMediaTrack`].
+    /// [`LocalMediaTrackImpl`].
     ///
     /// # Errors
     ///
@@ -359,7 +361,7 @@ impl LocalMediaTrack {
     }
 
     /// Indicates whether echo cancellation is enabled for this
-    /// [`LocalMediaTrack`].
+    /// [`LocalMediaTrackImpl`].
     ///
     /// # Errors
     ///
@@ -376,7 +378,7 @@ impl LocalMediaTrack {
     }
 
     /// Indicates whether high-pass filter is enabled for this
-    /// [`LocalMediaTrack`].
+    /// [`LocalMediaTrackImpl`].
     ///
     /// # Errors
     ///
@@ -392,7 +394,7 @@ impl LocalMediaTrack {
             .map_err(tracerr::wrap!())
     }
 
-    /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is
+    /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrackImpl`] is
     /// sourced from some device (webcam/microphone), or
     /// a [`MediaSourceKind::Display`] if it's captured via
     /// [MediaDevices.getDisplayMedia()][1].
@@ -403,8 +405,8 @@ impl LocalMediaTrack {
         self.0.media_source_kind().into()
     }
 
-    /// [Stops][1] this [`LocalMediaTrack`] if this is the last wrapper for the
-    /// underlying [`Track`].
+    /// [Stops][1] this [`LocalMediaTrackImpl`] if this is the last wrapper for
+    /// the underlying [`Track`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
     pub async fn maybe_stop(mut self) {

@@ -6227,8 +6227,8 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   void onFailedLocalMedia({required Object cb}) => RustLib.instance.api
       .crateApiDartApiRoomRoomHandleOnFailedLocalMedia(that: this, cb: cb);
 
-  /// Sets a callback to be invoked once a new [`LocalMediaTrack`] is added
-  /// to the provided [`Room`].
+  /// Sets a callback to be invoked once a new [`LocalMediaTrack`] is
+  /// added to the provided [`Room`].
   ///
   /// This might happen in such cases:
   /// 1. Media server initiates a media request.
