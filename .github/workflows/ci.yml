@@ -141,7 +141,6 @@ jobs:
       matrix:
         include:
           - crate: medea-control-api-proto
-
           - crate: medea-jason
     runs-on: ubuntu-latest
     steps:
