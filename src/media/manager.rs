@@ -234,6 +234,10 @@ impl InnerMediaManager {
         match caps.into() {
             None => Ok(tracks_from_storage.collect()),
             Some(MultiSourceTracksConstraints::Display(caps)) => {
+                #[cfg(target_family = "wasm")]
+                web_sys::console::log_1(
+                    &format!("Display caps: {caps:#?}").into(),
+                );
                 Ok(tracks_from_storage
                     .chain(
                         self.get_display_media(caps)
@@ -245,6 +249,10 @@ impl InnerMediaManager {
                     .collect())
             }
             Some(MultiSourceTracksConstraints::Device(caps)) => {
+                #[cfg(target_family = "wasm")]
+                web_sys::console::log_1(
+                    &format!("Device caps: {caps:#?}").into(),
+                );
                 Ok(tracks_from_storage
                     .chain(
                         self.get_user_media(caps)
@@ -259,6 +267,8 @@ impl InnerMediaManager {
                 device_caps,
                 display_caps,
             )) => {
+                #[cfg(target_family = "wasm")]
+                web_sys::console::log_1(&format!("Device caps: {device_caps:#?} and display caps: {display_caps:#?}").into());
                 let device_tracks = self
                     .get_user_media(device_caps)
                     .await
