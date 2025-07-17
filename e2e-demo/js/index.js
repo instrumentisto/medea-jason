@@ -721,7 +721,7 @@ window.onload = async function() {
         audio.device_id(audioSource.value);
       }
       audio.exact_auto_gain_control(!disableAudioGainControlSwitchEl.checked);
-      constraints.audio(audio);
+      constraints.device_audio(audio);
     }
 
     if (video_select != null) {
@@ -742,6 +742,7 @@ window.onload = async function() {
           constraints.device_video(video);
           if (screenshareSwitchEl.checked) {
             constraints.display_video(new rust.DisplayVideoTrackConstraints());
+            constraints.display_audio(new rust.AudioTrackConstraints());
           }
         }
       } else {
@@ -1035,7 +1036,8 @@ window.onload = async function() {
           }
           await room.set_local_media_settings(constraints, true, true);
           if (screenshareSwitchEl.checked) {
-            await room.enable_video(rust.MediaSourceKind.Display);
+              await room.enable_video(rust.MediaSourceKind.Display);
+              await room.enable_audio(rust.MediaSourceKind.Display);
           }
         } catch (e) {
           let name = e.kind();
