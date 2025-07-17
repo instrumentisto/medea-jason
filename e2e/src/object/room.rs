@@ -1,6 +1,6 @@
 //! [`Object`] representing a `Room` JS object.
 
-use std::{borrow::Cow, str::FromStr};
+use std::str::FromStr;
 
 use super::{AwaitCompletion, Error};
 use crate::{
