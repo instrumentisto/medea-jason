@@ -21,8 +21,9 @@ See also [`medea-jason` crate `master` changes](https://github.com/instrumentist
 ### Upgraded
 
 - Dependencies:
-  - [`flutter_rust_bridge`] to 2.11.1 version. ([#214])
-  - [`medea_flutter_webrtc`] to 0.15.1 version. ([#214])
+    - [`flutter_rust_bridge`] to 2.11.1 version. ([#214])
+    - [`medea_flutter_webrtc`] to 0.15.1 version. ([#214])
+    - [`freezed_annotation`] to 3.1.0 version. ([#214])
 
 [#212]: https://github.com/instrumentisto/medea-jason/pull/212
 [#214]: https://github.com/instrumentisto/medea-jason/pull/214
@@ -273,6 +274,7 @@ See also [`medea-jason` crate 0.5.0 changes](https://github.com/instrumentisto/m
 
 
 [`flutter_rust_bridge`]: https://pub.dev/packages/flutter_rust_bridge
+[`freezed_annotation`]: https://pub.dev/packages/freezed_annotation
 [macOS]: https://www.apple.com/macos
 [`medea_flutter_webrtc`]: https://pub.dev/packages/medea_flutter_webrtc
 [`medea-jason`]: https://docs.rs/medea-jason
