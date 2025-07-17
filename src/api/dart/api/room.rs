@@ -104,7 +104,7 @@ impl RoomHandle {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.mute_audio().await?;
+            room_handle.mute_audio(None).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }
@@ -119,7 +119,7 @@ impl RoomHandle {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.unmute_audio().await?;
+            room_handle.unmute_audio(None).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }
@@ -134,7 +134,7 @@ impl RoomHandle {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.enable_audio().await?;
+            room_handle.enable_audio(None).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }
@@ -149,7 +149,7 @@ impl RoomHandle {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.disable_audio().await?;
+            room_handle.disable_audio(None).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }
@@ -260,7 +260,7 @@ impl RoomHandle {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.enable_remote_audio().await?;
+            room_handle.enable_remote_audio(None).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }
@@ -275,7 +275,7 @@ impl RoomHandle {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.disable_remote_audio().await?;
+            room_handle.disable_remote_audio(None).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }

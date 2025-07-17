@@ -317,7 +317,7 @@ mod disable_recv_tracks {
         let (room, mut commands_rx) = get_test_room(Box::pin(event_rx));
         let room_handle = api::RoomHandle::from(room.new_handle());
 
-        JsFuture::from(room_handle.disable_remote_audio()).await.unwrap();
+        JsFuture::from(room_handle.disable_remote_audio(None)).await.unwrap();
 
         event_tx
             .unbounded_send(Event::PeerCreated {
@@ -646,10 +646,18 @@ mod disable_send_tracks {
         .await;
 
         let room_handle = api::RoomHandle::from(room.new_handle());
-        JsFuture::from(room_handle.disable_audio()).await.unwrap();
+        JsFuture::from(
+            room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
 
         assert!(!peer.is_send_audio_enabled());
-        JsFuture::from(room_handle.enable_audio()).await.unwrap();
+        JsFuture::from(
+            room_handle.enable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
         assert!(peer.is_send_audio_enabled());
     }
 
@@ -809,8 +817,12 @@ mod disable_send_tracks {
 
         let room_handle = api::RoomHandle::from(room.new_handle());
         let (first, second) = futures::future::join(
-            JsFuture::from(room_handle.disable_audio()),
-            JsFuture::from(room_handle.disable_audio()),
+            JsFuture::from(
+                room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+            ),
+            JsFuture::from(
+                room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+            ),
         )
         .await;
         first.unwrap();
@@ -893,8 +905,14 @@ mod disable_send_tracks {
         let room_handle = api::RoomHandle::from(room.new_handle());
         let (disable_audio_result, enable_audio_result) =
             futures::future::join(
-                JsFuture::from(room_handle.disable_audio()),
-                JsFuture::from(room_handle.enable_audio()),
+                JsFuture::from(
+                    room_handle
+                        .disable_audio(Some(api::MediaSourceKind::Device)),
+                ),
+                JsFuture::from(
+                    room_handle
+                        .enable_audio(Some(api::MediaSourceKind::Device)),
+                ),
             )
             .await;
         disable_audio_result.unwrap_err();
@@ -988,7 +1006,11 @@ mod disable_send_tracks {
         ));
 
         let room_handle = api::RoomHandle::from(room.new_handle());
-        JsFuture::from(room_handle.disable_audio()).await.unwrap();
+        JsFuture::from(
+            room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
 
         assert!(peer.is_all_transceiver_sides_in_media_state(
             MediaKind::Audio,
@@ -999,8 +1021,14 @@ mod disable_send_tracks {
 
         let (disable_audio_result, enable_audio_result) =
             futures::future::join(
-                JsFuture::from(room_handle.disable_audio()),
-                JsFuture::from(room_handle.enable_audio()),
+                JsFuture::from(
+                    room_handle
+                        .disable_audio(Some(api::MediaSourceKind::Device)),
+                ),
+                JsFuture::from(
+                    room_handle
+                        .enable_audio(Some(api::MediaSourceKind::Device)),
+                ),
             )
             .await;
         disable_audio_result.unwrap();
@@ -1028,7 +1056,11 @@ mod disable_send_tracks {
         .await
         .unwrap();
 
-        JsFuture::from(room_handle.disable_audio()).await.unwrap();
+        JsFuture::from(
+            room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
 
         let (audio_track, video_track) = get_test_tracks(false, false);
         event_tx
@@ -1107,7 +1139,11 @@ mod disable_send_tracks {
         .await
         .unwrap();
 
-        JsFuture::from(room_handle.mute_audio()).await.unwrap();
+        JsFuture::from(
+            room_handle.mute_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
 
         let (audio_track, video_track) = get_test_tracks(false, false);
         event_tx
@@ -1608,7 +1644,11 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.disable_audio()).await.unwrap_err();
+            JsFuture::from(
+                room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+            )
+            .await
+            .unwrap_err();
         });
 
         assert_eq!(
@@ -1648,7 +1688,11 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.disable_audio()).await.unwrap_err();
+            JsFuture::from(
+                room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+            )
+            .await
+            .unwrap_err();
         });
 
         let mut commands = HashMap::new();
@@ -1704,7 +1748,11 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.enable_audio()).await.unwrap();
+            JsFuture::from(
+                room_handle.enable_audio(Some(api::MediaSourceKind::Device)),
+            )
+            .await
+            .unwrap();
         });
 
         assert!(timeout(5, command_rx.next()).await.is_err());
@@ -1860,7 +1908,11 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.mute_audio()).await.unwrap_err();
+            JsFuture::from(
+                room_handle.mute_audio(Some(api::MediaSourceKind::Device)),
+            )
+            .await
+            .unwrap_err();
         });
 
         assert_eq!(
@@ -1888,7 +1940,11 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.unmute_audio()).await.unwrap_err();
+            JsFuture::from(
+                room_handle.unmute_audio(Some(api::MediaSourceKind::Device)),
+            )
+            .await
+            .unwrap_err();
         });
 
         assert_eq!(
@@ -1916,9 +1972,15 @@ async fn mute_unmute_audio() {
     .await;
 
     let room_handle = api::RoomHandle::from(room.new_handle());
-    JsFuture::from(room_handle.mute_audio()).await.unwrap();
+    JsFuture::from(room_handle.mute_audio(Some(api::MediaSourceKind::Device)))
+        .await
+        .unwrap();
     assert!(!peer.is_send_audio_unmuted());
-    JsFuture::from(room_handle.unmute_audio()).await.unwrap();
+    JsFuture::from(
+        room_handle.unmute_audio(Some(api::MediaSourceKind::Device)),
+    )
+    .await
+    .unwrap();
     assert!(peer.is_send_audio_unmuted());
 }
 
@@ -1933,9 +1995,22 @@ async fn remote_disable_enable_audio() {
     .await;
 
     let room_handle = api::RoomHandle::from(room.new_handle());
-    assert!(JsFuture::from(room_handle.disable_remote_audio()).await.is_ok());
+    assert!(
+        JsFuture::from(
+            room_handle
+                .disable_remote_audio(Some(api::MediaSourceKind::Device))
+        )
+        .await
+        .is_ok()
+    );
     assert!(!peer.is_recv_audio_enabled());
-    assert!(JsFuture::from(room_handle.enable_remote_audio()).await.is_ok());
+    assert!(
+        JsFuture::from(
+            room_handle.enable_remote_audio(Some(api::MediaSourceKind::Device))
+        )
+        .await
+        .is_ok()
+    );
     assert!(peer.is_recv_audio_enabled());
 }
 
@@ -2093,7 +2168,11 @@ async fn only_one_gum_performed_on_enable() {
             })],
         })
         .unwrap();
-    JsFuture::from(room_handle.enable_audio()).await.unwrap_err();
+    JsFuture::from(
+        room_handle.enable_audio(Some(api::MediaSourceKind::Device)),
+    )
+    .await
+    .unwrap_err();
 
     assert_eq!(mock.get_user_media_requests_count(), 1);
     mock.stop();
@@ -2112,13 +2191,21 @@ async fn no_updates_sent_if_gum_fails_on_enable() {
     assert_eq!(mock.get_user_media_requests_count(), 1);
     assert!(peer.is_send_audio_enabled());
 
-    JsFuture::from(room_handle.disable_audio()).await.unwrap();
+    JsFuture::from(
+        room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+    )
+    .await
+    .unwrap();
     assert!(!peer.is_send_audio_enabled());
 
     mock.error_get_user_media("gum error".into());
 
     let err = jsval_cast::<LocalMediaInitException>(
-        JsFuture::from(room_handle.enable_audio()).await.unwrap_err(),
+        JsFuture::from(
+            room_handle.enable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap_err(),
         "LocalMediaInitException",
     )
     .unwrap();
@@ -2159,12 +2246,20 @@ async fn set_media_state_return_media_error() {
     )
     .await;
     let room_handle = api::RoomHandle::from(room.new_handle());
-    JsFuture::from(room_handle.disable_audio()).await.unwrap();
+    JsFuture::from(
+        room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+    )
+    .await
+    .unwrap();
 
     mock.error_get_user_media(ERROR_MSG.into());
 
     let err = jsval_cast::<LocalMediaInitException>(
-        JsFuture::from(room_handle.enable_audio()).await.unwrap_err(),
+        JsFuture::from(
+            room_handle.enable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap_err(),
         "LocalMediaInitException",
     )
     .unwrap();
@@ -3141,7 +3236,10 @@ async fn intentions_are_sent_on_reconnect() {
     peer_state.connection_lost();
 
     spawn_local(async move {
-        let _ = JsFuture::from(room_handle.disable_audio()).await;
+        let _ = JsFuture::from(
+            room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await;
     });
     timeout(1000, async {
         while let Some(cmd) = commands_rx.next().await {

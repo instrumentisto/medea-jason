@@ -512,12 +512,13 @@ impl RoomHandle {
     /// didn't approve this state transition.
     pub fn mute_audio(
         &self,
+        source_kind: Option<MediaSourceKind>,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             mute_state::Stable::Muted,
             MediaKind::Audio,
             TrackDirection::Send,
-            None,
+            source_kind,
         )
         .map_err(tracerr::map_from_and_wrap!())
     }
@@ -534,12 +535,13 @@ impl RoomHandle {
     /// didn't approve this state transition.
     pub fn unmute_audio(
         &self,
+        source_kind: Option<MediaSourceKind>,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             mute_state::Stable::Unmuted,
             MediaKind::Audio,
             TrackDirection::Send,
-            None,
+            source_kind,
         )
         .map_err(tracerr::map_from_and_wrap!())
     }
@@ -605,12 +607,13 @@ impl RoomHandle {
     /// server didn't approve this state transition.
     pub fn disable_audio(
         &self,
+        source_kind: Option<MediaSourceKind>,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Audio,
             TrackDirection::Send,
-            None,
+            source_kind,
         )
         .map_err(tracerr::map_from_and_wrap!())
     }
@@ -630,12 +633,13 @@ impl RoomHandle {
     /// acquisition request failed.
     pub fn enable_audio(
         &self,
+        source_kind: Option<MediaSourceKind>,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Audio,
             TrackDirection::Send,
-            None,
+            source_kind,
         )
         .map_err(tracerr::map_from_and_wrap!())
     }
@@ -708,12 +712,13 @@ impl RoomHandle {
     /// media server didn't approve this state transition.
     pub fn disable_remote_audio(
         &self,
+        source_kind: Option<MediaSourceKind>,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Audio,
             TrackDirection::Recv,
-            None,
+            source_kind,
         )
         .map_err(tracerr::map_from_and_wrap!())
     }
@@ -755,12 +760,13 @@ impl RoomHandle {
     /// media server didn't approve this state transition.
     pub fn enable_remote_audio(
         &self,
+        source_kind: Option<MediaSourceKind>,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Audio,
             TrackDirection::Recv,
-            None,
+            source_kind,
         )
         .map_err(tracerr::map_from_and_wrap!())
     }
