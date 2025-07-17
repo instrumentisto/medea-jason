@@ -10,8 +10,8 @@ use medea_client_api_proto::{Event, ServerMsg};
 use medea_jason::{
     platform::{self, MockRpcTransport, RpcTransport, TransportState},
     rpc::{
-        CloseMsg, ConnectionInfo, ReconnectError, ReconnectHandle, RpcSession,
-        WebSocketRpcClient, WebSocketRpcSession,
+        CloseMsg, ConnectionInfo, ReconnectError, ReconnectHandleImpl,
+        RpcSession, WebSocketRpcClient, WebSocketRpcSession,
     },
 };
 use medea_reactive::ObservableCell;
@@ -21,7 +21,7 @@ use crate::{TEST_ROOM_URL, delay_for, rpc::RPC_SETTINGS, timeout};
 
 wasm_bindgen_test_configure!(run_in_browser);
 
-/// Makes sure that [`ReconnectHandle::reconnect_with_backoff()`] works as
+/// Makes sure that [`ReconnectHandleImpl::reconnect_with_backoff()`] works as
 /// expected.
 #[wasm_bindgen_test]
 async fn reconnect_with_backoff() {
@@ -62,8 +62,9 @@ async fn reconnect_with_backoff() {
 
     transport_state.set(TransportState::Closed(CloseMsg::Abnormal(999)));
     timeout(100, session.on_connection_loss().next()).await.unwrap().unwrap();
-    let handle =
-        ReconnectHandle::new(Rc::downgrade(&session) as Weak<dyn RpcSession>);
+    let handle = ReconnectHandleImpl::new(
+        Rc::downgrade(&session) as Weak<dyn RpcSession>
+    );
 
     // Checks that max_elapsed is not exceeded if starting_delay > max_elapsed.
     let start = instant::Instant::now();

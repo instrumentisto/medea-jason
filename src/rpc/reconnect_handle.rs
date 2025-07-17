@@ -11,14 +11,14 @@ use crate::{
     utils::Caused,
 };
 
-/// Errors occurring in a [`ReconnectHandle`].
+/// Errors occurring in a [`ReconnectHandleImpl`].
 #[derive(Caused, Clone, Debug, From, Display)]
 #[cause(error = platform::Error)]
 pub enum ReconnectError {
     /// Some [`SessionError`] has occurred while reconnecting.
     Session(#[cause] SessionError),
 
-    /// [`ReconnectHandle`]'s [`Weak`] pointer is detached.
+    /// [`ReconnectHandleImpl`]'s [`Weak`] pointer is detached.
     #[display("ReconnectHandle is in detached state")]
     Detached,
 }
@@ -27,10 +27,10 @@ pub enum ReconnectError {
 ///
 /// This handle will be passed to a `Room.on_connection_loss` callback.
 #[derive(Clone, Debug)]
-pub struct ReconnectHandle(#[debug(skip)] Weak<dyn RpcSession>);
+pub struct ReconnectHandleImpl(#[debug(skip)] Weak<dyn RpcSession>);
 
-impl ReconnectHandle {
-    /// Instantiates new [`ReconnectHandle`] from the given [`RpcSession`]
+impl ReconnectHandleImpl {
+    /// Instantiates new [`ReconnectHandleImpl`] from the given [`RpcSession`]
     /// reference.
     #[must_use]
     pub fn new(rpc: Weak<dyn RpcSession>) -> Self {

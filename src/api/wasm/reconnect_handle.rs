@@ -20,7 +20,7 @@ use crate::rpc;
 /// [`RoomHandle.on_connection_loss`]: crate::api::RoomHandle.on_connection_loss
 #[wasm_bindgen]
 #[derive(Clone, Debug, From)]
-pub struct ReconnectHandle(rpc::ReconnectHandle);
+pub struct ReconnectHandle(rpc::ReconnectHandleImpl);
 
 #[wasm_bindgen]
 impl ReconnectHandle {
