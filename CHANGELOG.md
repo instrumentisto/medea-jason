@@ -5,16 +5,13 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
 
-## [0.11.0] · 2025-07-17
-[0.11.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0
-
-[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.10.0...medea-jason-0.11.0)
-
-See also [`medea_jason` pub package 0.11.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0/flutter/CHANGELOG.md).
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
 
 ### Added
-- Ability to constraint system audio capture track: ([#225])
+ 
+- Ability to capture system audio tracks: ([#225])
     - `MediaStreamSettings.display_audio()` to set system audio constraints.
     - `MediaStreamSettings.get_display_audio()` to get system audio constraints.
     - `MediaStreamSettings.is_display_audio_enabled()` to indicate whether system audio is enabled.
@@ -25,17 +22,32 @@ See also [`medea_jason` pub package 0.11.0 changes](https://github.com/instrumen
 
 ### Changed
 
-- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
-- Constraints for audio tracks: ([#225])
+- Device audio tracks: ([#225])
     - `MediaStreamSettings.audio()` renamed to `MediaStreamSettings.device_audio()`.
     - `MediaStreamSettings.get_audio()` renamed to `MediaStreamSettings.get_device_audio()`.
     - `MediaStreamSettings.set_audio_publish()` now receives third argument for source kind of track.
     - `MediaStreamSettings.is_audio_enabled()` renamed to `MediaStreamSettings.is_device_audio_enabled()`.
     - `TrackRequestError.ExpectedAudioTracks` renamed to `TrackRequestError.ExpectedDeviceAudioTracks`.
     - `TrackRequestError.TooManyAudioTracks` renamed to `TrackRequestError.TooManyDeviceAudioTracks`.
+    - `RoomHandle.mute_audio()`, `RoomHandle.unmute_audio()`, `RoomHandle.enable_audio()`, `RoomHandle.disable_audio()`, `RoomHandle.enable_remote_audio()`, and `RoomHandle.disable_remote_audio()` now receive an argument to specify `MediaSourceKind`.
+
+[#225]: https://github.com/instrumentisto/medea-jason/pull/225
+
+
+
+
+## [0.11.0] · 2025-07-17
+[0.11.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.10.0...medea-jason-0.11.0)
+
+See also [`medea_jason` pub package 0.11.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0/flutter/CHANGELOG.md).
+
+### Changed
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 [#212]: https://github.com/instrumentisto/medea-jason/pull/212
-[#225]: https://github.com/instrumentisto/medea-jason/pull/225
 
 
 
@@ -58,10 +70,6 @@ See also [`medea_jason` pub package 0.11.0 changes](https://github.com/instrumen
     - `LocalMediaTrack.setAutoGainControlEnabled()`, `LocalMediaTrack.isAutoGainControlEnabled()` to inspect and toggle auto gain control (supported on web and desktop platforms).
     - `LocalMediaTrack.setNoiseSuppressionLevel()`, `LocalMediaTrack.getNoiseSuppressionLevel()` to inspect and configure noise suppression level (only supported on desktop platforms).
     - `LocalMediaTrack.setHighPassFilterEnabled()`, `LocalMediaTrack.isHighPassFilterEnabledO()` to inspect and toggle high-pass filter (only supported on desktop platforms).
-
-### Changed
-
-- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
 
