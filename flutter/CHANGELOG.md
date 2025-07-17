@@ -10,11 +10,23 @@ All user visible changes to this project will be documented in this file. This p
 
 See also [`medea-jason` crate `master` changes](https://github.com/instrumentisto/medea-jason/tree/master/CHANGELOG.md).
 
+## BC Breaks
+
+- Bumped up [macOS] deployment target to 10.15. ([#214])
+
 ### Changed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
+### Upgraded
+
+- Dependencies:
+    - [`flutter_rust_bridge`] to 2.11.1 version. ([#214])
+    - [`medea_flutter_webrtc`] to 0.15.1 version. ([#214])
+    - [`freezed_annotation`] to 3.1.0 version. ([#214])
+
 [#212]: https://github.com/instrumentisto/medea-jason/pull/212
+[#214]: https://github.com/instrumentisto/medea-jason/pull/214
 
 
 
@@ -101,7 +113,7 @@ See also [`medea-jason` crate 0.8.0 changes](https://github.com/instrumentisto/m
 
 ### Fixed
 
-- Segfault when closing [Flutter] application on macOS. ([#201])
+- Segfault when closing [Flutter] application on [macOS]. ([#201])
 
 [#200]: https://github.com/instrumentisto/medea-jason/pull/200
 [#201]: https://github.com/instrumentisto/medea-jason/pull/201
@@ -262,6 +274,8 @@ See also [`medea-jason` crate 0.5.0 changes](https://github.com/instrumentisto/m
 
 
 [`flutter_rust_bridge`]: https://pub.dev/packages/flutter_rust_bridge
+[`freezed_annotation`]: https://pub.dev/packages/freezed_annotation
+[macOS]: https://www.apple.com/macos
 [`medea_flutter_webrtc`]: https://pub.dev/packages/medea_flutter_webrtc
 [`medea-jason`]: https://docs.rs/medea-jason
 [Flutter]: https://flutter.dev
