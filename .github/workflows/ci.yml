@@ -1230,6 +1230,16 @@ jobs:
           echo "Changelog: $changelog"
           echo "Today: $today"
           [ "$changelog" = "$today" ]
+      - name: Ensure Flutter CHANGELOG date is today
+        run: |
+          today="$(date '+%Y-%m-%d')"
+          changelog="$(grep -E '^## \[${{ steps.release.outputs.group2 }}\] ·' \
+                            flutter/CHANGELOG.md \
+                       | cut -d' ' -f4 | tr -d ' ')"
+          echo "Changelog: $changelog"
+          echo "Today: $today"
+          [ "$changelog" = "$today" ]
+        if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-') }}
       - name: Parse CHANGELOG link
         id: changelog
         run: echo "link=$(make cargo.changelog.link

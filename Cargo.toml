@@ -1,6 +1,6 @@
 [package]
 name = "medea-jason"
-version = "0.10.0"
+version = "0.11.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Client library for Medea media server."
@@ -44,7 +44,7 @@ derivative = "2.2"
 derive_more = { version = "2.0", features = ["as_ref", "debug", "deref", "display", "from", "into", "mul"] }
 # TODO: Move this dep to `[target.'cfg(not(target_family = "wasm"))'.dependencies]`
 #       after fzyzcjy/flutter_rust_bridge#2805 will be released
-flutter_rust_bridge = { version = "=2.10.0", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
+flutter_rust_bridge = { version = "=2.11.1", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
 futures = "0.3"
 log = "0.4"
 medea-client-api-proto = { version = "0.9", path = "proto/client-api" }
