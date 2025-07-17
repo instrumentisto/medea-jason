@@ -2,13 +2,13 @@ PODS:
   - device_info_plus (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - instrumentisto-libwebrtc-bin (136.0.7103.113)
+  - instrumentisto-libwebrtc-bin (138.0.7204.100)
   - integration_test (0.0.1):
     - Flutter
-  - medea_flutter_webrtc (0.14.0):
+  - medea_flutter_webrtc (0.15.1):
     - Flutter
-    - instrumentisto-libwebrtc-bin (= 136.0.7103.113)
-  - medea_jason (0.10.0):
+    - instrumentisto-libwebrtc-bin (= 138.0.7204.100)
+  - medea_jason (0.11.0):
     - Flutter
 
 DEPENDENCIES:
@@ -37,10 +37,10 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  instrumentisto-libwebrtc-bin: 1cc1d224175e6bbd01b8dda519a6bbff9b09ee89
+  instrumentisto-libwebrtc-bin: 522036a664b313c1102578ed9489f9fcff3be1b4
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
-  medea_flutter_webrtc: c42166749c9857c4b3d49151323092bf6e0c769c
-  medea_jason: 718810f9297ccbab3d80f833ee42f3fb1c229445
+  medea_flutter_webrtc: b321871bb759df49c25ffaf2871606bc43f1b442
+  medea_jason: ce490beea3fb2e1080956de5be9dfbd22a407003
 
 PODFILE CHECKSUM: f3734cf2c64ab93db34ebd0461528389a119c1e8
 

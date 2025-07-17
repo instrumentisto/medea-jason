@@ -22,9 +22,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   device_info_plus: ^11.4.0
   faker_dart: ^0.2.2
-  freezed_annotation: ^2.4.1
+  freezed_annotation: ^3.1.0
   http: ">=0.13.6 <2.0.0"
-  medea_flutter_webrtc: 0.14.1-dev+rev.e6542e79cd05a459e49585ef98809ade96b07770
+  medea_flutter_webrtc: ^0.15.1
   retry: ^3.1.2
 
 dev_dependencies:
@@ -41,9 +41,11 @@ dev_dependencies:
 
 dependency_overrides:
   # TODO: Remove when `flutter_gherkin` updates.
-  analyzer: ^5.13.0
+  analyzer: ^7.4.5
   # TODO: Remove when `flutter_gherkin` updates.
-  uuid: ^3.0.7
+  uuid: ^4.4.2
+  # TODO: Remove when `flutter_gherkin` updates.
+  source_gen: ^2.0.0
 
 flutter:
   assets:
