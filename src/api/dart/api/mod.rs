@@ -361,8 +361,8 @@ pub struct ApiMediaStreamSettings {
 impl From<ApiMediaStreamSettings> for media::MediaStreamSettings {
     fn from(value: ApiMediaStreamSettings) -> Self {
         let mut res = Self::new();
-        // TODO: implement for display audio when `medea-flutter-webrtc` will
-        //       support it.
+        // TODO: implement for display audio when
+        //       `instrumentisto/medea-flutter-webrtc#244` will be resolved.
         if let Some(audio) = value.audio {
             res.device_audio(audio.into());
         }
