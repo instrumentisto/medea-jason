@@ -220,10 +220,10 @@ impl RoomHandle {
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
     /// [0]: crate::api::err::MediaStateTransitionException
-    pub fn mute_audio(&self) -> Promise {
+    pub fn mute_audio(&self, source_kind: Option<MediaSourceKind>) -> Promise {
         let this = self.0.clone();
 
-        let fut = this.mute_audio();
+        let fut = this.mute_audio(source_kind.map(Into::into));
         future_to_promise(async move {
             fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
@@ -243,10 +243,13 @@ impl RoomHandle {
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
     /// [0]: crate::api::err::MediaStateTransitionException
-    pub fn unmute_audio(&self) -> Promise {
+    pub fn unmute_audio(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> Promise {
         let this = self.0.clone();
 
-        let fut = this.unmute_audio();
+        let fut = this.unmute_audio(source_kind.map(Into::into));
         future_to_promise(async move {
             fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
@@ -315,10 +318,13 @@ impl RoomHandle {
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
     /// [0]: crate::api::err::MediaStateTransitionException
-    pub fn disable_audio(&self) -> Promise {
+    pub fn disable_audio(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> Promise {
         let this = self.0.clone();
 
-        let fut = this.disable_audio();
+        let fut = this.disable_audio(source_kind.map(Into::into));
         future_to_promise(async move {
             fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
@@ -342,10 +348,13 @@ impl RoomHandle {
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
     /// [0]: crate::api::err::MediaStateTransitionException
-    pub fn enable_audio(&self) -> Promise {
+    pub fn enable_audio(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> Promise {
         let this = self.0.clone();
 
-        let fut = this.enable_audio();
+        let fut = this.enable_audio(source_kind.map(Into::into));
         future_to_promise(async move {
             fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
@@ -423,10 +432,13 @@ impl RoomHandle {
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
     /// [0]: crate::api::err::MediaStateTransitionException
-    pub fn disable_remote_audio(&self) -> Promise {
+    pub fn disable_remote_audio(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> Promise {
         let this = self.0.clone();
 
-        let fut = this.disable_remote_audio();
+        let fut = this.disable_remote_audio(source_kind.map(Into::into));
         future_to_promise(async move {
             fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
@@ -474,10 +486,13 @@ impl RoomHandle {
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
     /// [0]: crate::api::err::MediaStateTransitionException
-    pub fn enable_remote_audio(&self) -> Promise {
+    pub fn enable_remote_audio(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> Promise {
         let this = self.0.clone();
 
-        let fut = this.enable_remote_audio();
+        let fut = this.enable_remote_audio(source_kind.map(Into::into));
         future_to_promise(async move {
             fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)

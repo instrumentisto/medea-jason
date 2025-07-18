@@ -12,7 +12,7 @@ use medea_client_api_proto::MediaType;
 #[doc(inline)]
 pub use self::{
     constraints::{
-        AudioMediaTracksSettings, AudioTrackConstraints,
+        AudioMediaTracksSettings, AudioSource, AudioTrackConstraints,
         DeviceVideoTrackConstraints, DisplayVideoTrackConstraints, FacingMode,
         LocalTracksConstraints, MediaStreamSettings,
         MultiSourceTracksConstraints, NoiseSuppressionLevel, RecvConstraints,

@@ -16,7 +16,7 @@ use medea_jason::{
 };
 use wasm_bindgen_test::*;
 
-use crate::get_media_stream_settings;
+use crate::{MediaSourceKind, get_media_stream_settings};
 
 wasm_bindgen_test_configure!(run_in_browser);
 
@@ -35,7 +35,10 @@ async fn sendrecv_works() {
         },
         media_direction: MediaDirection::SendRecv.into(),
         muted: false,
-        media_type: MediaType::Audio(AudioSettings { required: false }),
+        media_type: MediaType::Audio(AudioSettings {
+            required: false,
+            source_kind: MediaSourceKind::Device,
+        }),
     };
     let recv_audio_track = Track {
         id: TrackId(2),
@@ -45,7 +48,10 @@ async fn sendrecv_works() {
         },
         media_direction: MediaDirection::SendRecv.into(),
         muted: false,
-        media_type: MediaType::Audio(AudioSettings { required: false }),
+        media_type: MediaType::Audio(AudioSettings {
+            required: false,
+            source_kind: MediaSourceKind::Device,
+        }),
     };
     media_connections
         .create_tracks(
