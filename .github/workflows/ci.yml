@@ -27,6 +27,7 @@ jobs:
     needs:
       - build-jason
       - build-jason-linux
+      - check-codegen
       - clippy
       - dartanalyze
       - dartfmt
@@ -136,7 +137,7 @@ jobs:
 
       - run: make cargo.fmt check=yes
 
-  codegen:
+  check-codegen:
     strategy:
       matrix:
         include:
@@ -188,12 +189,6 @@ jobs:
           use-tool-cache: true
 
       - run: make cargo.gen crate=${{ matrix.crate }}
-
-      - run: make flutter.fmt
-        if: ${{ matrix.crate == 'medea-jason' }}
-
-      - run: make cargo.fmt
-        if: ${{ matrix.crate == 'medea-control-api-proto' }}
 
       - run: git status --short | (! read -t 1 -N 1)
 
