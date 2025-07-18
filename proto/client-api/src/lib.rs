@@ -1139,8 +1139,6 @@ pub struct AudioSettings {
     pub required: bool,
 
     /// Source kind of these [`AudioSettings`].
-    // TODO: remove this when server will support it.
-    #[serde(default = "MediaSourceKind::device")]
     pub source_kind: MediaSourceKind,
 }
 
@@ -1167,12 +1165,6 @@ pub enum MediaSourceKind {
 
     /// Media is obtained with screen-capture.
     Display,
-}
-
-impl MediaSourceKind {
-    fn device() -> MediaSourceKind {
-        MediaSourceKind::Device
-    }
 }
 
 /// [Scalability mode] preference for [SVC (Scalable Video Coding)][SVC].
