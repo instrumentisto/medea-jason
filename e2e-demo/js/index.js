@@ -143,6 +143,8 @@ let usernameMenuButton = document.getElementById('username-menu-button');
 let disableAudioSend = document.getElementById('control__disable_audio_send');
 let disableVideoSend = document.getElementById('control__disable_video_send');
 let disableAudioRecv = document.getElementById('control__disable_audio_recv');
+let disableDisplayAudioRecv = document.getElementById('control__disable_display_audio_recv');
+let disableDeviceAudioRecv = document.getElementById('control__disable_device_audio_recv');
 let disableVideoRecv = document.getElementById('control__disable_video_recv');
 let disableDisplayVideoRecv = document.getElementById('control__disable_display_video_recv');
 let disableCameraDisplayVideoRecv = document.getElementById('control__disable_camera_video_recv');
@@ -210,8 +212,6 @@ async function createRoom(roomId, memberId) {
           kind: 'Member',
           credentials: { plain: 'test' },
           pipeline: pipeline,
-          on_join: 'grpc://127.0.0.1:9099',
-          on_leave: 'grpc://127.0.0.1:9099'
         }
       }
     }
@@ -288,8 +288,6 @@ async function createMember(roomId, memberId) {
         kind: 'Member',
         credentials: { plain: 'test' },
         pipeline: pipeline,
-        on_join: 'grpc://127.0.0.1:9099',
-        on_leave: 'grpc://127.0.0.1:9099'
       }
     });
   } else {
@@ -303,8 +301,6 @@ async function createMember(roomId, memberId) {
             kind: 'Member',
             credentials: { plain: 'test' },
             pipeline: pipeline,
-            on_join: 'grpc://127.0.0.1:9099',
-            on_leave: 'grpc://127.0.0.1:9099'
           }
         }
       }
@@ -633,6 +629,8 @@ window.onload = async function() {
   let isAudioSendEnabled = true;
   let isVideoSendEnabled = true;
   let isAudioRecvEnabled = true;
+  let isDisplayAudioRecvEnabled = true;
+  let isDeviceAudioRecvEnabled = true;
   let isVideoRecvEnabled = true;
   let isDisplayVideoRecvEnabled = true;
   let isCameraVideoRecvEnabled = true;
@@ -894,21 +892,39 @@ window.onload = async function() {
             playElement.firstChild.srcObject = mediaStream;
           }
         } else {
-          playElement = memberVideoDiv.getElementsByClassName('audio')[0];
-          if (playElement === undefined) {
-            playElement = document.createElement('audio');
-            playElement.classList.add('audio', 'order-3');
-            playElement.controls = 'true';
-            playElement.autoplay = 'true';
-            if (track.media_direction() != 0) {
-              playElement.pause();
-              playElement.style.display = 'none';
+          if (track.media_source_kind() === rust.MediaSourceKind.Display) {
+            playElement = memberVideoDiv.getElementsByClassName('display-audio')[0];
+            if (playElement === undefined) {
+              playElement = document.createElement('audio');
+              playElement.classList.add('display-audio', 'order-3');
+              playElement.controls = 'true';
+              playElement.autoplay = 'true';
+              if (track.media_direction() !== 0) {
+                playElement.pause();
+                playElement.style.display = 'none';
+              }
+              memberVideoDiv.appendChild(playElement);
             }
-            memberVideoDiv.appendChild(playElement);
+            let mediaStream = new MediaStream();
+            mediaStream.addTrack(track.get_track());
+            playElement.srcObject = mediaStream;
+          } else {
+            playElement = memberVideoDiv.getElementsByClassName('device-audio')[0];
+            if (playElement === undefined) {
+              playElement = document.createElement('audio');
+              playElement.classList.add('device-audio', 'order-3');
+              playElement.controls = 'true';
+              playElement.autoplay = 'true';
+              if (track.media_direction() !== 0) {
+                playElement.pause();
+                playElement.style.display = 'none';
+              }
+              memberVideoDiv.appendChild(playElement);
+            }
+            let mediaStream = new MediaStream();
+            mediaStream.addTrack(track.get_track());
+            playElement.srcObject = mediaStream;
           }
-          let mediaStream = new MediaStream();
-          mediaStream.addTrack(track.get_track());
-          playElement.srcObject = mediaStream;
         }
 
         track.on_media_direction_changed(async (direction) => {
@@ -1149,6 +1165,28 @@ window.onload = async function() {
         await room.enable_remote_audio();
         isAudioRecvEnabled = true;
         disableAudioRecv.textContent = 'Disable audio recv'
+      }
+    });
+    disableDisplayAudioRecv.addEventListener('click', async () => {
+      if (isDisplayAudioRecvEnabled) {
+        await room.disable_remote_audio(rust.MediaSourceKind.Display);
+        isDisplayAudioRecvEnabled = false;
+        disableDisplayAudioRecv.textContent = 'Enable display audio recv'
+      } else {
+        await room.enable_remote_audio(rust.MediaSourceKind.Display);
+        isDisplayAudioRecvEnabled = true;
+        disableDisplayAudioRecv.textContent = 'Disable display audio recv'
+      }
+    });
+    disableDeviceAudioRecv.addEventListener('click', async () => {
+      if (isDeviceAudioRecvEnabled) {
+        await room.disable_remote_audio(rust.MediaSourceKind.Device);
+        isDeviceAudioRecvEnabled = false;
+        disableDeviceAudioRecv.textContent = 'Enable device audio recv'
+      } else {
+        await room.enable_remote_audio(rust.MediaSourceKind.Device);
+        isDeviceAudioRecvEnabled = true;
+        disableDeviceAudioRecv.textContent = 'Disable device audio recv'
       }
     });
     disableVideoRecv.addEventListener('click', async () => {
