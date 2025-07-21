@@ -3,6 +3,14 @@
 
 All user visible changes to this project will be documented in this file. This project uses [Semantic Versioning 2.0.0].
 
+## master
+
+### Changed
+
+- Added `source_kind` to `AudioSettings`. ([#225])
+
+[#225]: https://github.com/instrumentisto/medea-jason/pull/225
+
 
 
 
