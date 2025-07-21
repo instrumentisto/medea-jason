@@ -5,7 +5,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ## master
 
-### Changed
+### BC Breaks
 
 - Added `source_kind` to `AudioSettings`. ([#225])
 
