@@ -6,9 +6,12 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.11.0] · 2025-07-17
+[0.11.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.10.0...master)
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.10.0...medea-jason-0.11.0)
+
+See also [`medea_jason` pub package 0.11.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0/flutter/CHANGELOG.md).
 
 ### BC Breaks
 
