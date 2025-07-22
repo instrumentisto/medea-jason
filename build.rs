@@ -148,7 +148,7 @@ use std::env;
 
 fn main() {
     if env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("macos") {
-        println!("cargo:rustc-env=MACOSX_DEPLOYMENT_TARGET=10.11");
+        println!("cargo:rustc-env=MACOSX_DEPLOYMENT_TARGET=10.15");
         println!(
             "cargo:rustc-link-arg=-Wl,-install_name,\
              @rpath/libmedea_jason.dylib"
