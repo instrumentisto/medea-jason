@@ -1,6 +1,6 @@
 [package]
 name = "medea-jason"
-version = "0.10.0"
+version = "0.11.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Client library for Medea media server."
@@ -62,7 +62,7 @@ simple_logger = "5.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 dart-sys = "4.1"
-flutter_rust_bridge = { version = "=2.10.0", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
+flutter_rust_bridge = { version = "=2.11.1", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
 libc = "0.2"
 send_wrapper = "0.6"
 # TODO: Replace `sync_unsafe_cell` with `std` once the following API is

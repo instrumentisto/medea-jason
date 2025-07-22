@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name        = 'medea_jason'
-  s.version     = '0.10.0'
+  s.version     = '0.11.0'
   s.summary     = 'Cross-platform client library of Medea media server for Flutter.'
   s.description = 'Cross-platform client library of Medea media server for Flutter.'
   s.homepage    = 'https://github.com/instrumentisto/medea-jason'
