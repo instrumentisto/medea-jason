@@ -16,14 +16,15 @@ See also [`medea_jason` pub package 0.11.0 changes](https://github.com/instrumen
 ### BC Breaks
 
 - Library API:
-    - Renamed `RoomHandle` to `RoomHandleImpl` ([#220]).
+    - Renamed `ConnectionHandle` to `ConnectionHandleImpl` ([#221]).
 
 ### Changed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 [#212]: https://github.com/instrumentisto/medea-jason/pull/212
-[#220]: https://github.com/instrumentisto/medea-jason/pull/220
+[#221]: https://github.com/instrumentisto/medea-jason/pull/221
+
 
 
 
