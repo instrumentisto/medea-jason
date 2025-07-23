@@ -40,7 +40,8 @@ use crate::{
     platform,
     rpc::{
         ClientDisconnect, CloseReason, ConnectionInfo,
-        ConnectionInfoParseError, ReconnectHandle, RpcSession, SessionError,
+        ConnectionInfoParseError, ReconnectHandleImpl, RpcSession,
+        SessionError,
     },
     utils::{AsProtoState as _, Caused},
 };
@@ -1501,7 +1502,7 @@ impl InnerRoom {
     fn handle_rpc_connection_lost(&self) {
         self.peers.connection_lost();
         self.on_connection_loss
-            .call1(ReconnectHandle::new(Rc::downgrade(&self.rpc)));
+            .call1(ReconnectHandleImpl::new(Rc::downgrade(&self.rpc)));
     }
 
     /// Sends [`Command::SynchronizeMe`] with a current Client state to the

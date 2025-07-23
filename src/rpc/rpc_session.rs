@@ -140,7 +140,7 @@ pub trait RpcSession {
     /// case of connection loss, client side user should select reconnection
     /// strategy with [`ReconnectHandle`] (or simply close [`Room`]).
     ///
-    /// [`ReconnectHandle`]: crate::rpc::ReconnectHandle
+    /// [`ReconnectHandle`]: crate::rpc::ReconnectHandleImpl
     /// [`Room`]: crate::room::Room
     fn on_connection_loss(&self) -> LocalBoxStream<'static, ()>;
 
