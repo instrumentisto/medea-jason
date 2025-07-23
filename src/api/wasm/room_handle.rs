@@ -21,7 +21,7 @@ use crate::{
 /// [`Room`]: room::Room
 #[wasm_bindgen]
 #[derive(Debug, From, Into)]
-pub struct RoomHandle(room::RoomHandle);
+pub struct RoomHandle(room::RoomHandleImpl);
 
 #[wasm_bindgen]
 impl RoomHandle {
