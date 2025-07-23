@@ -6,21 +6,18 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.11.0] · 2025-07-17
+[0.11.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.10.0...master)
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.10.0...medea-jason-0.11.0)
 
-### BC Breaks
-
-- Library API:
-    - Renamed `ReconnectHandle` to `ReconnectHandleImpl` ([#223]).
+See also [`medea_jason` pub package 0.11.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0/flutter/CHANGELOG.md).
 
 ### Changed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 [#212]: https://github.com/instrumentisto/medea-jason/pull/212
-[#223]: https://github.com/instrumentisto/medea-jason/pull/223
 
 
 
