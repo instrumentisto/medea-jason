@@ -543,7 +543,7 @@ impl MediaManagerHandle {
         this.enumerate_displays().await.map_err(tracerr::map_from_and_wrap!())
     }
 
-    /// Returns [`local::LocalMediaTrack`]s objects, built from the provided
+    /// Returns [`local::LocalMediaTrackImpl`]s objects, built from the provided
     /// [`MediaStreamSettings`].
     ///
     /// # Errors
@@ -555,7 +555,8 @@ impl MediaManagerHandle {
     pub async fn init_local_tracks(
         &self,
         caps: MediaStreamSettings,
-    ) -> Result<Vec<local::LocalMediaTrack>, Traced<InitLocalTracksError>> {
+    ) -> Result<Vec<local::LocalMediaTrackImpl>, Traced<InitLocalTracksError>>
+    {
         let this = self
             .0
             .upgrade()
@@ -565,7 +566,7 @@ impl MediaManagerHandle {
             .map(|tracks| {
                 tracks
                     .into_iter()
-                    .map(|(t, _)| local::LocalMediaTrack::new(t))
+                    .map(|(t, _)| local::LocalMediaTrackImpl::new(t))
                     .collect::<Vec<_>>()
             })
             .map_err(tracerr::map_from_and_wrap!())

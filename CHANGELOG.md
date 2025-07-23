@@ -16,14 +16,14 @@ See also [`medea_jason` pub package 0.11.0 changes](https://github.com/instrumen
 ### BC Breaks
 
 - Library API:
-    - Renamed `Jason` to `JasonImpl` ([#218]).
+    - Renamed `LocalMediaTrack` to `LocalMediaTrackImpl` ([#219]).
 
 ### Changed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 [#212]: https://github.com/instrumentisto/medea-jason/pull/212
-[#218]: https://github.com/instrumentisto/medea-jason/pull/218
+[#219]: https://github.com/instrumentisto/medea-jason/pull/219
 
 
 
