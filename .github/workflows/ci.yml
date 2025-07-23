@@ -26,8 +26,8 @@ jobs:
     if: ${{ github.event_name == 'pull_request'
       && needs.build-jason.result == 'success'
       && needs.build-jason-linux.result == 'success'
-      && needs.check-codegen.result == 'success'
       && needs.clippy.result == 'success'
+      && needs.codegen.result == 'success'
       && needs.dartanalyze.result == 'success'
       && needs.dartfmt.result == 'success'
       && needs.docker.result == 'success'
@@ -41,8 +41,8 @@ jobs:
     needs:
       - build-jason
       - build-jason-linux
-      - check-codegen
       - clippy
+      - codegen
       - dartanalyze
       - dartfmt
       - docker
@@ -106,52 +106,7 @@ jobs:
       - run: make cargo.lint workspace=yes
         if: ${{ matrix.platform == 'workspace' }}
 
-  dartanalyze:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-
-      - run: make flutter
-
-      - run: make flutter.lint
-
-  dartfmt:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-
-      - run: make flutter
-
-      - run: make flutter.fmt check=yes
-
-  helm-lint:
-    name: helm lint
-    if: ${{ github.ref == 'refs/heads/master'
-         || !startsWith(github.ref, 'refs/tags/medea-') }}
-    strategy:
-      matrix:
-        chart: ["medea-demo"]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: azure/setup-helm@v4
-
-      - run: make helm.lint chart=${{ matrix.chart }}
-
-  rustfmt:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: nightly
-          components: rustfmt
-
-      - run: make cargo.fmt check=yes
-
-  check-codegen:
+  codegen:
     strategy:
       matrix:
         include:
@@ -205,6 +160,52 @@ jobs:
       - run: make cargo.gen crate=${{ matrix.crate }}
 
       - run: git status --short | (! read -t 1 -N 1)
+
+  dartanalyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+
+      - run: make flutter
+
+      - run: make flutter.lint
+
+  dartfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+
+      - run: make flutter
+
+      - run: make flutter.fmt check=yes
+
+  helm-lint:
+    name: helm lint
+    if: ${{ github.ref == 'refs/heads/master'
+         || !startsWith(github.ref, 'refs/tags/medea-') }}
+    strategy:
+      matrix:
+        chart: ["medea-demo"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+
+      - run: make helm.lint chart=${{ matrix.chart }}
+
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
+          components: rustfmt
+
+      - run: make cargo.fmt check=yes
+
 
 
 
@@ -859,6 +860,7 @@ jobs:
       - build-jason
       - build-jason-linux
       - clippy
+      - codegen
       - dartanalyze
       - dartfmt
       - rustdoc
