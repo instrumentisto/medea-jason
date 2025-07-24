@@ -570,7 +570,7 @@ impl Object<Room> {
                 }
                 if (audio) {
                     let audio = new window.rust.AudioTrackConstraints();
-                    constraints.audio(audio);
+                    constraints.device_audio(audio);
                 }
                 let promise = room.room.set_local_media_settings(
                     constraints,
