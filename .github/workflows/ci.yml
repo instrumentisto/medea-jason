@@ -23,11 +23,26 @@ jobs:
   ################
 
   pr:
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request'
+         && needs.build-jason.result == 'success'
+         && needs.build-jason-linux.result == 'success'
+         && needs.clippy.result == 'success'
+         && needs.codegen.result == 'success'
+         && needs.dartanalyze.result == 'success'
+         && needs.dartfmt.result == 'success'
+         && needs.docker.result == 'success'
+         && needs.helm-lint.result == 'success'
+         && needs.rustdoc.result == 'success'
+         && needs.rustfmt.result == 'success'
+         && needs.test.result == 'success'
+         && needs.test-e2e-browser.result == 'success'
+         && needs.test-e2e-native.result == 'success'
+         && needs.test-flutter == 'success' }}
     needs:
       - build-jason
       - build-jason-linux
       - clippy
+      - codegen
       - dartanalyze
       - dartfmt
       - docker
@@ -90,6 +105,57 @@ jobs:
 
       - run: make cargo.lint workspace=yes
         if: ${{ matrix.platform == 'workspace' }}
+
+  codegen:
+    strategy:
+      matrix:
+        crate:
+          - medea-control-api-proto
+          - medea-jason
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+        if: ${{ matrix.crate == 'medea-jason' }}
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
+          components: rustfmt
+        if: ${{ matrix.crate == 'medea-control-api-proto' }}
+      - run: make rustup.targets only=android
+        if: ${{ matrix.crate == 'medea-jason' }}
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-ndk
+          use-tool-cache: true
+        if: ${{ matrix.crate == 'medea-jason' }}
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-expand
+          use-tool-cache: true
+
+      - uses: subosito/flutter-action@v2
+        if: ${{ matrix.crate == 'medea-jason' }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin  # Temurin is cached on GitHub Actions Runners.
+          java-version: 17
+          cache: gradle
+        if: ${{ matrix.crate == 'medea-jason' }}
+
+      - uses: arduino/setup-protoc@v3
+        with:
+          version: ${{ env.PROTOC_VER }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ matrix.crate == 'medea-control-api-proto' }}
+
+      - run: make cargo.gen crate=${{ matrix.crate }}
+
+      - run: git status --short | (! read -t 1 -N 1)
 
   dartanalyze:
     runs-on: ubuntu-latest
@@ -594,6 +660,10 @@ jobs:
         if: ${{ matrix.platform == 'android' }}
 
       - uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          # TODO: Remove once jetli/wasm-pack-action#23 is released:
+          #       https://github.com/jetli/wasm-pack-action/issues/23
+          version: 'v0.13.1'
         if: ${{ matrix.platform == 'web' }}
 
       - uses: dart-lang/setup-dart@v1
@@ -790,6 +860,7 @@ jobs:
       - build-jason
       - build-jason-linux
       - clippy
+      - codegen
       - dartanalyze
       - dartfmt
       - rustdoc
