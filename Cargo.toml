@@ -42,8 +42,9 @@ backoff = { version = "0.4", features = ["futures"] }
 bitflags = "2.8"
 derivative = "2.2"
 derive_more = { version = "2.0", features = ["as_ref", "debug", "deref", "display", "from", "into", "mul"] }
-# TODO: Move this dep to `[target.'cfg(not(target_family = "wasm"))'.dependencies]`
-#       after fzyzcjy/flutter_rust_bridge#2805 will be released
+# TODO: Move this to `[target.'cfg(not(target_family = "wasm"))'.dependencies]`
+#       after fzyzcjy/flutter_rust_bridge#2805 will be released:
+#       http://github.com/fzyzcjy/flutter_rust_bridge/issues/2805
 flutter_rust_bridge = { version = "=2.11.1", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
 futures = "0.3"
 log = "0.4"
