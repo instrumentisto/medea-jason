@@ -356,7 +356,7 @@ impl TryFrom<TracksRequest> for SimpleTracksRequest {
         } else if value.device_video.is_empty()
             && value.display_video.is_empty()
             && value.device_audio.is_empty()
-            && value.display_video.is_empty()
+            && value.display_audio.is_empty()
         {
             return Err(NoTracks);
         }
