@@ -114,8 +114,9 @@ async fn when_enables_or_mutes(
     let media_kind = parse_media_kind(&audio_or_video);
     let source_kind = match media_kind {
         // Enabling `Display` audio without `Display` video results in error.
-        MediaKind::Audio => Some(MediaSourceKind::Device),
-        MediaKind::Video => None,
+        Some(MediaKind::Audio) => Some(MediaSourceKind::Device),
+        Some(MediaKind::Video) => None,
+        None => unreachable!(),
     };
 
     let result = match action.as_str() {
