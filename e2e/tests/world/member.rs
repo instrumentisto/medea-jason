@@ -217,7 +217,7 @@ impl Member {
     pub fn count_of_tracks_between_members(&self, other: &Self) -> (u64, u64) {
         if env::var("SFU").is_ok() {
             // All transceivers are always `sendrecv` in SFU mode.
-            return (3, 3);
+            return (4, 4);
         }
 
         let send_count = self
