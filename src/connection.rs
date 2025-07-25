@@ -498,7 +498,8 @@ impl ConnectionHandle {
                 inner.on_quality_score_update.set_func(f);
 
                 if inner.connection_mode == ConnectionMode::Sfu {
-                    // `on_quality_score_update()` isn't implemented for `SFU` mode.
+                    // `on_quality_score_update()` isn't implemented for `SFU`
+                    // mode.
                     // So we are manually refreshing quality score.
                     // See `instrumentisto/medea-jason#227`.
                     Connection(inner).refresh_client_conn_quality_score();
