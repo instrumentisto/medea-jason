@@ -12,8 +12,8 @@ use futures::{
     stream::LocalBoxStream,
 };
 use medea_client_api_proto::{
-    self as proto, ConnectionQualityScore, MemberId, PeerConnectionState,
-    TrackId,
+    self as proto, ConnectionMode, ConnectionQualityScore, MemberId,
+    PeerConnectionState, TrackId,
 };
 use tracerr::Traced;
 
@@ -110,6 +110,7 @@ impl Connections {
         &self,
         track_id: &TrackId,
         partner_members: HashSet<MemberId>,
+        connection_mode: ConnectionMode,
     ) -> Vec<Connection> {
         if let Some(partners) =
             self.tracks_to_members.borrow_mut().get_mut(track_id)
@@ -143,6 +144,7 @@ impl Connections {
                     let connection = Connection::new(
                         mid.clone(),
                         &self.room_recv_constraints,
+                        connection_mode,
                     );
                     self.on_new_connection.call1(connection.new_handle());
                     drop(connections.insert(mid.clone(), connection));
@@ -175,7 +177,7 @@ impl Connections {
                 .collect();
         }
 
-        self.add_connections(*track_id, &partner_members)
+        self.add_connections(*track_id, &partner_members, connection_mode)
     }
 
     /// Adds information about related [`Track`]s with the provided [`TrackId`]
@@ -189,6 +191,7 @@ impl Connections {
         &self,
         track_id: TrackId,
         partner_members: &HashSet<MemberId>,
+        connection_mode: ConnectionMode,
     ) -> Vec<Connection> {
         let mut connections = self.members_to_conns.borrow_mut();
 
@@ -204,6 +207,7 @@ impl Connections {
                 let connection = Connection::new(
                     partner.clone(),
                     &self.room_recv_constraints,
+                    connection_mode,
                 );
                 self.on_new_connection.call1(connection.new_handle());
                 drop(connections.insert(partner.clone(), connection));
@@ -359,6 +363,13 @@ struct InnerConnection {
 
     /// Callback invoked when a [`ConnectionQualityScore`] is updated.
     on_quality_score_update: platform::Callback<u8>,
+
+    /// Indicator whether this `Connection` is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    connection_mode: ConnectionMode,
 
     /// Callback invoked when this [`Connection`] is closed.
     on_close: platform::Callback<()>,
@@ -600,6 +611,7 @@ impl Connection {
     pub fn new(
         remote_id: MemberId,
         room_recv_constraints: &Rc<RecvConstraints>,
+        connection_mode: ConnectionMode,
     ) -> Self {
         // Clone initial incoming media constraints.
         let recv_constraints = Rc::new(room_recv_constraints.as_ref().clone());
@@ -631,6 +643,7 @@ impl Connection {
             peer_state: Cell::default(),
             on_quality_score_update: platform::Callback::default(),
             recv_constraints,
+            connection_mode,
             on_close: platform::Callback::default(),
             on_remote_track_added: platform::Callback::default(),
             receivers: RefCell::default(),
@@ -717,6 +730,13 @@ impl Connection {
     /// Refreshes the [`ClientConnectionQualityScore`] of this [`Connection`].
     fn refresh_client_conn_quality_score(&self) {
         use PeerConnectionState as S;
+
+        match self.0.connection_mode {
+            // `on_quality_score_update()` isn't implemented for `SFU` mode.
+            // See `instrumentisto/medea-jason#227`.
+            ConnectionMode::Sfu => return,
+            ConnectionMode::Mesh => (),
+        }
 
         let state = self.0.peer_state.get();
         let quality_score = self.0.quality_score.get();
