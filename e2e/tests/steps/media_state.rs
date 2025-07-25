@@ -111,45 +111,30 @@ async fn when_enables_or_mutes(
         AwaitCompletion::Dont
     };
 
+    let media_kind = parse_media_kind(&audio_or_video);
+    let source_kind = match media_kind {
+        // Enabling `Display` audio without `Display` video results in error.
+        MediaKind::Audio => Some(MediaSourceKind::Device),
+        MediaKind::Video => None,
+    };
+
     let result = match action.as_str() {
         "enables" => {
             member
-                .toggle_media(
-                    parse_media_kind(&audio_or_video),
-                    None,
-                    true,
-                    maybe_await,
-                )
+                .toggle_media(media_kind, source_kind, true, maybe_await)
                 .await
         }
         "disables" => {
             member
-                .toggle_media(
-                    parse_media_kind(&audio_or_video),
-                    None,
-                    false,
-                    maybe_await,
-                )
+                .toggle_media(media_kind, source_kind, false, maybe_await)
                 .await
         }
         "mutes" => {
-            member
-                .toggle_mute(
-                    parse_media_kind(&audio_or_video),
-                    None,
-                    true,
-                    maybe_await,
-                )
-                .await
+            member.toggle_mute(media_kind, source_kind, true, maybe_await).await
         }
         _ => {
             member
-                .toggle_mute(
-                    parse_media_kind(&audio_or_video),
-                    None,
-                    false,
-                    maybe_await,
-                )
+                .toggle_mute(media_kind, source_kind, false, maybe_await)
                 .await
         }
     };
