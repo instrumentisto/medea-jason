@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use cucumber::{given, then, when};
 use medea_e2e::object::{
-    AwaitCompletion, MediaSourceKind, remote_track::MediaDirection,
+    AwaitCompletion, MediaKind, MediaSourceKind, remote_track::MediaDirection,
 };
 use tokio::time::timeout;
 
