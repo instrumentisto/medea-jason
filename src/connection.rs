@@ -111,6 +111,7 @@ impl Connections {
         track_id: &TrackId,
         partner_members: HashSet<MemberId>,
         connection_mode: ConnectionMode,
+        peer_state: PeerConnectionState,
     ) -> Vec<Connection> {
         if let Some(partners) =
             self.tracks_to_members.borrow_mut().get_mut(track_id)
@@ -145,6 +146,7 @@ impl Connections {
                         mid.clone(),
                         &self.room_recv_constraints,
                         connection_mode,
+                        peer_state,
                     );
                     self.on_new_connection.call1(connection.new_handle());
                     drop(connections.insert(mid.clone(), connection));
@@ -177,7 +179,12 @@ impl Connections {
                 .collect();
         }
 
-        self.add_connections(*track_id, &partner_members, connection_mode)
+        self.add_connections(
+            *track_id,
+            &partner_members,
+            connection_mode,
+            peer_state,
+        )
     }
 
     /// Adds information about related [`Track`]s with the provided [`TrackId`]
@@ -192,6 +199,7 @@ impl Connections {
         track_id: TrackId,
         partner_members: &HashSet<MemberId>,
         connection_mode: ConnectionMode,
+        peer_state: PeerConnectionState,
     ) -> Vec<Connection> {
         let mut connections = self.members_to_conns.borrow_mut();
 
@@ -208,6 +216,7 @@ impl Connections {
                     partner.clone(),
                     &self.room_recv_constraints,
                     connection_mode,
+                    peer_state,
                 );
                 self.on_new_connection.call1(connection.new_handle());
                 drop(connections.insert(partner.clone(), connection));
@@ -484,10 +493,18 @@ impl ConnectionHandle {
         &self,
         f: platform::Function<u8>,
     ) -> Result<(), Traced<HandleDetachedError>> {
-        self.0
-            .upgrade()
-            .ok_or_else(|| tracerr::new!(HandleDetachedError))
-            .map(|inner| inner.on_quality_score_update.set_func(f))
+        self.0.upgrade().ok_or_else(|| tracerr::new!(HandleDetachedError)).map(
+            |inner| {
+                inner.on_quality_score_update.set_func(f);
+
+                if inner.connection_mode == ConnectionMode::Sfu {
+                    // `on_quality_score_update()` isn't implemented for `SFU` mode.
+                    // So we are manually refreshing quality score.
+                    // See `instrumentisto/medea-jason#227`.
+                    Connection(inner).refresh_client_conn_quality_score();
+                }
+            },
+        )
     }
 
     /// Enables inbound video in this [`Connection`].
@@ -612,6 +629,7 @@ impl Connection {
         remote_id: MemberId,
         room_recv_constraints: &Rc<RecvConstraints>,
         connection_mode: ConnectionMode,
+        peer_state: PeerConnectionState,
     ) -> Self {
         // Clone initial incoming media constraints.
         let recv_constraints = Rc::new(room_recv_constraints.as_ref().clone());
@@ -640,7 +658,7 @@ impl Connection {
             remote_id,
             quality_score: Cell::default(),
             client_quality_score: Cell::default(),
-            peer_state: Cell::default(),
+            peer_state: Cell::new(Some(peer_state)),
             on_quality_score_update: platform::Callback::default(),
             recv_constraints,
             connection_mode,
@@ -731,22 +749,23 @@ impl Connection {
     fn refresh_client_conn_quality_score(&self) {
         use PeerConnectionState as S;
 
-        match self.0.connection_mode {
-            // `on_quality_score_update()` isn't implemented for `SFU` mode.
-            // See `instrumentisto/medea-jason#227`.
-            ConnectionMode::Sfu => return,
-            ConnectionMode::Mesh => (),
-        }
-
         let state = self.0.peer_state.get();
         let quality_score = self.0.quality_score.get();
         let score = match (state, quality_score) {
             (Some(S::Connected), Some(quality_score)) => quality_score.into(),
+            (Some(S::Connected), None) => match self.0.connection_mode {
+                // `on_quality_score_update()` isn't implemented for `SFU` mode.
+                // So we are manually refreshing quality score.
+                // See `instrumentisto/medea-jason#227`.
+                ConnectionMode::Sfu => ClientConnectionQualityScore::Connected(
+                    ConnectionQualityScore::High,
+                ),
+                ConnectionMode::Mesh => return,
+            },
             (Some(S::Disconnected | S::Failed | S::Closed), _) => {
                 ClientConnectionQualityScore::Disconnected
             }
-            (Some(S::Connecting | S::New) | None, _)
-            | (Some(S::Connected), None) => return,
+            (Some(S::Connecting | S::New) | None, _) => return,
         };
 
         let is_score_changed =
