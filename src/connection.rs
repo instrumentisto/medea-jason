@@ -498,9 +498,9 @@ impl ConnectionHandle {
                 inner.on_quality_score_update.set_func(f);
 
                 if inner.connection_mode == ConnectionMode::Sfu {
-                    // `on_quality_score_update()` isn't implemented for `SFU`
-                    // mode.
-                    // So we are manually refreshing quality score.
+                    // `on_quality_score_update()` isn't called for new `SFU`
+                    // connections.
+                    // So we are manually refreshing quality score here.
                     // See `instrumentisto/medea-jason#227`.
                     Connection(inner).refresh_client_conn_quality_score();
                 }
@@ -756,7 +756,7 @@ impl Connection {
             (Some(S::Connected), Some(quality_score)) => quality_score.into(),
             (Some(S::Connected), None) => match self.0.connection_mode {
                 // `on_quality_score_update()` isn't implemented for `SFU` mode.
-                // So we are manually refreshing quality score.
+                // So we are manually setting quality score.
                 // See `instrumentisto/medea-jason#227`.
                 ConnectionMode::Sfu => ClientConnectionQualityScore::Connected(
                     ConnectionQualityScore::High,
