@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use cucumber::{given, then, when};
 use medea_e2e::object::{
-    AwaitCompletion, MediaKind, MediaSourceKind, remote_track::MediaDirection,
+    AwaitCompletion, MediaSourceKind, remote_track::MediaDirection,
 };
 use tokio::time::timeout;
 
@@ -111,31 +111,45 @@ async fn when_enables_or_mutes(
         AwaitCompletion::Dont
     };
 
-    let media_kind = parse_media_kind(&audio_or_video);
-    let source_kind = match media_kind {
-        // Enabling `Display` audio without `Display` video results in error.
-        Some(MediaKind::Audio) => Some(MediaSourceKind::Device),
-        Some(MediaKind::Video) => None,
-        None => unreachable!(),
-    };
-
     let result = match action.as_str() {
         "enables" => {
             member
-                .toggle_media(media_kind, source_kind, true, maybe_await)
+                .toggle_media(
+                    parse_media_kind(&audio_or_video),
+                    None,
+                    true,
+                    maybe_await,
+                )
                 .await
         }
         "disables" => {
             member
-                .toggle_media(media_kind, source_kind, false, maybe_await)
+                .toggle_media(
+                    parse_media_kind(&audio_or_video),
+                    None,
+                    false,
+                    maybe_await,
+                )
                 .await
         }
         "mutes" => {
-            member.toggle_mute(media_kind, source_kind, true, maybe_await).await
+            member
+                .toggle_mute(
+                    parse_media_kind(&audio_or_video),
+                    None,
+                    true,
+                    maybe_await,
+                )
+                .await
         }
         _ => {
             member
-                .toggle_mute(media_kind, source_kind, false, maybe_await)
+                .toggle_mute(
+                    parse_media_kind(&audio_or_video),
+                    None,
+                    false,
+                    maybe_await,
+                )
                 .await
         }
     };
