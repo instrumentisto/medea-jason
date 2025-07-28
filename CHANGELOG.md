@@ -44,16 +44,7 @@ See also [`medea_jason` pub package 0.11.0 changes](https://github.com/instrumen
     - `ConnectionHandle.get_state()` method ([#213])
     - `ConnectionHandle.on_state_change()` callback for state updates triggered by P2P state changes. ([#213])
 
-### Changed
-
-- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
-
-### Changed
-
-- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
-
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
-[#212]: https://github.com/instrumentisto/medea-jason/pull/212
 [#213]: https://github.com/instrumentisto/medea-jason/pull/213
 
 

@@ -39,13 +39,21 @@ pub enum PeerConnectionState {
     /// [`IceConnectionState::Disconnected`] state and none of the other
     /// transports are in the state [`IceConnectionState::Failed`] or
     /// [`IceConnectionState::Checking`].
+    ///
+    /// It's not a terminal state, and it can go back to `Connecting`
+    /// and then `Connected` on its own.
     Disconnected = 4,
 
     /// One or more of the ICE transports on the connection is in the
     /// [`IceConnectionState::Failed`] state.
+    ///
+    /// It's not a terminal state, and it can be fixed with ICE restart if
+    /// signalling connection is alive.
     Failed = 5,
 
     /// The `PeerConnection` is closed.
+    ///
+    /// It's a terminal state.
     Closed = 6,
 }
 
