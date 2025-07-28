@@ -48,6 +48,10 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
 
   /// Returns `MemberConnectionState` of the [`Connection`].
   ///
+  /// <div class="warning">
+  /// NOTE: this method only works in `P2P` mode and is subject to change.
+  /// </div>
+  ///
   /// # Errors
   ///
   /// If the [`core::ConnectionHandle::get_state()`] method errors.
@@ -83,6 +87,10 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
 
   /// Sets a callback to be invoked once a state of associated [`Connection`]
   /// is changed.
+  ///
+  /// <div class="warning">
+  /// NOTE: this method only works in `P2P` mode and is subject to change.
+  /// </div>
   ///
   /// # Errors
   ///
