@@ -265,7 +265,8 @@ impl Member {
                                 .await?;
                             self.enabled_audio = true;
                         }
-                        // Enabling `Display` audio without `Display` video results in error.
+                        // Enabling `Display` audio without `Display` video
+                        // results in error.
                         Some(MediaSourceKind::Display) => (),
                     },
                     MediaKind::Video => {
