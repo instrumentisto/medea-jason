@@ -6,6 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
+
+### Changed
+
+- Library API:
+    - `ConnectionHandle.get_state()` method ([#213])
+    - `ConnectionHandle.on_state_change()` callback for state updates triggered by P2P state changes. ([#213])
+
+[#213]: https://github.com/instrumentisto/medea-jason/pull/213
+
+
+
+
 ## [0.11.0] · 2025-07-17
 [0.11.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0/flutter
 
@@ -51,10 +66,6 @@ See also [`medea-jason` crate 0.10.0 changes](https://github.com/instrumentisto/
     - `LocalMediaTrack.setNoiseSuppressionLevel()`, `LocalMediaTrack.getNoiseSuppressionLevel()` to inspect and configure noise suppression level (only supported on desktop platforms).
     - `LocalMediaTrack.setHighPassFilterEnabled()`, `LocalMediaTrack.isHighPassFilterEnabledO()` to inspect and toggle high-pass filter (only supported on desktop platforms).
 
-### Changed
-
-- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
-
 ### Upgraded
 
 - Dependencies:
@@ -62,7 +73,6 @@ See also [`medea-jason` crate 0.10.0 changes](https://github.com/instrumentisto/
 
 [#206]: https://github.com/instrumentisto/medea-jason/pull/206
 [#208]: https://github.com/instrumentisto/medea-jason/pull/208
-[#212]: https://github.com/instrumentisto/medea-jason/pull/212
 
 
 
