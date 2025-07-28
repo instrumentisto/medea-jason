@@ -35,7 +35,7 @@ use crate::{
 #[derive(Caused, Clone, Copy, Debug, Display, From)]
 #[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
-    /// [`ConnectionHandle`]'s [`Weak`] pointer is detached.
+    /// [`ConnectionHandleImpl`]'s [`Weak`] pointer is detached.
     #[display("`ConnectionHandle` is in detached state")]
     Detached,
 
@@ -296,7 +296,7 @@ impl Connections {
     }
 }
 
-/// Error of [`ConnectionHandle`]'s [`Weak`] pointer being detached.
+/// Error of [`ConnectionHandleImpl`]'s [`Weak`] pointer being detached.
 #[derive(Caused, Clone, Copy, Debug, Display)]
 #[cause(error = platform::Error)]
 #[display("`ConnectionHandle` is in detached state")]
@@ -306,7 +306,7 @@ pub struct HandleDetachedError;
 ///
 /// Actually, represents a [`Weak`]-based handle to `InnerConnection`.
 #[derive(Clone, Debug)]
-pub struct ConnectionHandle(Weak<InnerConnection>);
+pub struct ConnectionHandleImpl(Weak<InnerConnection>);
 
 /// Estimated [`Connection`]'s quality on the client side only.
 #[derive(Clone, Copy, Debug, Display, Eq, From, Ord, PartialEq, PartialOrd)]
@@ -333,7 +333,8 @@ impl ClientConnectionQualityScore {
 
 /// Actual data of a connection with a specific remote `Member`.
 ///
-/// Shared between external [`ConnectionHandle`] and Rust side [`Connection`].
+/// Shared between external [`ConnectionHandleImpl`] and Rust side
+/// [`Connection`].
 #[derive(Debug)]
 struct InnerConnection {
     /// Remote `Member` ID.
@@ -417,7 +418,7 @@ impl InnerConnection {
     }
 }
 
-impl ConnectionHandle {
+impl ConnectionHandleImpl {
     /// Sets callback, invoked when this `Connection` will close.
     ///
     /// # Errors
@@ -487,8 +488,8 @@ impl ConnectionHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`ConnectionHandle::disable_remote_video()`] was called while enabling
-    /// or a media server didn't approve this state transition.
+    /// [`ConnectionHandleImpl::disable_remote_video()`] was called while
+    /// enabling or a media server didn't approve this state transition.
     pub fn enable_remote_video(
         &self,
         source_kind: Option<MediaSourceKind>,
@@ -508,8 +509,8 @@ impl ConnectionHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`ConnectionHandle::enable_remote_video()`] was called while disabling
-    /// or a media server didn't approve this state transition.
+    /// [`ConnectionHandleImpl::enable_remote_video()`] was called while
+    /// disabling or a media server didn't approve this state transition.
     pub fn disable_remote_video(
         &self,
         source_kind: Option<MediaSourceKind>,
@@ -529,8 +530,8 @@ impl ConnectionHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`ConnectionHandle::disable_remote_audio()`] was called while enabling
-    /// or a media server didn't approve this state transition.
+    /// [`ConnectionHandleImpl::disable_remote_audio()`] was called while
+    /// enabling or a media server didn't approve this state transition.
     pub fn enable_remote_audio(
         &self,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
@@ -549,8 +550,8 @@ impl ConnectionHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`ConnectionHandle::enable_remote_audio()`] was called while disabling
-    /// or a media server didn't approve this state transition.
+    /// [`ConnectionHandleImpl::enable_remote_audio()`] was called while
+    /// disabling or a media server didn't approve this state transition.
     pub fn disable_remote_audio(
         &self,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
@@ -692,8 +693,8 @@ impl Connection {
 
     /// Creates a new external handle to this [`Connection`].
     #[must_use]
-    pub fn new_handle(&self) -> ConnectionHandle {
-        ConnectionHandle(Rc::downgrade(&self.0))
+    pub fn new_handle(&self) -> ConnectionHandleImpl {
+        ConnectionHandleImpl(Rc::downgrade(&self.0))
     }
 
     /// Updates the [`ConnectionQualityScore`] of this [`Connection`].

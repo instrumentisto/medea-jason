@@ -21,7 +21,7 @@ use crate::{
 /// [`Room`]: room::Room
 #[wasm_bindgen]
 #[derive(Debug, From, Into)]
-pub struct RoomHandle(room::RoomHandle);
+pub struct RoomHandle(room::RoomHandleImpl);
 
 #[wasm_bindgen]
 impl RoomHandle {
@@ -86,7 +86,7 @@ impl RoomHandle {
     /// With a [`StateError`] if the underlying pointer has been freed.
     ///
     /// [`Room`]: room::Room
-    /// [`RoomCloseReason`]: room::RoomCloseReason
+    /// [`RoomCloseReason`]: room::RoomCloseReasonImpl
     /// [`StateError`]: crate::api::err::StateError
     pub fn on_close(&self, cb: js_sys::Function) -> Result<(), JsValue> {
         self.0.on_close(cb.into()).map_err(Error::from).map_err(Into::into)
