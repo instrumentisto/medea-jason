@@ -2163,10 +2163,12 @@ impl SseDecode for crate::api::dart::api::ApiMediaStreamSettings {
     fn sse_decode(
         deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
     ) -> Self {
-        let mut var_audio =
-            <Option<crate::api::dart::api::ApiAudioConstraints>>::sse_decode(
-                deserializer,
-            );
+        let mut var_deviceAudio = <Option<
+            crate::api::dart::api::ApiAudioConstraints,
+        >>::sse_decode(deserializer);
+        let mut var_displayAudio = <Option<
+            crate::api::dart::api::ApiAudioConstraints,
+        >>::sse_decode(deserializer);
         let mut var_deviceVideo = <Option<
             crate::api::dart::api::ApiDeviceVideoTrackConstraints,
         >>::sse_decode(deserializer);
@@ -2174,7 +2176,8 @@ impl SseDecode for crate::api::dart::api::ApiMediaStreamSettings {
             crate::api::dart::api::ApiDisplayVideoTrackConstraints,
         >>::sse_decode(deserializer);
         return crate::api::dart::api::ApiMediaStreamSettings {
-            audio: var_audio,
+            device_audio: var_deviceAudio,
+            display_audio: var_displayAudio,
             device_video: var_deviceVideo,
             display_video: var_displayVideo,
         };
@@ -3092,7 +3095,8 @@ impl flutter_rust_bridge::IntoDart
 {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.audio.into_into_dart().into_dart(),
+            self.device_audio.into_into_dart().into_dart(),
+            self.display_audio.into_into_dart().into_dart(),
             self.device_video.into_into_dart().into_dart(),
             self.display_video.into_into_dart().into_dart(),
         ]
@@ -3756,7 +3760,12 @@ impl SseEncode for crate::api::dart::api::ApiMediaStreamSettings {
         serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
     ) {
         <Option<crate::api::dart::api::ApiAudioConstraints>>::sse_encode(
-            self.audio, serializer,
+            self.device_audio,
+            serializer,
+        );
+        <Option<crate::api::dart::api::ApiAudioConstraints>>::sse_encode(
+            self.display_audio,
+            serializer,
         );
         <Option<crate::api::dart::api::ApiDeviceVideoTrackConstraints>>::sse_encode(self.device_video, serializer);
         <Option<crate::api::dart::api::ApiDisplayVideoTrackConstraints>>::sse_encode(self.display_video, serializer);

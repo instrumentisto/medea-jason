@@ -288,10 +288,15 @@ class ApiMediaDisplayDetails {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 class ApiMediaStreamSettings {
-  /// [MediaStreamConstraints][1] for the audio media type.
+  /// [MediaStreamConstraints][1] for the device audio media type.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-  ApiAudioConstraints? audio;
+  ApiAudioConstraints? deviceAudio;
+
+  /// [MediaStreamConstraints][1] for the display audio media type.
+  ///
+  /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
+  ApiAudioConstraints? displayAudio;
 
   /// [MediaStreamConstraints][1] for the device video media type.
   ///
@@ -303,18 +308,27 @@ class ApiMediaStreamSettings {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
   ApiDisplayVideoTrackConstraints? displayVideo;
 
-  ApiMediaStreamSettings({this.audio, this.deviceVideo, this.displayVideo});
+  ApiMediaStreamSettings({
+    this.deviceAudio,
+    this.displayAudio,
+    this.deviceVideo,
+    this.displayVideo,
+  });
 
   @override
   int get hashCode =>
-      audio.hashCode ^ deviceVideo.hashCode ^ displayVideo.hashCode;
+      deviceAudio.hashCode ^
+      displayAudio.hashCode ^
+      deviceVideo.hashCode ^
+      displayVideo.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ApiMediaStreamSettings &&
           runtimeType == other.runtimeType &&
-          audio == other.audio &&
+          deviceAudio == other.deviceAudio &&
+          displayAudio == other.displayAudio &&
           deviceVideo == other.deviceVideo &&
           displayVideo == other.displayVideo;
 }

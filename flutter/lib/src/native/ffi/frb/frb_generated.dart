@@ -3547,15 +3547,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ApiMediaStreamSettings dco_decode_api_media_stream_settings(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return ApiMediaStreamSettings(
-      audio: dco_decode_opt_box_autoadd_api_audio_constraints(arr[0]),
+      deviceAudio: dco_decode_opt_box_autoadd_api_audio_constraints(arr[0]),
+      displayAudio: dco_decode_opt_box_autoadd_api_audio_constraints(arr[1]),
       deviceVideo:
-          dco_decode_opt_box_autoadd_api_device_video_track_constraints(arr[1]),
+          dco_decode_opt_box_autoadd_api_device_video_track_constraints(arr[2]),
       displayVideo:
           dco_decode_opt_box_autoadd_api_display_video_track_constraints(
-            arr[2],
+            arr[3],
           ),
     );
   }
@@ -4272,7 +4273,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_audio = sse_decode_opt_box_autoadd_api_audio_constraints(
+    var var_deviceAudio = sse_decode_opt_box_autoadd_api_audio_constraints(
+      deserializer,
+    );
+    var var_displayAudio = sse_decode_opt_box_autoadd_api_audio_constraints(
       deserializer,
     );
     var var_deviceVideo =
@@ -4284,7 +4288,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           deserializer,
         );
     return ApiMediaStreamSettings(
-      audio: var_audio,
+      deviceAudio: var_deviceAudio,
+      displayAudio: var_displayAudio,
       deviceVideo: var_deviceVideo,
       displayVideo: var_displayVideo,
     );
@@ -5105,7 +5110,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_opt_box_autoadd_api_audio_constraints(self.audio, serializer);
+    sse_encode_opt_box_autoadd_api_audio_constraints(
+      self.deviceAudio,
+      serializer,
+    );
+    sse_encode_opt_box_autoadd_api_audio_constraints(
+      self.displayAudio,
+      serializer,
+    );
     sse_encode_opt_box_autoadd_api_device_video_track_constraints(
       self.deviceVideo,
       serializer,

@@ -16,6 +16,7 @@ void Function(Object, int, ForeignValue)? _setAudioConstraintValue;
 void Function(Object, int, Object)? _setVideoConstraint;
 void Function(Object, int, Object)? _setDisplayVideoConstraint;
 void Function(Object, int, Object)? _setAudioConstraint;
+void Function(Object, int, Object)? _setDisplayAudioConstraint;
 
 _ErrorSetterFnDart? _constraints__init_device_constraints__set_error;
 _ErrorSetterFnDart? _constraints__init_display_constraints__set_error;
@@ -26,6 +27,7 @@ _ErrorSetterFnDart? _constraints__set_audio_constraint_value__set_error;
 _ErrorSetterFnDart? _constraints__set_video_constraint__set_error;
 _ErrorSetterFnDart? _constraints__set_display_video_constraint__set_error;
 _ErrorSetterFnDart? _constraints__set_audio_constraint__set_error;
+_ErrorSetterFnDart? _constraints__set_display_audio_constraint__set_error;
 
 void registerFunction(
   DynamicLibrary dl, {
@@ -38,6 +40,7 @@ void registerFunction(
   required void Function(Object, int, Object) setVideoConstraint,
   required void Function(Object, int, Object) setDisplayVideoConstraint,
   required void Function(Object, int, Object) setAudioConstraint,
+  required void Function(Object, int, Object) setDisplayAudioConstraint,
 }) {
   _initDeviceConstraints = initDeviceConstraints;
   _initDisplayConstraints = initDisplayConstraints;
@@ -48,6 +51,7 @@ void registerFunction(
   _setVideoConstraint = setVideoConstraint;
   _setDisplayVideoConstraint = setDisplayVideoConstraint;
   _setAudioConstraint = setAudioConstraint;
+  _setDisplayAudioConstraint = setDisplayAudioConstraint;
 
   _constraints__init_device_constraints__set_error = dl
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
@@ -85,6 +89,10 @@ void registerFunction(
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
         'constraints__set_audio_constraint__set_error',
       );
+  _constraints__set_display_audio_constraint__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'constraints__set_display_audio_constraint__set_error',
+      );
 
   Pointer<NativeFunction<Handle Function()>> initDeviceConstraints_native =
       Pointer.fromFunction(_initDeviceConstraintsProxy);
@@ -110,9 +118,14 @@ void registerFunction(
   );
   Pointer<NativeFunction<Void Function(Handle, Int64, Handle)>>
   setAudioConstraint_native = Pointer.fromFunction(_setAudioConstraintProxy);
+  Pointer<NativeFunction<Void Function(Handle, Int64, Handle)>>
+  setDisplayAudioConstraint_native = Pointer.fromFunction(
+    _setDisplayAudioConstraintProxy,
+  );
 
   dl.lookupFunction<
     Void Function(
+      Pointer,
       Pointer,
       Pointer,
       Pointer,
@@ -133,6 +146,7 @@ void registerFunction(
       Pointer,
       Pointer,
       Pointer,
+      Pointer,
     )
   >('register_constraints')(
     initDeviceConstraints_native,
@@ -144,6 +158,7 @@ void registerFunction(
     setVideoConstraint_native,
     setDisplayVideoConstraint_native,
     setAudioConstraint_native,
+    setDisplayAudioConstraint_native,
   );
 }
 
@@ -224,6 +239,15 @@ void _setAudioConstraintProxy(Object arg0, int arg1, Object arg2) {
     return _setAudioConstraint!(arg0, arg1, arg2);
   } catch (e) {
     _constraints__set_audio_constraint__set_error!(e);
+    return;
+  }
+}
+
+void _setDisplayAudioConstraintProxy(Object arg0, int arg1, Object arg2) {
+  try {
+    return _setDisplayAudioConstraint!(arg0, arg1, arg2);
+  } catch (e) {
+    _constraints__set_display_audio_constraint__set_error!(e);
     return;
   }
 }
