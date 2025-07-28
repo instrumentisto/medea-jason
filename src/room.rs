@@ -53,7 +53,7 @@ type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 ///
 /// This struct is passed into [`RoomHandleImpl::on_close`] callback.
 #[derive(Debug, Into)]
-pub struct RoomCloseReason {
+pub struct RoomCloseReasonImpl {
     /// Reason of closing.
     pub(crate) reason: String,
 
@@ -68,8 +68,8 @@ pub struct RoomCloseReason {
     pub(crate) is_err: bool,
 }
 
-impl RoomCloseReason {
-    /// Creates a new [`RoomCloseReason`] with the provided [`CloseReason`].
+impl RoomCloseReasonImpl {
+    /// Creates a new [`RoomCloseReasonImpl`] with the provided [`CloseReason`].
     ///
     /// `is_err` may be `true` only on closing by client.
     ///
@@ -283,7 +283,7 @@ impl RoomHandleImpl {
     }
 
     /// Sets `on_close` callback, invoked on this [`Room`] close, providing a
-    /// [`RoomCloseReason`].
+    /// [`RoomCloseReasonImpl`].
     ///
     /// # Errors
     ///
@@ -1905,7 +1905,8 @@ impl Drop for InnerRoom {
             });
         }
 
-        self.on_close.call1(RoomCloseReason::new(*self.close_reason.borrow()));
+        self.on_close
+            .call1(RoomCloseReasonImpl::new(*self.close_reason.borrow()));
     }
 }
 
