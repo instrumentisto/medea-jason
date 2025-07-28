@@ -12,7 +12,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Changed
 
-- `ConnectionHandle.onQualityScoreUpdate()` callback now is being called with `ConnectionQualityScore::High` when `Connection` is in `SFU` mode. ([#228])
+- `ConnectionHandle.onQualityScoreUpdate()` callback is no longer being called when `Connection` is in `SFU` mode. ([#228])
 
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
 
