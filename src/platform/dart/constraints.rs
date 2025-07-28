@@ -97,6 +97,17 @@ mod constraints {
             ty: i64,
             audio: Dart_Handle,
         ) -> Result<(), Error>;
+
+        /// Specifies the provided nature and settings of a display `audio`
+        /// [MediaStreamTrack][1] to the given [MediaStreamConstraints][0].
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
+        /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+        pub fn set_display_audio_constraint(
+            constraints: Dart_Handle,
+            ty: i64,
+            audio: Dart_Handle,
+        ) -> Result<(), Error>;
     }
 }
 
@@ -272,6 +283,30 @@ impl DisplayMediaStreamConstraints {
                 self.0.get(),
                 ConstraintType::Optional as i64,
                 video.optional.get(),
+            )
+        }
+        .unwrap();
+    }
+
+    /// Specifies the provided nature and settings of an `audio`
+    /// [MediaStreamTrack][1] to these [`DisplayMediaStreamConstraints`].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    pub fn audio(&mut self, audio: AudioTrackConstraints) {
+        let audio = MediaTrackConstraints::from(audio);
+        unsafe {
+            constraints::set_display_audio_constraint(
+                self.0.get(),
+                ConstraintType::Mandatory as i64,
+                audio.mandatory.get(),
+            )
+        }
+        .unwrap();
+        unsafe {
+            constraints::set_display_audio_constraint(
+                self.0.get(),
+                ConstraintType::Optional as i64,
+                audio.optional.get(),
             )
         }
         .unwrap();

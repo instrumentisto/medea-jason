@@ -339,11 +339,17 @@ impl From<ApiDisplayVideoTrackConstraints>
 #[derive(Debug)]
 #[frb]
 pub struct ApiMediaStreamSettings {
-    /// [MediaStreamConstraints][1] for the audio media type.
+    /// [MediaStreamConstraints][1] for the device audio media type.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     #[frb(non_final)]
-    pub audio: Option<ApiAudioConstraints>,
+    pub device_audio: Option<ApiAudioConstraints>,
+
+    /// [MediaStreamConstraints][1] for the display audio media type.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
+    #[frb(non_final)]
+    pub display_audio: Option<ApiAudioConstraints>,
 
     /// [MediaStreamConstraints][1] for the device video media type.
     ///
@@ -361,10 +367,11 @@ pub struct ApiMediaStreamSettings {
 impl From<ApiMediaStreamSettings> for media::MediaStreamSettings {
     fn from(value: ApiMediaStreamSettings) -> Self {
         let mut res = Self::new();
-        // TODO: implement for display audio when
-        //       `instrumentisto/medea-flutter-webrtc#244` will be resolved.
-        if let Some(audio) = value.audio {
-            res.device_audio(audio.into());
+        if let Some(device) = value.device_audio {
+            res.device_audio(device.into());
+        }
+        if let Some(display) = value.display_audio {
+            res.display_audio(display.into());
         }
         if let Some(device) = value.device_video {
             res.device_video(device.into());

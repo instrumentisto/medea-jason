@@ -458,10 +458,11 @@ packages:
   medea_flutter_webrtc:
     dependency: "direct main"
     description:
-      name: medea_flutter_webrtc
-      sha256: "07852d01034108cf8b634c6b4e40a8e09b6f8080d97ce4695b587026ac60b808"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: add-win-system-audio-capture
+      resolved-ref: fcff3a7435675574b2299cde2f8625e9b16f3160
+      url: "https://github.com/instrumentisto/medea-flutter-webrtc.git"
+    source: git
     version: "0.15.1"
   medea_jason:
     dependency: "direct main"
