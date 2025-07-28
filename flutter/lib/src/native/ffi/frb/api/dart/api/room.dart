@@ -87,7 +87,7 @@ abstract class RoomHandle implements RustOpaqueInterface {
   ///
   /// # Errors
   ///
-  /// If the [`core::RoomHandle::on_close()`] method errors.
+  /// If the [`core::RoomHandleImpl::on_close()`] method errors.
   void onClose({required Object cb});
 
   /// Sets a callback to be invoked once a connection with a media server is
@@ -95,18 +95,18 @@ abstract class RoomHandle implements RustOpaqueInterface {
   ///
   /// # Errors
   ///
-  /// If the [`core::RoomHandle::on_connection_loss()`] method errors.
+  /// If the [`core::RoomHandleImpl::on_connection_loss()`] method errors.
   void onConnectionLoss({required Object cb});
 
   /// Sets a callback to be invoked on local media acquisition failures.
   ///
   /// # Errors
   ///
-  /// If the [`core::RoomHandle::on_failed_local_media()`] method errors.
+  /// If the [`core::RoomHandleImpl::on_failed_local_media()`] method errors.
   void onFailedLocalMedia({required Object cb});
 
-  /// Sets a callback to be invoked once a new [`LocalMediaTrack`] is added
-  /// to the provided [`Room`].
+  /// Sets a callback to be invoked once a new [`LocalMediaTrack`] is
+  /// added to the provided [`Room`].
   ///
   /// This might happen in such cases:
   /// 1. Media server initiates a media request.
@@ -116,7 +116,7 @@ abstract class RoomHandle implements RustOpaqueInterface {
   ///
   /// # Errors
   ///
-  /// If the [`core::RoomHandle::on_local_track()`] method errors.
+  /// If the [`core::RoomHandleImpl::on_local_track()`] method errors.
   ///
   /// [`enable_audio()`]: RoomHandle::enable_audio
   /// [`enable_video()`]: RoomHandle::enable_video
@@ -129,7 +129,7 @@ abstract class RoomHandle implements RustOpaqueInterface {
   ///
   /// # Errors
   ///
-  /// If the [`core::RoomHandle::on_new_connection()`] method errors.
+  /// If the [`core::RoomHandleImpl::on_new_connection()`] method errors.
   ///
   /// [`Connection`]: connection::Connection
   void onNewConnection({required Object cb});
