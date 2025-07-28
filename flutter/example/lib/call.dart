@@ -203,6 +203,7 @@ class Call {
     constraints.deviceAudio(audio);
     if (screenShare) {
       constraints.displayVideo(display);
+      constraints.displayAudio(audio);
     }
 
     _tracks = await _mediaManager.initLocalTracks(constraints);
