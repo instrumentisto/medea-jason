@@ -365,8 +365,8 @@ struct InnerConnection {
     /// Callback invoked when a [`ConnectionQualityScore`] is updated.
     on_quality_score_update: platform::Callback<u8>,
 
-    /// Indicator whether this `Connection` is working in a [P2P mesh] or [SFU]
-    /// mode.
+    /// Indicator whether this [`Connection`] is working in a [P2P mesh] or
+    /// [SFU] mode.
     ///
     /// [P2P mesh]: https://webrtcglossary.com/mesh
     /// [SFU]: https://webrtcglossary.com/sfu
@@ -733,8 +733,9 @@ impl Connection {
         use PeerConnectionState as S;
 
         match self.0.connection_mode {
-            // `on_quality_score_update()` isn't implemented for `SFU` mode.
-            // See `instrumentisto/medea-jason#227`.
+            // `on_quality_score_update()` isn't implemented for SFU mode.
+            // See instrumentisto/medea-jason#227 for the details:
+            // https://github.com/instrumentisto/medea-jason/issues/227
             ConnectionMode::Sfu => return,
             ConnectionMode::Mesh => (),
         }

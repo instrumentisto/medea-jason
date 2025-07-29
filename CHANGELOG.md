@@ -10,9 +10,9 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
 
-### Changed
+### Fixed
 
-- `ConnectionHandle.onQualityScoreUpdate()` callback is no longer being called when `Connection` is in `SFU` mode. ([#228])
+- `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
 
