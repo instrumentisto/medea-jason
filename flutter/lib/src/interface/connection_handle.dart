@@ -1,4 +1,5 @@
 import '/src/util/rust_handles_storage.dart';
+import 'enums.dart';
 import 'media_track.dart';
 
 /// External handler to a `Connection` with a remote `Member`.
@@ -10,6 +11,28 @@ abstract class ConnectionHandle implements SyncPlatformHandle {
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
   String getRemoteMemberId();
+
+
+  /// Returns `MemberConnectionState` of the [`Connection`].
+  ///
+  /// NOTE: this method only works in `P2P` mode and is subject to change.
+  ///
+  /// Throws a [StateError] if an underlying object has been disposed, e.g.
+  /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
+  /// `RoomHandle` that implicitly owns native object behind this
+  /// [ConnectionHandle].
+  MemberConnectionState? getState();
+
+  /// Sets a callback to be invoked once a state of associated `Connection`
+  /// is changed.
+  ///
+  /// NOTE: this method only works in `P2P` mode and is subject to change.
+  ///
+  /// Throws a [StateError] if an underlying object has been disposed, e.g.
+  /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
+  /// `RoomHandle` that implicitly owns native object behind this
+  /// [ConnectionHandle].
+  void onStateChange(void Function(MemberConnectionState) f);
 
   /// Sets callback, invoked when this `Connection` is closed.
   ///

@@ -1,5 +1,6 @@
 import 'package:medea_jason/src/native/remote_media_track.dart';
 import '../interface/connection_handle.dart';
+import '../interface/enums.dart';
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
@@ -20,6 +21,18 @@ class NativeConnectionHandle implements ConnectionHandle {
   @override
   String getRemoteMemberId() {
     return opaque.inner.getRemoteMemberId();
+  }
+
+  @override
+  MemberConnectionState? getState() {
+    return freezeState(opaque.inner.getState());
+  }
+
+  @override
+  void onStateChange(void Function(MemberConnectionState) f) {
+    opaque.inner.onStateChange(f: (t) {
+      f(freezeState(frb.MemberConnectionState.fromPtr(ptr: t.address))!);
+    });
   }
 
   @override
@@ -69,5 +82,33 @@ class NativeConnectionHandle implements ConnectionHandle {
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
     await (opaque.inner.disableRemoteVideo(sourceKind: kind) as Future);
+  }
+
+  MemberConnectionState? freezeState(frb.MemberConnectionState? state) {
+    if (state == null) {
+      return null;
+    }
+
+    switch (state) {
+      case frb.MemberConnectionState_P2P(:final field0):
+        return MemberConnectionState.p2p(freezePeerState(field0));
+    }
+  }
+
+  PeerConnectionState freezePeerState(frb.PeerConnectionState peerState) {
+    switch (peerState) {
+      case frb.PeerConnectionState.new_:
+        return PeerConnectionState.new_;
+      case frb.PeerConnectionState.connecting:
+        return PeerConnectionState.connecting;
+      case frb.PeerConnectionState.connected:
+        return PeerConnectionState.connected;
+      case frb.PeerConnectionState.disconnected:
+        return PeerConnectionState.disconnected;
+      case frb.PeerConnectionState.failed:
+        return PeerConnectionState.failed;
+      case frb.PeerConnectionState.closed:
+        return PeerConnectionState.closed;
+    }
   }
 }
