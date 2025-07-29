@@ -88,7 +88,6 @@ impl MemberConnectionState {
     /// Returns the [`Connection`]'s mode.
     #[must_use]
     pub fn kind(&self) -> MemberConnectionStateKind {
-        web_sys::console::log_1(&format!("Call to kind()").into());
         match self.0 {
             core::MemberConnectionState::P2P(_) => {
                 MemberConnectionStateKind::P2P
