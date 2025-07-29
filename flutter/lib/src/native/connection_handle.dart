@@ -1,6 +1,7 @@
 import 'package:medea_jason/src/native/remote_media_track.dart';
 import '../interface/connection_handle.dart';
-import '../interface/enums.dart';
+import '../interface/enums.dart'
+    show MemberConnectionState, PeerConnectionState;
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';

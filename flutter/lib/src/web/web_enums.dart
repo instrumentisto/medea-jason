@@ -92,9 +92,3 @@ enum NoiseSuppressionLevel {
   /// Maximum suppression.
   veryHigh,
 }
-
-/// `Connection`'s state kind.
-enum MemberConnectionStateKind {
-  /// `Connection`'s state is in P2P mode.
-  p2p,
-}

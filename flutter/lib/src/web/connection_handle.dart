@@ -1,13 +1,12 @@
 // ignore_for_file: avoid_web_libraries_in_flutter
 
 import 'dart:js_interop';
-import 'dart:js_interop_unsafe';
 
 import 'package:js_interop_utils/js_interop_utils.dart';
 
-import 'package:medea_jason/src/web/web_enums.dart';
 import '../interface/connection_handle.dart';
-import '../interface/enums.dart';
+import '../interface/enums.dart'
+    show MemberConnectionState, MemberConnectionStateKind, PeerConnectionState;
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import 'exceptions.dart';

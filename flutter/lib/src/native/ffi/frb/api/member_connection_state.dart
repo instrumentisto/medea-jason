@@ -56,3 +56,9 @@ enum PeerConnectionState {
   /// It's a terminal state.
   closed,
 }
+
+/// `Connection`'s state kind.
+enum MemberConnectionStateKind {
+  /// `Connection`'s state is in P2P mode.
+  p2p,
+}
