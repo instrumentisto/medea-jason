@@ -1,12 +1,13 @@
 import 'package:medea_jason/src/native/remote_media_track.dart';
 import '../interface/connection_handle.dart';
-import '../interface/enums.dart'
-    show MemberConnectionState, PeerConnectionState;
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/frb/frb.dart' as frb;
+
+import '../interface/enums.dart'
+    show MemberConnectionState, PeerConnectionState;
 
 class NativeConnectionHandle implements ConnectionHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.

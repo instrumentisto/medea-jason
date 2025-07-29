@@ -5,13 +5,14 @@ import 'dart:js_interop';
 import 'package:js_interop_utils/js_interop_utils.dart';
 
 import '../interface/connection_handle.dart';
-import '../interface/enums.dart'
-    show MemberConnectionState, MemberConnectionStateKind, PeerConnectionState;
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 import 'remote_media_track.dart';
+
+import '../interface/enums.dart'
+    show MemberConnectionState, MemberConnectionStateKind, PeerConnectionState;
 
 class WebConnectionHandle implements ConnectionHandle {
   late wasm.ConnectionHandle obj;
