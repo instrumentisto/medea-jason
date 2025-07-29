@@ -87,7 +87,7 @@ pub struct MemberConnectionState(core::MemberConnectionState);
 impl MemberConnectionState {
     /// Returns the [`Connection`]'s mode.
     #[must_use]
-    pub fn kind(&self) -> MemberConnectionStateKind {
+    pub const fn kind(&self) -> MemberConnectionStateKind {
         match self.0 {
             core::MemberConnectionState::P2P(_) => {
                 MemberConnectionStateKind::P2P
