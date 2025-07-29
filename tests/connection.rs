@@ -1,6 +1,6 @@
 use std::{cell::Cell, rc::Rc};
 
-use medea_client_api_proto::{MemberId, PeerConnectionState};
+use medea_client_api_proto::{ConnectionMode, MemberId, PeerConnectionState};
 use medea_jason::{api, connection::Connection, media::RecvConstraints};
 use wasm_bindgen::{JsValue, closure::Closure};
 use wasm_bindgen_test::*;
@@ -11,7 +11,7 @@ fn get_test_connection() -> Connection {
     let member_id = MemberId::from("Test");
     let constraints = Rc::new(RecvConstraints::default());
 
-    Connection::new(member_id, &constraints)
+    Connection::new(member_id, &constraints, ConnectionMode::Mesh)
 }
 
 #[wasm_bindgen_test]
