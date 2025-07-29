@@ -16,7 +16,12 @@ All user visible changes to this project will be documented in this file. This p
     - `ConnectionHandle.get_state()` method ([#213])
     - `ConnectionHandle.on_state_change()` callback for state updates triggered by P2P state changes. ([#213])
 
+### Fixed
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
+
 [#213]: https://github.com/instrumentisto/medea-jason/pull/213
+[#228]: https://github.com/instrumentisto/medea-jason/pull/228
 
 
 
