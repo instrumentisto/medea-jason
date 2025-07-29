@@ -95,12 +95,15 @@ impl Object<ConnectionStore> {
 
                 const state = conn.get_state();
 
+                const P2P = window.rust.MemberConnectionStateKind.P2P;
+                const CONNECTED = window.rust.PeerConnectionState.Connected;
+
                 if (state) {
-                    if (state.kind() !== window.rust.MemberConnectionStateKind.P2P) {
+                    if (state.kind() !== P2P) {
                         throw new Error();
                     }
 
-                    return state.value() === window.rust.PeerConnectionState.Connected;
+                    return state.value() === CONNECTED;
                 }
 
                 return new Promise((resolve) => {
