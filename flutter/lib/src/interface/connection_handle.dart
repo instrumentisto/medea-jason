@@ -12,7 +12,6 @@ abstract class ConnectionHandle implements SyncPlatformHandle {
   /// [ConnectionHandle].
   String getRemoteMemberId();
 
-
   /// Returns `MemberConnectionState` of the [`Connection`].
   ///
   /// NOTE: this method only works in `P2P` mode and is subject to change.
