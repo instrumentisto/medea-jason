@@ -3,7 +3,10 @@
 
 use crate::{
     browser::Statement,
-    object::{Error, Object, connection::Connection},
+    object::{
+        Error, Object,
+        connection::{Connection, MemberConnectionState},
+    },
 };
 
 /// Storage for [`Connection`]s thrown by `Room.on_new_connection()` callback.
@@ -62,6 +65,47 @@ impl Object<ConnectionStore> {
                     });
                     return await waiter;
                 }
+            }
+            ",
+            [remote_id.into()],
+        ))
+        .await
+    }
+
+    /// Returns promise that resolves when [`MemberConnectionState`] is
+    /// `Connected`.
+    ///
+    /// # Errors
+    ///
+    /// If failed to execute JS statement.
+    pub async fn wait_for_connected_state(
+        &self,
+        remote_id: String,
+    ) -> Result<Object<MemberConnectionState>, Error> {
+        self.execute_and_fetch(Statement::new(
+            // language=JavaScript
+            "
+            async (store) => {
+                const [remoteId] = args;
+                const conn = store.connections.get(remoteId);
+
+                if (!conn) {
+                    throw new NotFoundError();
+                }
+
+                const state = conn.get_state();
+
+                if (state) {
+                    if (state.kind() !== window.rust.MemberConnectionStateKind.P2P) {
+                        throw new Error();
+                    }
+
+                    return state.value() === window.rust.PeerConnectionState.Connected;
+                }
+
+                return new Promise((resolve) => {
+                    conn.stateListener.subs.push(resolve);
+                });
             }
             ",
             [remote_id.into()],
