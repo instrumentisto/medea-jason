@@ -30,9 +30,11 @@ class NativeConnectionHandle implements ConnectionHandle {
 
   @override
   void onStateChange(void Function(MemberConnectionState) f) {
-    opaque.inner.onStateChange(f: (t) {
-      f(freezeState(frb.MemberConnectionState.fromPtr(ptr: t.address))!);
-    });
+    opaque.inner.onStateChange(
+      f: (t) {
+        f(freezeState(frb.MemberConnectionState.fromPtr(ptr: t.address))!);
+      },
+    );
   }
 
   @override

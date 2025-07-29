@@ -8,7 +8,7 @@ sealed class MemberConnectionState with _$MemberConnectionState {
 
   /// State in P2P mode.
   const factory MemberConnectionState.p2p(PeerConnectionState peerState) =
-  MemberConnectionState_P2P;
+      MemberConnectionState_P2P;
 }
 
 /// `PeerConnection`'s connection state.

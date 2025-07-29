@@ -4,8 +4,8 @@ import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
 
 import 'package:js_interop_utils/js_interop_utils.dart';
-import 'package:medea_jason/src/web/web_enums.dart';
 
+import 'package:medea_jason/src/web/web_enums.dart';
 import '../interface/connection_handle.dart';
 import '../interface/enums.dart';
 import '../interface/media_track.dart';
@@ -31,7 +31,8 @@ class WebConnectionHandle implements ConnectionHandle {
 
   @override
   void onStateChange(void Function(MemberConnectionState) f) {
-    void fn(JSAny state) => f(freezeState(state as wasm.MemberConnectionState)!);
+    void fn(JSAny state) =>
+        f(freezeState(state as wasm.MemberConnectionState)!);
     fallibleFunction(() => obj.on_state_change(fn.toJS));
   }
 
@@ -83,11 +84,16 @@ class WebConnectionHandle implements ConnectionHandle {
       return null;
     }
 
-    if (MemberConnectionStateKind.values[state.kind().toInt()] == MemberConnectionStateKind.p2p) {
-      return MemberConnectionState.p2p(PeerConnectionState.values[(state.value() as JSNumber).toDartInt]);
+    if (MemberConnectionStateKind.values[state.kind().toInt()] ==
+        MemberConnectionStateKind.p2p) {
+      return MemberConnectionState.p2p(
+        PeerConnectionState.values[(state.value() as JSNumber).toDartInt],
+      );
     }
 
     // TODO: implement for SFU.
-    throw UnimplementedError('Only MemberConnectionStateKind.p2p is supported.');
+    throw UnimplementedError(
+      'Only MemberConnectionStateKind.p2p is supported.',
+    );
   }
 }
