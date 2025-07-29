@@ -169,7 +169,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {enable};
+                    {maybe_await} {enable}
                 }}
                 ",
             ),
@@ -283,7 +283,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {mute};
+                    {maybe_await} {mute}
                 }}
                 ",
             ),
@@ -321,7 +321,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {unmute};
+                    {maybe_await} {unmute}
                 }}
                 ",
             ),
@@ -356,10 +356,14 @@ impl Object<Room> {
                         tracks: [],
                         subs: []
                     };
+                    let stateListener = {
+                        subs: [],
+                    };
                     let connection = {
                         conn: conn,
                         tracksStore: tracksStore,
                         closeListener: closeListener,
+                        stateListener: stateListener,
                     };
                     conn.on_remote_track_added((t) => {
                         let track = {
@@ -418,6 +422,11 @@ impl Object<Room> {
                                 return sub(track);
                             });
                         tracksStore.subs = newStoreSubs;
+                    });
+                    conn.on_state_change((state) => {
+                        for (const sub of stateListener.subs) {
+                            sub(state);
+                        }
                     });
                     conn.on_close(() => {
                         closeListener.isClosed = true;
