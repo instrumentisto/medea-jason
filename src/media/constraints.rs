@@ -888,7 +888,7 @@ impl MediaStreamSettings {
         // enabled room.
         self.device_audio.enabled &= other.device_audio.enabled;
         self.device_audio.constraints = other.device_audio.constraints;
-        self.display_audio.enabled &= other.display_audio.enabled;
+        self.display_audio.enabled = other.display_audio.enabled;
         self.display_audio.constraints = other.display_audio.constraints;
         self.display_video.constrain(other.display_video);
         self.device_video.constrain(other.device_video);
