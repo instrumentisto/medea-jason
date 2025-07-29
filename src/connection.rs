@@ -777,9 +777,17 @@ impl Connection {
 
         self.refresh_client_conn_quality_score();
 
-        self.0
-            .on_state_change
-            .call1::<api::MemberConnectionState>(state.into());
+        match self.0.connection_mode {
+            // `MemberConnectionState::SFU` isn't implemented.
+            // See instrumentisto/medea-jason#211 for the details:
+            // https://github.com/instrumentisto/medea-jason/issues/211
+            ConnectionMode::Sfu => (),
+            ConnectionMode::Mesh => {
+                self.0
+                    .on_state_change
+                    .call1::<api::MemberConnectionState>(state.into());
+            }
+        }
     }
 
     /// Refreshes the [`ClientConnectionQualityScore`] of this [`Connection`].
