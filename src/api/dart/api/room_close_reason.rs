@@ -17,8 +17,8 @@ pub struct RoomCloseReason {
     pub is_err: bool,
 }
 
-impl From<core::RoomCloseReason> for RoomCloseReason {
-    fn from(r: core::RoomCloseReason) -> Self {
+impl From<core::RoomCloseReasonImpl> for RoomCloseReason {
+    fn from(r: core::RoomCloseReasonImpl) -> Self {
         Self {
             reason: r.reason,
             is_closed_by_server: r.is_closed_by_server,
