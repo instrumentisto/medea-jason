@@ -193,6 +193,7 @@ class Call {
     DeviceVideoTrackConstraints video,
     AudioTrackConstraints audio,
     DisplayVideoTrackConstraints display,
+    AudioTrackConstraints displayAudio,
   ) async {
     for (var t in _tracks) {
       await t.free();
@@ -203,7 +204,7 @@ class Call {
     constraints.deviceAudio(audio);
     if (screenShare) {
       constraints.displayVideo(display);
-      constraints.displayAudio(audio);
+      constraints.displayAudio(displayAudio);
     }
 
     _tracks = await _mediaManager.initLocalTracks(constraints);

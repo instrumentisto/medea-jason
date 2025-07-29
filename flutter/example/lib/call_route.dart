@@ -829,7 +829,14 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                     var audioTrack = jason.AudioTrackConstraints();
                     audioTrack.deviceId(call.audioDeviceId!);
 
-                    await call.setMedia(videoTrack, audioTrack, displayTrack);
+                    var displayAudioTrack = jason.AudioTrackConstraints();
+
+                    await call.setMedia(
+                      videoTrack,
+                      audioTrack,
+                      displayTrack,
+                      displayAudioTrack,
+                    );
                   },
                   child: const Text('Set media setting'),
                 ),
