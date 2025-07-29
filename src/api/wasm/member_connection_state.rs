@@ -83,11 +83,15 @@ pub enum MemberConnectionStateKind {
 #[derive(Clone, Copy, Debug)]
 pub struct MemberConnectionState(core::MemberConnectionState);
 
+#[expect( // `wasm_bindgen` doesn't support `const fn`
+    clippy::missing_const_for_fn,
+    reason = "`wasm_bindgen` doesn't support `const fn`"
+)]
 #[wasm_bindgen]
 impl MemberConnectionState {
     /// Returns the [`Connection`]'s mode.
     #[must_use]
-    pub const fn kind(&self) -> MemberConnectionStateKind {
+    pub fn kind(&self) -> MemberConnectionStateKind {
         match self.0 {
             core::MemberConnectionState::P2P(_) => {
                 MemberConnectionStateKind::P2P
