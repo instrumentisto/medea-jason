@@ -38,7 +38,7 @@ async fn then_connection_closes(
     connection.wait_for_close().await.unwrap();
 }
 
-#[then(regex = r"^(\S+)'s gets connected with (\S+)$")]
+#[then(regex = r"^(\S+) gets connected with (\S+)$")]
 async fn then_member_gets_connected(
     world: &mut World,
     id: String,
