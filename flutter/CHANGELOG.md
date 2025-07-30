@@ -13,13 +13,13 @@ All user visible changes to this project will be documented in this file. This p
 ### Added
 
 - Ability to capture system audio tracks: ([#225])
-  - `MediaStreamSettings.display_audio()` to set system audio constraints. (only for WASM platform)
+  - `MediaStreamSettings.displayAudio()` to set system audio constraints. (only for WASM platform)
 
 ### Changed
 
 - Device audio tracks: ([#225])
-  - `MediaStreamSettings.audio()` renamed to `MediaStreamSettings.device_audio()`.
-  - `RoomHandle.mute_audio()`, `RoomHandle.unmute_audio()`, `RoomHandle.enable_audio()`, `RoomHandle.disable_audio()`, `RoomHandle.enable_remote_audio()`, and `RoomHandle.disable_remote_audio()` now receive an argument to specify `MediaSourceKind`.
+  - `MediaStreamSettings.audio()` renamed to `MediaStreamSettings.deviceAudio()`.
+  - `RoomHandle.muteAudio()`, `RoomHandle.unmuteAudio()`, `RoomHandle.enableAudio()`, `RoomHandle.disableAudio()`, `RoomHandle.enableRemoteAudio()`, and `RoomHandle.disableRemoteAudio()` now receive an argument to specify `MediaSourceKind`.
 
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
 
