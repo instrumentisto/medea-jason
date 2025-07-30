@@ -33,10 +33,12 @@ use crate::{
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
 #[derive(Debug)]
 #[frb(opaque)]
-pub struct MediaManagerHandle(pub(crate) SendWrapper<core::MediaManagerHandle>);
+pub struct MediaManagerHandle(
+    pub(crate) SendWrapper<core::MediaManagerHandleImpl>,
+);
 
-impl From<core::MediaManagerHandle> for MediaManagerHandle {
-    fn from(value: core::MediaManagerHandle) -> Self {
+impl From<core::MediaManagerHandleImpl> for MediaManagerHandle {
+    fn from(value: core::MediaManagerHandleImpl) -> Self {
         Self(SendWrapper::new(value))
     }
 }

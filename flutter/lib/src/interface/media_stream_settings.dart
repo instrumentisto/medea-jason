@@ -8,12 +8,11 @@ import 'display_video_track_constraints.dart';
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 abstract class MediaStreamSettings implements SyncPlatformHandle {
-  /// Specifies a nature and settings of the audio `LocalMediaTrack`,
-  /// sourced from a media device.
+  /// Specifies a nature and settings of the device audio `LocalMediaTrack`.
   void deviceAudio(@moveSemantics AudioTrackConstraints constraints);
 
-  /// Specifies a nature and settings of the audio `LocalMediaTrack`,
-  /// sourced from user's display.
+  /// Specifies a nature and settings of the display audio `LocalMediaTrack`.
+  /// NOTE: Implemented only on Windows and WASM platforms.
   void displayAudio(@moveSemantics AudioTrackConstraints constraints);
 
   /// Sets constraints for obtaining a local video, sourced from a media device.

@@ -36,6 +36,19 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
+
+### Fixed
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
+
+[#228]: https://github.com/instrumentisto/medea-jason/pull/228
+
+
+
+
 ## [0.11.0] · 2025-07-17
 [0.11.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0
 

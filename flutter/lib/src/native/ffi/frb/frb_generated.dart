@@ -5602,7 +5602,8 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::get_remote_member_id()`] method errors.
+  /// If the [`core::ConnectionHandleImpl::get_remote_member_id()`] method
+  /// errors.
   String getRemoteMemberId() => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleGetRemoteMemberId(
         that: this,
@@ -5613,7 +5614,7 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::on_close()`] method errors.
+  /// If the [`core::ConnectionHandleImpl::on_close()`] method errors.
   void onClose({required Object f}) => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleOnClose(that: this, f: f);
 
@@ -5622,7 +5623,7 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::on_quality_score_update()`] method
+  /// If the [`core::ConnectionHandleImpl::on_quality_score_update()`] method
   /// errors.
   void onQualityScoreUpdate({required Object f}) => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdate(
@@ -5635,7 +5636,7 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::on_remote_track_added()`] method
+  /// If the [`core::ConnectionHandleImpl::on_remote_track_added()`] method
   /// errors.
   ///
   /// [`remote::Track`]: media::track::remote::Track
@@ -6218,7 +6219,7 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::RoomHandle::on_close()`] method errors.
+  /// If the [`core::RoomHandleImpl::on_close()`] method errors.
   void onClose({required Object cb}) => RustLib.instance.api
       .crateApiDartApiRoomRoomHandleOnClose(that: this, cb: cb);
 
@@ -6227,7 +6228,7 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::RoomHandle::on_connection_loss()`] method errors.
+  /// If the [`core::RoomHandleImpl::on_connection_loss()`] method errors.
   void onConnectionLoss({required Object cb}) => RustLib.instance.api
       .crateApiDartApiRoomRoomHandleOnConnectionLoss(that: this, cb: cb);
 
@@ -6235,12 +6236,12 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::RoomHandle::on_failed_local_media()`] method errors.
+  /// If the [`core::RoomHandleImpl::on_failed_local_media()`] method errors.
   void onFailedLocalMedia({required Object cb}) => RustLib.instance.api
       .crateApiDartApiRoomRoomHandleOnFailedLocalMedia(that: this, cb: cb);
 
-  /// Sets a callback to be invoked once a new [`LocalMediaTrack`] is added
-  /// to the provided [`Room`].
+  /// Sets a callback to be invoked once a new [`LocalMediaTrack`] is
+  /// added to the provided [`Room`].
   ///
   /// This might happen in such cases:
   /// 1. Media server initiates a media request.
@@ -6250,7 +6251,7 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::RoomHandle::on_local_track()`] method errors.
+  /// If the [`core::RoomHandleImpl::on_local_track()`] method errors.
   ///
   /// [`enable_audio()`]: RoomHandle::enable_audio
   /// [`enable_video()`]: RoomHandle::enable_video
@@ -6264,7 +6265,7 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   ///
   /// # Errors
   ///
-  /// If the [`core::RoomHandle::on_new_connection()`] method errors.
+  /// If the [`core::RoomHandleImpl::on_new_connection()`] method errors.
   ///
   /// [`Connection`]: connection::Connection
   void onNewConnection({required Object cb}) => RustLib.instance.api

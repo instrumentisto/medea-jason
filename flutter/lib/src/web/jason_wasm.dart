@@ -191,7 +191,8 @@ extension type MediaStateTransitionException._(JSObject _) implements JSObject {
 extension type MediaStreamSettings._(JSObject _) implements JSObject {
   external void free();
   external factory MediaStreamSettings();
-  external void audio(AudioTrackConstraints constraints);
+  external void device_audio(AudioTrackConstraints constraints);
+  external void display_audio(AudioTrackConstraints constraints);
   external void device_video(DeviceVideoTrackConstraints constraints);
   external void display_video(DisplayVideoTrackConstraints constraints);
 }
@@ -247,17 +248,17 @@ extension type RoomHandle._(JSObject _) implements JSObject {
     bool stop_first,
     bool rollback_on_fail,
   );
-  external JSPromise<JSAny?> mute_audio();
-  external JSPromise<JSAny?> unmute_audio();
+  external JSPromise<JSAny?> mute_audio(num? source_kind);
+  external JSPromise<JSAny?> unmute_audio(num? source_kind);
   external JSPromise<JSAny?> mute_video(num? source_kind);
   external JSPromise<JSAny?> unmute_video(num? source_kind);
-  external JSPromise<JSAny?> disable_audio();
-  external JSPromise<JSAny?> enable_audio();
+  external JSPromise<JSAny?> disable_audio(num? source_kind);
+  external JSPromise<JSAny?> enable_audio(num? source_kind);
   external JSPromise<JSAny?> disable_video(num? source_kind);
   external JSPromise<JSAny?> enable_video(num? source_kind);
-  external JSPromise<JSAny?> disable_remote_audio();
+  external JSPromise<JSAny?> disable_remote_audio(num? source_kind);
   external JSPromise<JSAny?> disable_remote_video(num? source_kind);
-  external JSPromise<JSAny?> enable_remote_audio();
+  external JSPromise<JSAny?> enable_remote_audio(num? source_kind);
   external JSPromise<JSAny?> enable_remote_video(num? source_kind);
 }
 

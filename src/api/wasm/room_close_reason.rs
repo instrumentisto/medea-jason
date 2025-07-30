@@ -15,7 +15,7 @@ use crate::room;
 /// [`RoomHandle::on_close`]: crate::api::RoomHandle::on_close
 #[wasm_bindgen]
 #[derive(Debug, From)]
-pub struct RoomCloseReason(room::RoomCloseReason);
+pub struct RoomCloseReason(room::RoomCloseReasonImpl);
 
 #[expect( // `wasm_bindgen` doesn't support `const fn`
     clippy::missing_const_for_fn,

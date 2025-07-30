@@ -6,6 +6,26 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
+
+### Added
+
+- Ability to capture system audio tracks: ([#225])
+  - `MediaStreamSettings.display_audio()` to set system audio constraints. (only for WASM platform)
+
+### Changed
+
+- Device audio tracks: ([#225])
+  - `MediaStreamSettings.audio()` renamed to `MediaStreamSettings.device_audio()`.
+  - `RoomHandle.mute_audio()`, `RoomHandle.unmute_audio()`, `RoomHandle.enable_audio()`, `RoomHandle.disable_audio()`, `RoomHandle.enable_remote_audio()`, and `RoomHandle.disable_remote_audio()` now receive an argument to specify `MediaSourceKind`.
+
+[#225]: https://github.com/instrumentisto/medea-jason/pull/225
+
+
+
+
 ## [0.11.0] · 2025-07-17
 [0.11.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0/flutter
 

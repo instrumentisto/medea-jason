@@ -20,7 +20,7 @@ use crate::{
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
 #[wasm_bindgen]
 #[derive(Debug, From)]
-pub struct LocalMediaTrack(local::LocalMediaTrack);
+pub struct LocalMediaTrack(local::LocalMediaTrackImpl);
 
 #[wasm_bindgen]
 impl LocalMediaTrack {

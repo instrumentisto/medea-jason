@@ -12,8 +12,8 @@ use futures::{
     stream::LocalBoxStream,
 };
 use medea_client_api_proto::{
-    self as proto, ConnectionQualityScore, MemberId, PeerConnectionState,
-    TrackId,
+    self as proto, ConnectionMode, ConnectionQualityScore, MemberId,
+    PeerConnectionState, TrackId,
 };
 use tracerr::Traced;
 
@@ -35,7 +35,7 @@ use crate::{
 #[derive(Caused, Clone, Copy, Debug, Display, From)]
 #[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
-    /// [`ConnectionHandle`]'s [`Weak`] pointer is detached.
+    /// [`ConnectionHandleImpl`]'s [`Weak`] pointer is detached.
     #[display("`ConnectionHandle` is in detached state")]
     Detached,
 
@@ -110,6 +110,7 @@ impl Connections {
         &self,
         track_id: &TrackId,
         partner_members: HashSet<MemberId>,
+        connection_mode: ConnectionMode,
     ) -> Vec<Connection> {
         if let Some(partners) =
             self.tracks_to_members.borrow_mut().get_mut(track_id)
@@ -143,6 +144,7 @@ impl Connections {
                     let connection = Connection::new(
                         mid.clone(),
                         &self.room_recv_constraints,
+                        connection_mode,
                     );
                     self.on_new_connection.call1(connection.new_handle());
                     drop(connections.insert(mid.clone(), connection));
@@ -175,7 +177,7 @@ impl Connections {
                 .collect();
         }
 
-        self.add_connections(*track_id, &partner_members)
+        self.add_connections(*track_id, &partner_members, connection_mode)
     }
 
     /// Adds information about related [`Track`]s with the provided [`TrackId`]
@@ -189,6 +191,7 @@ impl Connections {
         &self,
         track_id: TrackId,
         partner_members: &HashSet<MemberId>,
+        connection_mode: ConnectionMode,
     ) -> Vec<Connection> {
         let mut connections = self.members_to_conns.borrow_mut();
 
@@ -204,6 +207,7 @@ impl Connections {
                 let connection = Connection::new(
                     partner.clone(),
                     &self.room_recv_constraints,
+                    connection_mode,
                 );
                 self.on_new_connection.call1(connection.new_handle());
                 drop(connections.insert(partner.clone(), connection));
@@ -296,7 +300,7 @@ impl Connections {
     }
 }
 
-/// Error of [`ConnectionHandle`]'s [`Weak`] pointer being detached.
+/// Error of [`ConnectionHandleImpl`]'s [`Weak`] pointer being detached.
 #[derive(Caused, Clone, Copy, Debug, Display)]
 #[cause(error = platform::Error)]
 #[display("`ConnectionHandle` is in detached state")]
@@ -306,7 +310,7 @@ pub struct HandleDetachedError;
 ///
 /// Actually, represents a [`Weak`]-based handle to `InnerConnection`.
 #[derive(Clone, Debug)]
-pub struct ConnectionHandle(Weak<InnerConnection>);
+pub struct ConnectionHandleImpl(Weak<InnerConnection>);
 
 /// Estimated [`Connection`]'s quality on the client side only.
 #[derive(Clone, Copy, Debug, Display, Eq, From, Ord, PartialEq, PartialOrd)]
@@ -333,7 +337,8 @@ impl ClientConnectionQualityScore {
 
 /// Actual data of a connection with a specific remote `Member`.
 ///
-/// Shared between external [`ConnectionHandle`] and Rust side [`Connection`].
+/// Shared between external [`ConnectionHandleImpl`] and Rust side
+/// [`Connection`].
 #[derive(Debug)]
 struct InnerConnection {
     /// Remote `Member` ID.
@@ -359,6 +364,13 @@ struct InnerConnection {
 
     /// Callback invoked when a [`ConnectionQualityScore`] is updated.
     on_quality_score_update: platform::Callback<u8>,
+
+    /// Indicator whether this [`Connection`] is working in a [P2P mesh] or
+    /// [SFU] mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    connection_mode: ConnectionMode,
 
     /// Callback invoked when this [`Connection`] is closed.
     on_close: platform::Callback<()>,
@@ -417,7 +429,7 @@ impl InnerConnection {
     }
 }
 
-impl ConnectionHandle {
+impl ConnectionHandleImpl {
     /// Sets callback, invoked when this `Connection` will close.
     ///
     /// # Errors
@@ -487,8 +499,8 @@ impl ConnectionHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`ConnectionHandle::disable_remote_video()`] was called while enabling
-    /// or a media server didn't approve this state transition.
+    /// [`ConnectionHandleImpl::disable_remote_video()`] was called while
+    /// enabling or a media server didn't approve this state transition.
     pub fn enable_remote_video(
         &self,
         source_kind: Option<MediaSourceKind>,
@@ -508,8 +520,8 @@ impl ConnectionHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`ConnectionHandle::enable_remote_video()`] was called while disabling
-    /// or a media server didn't approve this state transition.
+    /// [`ConnectionHandleImpl::enable_remote_video()`] was called while
+    /// disabling or a media server didn't approve this state transition.
     pub fn disable_remote_video(
         &self,
         source_kind: Option<MediaSourceKind>,
@@ -529,8 +541,8 @@ impl ConnectionHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`ConnectionHandle::disable_remote_audio()`] was called while enabling
-    /// or a media server didn't approve this state transition.
+    /// [`ConnectionHandleImpl::disable_remote_audio()`] was called while
+    /// enabling or a media server didn't approve this state transition.
     pub fn enable_remote_audio(
         &self,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
@@ -549,8 +561,8 @@ impl ConnectionHandle {
     /// upgrade fails.
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
-    /// [`ConnectionHandle::enable_remote_audio()`] was called while disabling
-    /// or a media server didn't approve this state transition.
+    /// [`ConnectionHandleImpl::enable_remote_audio()`] was called while
+    /// disabling or a media server didn't approve this state transition.
     pub fn disable_remote_audio(
         &self,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static + use<> {
@@ -600,6 +612,7 @@ impl Connection {
     pub fn new(
         remote_id: MemberId,
         room_recv_constraints: &Rc<RecvConstraints>,
+        connection_mode: ConnectionMode,
     ) -> Self {
         // Clone initial incoming media constraints.
         let recv_constraints = Rc::new(room_recv_constraints.as_ref().clone());
@@ -637,6 +650,7 @@ impl Connection {
             peer_state: Cell::default(),
             on_quality_score_update: platform::Callback::default(),
             recv_constraints,
+            connection_mode,
             on_close: platform::Callback::default(),
             on_remote_track_added: platform::Callback::default(),
             receivers: RefCell::default(),
@@ -701,8 +715,8 @@ impl Connection {
 
     /// Creates a new external handle to this [`Connection`].
     #[must_use]
-    pub fn new_handle(&self) -> ConnectionHandle {
-        ConnectionHandle(Rc::downgrade(&self.0))
+    pub fn new_handle(&self) -> ConnectionHandleImpl {
+        ConnectionHandleImpl(Rc::downgrade(&self.0))
     }
 
     /// Updates the [`ConnectionQualityScore`] of this [`Connection`].
@@ -726,6 +740,14 @@ impl Connection {
     /// Refreshes the [`ClientConnectionQualityScore`] of this [`Connection`].
     fn refresh_client_conn_quality_score(&self) {
         use PeerConnectionState as S;
+
+        match self.0.connection_mode {
+            // `on_quality_score_update()` isn't implemented for SFU mode.
+            // See instrumentisto/medea-jason#227 for the details:
+            // https://github.com/instrumentisto/medea-jason/issues/227
+            ConnectionMode::Sfu => return,
+            ConnectionMode::Mesh => (),
+        }
 
         let state = self.0.peer_state.get();
         let quality_score = self.0.quality_score.get();
