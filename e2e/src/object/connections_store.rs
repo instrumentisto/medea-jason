@@ -96,7 +96,7 @@ impl Object<ConnectionStore> {
                 const P2P = window.rust.MemberConnectionStateKind.P2P;
                 const CONNECTED = window.rust.PeerConnectionState.Connected;
 
-                if (state.kind !== P2P) {
+                if (state.kind() !== P2P) {
                     throw new Error('Wrong MemberConnectionStateKind');
                 }
 
@@ -150,7 +150,7 @@ impl Object<ConnectionStore> {
                 const DISCONNECTED =
                     window.rust.PeerConnectionState.Disconnected;
 
-                if (state.kind !== P2P) {
+                if (state.kind() !== P2P) {
                     throw new Error('Wrong MemberConnectionStateKind');
                 }
 
