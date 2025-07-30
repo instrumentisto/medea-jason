@@ -46,7 +46,6 @@ async fn then_member_gets_connected(
 ) {
     let member = world.get_member(&id).unwrap();
     member.connections().wait_for_connected_state(partner_id).await.unwrap();
-    member.connections().wait_for_connected_state(id).await.unwrap();
 }
 
 #[when(regex = r"^(\S+) (enables|disables) (audio|video) receiving from (\S+)")]
