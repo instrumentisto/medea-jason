@@ -10,11 +10,19 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
 
+### Added
+
+- Library API:
+    - Ability to get and track state of a `Connection`: ([#229])
+        - `ConnectionHandle.get_state()` method.
+        - `ConnectionHandle.on_state_change()` callback for updates triggered by P2P state changes.
+
 ### Fixed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
+[#229]: https://github.com/instrumentisto/medea-jason/pull/229
 
 
 

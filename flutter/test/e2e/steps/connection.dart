@@ -5,11 +5,16 @@ import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
 
+const bool isSfu = bool.fromEnvironment('SFU', defaultValue: false);
+
 List<StepDefinitionGeneric> steps() {
   return [
     thenConnectionCloses,
     thenMemberReceivesConnection,
+    thenMemberGetsConnected,
+    thenMemberGetsDisconnected,
     whenConnectionChangesRemoteMediaState,
+    whenMemberReceivesConnection,
     thenMemberDoesntReceiveConnection,
   ];
 }
@@ -40,6 +45,36 @@ StepDefinitionGeneric thenMemberDoesntReceiveConnection =
       },
     );
 
+StepDefinitionGeneric thenMemberGetsConnected =
+    then2<String, String, CustomWorld>(r'(\S+) gets connected with (\S+)$', (
+      id,
+      responderId,
+      context,
+    ) async {
+      // `on_state_change()` is not implemented for SFU.
+      if (isSfu) {
+        return;
+      }
+
+      var member = context.world.members[id]!;
+      await member.waitForConnected(responderId);
+    });
+
+StepDefinitionGeneric thenMemberGetsDisconnected =
+    then2<String, String, CustomWorld>(r'(\S+) gets disconnected with (\S+)$', (
+      id,
+      responderId,
+      context,
+    ) async {
+      // `on_state_change()` is not implemented for SFU.
+      if (isSfu) {
+        return;
+      }
+
+      var member = context.world.members[id]!;
+      await member.waitForDisconnected(responderId);
+    });
+
 StepDefinitionGeneric whenConnectionChangesRemoteMediaState =
     when4<String, String, String, String, CustomWorld>(
       r'(\S+) (enables|disables) (audio|video) receiving from (\S+)',
@@ -61,5 +96,14 @@ StepDefinitionGeneric whenConnectionChangesRemoteMediaState =
             await connect.disableRemoteVideo();
           }
         }
+      },
+    );
+
+StepDefinitionGeneric whenMemberReceivesConnection =
+    when2<String, String, CustomWorld>(
+      r'(\S+) receives connection with (\S+)$',
+      (id, responderId, context) async {
+        var member = context.world.members[id]!;
+        await member.waitForConnect(responderId);
       },
     );

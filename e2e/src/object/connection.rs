@@ -109,3 +109,7 @@ impl Object<Connection> {
         .map(drop)
     }
 }
+
+/// [`Connection`]'s state.
+#[derive(Clone, Copy, Debug)]
+pub struct MemberConnectionState;

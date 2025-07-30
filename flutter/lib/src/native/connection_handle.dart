@@ -6,6 +6,9 @@ import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/frb/frb.dart' as frb;
 
+import '../interface/enums.dart'
+    show MemberConnectionState, PeerConnectionState;
+
 class NativeConnectionHandle implements ConnectionHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   final RustOpaque<frb.ConnectionHandle> opaque;
@@ -20,6 +23,20 @@ class NativeConnectionHandle implements ConnectionHandle {
   @override
   String getRemoteMemberId() {
     return opaque.inner.getRemoteMemberId();
+  }
+
+  @override
+  MemberConnectionState? getState() {
+    return freezeState(opaque.inner.getState());
+  }
+
+  @override
+  void onStateChange(void Function(MemberConnectionState) f) {
+    opaque.inner.onStateChange(
+      f: (t) {
+        f(freezeState(frb.MemberConnectionState.fromPtr(ptr: t.address))!);
+      },
+    );
   }
 
   @override
@@ -69,5 +86,33 @@ class NativeConnectionHandle implements ConnectionHandle {
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
     await (opaque.inner.disableRemoteVideo(sourceKind: kind) as Future);
+  }
+
+  MemberConnectionState? freezeState(frb.MemberConnectionState? state) {
+    if (state == null) {
+      return null;
+    }
+
+    switch (state) {
+      case frb.MemberConnectionState_P2P(:final field0):
+        return MemberConnectionState.p2p(freezePeerState(field0));
+    }
+  }
+
+  PeerConnectionState freezePeerState(frb.PeerConnectionState peerState) {
+    switch (peerState) {
+      case frb.PeerConnectionState.new_:
+        return PeerConnectionState.new_;
+      case frb.PeerConnectionState.connecting:
+        return PeerConnectionState.connecting;
+      case frb.PeerConnectionState.connected:
+        return PeerConnectionState.connected;
+      case frb.PeerConnectionState.disconnected:
+        return PeerConnectionState.disconnected;
+      case frb.PeerConnectionState.failed:
+        return PeerConnectionState.failed;
+      case frb.PeerConnectionState.closed:
+        return PeerConnectionState.closed;
+    }
   }
 }

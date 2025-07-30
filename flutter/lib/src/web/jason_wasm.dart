@@ -39,6 +39,13 @@ extension type RpcClientExceptionKind._(JSObject _) implements JSObject {
 }
 
 @JS()
+extension type MemberConnectionState._(JSObject _) implements JSObject {
+  external num kind();
+  external JSAny value();
+  external String test();
+}
+
+@JS()
 extension type AudioTrackConstraints._(JSObject _) implements JSObject {
   external void free();
   external factory AudioTrackConstraints();
@@ -56,6 +63,8 @@ extension type ConnectionHandle._(JSObject _) implements JSObject {
   external void free();
   external void on_close(JSFunction cb);
   external String get_remote_member_id();
+  external MemberConnectionState? get_state();
+  external void on_state_change(JSFunction cb);
   external void on_remote_track_added(JSFunction cb);
   external void on_quality_score_update(JSFunction cb);
   external JSPromise<JSAny?> disable_remote_audio();

@@ -8,6 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import '../../../frb_generated.dart';
 import '../../../media/track.dart';
 import '../api.dart';
+import 'member_connection_state.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
 
@@ -46,6 +47,17 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
   /// errors.
   String getRemoteMemberId();
 
+  /// Returns `MemberConnectionState` of the [`Connection`].
+  ///
+  /// <div class="warning">
+  /// NOTE: this method only works in `P2P` mode and is subject to change.
+  /// </div>
+  ///
+  /// # Errors
+  ///
+  /// If the [`core::ConnectionHandle::get_state()`] method errors.
+  MemberConnectionState? getState();
+
   /// Sets a callback to be invoked once the associated [`Connection`] is
   /// closed.
   ///
@@ -73,4 +85,16 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
   ///
   /// [`remote::Track`]: media::track::remote::Track
   void onRemoteTrackAdded({required Object f});
+
+  /// Sets a callback to be invoked once a state of associated [`Connection`]
+  /// is changed.
+  ///
+  /// <div class="warning">
+  /// NOTE: this method only works in `P2P` mode and is subject to change.
+  /// </div>
+  ///
+  /// # Errors
+  ///
+  /// If the [`core::ConnectionHandle::on_state_change()`] method errors.
+  void onStateChange({required Object f});
 }

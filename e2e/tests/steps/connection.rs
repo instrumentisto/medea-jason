@@ -1,3 +1,5 @@
+use std::env;
+
 use cucumber::{then, when};
 
 use crate::{World, steps::parse_media_kind};
@@ -38,6 +40,40 @@ async fn then_connection_closes(
     connection.wait_for_close().await.unwrap();
 }
 
+#[then(regex = r"^(\S+) gets connected with (\S+)$")]
+async fn then_member_gets_connected(
+    world: &mut World,
+    id: String,
+    partner_id: String,
+) {
+    let is_sfu = env::var("SFU").is_ok();
+
+    // `on_state_change()` is not implemented for SFU.
+    if is_sfu {
+        return;
+    }
+
+    let member = world.get_member(&id).unwrap();
+    member.connections().wait_for_connected_state(partner_id).await.unwrap();
+}
+
+#[then(regex = r"^(\S+) gets disconnected with (\S+)$")]
+async fn then_member_gets_disconnected(
+    world: &mut World,
+    id: String,
+    partner_id: String,
+) {
+    let is_sfu = env::var("SFU").is_ok();
+
+    // `on_state_change()` is not implemented for SFU.
+    if is_sfu {
+        return;
+    }
+
+    let member = world.get_member(&id).unwrap();
+    member.connections().wait_for_disconnected_state(partner_id).await.unwrap();
+}
+
 #[when(regex = r"^(\S+) (enables|disables) (audio|video) receiving from (\S+)")]
 async fn when_connection_changes_remote_media_state(
     world: &mut World,
@@ -57,4 +93,18 @@ async fn when_connection_changes_remote_media_state(
     } else {
         connection.disable_remote_media(kind).await.unwrap();
     }
+}
+
+#[when(regex = r"^(\S+) receives connection with (\S+)$")]
+async fn when_member_receives_connection(
+    world: &mut World,
+    id: String,
+    responder_id: String,
+) {
+    let member = world.get_member(&id).unwrap();
+    member
+        .connections()
+        .wait_for_connection(responder_id.clone())
+        .await
+        .unwrap();
 }

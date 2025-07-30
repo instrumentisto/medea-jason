@@ -68,4 +68,111 @@ impl Object<ConnectionStore> {
         ))
         .await
     }
+
+    /// Returns promise that resolves when [`MemberConnectionState`] is
+    /// `Connected`.
+    ///
+    /// # Errors
+    ///
+    /// If failed to execute JS statement.
+    pub async fn wait_for_connected_state(
+        &self,
+        remote_id: String,
+    ) -> Result<Object<()>, Error> {
+        self.execute_and_fetch(Statement::new(
+            // language=JavaScript
+            "
+            async (store) => {
+                const [remoteId] = args;
+                const connection = store.connections.get(remoteId);
+
+                if (!connection) {
+                    throw new NotFoundError();
+                }
+
+                const handle = connection.conn;
+                const state = handle.get_state();
+
+                const P2P = window.rust.MemberConnectionStateKind.P2P;
+                const CONNECTED = window.rust.PeerConnectionState.Connected;
+
+                if (state.kind() !== P2P) {
+                    throw new Error('Wrong MemberConnectionStateKind');
+                }
+
+                if (state.value() === CONNECTED) {
+                    return;
+                }
+
+                return new Promise((resolve) => {
+                    connection.stateListener.subs.push((state) => {
+                        if (state.kind() !== P2P) {
+                            return reject();
+                        }
+
+                        if (state.value() === CONNECTED) {
+                            return resolve();
+                        }
+                    });
+                });
+            }
+            ",
+            [remote_id.into()],
+        ))
+        .await
+    }
+
+    /// Returns promise that resolves when [`MemberConnectionState`] is
+    /// `Disconnected`.
+    ///
+    /// # Errors
+    ///
+    /// If failed to execute JS statement.
+    pub async fn wait_for_disconnected_state(
+        &self,
+        remote_id: String,
+    ) -> Result<Object<()>, Error> {
+        self.execute_and_fetch(Statement::new(
+            // language=JavaScript
+            "
+            async (store) => {
+                const [remoteId] = args;
+                const connection = store.connections.get(remoteId);
+
+                if (!connection) {
+                    throw new NotFoundError();
+                }
+
+                const handle = connection.conn;
+                const state = handle.get_state();
+
+                const P2P = window.rust.MemberConnectionStateKind.P2P;
+                const DISCONNECTED =
+                    window.rust.PeerConnectionState.Disconnected;
+
+                if (state.kind() !== P2P) {
+                    throw new Error('Wrong MemberConnectionStateKind');
+                }
+
+                if (state.value() === DISCONNECTED) {
+                    return;
+                }
+
+                return new Promise((resolve, reject) => {
+                    connection.stateListener.subs.push((state) => {
+                        if (state.kind() !== P2P) {
+                            return reject();
+                        }
+
+                        if (state.value() === DISCONNECTED) {
+                            return resolve();
+                        }
+                    });
+                });
+            }
+            ",
+            [remote_id.into()],
+        ))
+        .await
+    }
 }
