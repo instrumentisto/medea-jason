@@ -62,7 +62,7 @@ abstract class RoomHandle implements SyncPlatformHandle {
   /// Throws a `MediaStateTransitionException` if [RoomHandle.unmuteAudio] was
   /// called while muting or a media server didn't approve this state
   /// transition.
-  Future<void> muteAudio();
+  Future<void> muteAudio([MediaSourceKind? kind]);
 
   /// Unmutes outbound audio in this `Room`.
   ///
@@ -71,7 +71,7 @@ abstract class RoomHandle implements SyncPlatformHandle {
   /// Throws a `MediaStateTransitionException` if [RoomHandle.muteAudio] was
   /// called while unmuting or a media server didn't approve this state
   /// transition.
-  Future<void> unmuteAudio();
+  Future<void> unmuteAudio([MediaSourceKind? kind]);
 
   /// Enables outbound audio in this `Room`.
   ///
@@ -83,7 +83,7 @@ abstract class RoomHandle implements SyncPlatformHandle {
   ///
   /// Throws a `LocalMediaInitException` if a request of platform media devices
   /// access failed.
-  Future<void> enableAudio();
+  Future<void> enableAudio([MediaSourceKind? kind]);
 
   /// Disables outbound audio in this `Room`.
   ///
@@ -92,7 +92,7 @@ abstract class RoomHandle implements SyncPlatformHandle {
   /// Throws a `MediaStateTransitionException` if [RoomHandle.enableAudio] was
   /// called while disabling or a media server didn't approve this state
   /// transition.
-  Future<void> disableAudio();
+  Future<void> disableAudio([MediaSourceKind? kind]);
 
   /// Mutes outbound video in this `Room`.
   ///
@@ -148,7 +148,7 @@ abstract class RoomHandle implements SyncPlatformHandle {
   /// Throws a `MediaStateTransitionException` if
   /// [RoomHandle.disableRemoteAudio] was called while enabling or a media
   /// server didn't approve this state transition.
-  Future<void> enableRemoteAudio();
+  Future<void> enableRemoteAudio([MediaSourceKind? kind]);
 
   /// Disables inbound audio in this `Room`.
   ///
@@ -157,7 +157,7 @@ abstract class RoomHandle implements SyncPlatformHandle {
   /// Throws a `MediaStateTransitionException` if [RoomHandle.enableRemoteAudio]
   /// was called while disabling or a media server didn't approve this state
   /// transition.
-  Future<void> disableRemoteAudio();
+  Future<void> disableRemoteAudio([MediaSourceKind? kind]);
 
   /// Enables inbound video in this `Room`.
   ///
