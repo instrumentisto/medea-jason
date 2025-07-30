@@ -14,7 +14,7 @@ use crate::{
 /// initialization.
 #[wasm_bindgen]
 #[derive(Debug, Default, From)]
-pub struct Jason(jason::Jason);
+pub struct Jason(jason::JasonImpl);
 
 #[wasm_bindgen]
 impl Jason {
@@ -22,7 +22,7 @@ impl Jason {
     #[must_use]
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        Self(jason::Jason::new(None))
+        Self(jason::JasonImpl::new(None))
     }
 
     /// Creates a new `Room` and returns its [`RoomHandle`].
