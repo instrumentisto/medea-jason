@@ -9,7 +9,10 @@ List<StepDefinitionGeneric> steps() {
   return [
     thenConnectionCloses,
     thenMemberReceivesConnection,
+    thenMemberGetsConnected,
+    thenMemberGetsDisconnected,
     whenConnectionChangesRemoteMediaState,
+    whenMemberReceivesConnection,
     thenMemberDoesntReceiveConnection,
   ];
 }
@@ -43,7 +46,7 @@ StepDefinitionGeneric thenMemberDoesntReceiveConnection =
 StepDefinitionGeneric thenMemberGetsConnected =
     then2<String, String, CustomWorld>(
       r'(\S+) gets connected with (\S+)$',
-          (id, responderId, context) async {
+      (id, responderId, context) async {
         var member = context.world.members[id]!;
         await member.waitForConnected(responderId);
       },
@@ -52,7 +55,7 @@ StepDefinitionGeneric thenMemberGetsConnected =
 StepDefinitionGeneric thenMemberGetsDisconnected =
     then2<String, String, CustomWorld>(
       r'(\S+) gets disconnected with (\S+)$',
-          (id, responderId, context) async {
+      (id, responderId, context) async {
         var member = context.world.members[id]!;
         await member.waitForDisconnected(responderId);
       },
