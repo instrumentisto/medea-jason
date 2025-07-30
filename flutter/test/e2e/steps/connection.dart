@@ -5,6 +5,8 @@ import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
 
+const bool isSfu = bool.fromEnvironment('SFU', defaultValue: false);
+
 List<StepDefinitionGeneric> steps() {
   return [
     thenConnectionCloses,
@@ -49,6 +51,11 @@ StepDefinitionGeneric thenMemberGetsConnected =
       responderId,
       context,
     ) async {
+      // `on_state_change()` is not implemented for SFU.
+      if (isSfu) {
+        return;
+      }
+
       var member = context.world.members[id]!;
       await member.waitForConnected(responderId);
     });
@@ -59,6 +66,11 @@ StepDefinitionGeneric thenMemberGetsDisconnected =
       responderId,
       context,
     ) async {
+      // `on_state_change()` is not implemented for SFU.
+      if (isSfu) {
+        return;
+      }
+
       var member = context.world.members[id]!;
       await member.waitForDisconnected(responderId);
     });
