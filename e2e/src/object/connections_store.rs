@@ -171,6 +171,6 @@ impl Object<ConnectionStore> {
             ",
             [remote_id.into()],
         ))
-            .await
+        .await
     }
 }
