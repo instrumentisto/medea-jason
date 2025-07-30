@@ -169,7 +169,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {enable}
+                    {maybe_await} {enable};
                 }}
                 ",
             ),
@@ -283,7 +283,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {mute}
+                    {maybe_await} {mute};
                 }}
                 ",
             ),
@@ -321,7 +321,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {unmute}
+                    {maybe_await} {unmute};
                 }}
                 ",
             ),
@@ -336,6 +336,7 @@ impl Object<Room> {
     /// # Errors
     ///
     /// If failed to execute JS statement.
+    #[expect(clippy::too_many_lines, reason = "not a problem here")]
     pub async fn connections_store(
         &self,
     ) -> Result<Object<ConnectionStore>, Error> {
