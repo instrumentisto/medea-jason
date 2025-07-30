@@ -18,9 +18,14 @@ class MediaStreamSettings implements base.MediaStreamSettings {
   );
 
   @override
-  void audio(base_audio.AudioTrackConstraints audio) {
+  void deviceAudio(base_audio.AudioTrackConstraints audio) {
     audio as AudioTrackConstraints;
     setting.audio = audio.constraints;
+  }
+
+  @override
+  void displayAudio(base_audio.AudioTrackConstraints _) {
+    throw UnimplementedError('Native Display audio tracks are not supported');
   }
 
   @override

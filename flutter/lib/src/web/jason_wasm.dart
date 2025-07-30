@@ -191,7 +191,8 @@ extension type MediaStateTransitionException._(JSObject _) implements JSObject {
 extension type MediaStreamSettings._(JSObject _) implements JSObject {
   external void free();
   external factory MediaStreamSettings();
-  external void audio(AudioTrackConstraints constraints);
+  external void device_audio(AudioTrackConstraints constraints);
+  external void display_audio(AudioTrackConstraints constraints);
   external void device_video(DeviceVideoTrackConstraints constraints);
   external void display_video(DisplayVideoTrackConstraints constraints);
 }
