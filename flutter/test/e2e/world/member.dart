@@ -55,6 +55,9 @@ class ConnectionStore {
   /// [Completer]s waiting the [ConnectionHandle]s being closed.
   var closeConnect = HashMap<String, Completer>();
 
+  /// [Completer]s waiting state changes of the [ConnectionHandle]s.
+  var stateChange = HashMap<String, Function(MemberConnectionState)>();
+
   /// Callbacks calls after [RemoteMediaTrack.onMediaDirectionChanged], where
   /// the key is `track.id`.
   var onMediaDirectionChanged =
@@ -270,6 +273,12 @@ class Member {
         }
       });
 
+      connection.onStateChange((state) {
+        connectionStore.stateChange.forEach((id, callback) {
+          callback(state);
+        });
+      });
+
       connection.onClose(() {
         connectionStore.closeConnect[remoteMemberId]!.complete();
       });
@@ -296,6 +305,68 @@ class Member {
       };
       return conn.future;
     }
+  }
+
+  /// Waits for a `Connected` state of `Connection` to the [Member] with the
+  /// provided [id].
+  Future<void> waitForConnected(String id) async {
+    var completer = Completer();
+    var conn = connectionStore.connections[id]!;
+    var state = conn.getState();
+
+    if (state != null) {
+      switch (state) {
+        case MemberConnectionState_P2P(:final peerState):
+          if (peerState == PeerConnectionState.connected) {
+            completer.complete();
+            return completer.future;
+          }
+      }
+    }
+
+    connectionStore.stateChange[id] = (state) {
+      switch (state) {
+        case MemberConnectionState_P2P(:final peerState):
+          if (peerState == PeerConnectionState.connected) {
+            completer.complete();
+            connectionStore.stateChange[id] = (_) {};
+            return;
+          }
+      }
+    };
+
+    return completer.future;
+  }
+
+  /// Waits for a `Disconnected` state of `Connection` to the [Member] with the
+  /// provided [id].
+  Future<void> waitForDisconnected(String id) async {
+    var completer = Completer();
+    var conn = connectionStore.connections[id]!;
+    var state = conn.getState();
+
+    if (state != null) {
+      switch (state) {
+        case MemberConnectionState_P2P(:final peerState):
+          if (peerState == PeerConnectionState.disconnected) {
+            completer.complete();
+            return completer.future;
+          }
+      }
+    }
+
+    connectionStore.stateChange[id] = (state) {
+      switch (state) {
+        case MemberConnectionState_P2P(:final peerState):
+          if (peerState == PeerConnectionState.disconnected) {
+            completer.complete();
+            connectionStore.stateChange[id] = (_) {};
+            return;
+          }
+      }
+    };
+
+    return completer.future;
   }
 
   /// Waits for a `count` of [RemoteMediaTrack]s from the [Member] with the
