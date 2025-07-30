@@ -13,7 +13,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Added
 
 - Library API:
-    - Ability to get and track state of a `Connection`: ([#213])
+    - Ability to get and track state of a `Connection`: ([#229])
         - `ConnectionHandle.get_state()` method.
         - `ConnectionHandle.on_state_change()` callback for updates triggered by P2P state changes.
 
@@ -21,8 +21,8 @@ All user visible changes to this project will be documented in this file. This p
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 
-[#213]: https://github.com/instrumentisto/medea-jason/pull/213
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
+[#229]: https://github.com/instrumentisto/medea-jason/pull/213
 
 
 
