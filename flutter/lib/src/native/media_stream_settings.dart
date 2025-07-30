@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import '../interface/audio_track_constraints.dart' as base_audio;
 import '../interface/device_video_track_constraints.dart' as base_device_video;
 import '../interface/media_stream_settings.dart' as base;
@@ -26,6 +28,12 @@ class MediaStreamSettings implements base.MediaStreamSettings {
 
   @override
   void displayAudio(base_audio.AudioTrackConstraints audio) {
+    if (!Platform.isWindows) {
+      throw UnimplementedError(
+        'Display audio tracks are supported only on Windows.',
+      );
+    }
+
     audio as AudioTrackConstraints;
     setting.displayAudio = audio.constraints;
   }
