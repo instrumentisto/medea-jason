@@ -96,20 +96,21 @@ impl Object<ConnectionStore> {
                 const P2P = window.rust.MemberConnectionStateKind.P2P;
                 const CONNECTED = window.rust.PeerConnectionState.Connected;
 
-                const isConnected = state && (
-                    state.kind() !== P2P || state.value() === CONNECTED
-                );
+                if (state.kind !== P2P) {
+                    throw new Error('Wrong MemberConnectionStateKind');
+                }
 
-                if (isConnected) {
+                if (state.value() === CONNECTED) {
                     return;
                 }
 
                 return new Promise((resolve) => {
                     connection.stateListener.subs.push((state) => {
-                        const isConnected = state.kind() !== P2P ||
-                            state.value() === CONNECTED;
+                        if (state.kind() !== P2P) {
+                            return reject();
+                        }
 
-                        if (isConnected) {
+                        if (state.value() === CONNECTED) {
                             return resolve();
                         }
                     });
@@ -149,20 +150,21 @@ impl Object<ConnectionStore> {
                 const DISCONNECTED =
                     window.rust.PeerConnectionState.Disconnected;
 
-                const isDisconnected = state && (
-                    state.kind() !== P2P || state.value() === DISCONNECTED
-                );
+                if (state.kind !== P2P) {
+                    throw new Error('Wrong MemberConnectionStateKind');
+                }
 
-                if (isDisconnected) {
+                if (state.value() === DISCONNECTED) {
                     return;
                 }
 
-                return new Promise((resolve) => {
+                return new Promise((resolve, reject) => {
                     connection.stateListener.subs.push((state) => {
-                        const isDisconnected = state.kind() !== P2P ||
-                            state.value() === DISCONNECTED;
+                        if (state.kind() !== P2P) {
+                            return reject();
+                        }
 
-                        if (isDisconnected) {
+                        if (state.value() === DISCONNECTED) {
                             return resolve();
                         }
                     });
