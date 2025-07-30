@@ -162,6 +162,7 @@ impl Component {
         drop(peer.connections.update_connections(
             &track_id,
             new_sender.receivers().into_iter().collect(),
+            state.connection_mode,
         ));
         let sender = sender::Sender::new(
             &new_sender,
@@ -201,6 +202,7 @@ impl Component {
         let conns = peer.connections.update_connections(
             &track_id,
             HashSet::from([rcvr_state.sender_id().clone()]),
+            state.connection_mode,
         );
         let receiver = receiver::Receiver::new(
             &rcvr_state,
@@ -230,7 +232,11 @@ impl Component {
         state: &State,
         val: (TrackId, HashSet<MemberId>),
     ) {
-        drop(peer.connections.update_connections(&val.0, val.1));
+        drop(peer.connections.update_connections(
+            &val.0,
+            val.1,
+            state.connection_mode,
+        ));
 
         state.maybe_update_connections.set(None);
     }
