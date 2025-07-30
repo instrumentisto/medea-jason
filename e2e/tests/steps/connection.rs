@@ -48,6 +48,16 @@ async fn then_member_gets_connected(
     member.connections().wait_for_connected_state(partner_id).await.unwrap();
 }
 
+#[then(regex = r"^(\S+) gets disconnected with (\S+)$")]
+async fn then_member_gets_disconnected(
+    world: &mut World,
+    id: String,
+    partner_id: String,
+) {
+    let member = world.get_member(&id).unwrap();
+    member.connections().wait_for_disconnected_state(partner_id).await.unwrap();
+}
+
 #[when(regex = r"^(\S+) (enables|disables) (audio|video) receiving from (\S+)")]
 async fn when_connection_changes_remote_media_state(
     world: &mut World,

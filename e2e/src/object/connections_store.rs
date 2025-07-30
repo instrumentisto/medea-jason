@@ -120,4 +120,57 @@ impl Object<ConnectionStore> {
         ))
         .await
     }
+
+    /// Returns promise that resolves when [`MemberConnectionState`] is
+    /// `Disconnected`.
+    ///
+    /// # Errors
+    ///
+    /// If failed to execute JS statement.
+    pub async fn wait_for_disconnected_state(
+        &self,
+        remote_id: String,
+    ) -> Result<Object<()>, Error> {
+        self.execute_and_fetch(Statement::new(
+            // language=JavaScript
+            "
+            async (store) => {
+                const [remoteId] = args;
+                const connection = store.connections.get(remoteId);
+
+                if (!connection) {
+                    throw new NotFoundError();
+                }
+
+                const handle = connection.conn;
+                const state = handle.get_state();
+
+                const P2P = window.rust.MemberConnectionStateKind.P2P;
+                const DISCONNECTED =
+                    window.rust.PeerConnectionState.Disconnected;
+
+                const isDisconnected = state && (
+                    state.kind() !== P2P || state.value() === DISCONNECTED
+                );
+
+                if (isDisconnected) {
+                    return;
+                }
+
+                return new Promise((resolve) => {
+                    connection.stateListener.subs.push((state) => {
+                        const isDisconnected = state.kind() !== P2P ||
+                            state.value() === DISCONNECTED;
+
+                        if (isDisconnected) {
+                            return resolve();
+                        }
+                    });
+                });
+            }
+            ",
+            [remote_id.into()],
+        ))
+            .await
+    }
 }
