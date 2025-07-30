@@ -16,7 +16,7 @@ All user visible changes to this project will be documented in this file. This p
     - `ConnectionHandle.getState()` method.
     - `ConnectionHandle.onStateChange()` callback for updates triggered by P2P state changes.
 
-[#229]: https://github.com/instrumentisto/medea-jason/pull/213
+[#229]: https://github.com/instrumentisto/medea-jason/pull/229
 
 
 

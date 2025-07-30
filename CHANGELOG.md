@@ -22,7 +22,7 @@ All user visible changes to this project will be documented in this file. This p
 - `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
-[#229]: https://github.com/instrumentisto/medea-jason/pull/213
+[#229]: https://github.com/instrumentisto/medea-jason/pull/229
 
 
 
