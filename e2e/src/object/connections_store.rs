@@ -3,10 +3,7 @@
 
 use crate::{
     browser::Statement,
-    object::{
-        Error, Object,
-        connection::{Connection, MemberConnectionState},
-    },
+    object::{Error, Object, connection::Connection},
 };
 
 /// Storage for [`Connection`]s thrown by `Room.on_new_connection()` callback.
@@ -81,33 +78,41 @@ impl Object<ConnectionStore> {
     pub async fn wait_for_connected_state(
         &self,
         remote_id: String,
-    ) -> Result<Object<MemberConnectionState>, Error> {
+    ) -> Result<Object<()>, Error> {
         self.execute_and_fetch(Statement::new(
             // language=JavaScript
             "
             async (store) => {
                 const [remoteId] = args;
-                const conn = store.connections.get(remoteId);
+                const connection = store.connections.get(remoteId);
 
-                if (!conn) {
+                if (!connection) {
                     throw new NotFoundError();
                 }
 
-                const state = conn.get_state();
+                const handle = connection.conn;
+                const state = handle.get_state();
 
                 const P2P = window.rust.MemberConnectionStateKind.P2P;
                 const CONNECTED = window.rust.PeerConnectionState.Connected;
 
-                if (state) {
-                    if (state.kind() !== P2P) {
-                        throw new Error();
-                    }
+                const isConnected = state && (
+                    state.kind() !== P2P || state.value() === CONNECTED
+                );
 
-                    return state.value() === CONNECTED;
+                if (isConnected) {
+                    return;
                 }
 
                 return new Promise((resolve) => {
-                    conn.stateListener.subs.push(resolve);
+                    connection.stateListener.subs.push((state) => {
+                        const isConnected = state.kind() !== P2P ||
+                            state.value() === CONNECTED;
+
+                        if (isConnected) {
+                            return resolve();
+                        }
+                    });
                 });
             }
             ",
