@@ -255,7 +255,7 @@ impl Member {
             if let Some(kind) = kind {
                 match kind {
                     MediaKind::Audio => match source {
-                        Some(MediaSourceKind::Device) => {
+                        Some(MediaSourceKind::Device) | None => {
                             self.room
                                 .enable_media_send(
                                     kind,
@@ -265,42 +265,9 @@ impl Member {
                                 .await?;
                             self.enabled_audio = true;
                         }
-                        Some(MediaSourceKind::Display) => {
-                            self.room
-                                .enable_media_send(
-                                   MediaKind::Video,
-                                    Some(MediaSourceKind::Display),
-                                    maybe_await,
-                                )
-                                .await?;
-                            self.enabled_video = true;
-                            self.room
-                                .enable_media_send(
-                                    kind,
-                                    Some(MediaSourceKind::Display),
-                                    maybe_await,
-                                )
-                                .await?;
-                            self.enabled_audio = true;
-                        },
-                        None => {
-                            self.room
-                                .enable_media_send(
-                                    MediaKind::Video,
-                                    Some(MediaSourceKind::Display),
-                                    maybe_await,
-                                )
-                                .await?;
-                            self.enabled_video = true;
-                            self.room
-                                .enable_media_send(
-                                    kind,
-                                    None,
-                                    maybe_await,
-                                )
-                                .await?;
-                            self.enabled_audio = true;
-                        }
+                        // Enabling `Display` audio without `Display` video
+                        // results in error.
+                        Some(MediaSourceKind::Display) => (),
                     },
                     MediaKind::Video => {
                         self.room
