@@ -133,7 +133,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {disable}
+                    {maybe_await} {disable};
                 }}
                 ",
             ),
@@ -173,7 +173,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {enable}
+                    {maybe_await} {enable};
                 }}
                 ",
             ),
