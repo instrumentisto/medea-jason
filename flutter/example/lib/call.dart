@@ -115,7 +115,7 @@ class Call {
               (element) => element.kind() == MediaDeviceKind.audioInput,
             )
             .deviceId();
-        constraints.audio(AudioTrackConstraints());
+        constraints.deviceAudio(AudioTrackConstraints());
       }
 
       var tracks = await _mediaManager.initLocalTracks(constraints);
@@ -200,7 +200,7 @@ class Call {
 
     var constraints = MediaStreamSettings();
     constraints.deviceVideo(video);
-    constraints.audio(audio);
+    constraints.deviceAudio(audio);
     if (screenShare) {
       constraints.displayVideo(display);
     }

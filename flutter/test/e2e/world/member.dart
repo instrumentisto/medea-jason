@@ -446,14 +446,14 @@ class Member {
     if (enabled) {
       if (kind != null) {
         if (kind == MediaKind.audio) {
-          await room.enableAudio();
+          await room.enableAudio(source);
           enabledAudio = true;
         } else {
           await room.enableVideo(source);
           enabledVideo = true;
         }
       } else {
-        await room.enableAudio();
+        await room.enableAudio(source);
         await room.enableVideo(source);
         enabledAudio = true;
         enabledVideo = true;
@@ -461,14 +461,14 @@ class Member {
     } else {
       if (kind != null) {
         if (kind == MediaKind.audio) {
-          await room.disableAudio();
+          await room.disableAudio(source);
           enabledAudio = false;
         } else {
           await room.disableVideo(source);
           enabledVideo = false;
         }
       } else {
-        await room.disableAudio();
+        await room.disableAudio(source);
         await room.disableVideo(source);
         enabledAudio = false;
         enabledVideo = false;
@@ -485,23 +485,23 @@ class Member {
     if (!muted) {
       if (kind != null) {
         if (kind == MediaKind.audio) {
-          await room.unmuteAudio();
+          await room.unmuteAudio(source);
         } else {
           await room.unmuteVideo(source);
         }
       } else {
-        await room.unmuteAudio();
+        await room.unmuteAudio(source);
         await room.unmuteVideo(source);
       }
     } else {
       if (kind != null) {
         if (kind == MediaKind.audio) {
-          await room.muteAudio();
+          await room.muteAudio(source);
         } else {
           await room.muteVideo(source);
         }
       } else {
-        await room.muteAudio();
+        await room.muteAudio(source);
         await room.muteVideo(source);
       }
     }
@@ -517,24 +517,24 @@ class Member {
     if (enabled) {
       if (kind != null) {
         if (kind == MediaKind.audio) {
-          await room.enableRemoteAudio();
+          await room.enableRemoteAudio(source);
         } else {
-          await room.enableRemoteVideo();
+          await room.enableRemoteVideo(source);
         }
       } else {
-        await room.enableRemoteAudio();
-        await room.enableRemoteVideo();
+        await room.enableRemoteAudio(source);
+        await room.enableRemoteVideo(source);
       }
     } else {
       if (kind != null) {
         if (kind == MediaKind.audio) {
-          await room.disableRemoteAudio();
+          await room.disableRemoteAudio(source);
         } else {
-          await room.disableRemoteVideo();
+          await room.disableRemoteVideo(source);
         }
       } else {
-        await room.disableRemoteAudio();
-        await room.disableRemoteVideo();
+        await room.disableRemoteAudio(source);
+        await room.disableRemoteVideo(source);
       }
     }
   }

@@ -1238,7 +1238,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_disable_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_disable_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1249,7 +1250,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::disable_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::disable_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_disable_remote_audio_impl(
@@ -1260,7 +1261,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_disable_remote_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_disable_remote_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1271,7 +1273,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::disable_remote_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::disable_remote_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_disable_remote_video_impl(
@@ -1328,7 +1330,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_enable_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_enable_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1339,7 +1342,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::enable_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::enable_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_enable_remote_audio_impl(
@@ -1350,7 +1353,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_enable_remote_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_enable_remote_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1361,7 +1365,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::enable_remote_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::enable_remote_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_enable_remote_video_impl(
@@ -1441,7 +1445,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_mute_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_mute_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1452,7 +1457,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::mute_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::mute_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_mute_video_impl(
@@ -1626,7 +1631,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_unmute_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_unmute_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1637,7 +1643,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::unmute_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::unmute_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_unmute_video_impl(

@@ -461,7 +461,7 @@ impl TransceiverSide for State {
 
     fn source_kind(&self) -> MediaSourceKind {
         match &self.media_type {
-            MediaType::Audio(_) => MediaSourceKind::Device,
+            MediaType::Audio(audio) => audio.source_kind,
             MediaType::Video(video) => video.source_kind,
         }
     }

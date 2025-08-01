@@ -28,11 +28,20 @@ impl MediaStreamSettings {
         media::MediaStreamSettings::new().into()
     }
 
-    /// Specifies the nature and settings of an audio [MediaStreamTrack][1].
+    /// Specifies the nature and settings of a device audio
+    /// [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    pub fn audio(&mut self, constraints: AudioTrackConstraints) {
-        self.0.audio(constraints.into());
+    pub fn device_audio(&mut self, constraints: AudioTrackConstraints) {
+        self.0.device_audio(constraints.into());
+    }
+
+    /// Specifies the nature and settings of a display audio
+    /// [MediaStreamTrack][1].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    pub fn display_audio(&mut self, constraints: AudioTrackConstraints) {
+        self.0.display_audio(constraints.into());
     }
 
     /// Set constraints that will be used to obtain a local video sourced from
