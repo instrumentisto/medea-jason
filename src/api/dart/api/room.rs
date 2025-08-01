@@ -100,11 +100,14 @@ impl RoomHandle {
     /// Mutes outbound audio in the provided [`Room`].
     #[frb(sync)]
     #[must_use]
-    pub fn mute_audio(&self) -> DartOpaque {
+    pub fn mute_audio(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> DartOpaque {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.mute_audio(None).await?;
+            room_handle.mute_audio(source_kind).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }
@@ -115,11 +118,14 @@ impl RoomHandle {
     /// Unmutes outbound audio in the provided [`Room`].
     #[frb(sync)]
     #[must_use]
-    pub fn unmute_audio(&self) -> DartOpaque {
+    pub fn unmute_audio(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> DartOpaque {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.unmute_audio(None).await?;
+            room_handle.unmute_audio(source_kind).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }
@@ -130,11 +136,14 @@ impl RoomHandle {
     /// Enables outbound audio in the provided [`Room`].
     #[frb(sync)]
     #[must_use]
-    pub fn enable_audio(&self) -> DartOpaque {
+    pub fn enable_audio(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> DartOpaque {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.enable_audio(None).await?;
+            room_handle.enable_audio(source_kind).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }
@@ -145,11 +154,14 @@ impl RoomHandle {
     /// Disables outbound audio in the provided [`Room`].
     #[frb(sync)]
     #[must_use]
-    pub fn disable_audio(&self) -> DartOpaque {
+    pub fn disable_audio(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> DartOpaque {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.disable_audio(None).await?;
+            room_handle.disable_audio(source_kind).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }
@@ -256,11 +268,14 @@ impl RoomHandle {
     /// Enables inbound audio in the provided [`Room`].
     #[frb(sync)]
     #[must_use]
-    pub fn enable_remote_audio(&self) -> DartOpaque {
+    pub fn enable_remote_audio(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> DartOpaque {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.enable_remote_audio(None).await?;
+            room_handle.enable_remote_audio(source_kind).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }
@@ -271,11 +286,14 @@ impl RoomHandle {
     /// Disables inbound audio in the provided [`Room`].
     #[frb(sync)]
     #[must_use]
-    pub fn disable_remote_audio(&self) -> DartOpaque {
+    pub fn disable_remote_audio(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> DartOpaque {
         let room_handle = self.0.clone();
 
         async move {
-            room_handle.disable_remote_audio(None).await?;
+            room_handle.disable_remote_audio(source_kind).await?;
 
             Ok::<_, Traced<core::ChangeMediaStateError>>(())
         }
