@@ -307,58 +307,44 @@ class Member {
     }
   }
 
-  /// Waits for a `Connected` state of `Connection` to the [Member] with the
+  /// Waits for specific state of `Connection` to the [Member] with the
   /// provided [id].
-  Future<void> waitForConnected(String id) async {
+  Future<void> waitForState(
+    String id,
+    MemberConnectionState? expectedState,
+  ) async {
     var completer = Completer();
     var conn = connectionStore.connections[id]!;
     var state = conn.getState();
 
     if (state != null) {
+      if (expectedState == null) {
+        completer.completeError('State must not be set');
+        return completer.future;
+      }
+
       switch (state) {
-        case MemberConnectionState_P2P(:final peerState):
-          if (peerState == PeerConnectionState.connected) {
+        case MemberConnectionStateP2P(:final peerState):
+          var isStateMatch =
+              expectedState is MemberConnectionStateP2P &&
+              peerState == expectedState.peerState;
+          if (isStateMatch) {
             completer.complete();
             return completer.future;
           }
       }
+    } else if (expectedState == null) {
+      completer.complete();
+      return completer.future;
     }
 
     connectionStore.stateChange[id] = (state) {
       switch (state) {
-        case MemberConnectionState_P2P(:final peerState):
-          if (peerState == PeerConnectionState.connected) {
-            completer.complete();
-            connectionStore.stateChange[id] = (_) {};
-            return;
-          }
-      }
-    };
-
-    return completer.future;
-  }
-
-  /// Waits for a `Disconnected` state of `Connection` to the [Member] with the
-  /// provided [id].
-  Future<void> waitForDisconnected(String id) async {
-    var completer = Completer();
-    var conn = connectionStore.connections[id]!;
-    var state = conn.getState();
-
-    if (state != null) {
-      switch (state) {
-        case MemberConnectionState_P2P(:final peerState):
-          if (peerState == PeerConnectionState.disconnected) {
-            completer.complete();
-            return completer.future;
-          }
-      }
-    }
-
-    connectionStore.stateChange[id] = (state) {
-      switch (state) {
-        case MemberConnectionState_P2P(:final peerState):
-          if (peerState == PeerConnectionState.disconnected) {
+        case MemberConnectionStateP2P(:final peerState):
+          var isStateMatch =
+              expectedState is MemberConnectionStateP2P &&
+              peerState == expectedState.peerState;
+          if (isStateMatch) {
             completer.complete();
             connectionStore.stateChange[id] = (_) {};
             return;

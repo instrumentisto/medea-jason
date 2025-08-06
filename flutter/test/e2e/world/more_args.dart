@@ -2,6 +2,8 @@ import 'package:gherkin/gherkin.dart';
 import 'package:tuple/tuple.dart';
 
 import 'package:medea_jason/src/interface/media_track.dart';
+import 'package:medea_jason/src/interface/member_connection_state.dart';
+import 'package:medea_jason/src/interface/enums.dart' show PeerConnectionState;
 
 StepDefinitionGeneric<TWorld> step6<
   TWorld extends World,
@@ -250,6 +252,44 @@ Tuple2<MediaKind, MediaSourceKind> parseMediaKind(String kind) {
     }
   }
   return Tuple2(kind_, source);
+}
+
+MemberConnectionState? parseConnectionState(String state) {
+  var trimmed = state.trim();
+
+  if (trimmed == 'None') {
+    return null;
+  }
+
+  var parts = trimmed.split('::');
+
+  if (parts[0] == 'P2P') {
+    if (parts[1] == 'New') {
+      return MemberConnectionStateP2P(PeerConnectionState.new_);
+    }
+
+    if (parts[1] == 'Connecting') {
+      return MemberConnectionStateP2P(PeerConnectionState.connecting);
+    }
+
+    if (parts[1] == 'Connected') {
+      return MemberConnectionStateP2P(PeerConnectionState.connected);
+    }
+
+    if (parts[1] == 'Disconnected') {
+      return MemberConnectionStateP2P(PeerConnectionState.disconnected);
+    }
+
+    if (parts[1] == 'Failed') {
+      return MemberConnectionStateP2P(PeerConnectionState.failed);
+    }
+
+    if (parts[1] == 'Closed') {
+      return MemberConnectionStateP2P(PeerConnectionState.closed);
+    }
+  }
+
+  return null;
 }
 
 StepDefinitionGeneric<TWorld>

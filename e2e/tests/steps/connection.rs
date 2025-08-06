@@ -5,6 +5,7 @@ use crate::{
     steps::{parse_connection_state, parse_media_kind},
 };
 
+#[when(regex = r"^(\S+) receives connection with (\S+)$")]
 #[then(regex = r"^(\S+) receives connection with (\S+)$")]
 async fn then_member_receives_connection(
     world: &mut World,
@@ -79,18 +80,4 @@ async fn when_connection_changes_remote_media_state(
     } else {
         connection.disable_remote_media(kind).await.unwrap();
     }
-}
-
-#[when(regex = r"^(\S+) receives connection with (\S+)$")]
-async fn when_member_receives_connection(
-    world: &mut World,
-    id: String,
-    responder_id: String,
-) {
-    let member = world.get_member(&id).unwrap();
-    member
-        .connections()
-        .wait_for_connection(responder_id.clone())
-        .await
-        .unwrap();
 }

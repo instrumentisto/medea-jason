@@ -1,6 +1,6 @@
 Feature: `on_state_change` callback
 
-  Scenario: Member joined and on_state_change() triggered
+  Scenario Outline: Member joined and on_state_change() triggered
     Given room with joined members Alice and Bob
     When Alice receives connection with Bob
     Then Alice's connection with Bob is <connection_state>
@@ -17,7 +17,7 @@ Feature: `on_state_change` callback
       | connection_state  |
       | None              |
 
-  Scenario: Member disconnected and on_state_change() triggered
+  Scenario Outline: Member disconnected and on_state_change() triggered
     Given room with joined members Alice and Bob
     When Alice loses WS connection
     Then Alice's connection with Bob is <connection_state>

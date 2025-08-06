@@ -114,7 +114,7 @@ impl Object<ConnectionStore> {
 
                 if (state !== undefined) {
                     if (expected === null) {
-                        throw new Error('State must be set');
+                        throw new Error('State must not be set');
                     }
 
                     if (state.kind() !== kinds[expected.kind]) {

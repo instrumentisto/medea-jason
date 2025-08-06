@@ -11,8 +11,7 @@ List<StepDefinitionGeneric> steps() {
   return [
     thenConnectionCloses,
     thenMemberReceivesConnection,
-    thenMemberGetsConnected,
-    thenMemberGetsDisconnected,
+    thenMemberConnectionStateIs,
     whenConnectionChangesRemoteMediaState,
     whenMemberReceivesConnection,
     thenMemberDoesntReceiveConnection,
@@ -45,35 +44,17 @@ StepDefinitionGeneric thenMemberDoesntReceiveConnection =
       },
     );
 
-StepDefinitionGeneric thenMemberGetsConnected =
-    then2<String, String, CustomWorld>(r'(\S+) gets connected with (\S+)$', (
-      id,
-      responderId,
-      context,
-    ) async {
-      // `on_state_change()` is not implemented for SFU.
-      if (isSfu) {
-        return;
-      }
-
-      var member = context.world.members[id]!;
-      await member.waitForConnected(responderId);
-    });
-
-StepDefinitionGeneric thenMemberGetsDisconnected =
-    then2<String, String, CustomWorld>(r'(\S+) gets disconnected with (\S+)$', (
-      id,
-      responderId,
-      context,
-    ) async {
-      // `on_state_change()` is not implemented for SFU.
-      if (isSfu) {
-        return;
-      }
-
-      var member = context.world.members[id]!;
-      await member.waitForDisconnected(responderId);
-    });
+StepDefinitionGeneric thenMemberConnectionStateIs =
+    then3<String, String, String, CustomWorld>(
+      r"(\S+)'s connection with (\S+) is (\S+)$",
+      (id, responderId, connectionState, context) async {
+        var member = context.world.members[id]!;
+        await member.waitForState(
+          responderId,
+          parseConnectionState(connectionState),
+        );
+      },
+    );
 
 StepDefinitionGeneric whenConnectionChangesRemoteMediaState =
     when4<String, String, String, String, CustomWorld>(
