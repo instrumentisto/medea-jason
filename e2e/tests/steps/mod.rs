@@ -10,7 +10,8 @@ use std::{convert::Infallible, str::FromStr};
 use async_recursion::async_recursion;
 use cucumber::given;
 use medea_e2e::object::{
-    AwaitCompletion, MediaKind, MediaSourceKind, room::ParsingFailedError,
+    AwaitCompletion, MediaKind, MediaSourceKind,
+    connection::MemberConnectionState, room::ParsingFailedError,
 };
 
 use crate::world::{World, member::Builder as MemberBuilder};
@@ -271,4 +272,17 @@ fn parse_media_kinds(
         MediaKind::Video => s.parse()?,
     };
     Ok((media_kind, source_kind))
+}
+
+/// Parses a [`MemberConnectionState`] from the provided `str`.
+fn parse_connection_state(
+    s: &str,
+) -> Result<Option<MemberConnectionState>, ParsingFailedError> {
+    let s = s.trim();
+
+    if s == "None" {
+        return Ok(None);
+    }
+
+    Ok(Some(s.parse()?))
 }

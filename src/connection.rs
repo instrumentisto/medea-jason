@@ -769,6 +769,13 @@ impl Connection {
 
     /// Updates the [`PeerConnectionState`] of this [`Connection`].
     pub fn update_peer_state(&self, state: PeerConnectionState) {
+        if self.0.connection_mode != ConnectionMode::Mesh {
+            // `MemberConnectionState::SFU` isn't implemented.
+            // See instrumentisto/medea-jason#211 for the details:
+            // https://github.com/instrumentisto/medea-jason/issues/211
+            return;
+        }
+
         let state = state.into();
 
         if self.0.state.replace(Some(state)) == Some(state) {
@@ -777,17 +784,9 @@ impl Connection {
 
         self.refresh_client_conn_quality_score();
 
-        match self.0.connection_mode {
-            // `MemberConnectionState::SFU` isn't implemented.
-            // See instrumentisto/medea-jason#211 for the details:
-            // https://github.com/instrumentisto/medea-jason/issues/211
-            ConnectionMode::Sfu => (),
-            ConnectionMode::Mesh => {
-                self.0
-                    .on_state_change
-                    .call1::<api::MemberConnectionState>(state.into());
-            }
-        }
+        self.0
+            .on_state_change
+            .call1::<api::MemberConnectionState>(state.into());
     }
 
     /// Refreshes the [`ClientConnectionQualityScore`] of this [`Connection`].
