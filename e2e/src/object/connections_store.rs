@@ -145,7 +145,7 @@ impl Object<ConnectionStore> {
             ",
             [
                 remote_id.into(),
-                serde_json::to_value(state).map_err(|_| Error::TypeCast)?,
+                serde_json::to_value(state).map_err(|_e| Error::TypeCast)?,
             ],
         ))
         .await
