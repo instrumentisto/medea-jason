@@ -30,13 +30,13 @@ class WebConnectionHandle implements ConnectionHandle {
 
   @override
   MemberConnectionState? getState() {
-    return freezeState(obj.get_state());
+    return convertState(obj.get_state());
   }
 
   @override
   void onStateChange(void Function(MemberConnectionState) f) {
     void fn(JSAny state) =>
-        f(freezeState(state as wasm.MemberConnectionState)!);
+        f(convertState(state as wasm.MemberConnectionState)!);
     fallibleFunction(() => obj.on_state_change(fn.toJS));
   }
 
@@ -83,7 +83,7 @@ class WebConnectionHandle implements ConnectionHandle {
     obj.free();
   }
 
-  MemberConnectionState? freezeState(wasm.MemberConnectionState? state) {
+  MemberConnectionState? convertState(wasm.MemberConnectionState? state) {
     if (state == null) {
       return null;
     }
@@ -98,7 +98,9 @@ class WebConnectionHandle implements ConnectionHandle {
       return MemberConnectionStateP2P(peerState);
     }
 
-    // TODO: implement for SFU.
+    // TODO: implement for SFU when Jason will support it.
+    // See instrumentisto/medea-jason#211 for the details:
+    // https://github.com/instrumentisto/medea-jason/issues/211
     throw UnimplementedError(
       'Only MemberConnectionStateKind.p2p is supported.',
     );

@@ -143,7 +143,10 @@ impl Object<ConnectionStore> {
                 });
             }
             ",
-            [remote_id.into(), serde_json::to_value(state).unwrap()],
+            [
+                remote_id.into(),
+                serde_json::to_value(state).map_err(|_| Error::TypeCast)?,
+            ],
         ))
         .await
     }

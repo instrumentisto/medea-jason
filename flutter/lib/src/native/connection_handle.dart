@@ -27,14 +27,14 @@ class NativeConnectionHandle implements ConnectionHandle {
 
   @override
   MemberConnectionState? getState() {
-    return freezeState(opaque.inner.getState());
+    return convertState(opaque.inner.getState());
   }
 
   @override
   void onStateChange(void Function(MemberConnectionState) f) {
     opaque.inner.onStateChange(
       f: (t) {
-        f(freezeState(frb.MemberConnectionState.fromPtr(ptr: t.address))!);
+        f(convertState(frb.MemberConnectionState.fromPtr(ptr: t.address))!);
       },
     );
   }
@@ -88,7 +88,7 @@ class NativeConnectionHandle implements ConnectionHandle {
     await (opaque.inner.disableRemoteVideo(sourceKind: kind) as Future);
   }
 
-  MemberConnectionState? freezeState(frb.MemberConnectionState? state) {
+  MemberConnectionState? convertState(frb.MemberConnectionState? state) {
     if (state == null) {
       return null;
     }
