@@ -1,9 +1,9 @@
 import 'package:gherkin/gherkin.dart';
 import 'package:tuple/tuple.dart';
 
+import 'package:medea_jason/src/interface/enums.dart' show PeerConnectionState;
 import 'package:medea_jason/src/interface/media_track.dart';
 import 'package:medea_jason/src/interface/member_connection_state.dart';
-import 'package:medea_jason/src/interface/enums.dart' show PeerConnectionState;
 
 StepDefinitionGeneric<TWorld> step6<
   TWorld extends World,
