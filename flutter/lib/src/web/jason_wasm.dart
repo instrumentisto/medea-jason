@@ -42,7 +42,7 @@ extension type RpcClientExceptionKind._(JSObject _) implements JSObject {
 extension type MemberConnectionState._(JSObject _) implements JSObject {
   external num kind();
   external JSAny value();
-  external String test();
+  external void free();
 }
 
 @JS()

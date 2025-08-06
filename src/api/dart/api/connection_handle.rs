@@ -95,9 +95,8 @@ impl ConnectionHandle {
 
     /// Returns `MemberConnectionState` of the [`Connection`].
     ///
-    /// <div class="warning">
-    /// NOTE: this method only works in `P2P` mode and is subject to change.
-    /// </div>
+    /// __NOTE__: this method only works in `P2P` mode and is subject to
+    ///           change.
     ///
     /// # Errors
     ///
@@ -116,9 +115,8 @@ impl ConnectionHandle {
     /// Sets a callback to be invoked once a state of associated [`Connection`]
     /// is changed.
     ///
-    /// <div class="warning">
-    /// NOTE: this method only works in `P2P` mode and is subject to change.
-    /// </div>
+    /// __NOTE__: this method only works in `P2P` mode and is subject to
+    ///           change.
     ///
     /// # Errors
     ///

@@ -1,6 +1,6 @@
 import '/src/util/rust_handles_storage.dart';
-import 'enums.dart';
 import 'media_track.dart';
+import 'member_connection_state.dart';
 
 /// External handler to a `Connection` with a remote `Member`.
 abstract class ConnectionHandle implements SyncPlatformHandle {

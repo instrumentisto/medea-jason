@@ -187,7 +187,7 @@ class _CallState extends State<CallRoute> {
 
         conn.onStateChange((state) {
           switch (state) {
-            case jason.MemberConnectionState_P2P(:final peerState):
+            case jason.MemberConnectionStateP2P(:final peerState):
               switch (peerState) {
                 case jason.PeerConnectionState.new_:
                   _memberConnectionState = 'P2P (New)';

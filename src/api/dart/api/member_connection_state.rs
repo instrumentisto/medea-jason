@@ -68,6 +68,7 @@ impl From<proto::PeerConnectionState> for PeerConnectionState {
     }
 }
 
+/// State of a member [`Connection`].
 #[derive(Clone, Copy, Debug)]
 pub enum MemberConnectionState {
     /// State in P2P mode.

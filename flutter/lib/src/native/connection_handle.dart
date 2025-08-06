@@ -6,8 +6,8 @@ import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/frb/frb.dart' as frb;
 
-import '../interface/enums.dart'
-    show MemberConnectionState, PeerConnectionState;
+import '../interface/member_connection_state.dart'
+    show MemberConnectionState, MemberConnectionStateP2P;
 
 class NativeConnectionHandle implements ConnectionHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
@@ -95,24 +95,7 @@ class NativeConnectionHandle implements ConnectionHandle {
 
     switch (state) {
       case frb.MemberConnectionState_P2P(:final field0):
-        return MemberConnectionState.p2p(freezePeerState(field0));
-    }
-  }
-
-  PeerConnectionState freezePeerState(frb.PeerConnectionState peerState) {
-    switch (peerState) {
-      case frb.PeerConnectionState.new_:
-        return PeerConnectionState.new_;
-      case frb.PeerConnectionState.connecting:
-        return PeerConnectionState.connecting;
-      case frb.PeerConnectionState.connected:
-        return PeerConnectionState.connected;
-      case frb.PeerConnectionState.disconnected:
-        return PeerConnectionState.disconnected;
-      case frb.PeerConnectionState.failed:
-        return PeerConnectionState.failed;
-      case frb.PeerConnectionState.closed:
-        return PeerConnectionState.closed;
+        return MemberConnectionStateP2P(field0);
     }
   }
 }
