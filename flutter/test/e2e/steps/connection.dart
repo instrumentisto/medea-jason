@@ -5,8 +5,6 @@ import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
 
-const bool isSfu = bool.fromEnvironment('SFU', defaultValue: false);
-
 List<StepDefinitionGeneric> steps() {
   return [
     thenConnectionCloses,
