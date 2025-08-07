@@ -3,15 +3,15 @@ Feature: `on_state_change` callback
   Scenario Outline: Member joined and on_state_change() triggered
     Given room with joined members Alice and Bob
     When Alice receives connection with Bob
+    And Bob receives connection with Alice
     Then Alice's connection with Bob is <connection_state>
-    When Bob receives connection with Alice
-    Then Bob's connection with Alice is <connection_state>
+    And Bob's connection with Alice is <connection_state>
 
     @mesh
     Examples:
       | connection_state  |
       | P2P::Connected    |
-
+    # TOOD: Implement for SFU.
     @sfu
     Examples:
       | connection_state  |
@@ -26,7 +26,7 @@ Feature: `on_state_change` callback
     Examples:
       | connection_state  |
       | P2P::Disconnected |
-
+    # TOOD: Implement for SFU.
     @sfu
     Examples:
       | connection_state  |

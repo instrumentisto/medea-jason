@@ -13,9 +13,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Added
 
 - Library API:
-    - Ability to get and track state of a `Connection`: ([#229])
-        - `ConnectionHandle.get_state()` method.
-        - `ConnectionHandle.on_state_change()` callback for updates triggered by P2P state changes.
+    - `ConnectionHandle.get_state()` and `ConnectionHandle.on_state_change()` to track connection with the remote member in P2P mode. ([#229])
 
 ### Fixed
 

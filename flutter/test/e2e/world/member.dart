@@ -307,7 +307,7 @@ class Member {
     }
   }
 
-  /// Waits for specific state of `Connection` to the [Member] with the
+  /// Waits for a specific `Connection` state with the [Member] with the
   /// provided [id].
   Future<void> waitForState(
     String id,

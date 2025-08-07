@@ -40,9 +40,9 @@ extension type RpcClientExceptionKind._(JSObject _) implements JSObject {
 
 @JS()
 extension type MemberConnectionState._(JSObject _) implements JSObject {
+  external void free();
   external num kind();
   external JSAny value();
-  external void free();
 }
 
 @JS()

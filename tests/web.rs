@@ -77,7 +77,6 @@ macro_rules! js_callback {
     }}
 }
 
-mod connection;
 mod media;
 mod peer;
 mod room;

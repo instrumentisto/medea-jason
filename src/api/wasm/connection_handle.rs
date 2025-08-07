@@ -56,6 +56,8 @@ impl ConnectionHandle {
 
     /// Returns `MemberConnectionState` of the [`Connection`].
     ///
+    /// __NOTE__: only works in `P2P` mode and is subject to change.
+    ///
     /// # Errors
     ///
     /// With a [`StateError`] if an underlying object has been disposed, e.g.
@@ -79,6 +81,8 @@ impl ConnectionHandle {
 
     /// Sets a callback to be invoked once a state of associated [`Connection`]
     /// is changed.
+    ///
+    /// __NOTE__: only works in `P2P` mode and is subject to change.
     ///
     /// # Errors
     ///

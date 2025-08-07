@@ -336,7 +336,7 @@ impl Object<Room> {
     /// # Errors
     ///
     /// If failed to execute JS statement.
-    #[expect(clippy::too_many_lines, reason = "not a problem here")]
+    #[expect(clippy::too_many_lines, reason = "needs refactoring")]
     pub async fn connections_store(
         &self,
     ) -> Result<Object<ConnectionStore>, Error> {

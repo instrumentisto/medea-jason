@@ -5842,12 +5842,18 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
 
   /// Returns `MemberConnectionState` of the [`Connection`].
   ///
-  /// __NOTE__: this method only works in `P2P` mode and is subject to
-  ///           change.
+  /// __NOTE__: only works in `P2P` mode and is subject to change.
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::get_state()`] method errors.
+  /// With a [`StateError`] if an underlying object has been disposed, e.g.
+  /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+  /// a [`RoomHandle`] that implicitly owns native object behind this
+  /// [`ConnectionHandle`].
+  ///
+  /// [`Jason`]: api::Jason
+  /// [`RoomHandle`]: api::RoomHandle
+  /// [`StateError`]: crate::api::err::StateError
   MemberConnectionState? getState() => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleGetState(that: this);
 
@@ -5891,12 +5897,18 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   /// Sets a callback to be invoked once a state of associated [`Connection`]
   /// is changed.
   ///
-  /// __NOTE__: this method only works in `P2P` mode and is subject to
-  ///           change.
+  /// __NOTE__: only works in `P2P` mode and is subject to change.
   ///
   /// # Errors
   ///
-  /// If the [`core::ConnectionHandle::on_state_change()`] method errors.
+  /// With a [`StateError`] if an underlying object has been disposed, e.g.
+  /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+  /// a [`RoomHandle`] that implicitly owns native object behind this
+  /// [`ConnectionHandle`].
+  ///
+  /// [`Jason`]: api::Jason
+  /// [`RoomHandle`]: api::RoomHandle
+  /// [`StateError`]: crate::api::err::StateError
   void onStateChange({required Object f}) => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleOnStateChange(
         that: this,

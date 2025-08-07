@@ -34,7 +34,12 @@ class NativeConnectionHandle implements ConnectionHandle {
   void onStateChange(void Function(MemberConnectionState) f) {
     opaque.inner.onStateChange(
       f: (t) {
-        f(convertState(frb.MemberConnectionState.fromPtr(ptr: t.address))!);
+        var state = convertState(
+          frb.MemberConnectionState.fromPtr(ptr: t.address),
+        );
+        if (state != null) {
+          f(state);
+        }
       },
     );
   }
@@ -87,15 +92,15 @@ class NativeConnectionHandle implements ConnectionHandle {
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
     await (opaque.inner.disableRemoteVideo(sourceKind: kind) as Future);
   }
+}
 
-  MemberConnectionState? convertState(frb.MemberConnectionState? state) {
-    if (state == null) {
-      return null;
-    }
+MemberConnectionState? convertState(frb.MemberConnectionState? state) {
+  if (state == null) {
+    return null;
+  }
 
-    switch (state) {
-      case frb.MemberConnectionState_P2P(:final field0):
-        return MemberConnectionStateP2P(field0);
-    }
+  switch (state) {
+    case frb.MemberConnectionState_P2P(:final field0):
+      return MemberConnectionStateP2P(field0);
   }
 }
