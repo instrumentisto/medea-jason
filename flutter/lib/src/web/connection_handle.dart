@@ -98,8 +98,6 @@ MemberConnectionState? convertState(wasm.MemberConnectionState? state) {
       var peerState =
           PeerConnectionState.values[(state.value() as JSNumber).toDartInt];
 
-      state.free();
-
       return MemberConnectionStateP2P(peerState);
     } else {
       // TODO: Implement for SFU:
