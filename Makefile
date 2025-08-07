@@ -337,7 +337,7 @@ endif
 define cargo.build.medea-jason.android
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
-	cargo ndk -p $(ANDROID_SDK_MIN_VERSION) -t $(target) \
+	cargo ndk --platform $(ANDROID_SDK_MIN_VERSION) -t $(target) \
 	          -o ./flutter/android/src/main/jniLibs \
 	          --manifest-path=./Cargo.toml \
 		build $(if $(call eq,$(debug),no),--release,) $(args)
