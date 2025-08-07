@@ -43,23 +43,23 @@ class WebRoomHandle implements RoomHandle {
   }
 
   @override
-  Future<void> muteAudio() async {
-    await fallibleFuture(obj.mute_audio().toDart);
+  Future<void> muteAudio([MediaSourceKind? kind]) async {
+    await fallibleFuture(obj.mute_audio(kind?.index).toDart);
   }
 
   @override
-  Future<void> unmuteAudio() async {
-    await fallibleFuture(obj.unmute_audio().toDart);
+  Future<void> unmuteAudio([MediaSourceKind? kind]) async {
+    await fallibleFuture(obj.unmute_audio(kind?.index).toDart);
   }
 
   @override
-  Future<void> enableAudio() async {
-    await fallibleFuture(obj.enable_audio().toDart);
+  Future<void> enableAudio([MediaSourceKind? kind]) async {
+    await fallibleFuture(obj.enable_audio(kind?.index).toDart);
   }
 
   @override
-  Future<void> disableAudio() async {
-    await fallibleFuture(obj.disable_audio().toDart);
+  Future<void> disableAudio([MediaSourceKind? kind]) async {
+    await fallibleFuture(obj.disable_audio(kind?.index).toDart);
   }
 
   @override
@@ -83,13 +83,13 @@ class WebRoomHandle implements RoomHandle {
   }
 
   @override
-  Future<void> enableRemoteAudio() async {
-    await fallibleFuture(obj.enable_remote_audio().toDart);
+  Future<void> enableRemoteAudio([MediaSourceKind? kind]) async {
+    await fallibleFuture(obj.enable_remote_audio(kind?.index).toDart);
   }
 
   @override
-  Future<void> disableRemoteAudio() async {
-    await fallibleFuture(obj.disable_remote_audio().toDart);
+  Future<void> disableRemoteAudio([MediaSourceKind? kind]) async {
+    await fallibleFuture(obj.disable_remote_audio(kind?.index).toDart);
   }
 
   @override

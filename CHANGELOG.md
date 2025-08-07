@@ -5,6 +5,36 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
+
+### Added
+ 
+- Ability to capture system audio tracks: ([#225])
+    - `MediaStreamSettings.display_audio()` to set system audio constraints.
+    - `MediaStreamSettings.get_display_audio()` to get system audio constraints.
+    - `MediaStreamSettings.is_display_audio_enabled()` to indicate whether system audio is enabled.
+    - `AudioSource` to distinguish system audio and device audio in `TrackConstraints`.
+    - `DisplayMediaStreamConstraints.audio()` to set system audio constraints. (only for WASM platform)
+    - `TrackRequestError.ExpectedDisplayAudioTracks` to indicate invalid system audio tracks in `SimpleTracksRequest.parse_tracks()` and `SimpleTracksRequest.merge()`.
+    - `TrackRequestError.TooManyDisplayAudioTracks` to indicate invalid conversion from `TrackRequest` with system audio tracks to `SimpleTracksRequest`.
+
+### Changed
+
+- Device audio tracks: ([#225])
+    - `MediaStreamSettings.audio()` renamed to `MediaStreamSettings.device_audio()`.
+    - `MediaStreamSettings.get_audio()` renamed to `MediaStreamSettings.get_device_audio()`.
+    - `MediaStreamSettings.set_audio_publish()` now receives third argument for source kind of track.
+    - `MediaStreamSettings.is_audio_enabled()` renamed to `MediaStreamSettings.is_device_audio_enabled()`.
+    - `TrackRequestError.ExpectedAudioTracks` renamed to `TrackRequestError.ExpectedDeviceAudioTracks`.
+    - `TrackRequestError.TooManyAudioTracks` renamed to `TrackRequestError.TooManyDeviceAudioTracks`.
+    - `RoomHandle.mute_audio()`, `RoomHandle.unmute_audio()`, `RoomHandle.enable_audio()`, `RoomHandle.disable_audio()`, `RoomHandle.enable_remote_audio()`, and `RoomHandle.disable_remote_audio()` now receive an argument to specify `MediaSourceKind`.
+
+[#225]: https://github.com/instrumentisto/medea-jason/pull/225
+
+
+
 
 ## master
 

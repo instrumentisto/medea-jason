@@ -127,7 +127,7 @@ mod audio_processing {
         let media_manager = media_manager.unwrap_or_default();
         let constraints = {
             let mut constraints = api::MediaStreamSettings::new();
-            constraints.audio(caps);
+            constraints.device_audio(caps);
             constraints
         };
         js_sys::Array::from(
