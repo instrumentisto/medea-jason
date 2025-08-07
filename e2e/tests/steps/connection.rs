@@ -5,6 +5,7 @@ use crate::{
     steps::{parse_connection_state, parse_media_kind},
 };
 
+#[when(regex = r"^(\S+) receives connection with (\S+)$")]
 #[then(regex = r"^(\S+) receives connection with (\S+)$")]
 async fn then_member_receives_connection(
     world: &mut World,
