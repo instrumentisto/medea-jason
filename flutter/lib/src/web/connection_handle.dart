@@ -3,11 +3,18 @@
 import 'dart:js_interop';
 
 import '../interface/connection_handle.dart';
+import '../interface/enums.dart';
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 import 'remote_media_track.dart';
+
+import '../interface/member_connection_state.dart'
+    show
+        MemberConnectionState,
+        MemberConnectionStateP2P,
+        MemberConnectionStateKind;
 
 class WebConnectionHandle implements ConnectionHandle {
   late wasm.ConnectionHandle obj;
@@ -17,6 +24,23 @@ class WebConnectionHandle implements ConnectionHandle {
   @override
   String getRemoteMemberId() {
     return fallibleFunction(() => obj.get_remote_member_id());
+  }
+
+  @override
+  MemberConnectionState? getState() {
+    return convertState(obj.get_state());
+  }
+
+  @override
+  void onStateChange(void Function(MemberConnectionState) f) {
+    void fn(JSAny s) {
+      var state = convertState(s as wasm.MemberConnectionState);
+      if (state != null) {
+        f(state);
+      }
+    }
+
+    fallibleFunction(() => obj.on_state_change(fn.toJS));
   }
 
   @override
@@ -60,5 +84,27 @@ class WebConnectionHandle implements ConnectionHandle {
   @override
   void free() {
     obj.free();
+  }
+}
+
+MemberConnectionState? convertState(wasm.MemberConnectionState? state) {
+  if (state == null) {
+    return null;
+  }
+
+  try {
+    if (MemberConnectionStateKind.values[state.kind().toInt()] ==
+        MemberConnectionStateKind.p2p) {
+      var peerState =
+          PeerConnectionState.values[(state.value() as JSNumber).toDartInt];
+
+      return MemberConnectionStateP2P(peerState);
+    } else {
+      // TODO: Implement for SFU:
+      //       https://github.com/instrumentisto/medea-jason/issues/211
+      return null;
+    }
+  } finally {
+    state.free();
   }
 }

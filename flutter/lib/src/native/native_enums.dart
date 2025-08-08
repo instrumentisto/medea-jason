@@ -1,3 +1,5 @@
+export '../native/ffi/frb/api/dart/api/member_connection_state.dart'
+    show PeerConnectionState;
 export '../native/ffi/frb/media/track/remote.dart' show MediaDirection;
 export '../native/ffi/frb/media/track.dart' show MediaSourceKind;
 export '../native/ffi/frb/media.dart' show MediaKind, MediaDeviceKind;

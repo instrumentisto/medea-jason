@@ -10,11 +10,17 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
 
+### Added
+
+- Library API:
+    - `ConnectionHandle.get_state()` and `ConnectionHandle.on_state_change()` to track connection with the remote member in P2P mode. ([#229])
+
 ### Fixed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
+[#229]: https://github.com/instrumentisto/medea-jason/pull/229
 
 
 

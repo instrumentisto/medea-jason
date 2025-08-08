@@ -159,6 +159,7 @@ impl Sid {
     pub fn to_uri_string(&self) -> String {
         let mut sid =
             format!("{}/{}/{}", self.public_url, self.room_id, self.member_id);
+        #[expect(clippy::expect_used, reason = "never fails")]
         if let Some(plain) = &self.creds {
             write!(sid, "?token={}", plain.expose_str())
                 .expect("writing to `String` never fails");

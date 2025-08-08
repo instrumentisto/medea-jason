@@ -5,7 +5,7 @@ use send_wrapper::SendWrapper;
 use tracerr::Traced;
 
 use crate::{
-    api::{Error as DartError, dart::api::ForeignClass},
+    api::{Error as DartError, MemberConnectionState, dart::api::ForeignClass},
     connection as core,
     media::MediaSourceKind,
     platform::{self, utils::dart_future::IntoDartFuture as _},
@@ -89,6 +89,54 @@ impl ConnectionHandle {
     pub fn get_remote_member_id(&self) -> Result<String, DartOpaque> {
         self.0
             .get_remote_member_id()
+            .map_err(DartError::from)
+            .map_err(Into::into)
+    }
+
+    /// Returns `MemberConnectionState` of the [`Connection`].
+    ///
+    /// __NOTE__: only works in `P2P` mode and is subject to change.
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    /// a [`RoomHandle`] that implicitly owns native object behind this
+    /// [`ConnectionHandle`].
+    ///
+    /// [`Jason`]: api::Jason
+    /// [`RoomHandle`]: api::RoomHandle
+    /// [`StateError`]: crate::api::err::StateError
+    #[frb(sync)]
+    pub fn get_state(
+        &self,
+    ) -> Result<Option<MemberConnectionState>, DartOpaque> {
+        self.0
+            .get_state()
+            .map(|state| state.map(Into::into))
+            .map_err(DartError::from)
+            .map_err(Into::into)
+    }
+
+    /// Sets a callback to be invoked once a state of associated [`Connection`]
+    /// is changed.
+    ///
+    /// __NOTE__: only works in `P2P` mode and is subject to change.
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    /// a [`RoomHandle`] that implicitly owns native object behind this
+    /// [`ConnectionHandle`].
+    ///
+    /// [`Jason`]: api::Jason
+    /// [`RoomHandle`]: api::RoomHandle
+    /// [`StateError`]: crate::api::err::StateError
+    #[frb(sync)]
+    pub fn on_state_change(&self, f: DartOpaque) -> Result<(), DartOpaque> {
+        self.0
+            .on_state_change(platform::Function::new(f))
             .map_err(DartError::from)
             .map_err(Into::into)
     }

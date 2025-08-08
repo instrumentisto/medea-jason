@@ -796,12 +796,12 @@ pub enum SenderStatsKind {
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum ReceiverStatsKind {
-    /// [RTCAudioReceiverStats] object.
+    /// [RTCAudioReceiverStats][1] object.
     ///
     /// [1]: https://w3.org/TR/webrtc-stats/#dom-rtcaudioreceiverstats
     Audio {},
 
-    /// [RTCVideoReceiverStats] object.
+    /// [RTCVideoReceiverStats][1] object.
     ///
     /// [1]: https://w3.org/TR/webrtc-stats/#dom-rtcvideoreceiverstats
     Video {},

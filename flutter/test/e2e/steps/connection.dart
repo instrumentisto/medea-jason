@@ -9,7 +9,9 @@ List<StepDefinitionGeneric> steps() {
   return [
     thenConnectionCloses,
     thenMemberReceivesConnection,
+    thenMemberConnectionStateIs,
     whenConnectionChangesRemoteMediaState,
+    whenMemberReceivesConnection,
     thenMemberDoesntReceiveConnection,
   ];
 }
@@ -40,6 +42,18 @@ StepDefinitionGeneric thenMemberDoesntReceiveConnection =
       },
     );
 
+StepDefinitionGeneric thenMemberConnectionStateIs =
+    then3<String, String, String, CustomWorld>(
+      r"(\S+)'s connection with (\S+) is (\S+)$",
+      (id, responderId, connectionState, context) async {
+        var member = context.world.members[id]!;
+        await member.waitForState(
+          responderId,
+          parseConnectionState(connectionState),
+        );
+      },
+    );
+
 StepDefinitionGeneric whenConnectionChangesRemoteMediaState =
     when4<String, String, String, String, CustomWorld>(
       r'(\S+) (enables|disables) (audio|video) receiving from (\S+)',
@@ -61,5 +75,14 @@ StepDefinitionGeneric whenConnectionChangesRemoteMediaState =
             await connect.disableRemoteVideo();
           }
         }
+      },
+    );
+
+StepDefinitionGeneric whenMemberReceivesConnection =
+    when2<String, String, CustomWorld>(
+      r'(\S+) receives connection with (\S+)$',
+      (id, responderId, context) async {
+        var member = context.world.members[id]!;
+        await member.waitForConnect(responderId);
       },
     );

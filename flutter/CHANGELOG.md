@@ -6,6 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
+
+### Added
+
+- Library API:
+    - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` to track connection with the remote member in P2P mode. ([#229])
+
+
+[#229]: https://github.com/instrumentisto/medea-jason/pull/229
+
+
+
+
 ## [0.11.0] · 2025-07-17
 [0.11.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0/flutter
 
@@ -50,10 +65,6 @@ See also [`medea-jason` crate 0.10.0 changes](https://github.com/instrumentisto/
     - `LocalMediaTrack.setAutoGainControlEnabled()`, `LocalMediaTrack.isAutoGainControlEnabled()` to inspect and toggle auto gain control (supported on web and desktop platforms).
     - `LocalMediaTrack.setNoiseSuppressionLevel()`, `LocalMediaTrack.getNoiseSuppressionLevel()` to inspect and configure noise suppression level (only supported on desktop platforms).
     - `LocalMediaTrack.setHighPassFilterEnabled()`, `LocalMediaTrack.isHighPassFilterEnabledO()` to inspect and toggle high-pass filter (only supported on desktop platforms).
-
-### Changed
-
-- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 ### Upgraded
 

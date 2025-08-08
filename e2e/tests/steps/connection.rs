@@ -1,7 +1,11 @@
 use cucumber::{then, when};
 
-use crate::{World, steps::parse_media_kind};
+use crate::{
+    World,
+    steps::{parse_connection_state, parse_media_kind},
+};
 
+#[when(regex = r"^(\S+) receives connection with (\S+)$")]
 #[then(regex = r"^(\S+) receives connection with (\S+)$")]
 async fn then_member_receives_connection(
     world: &mut World,
@@ -36,6 +40,25 @@ async fn then_connection_closes(
     let connection =
         member.connections().get(partner_id).await.unwrap().unwrap();
     connection.wait_for_close().await.unwrap();
+}
+
+#[then(regex = r"^(\S+)'s connection with (\S+) is (\S+)$")]
+async fn then_member_connection_state_is(
+    world: &mut World,
+    id: String,
+    partner_id: String,
+    connection_state: String,
+) {
+    let member = world.get_member(&id).unwrap();
+    member
+        .connections()
+        .wait_for_state(
+            partner_id,
+            parse_connection_state(&connection_state)
+                .expect("Failed to parse connection state"),
+        )
+        .await
+        .unwrap();
 }
 
 #[when(regex = r"^(\S+) (enables|disables) (audio|video) receiving from (\S+)")]

@@ -392,7 +392,7 @@ impl Member {
     /// Returns WebAPI `WebSocket` mock object for [`Window`] of this
     /// [`Member`].
     #[must_use]
-    pub fn ws_mock(&self) -> mock::WebSocket {
+    pub fn ws_mock(&self) -> mock::WebSocket<'_> {
         self.window.websocket_mock()
     }
 
@@ -401,7 +401,7 @@ impl Member {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     #[must_use]
-    pub fn media_devices_mock(&self) -> mock::MediaDevices {
+    pub fn media_devices_mock(&self) -> mock::MediaDevices<'_> {
         self.window.media_devices_mock()
     }
 }

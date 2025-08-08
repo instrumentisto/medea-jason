@@ -39,6 +39,8 @@ dependency_overrides:
   # Pinned until `flutter_gherkin` updates
   analyzer: ^7.4.5
   # Pinned until `flutter_gherkin` updates
+  dart_style: 3.1.1
+  # Pinned until `flutter_gherkin` updates
   meta: ^1.14.0
   # Pinned until `flutter_gherkin` updates
   uuid: ^4.4.2
