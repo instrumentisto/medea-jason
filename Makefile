@@ -20,11 +20,11 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.88
-CHROME_VERSION := 137.0-chromedriver-137.0
-FIREFOX_VERSION := 140.0.1-driver0.36.0
+RUST_VER := 1.89
+CHROME_VERSION := 138.0-chromedriver-138.0
+FIREFOX_VERSION := 141.0.2-driver0.36.0
 
-CARGO_NDK_VER := 3.5.4-ndkr28b-rust$(RUST_VER)
+CARGO_NDK_VER := 4.1.1-ndkr28c-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
                    i686-linux-android \
@@ -337,7 +337,7 @@ endif
 define cargo.build.medea-jason.android
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
-	cargo ndk -p $(ANDROID_SDK_MIN_VERSION) -t $(target) \
+	cargo ndk --platform $(ANDROID_SDK_MIN_VERSION) -t $(target) \
 	          -o ./flutter/android/src/main/jniLibs \
 	          --manifest-path=./Cargo.toml \
 		build $(if $(call eq,$(debug),no),--release,) $(args)

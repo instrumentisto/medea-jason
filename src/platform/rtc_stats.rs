@@ -20,7 +20,7 @@ pub enum RtcStatsError {
 
     /// [RTCStats.stats] are undefined.
     ///
-    /// [1]: https://w3.org/TR/webrtc-stats/#dfn-stats-object
+    /// [1]: https://w3.org/TR/webrtc-stats#dfn-stats-object
     #[display("RTCStats.stats are undefined")]
     UndefinedStats,
 
