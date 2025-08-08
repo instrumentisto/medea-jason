@@ -10,7 +10,7 @@ Feature: `on_state_change` callback
     @mesh
     Examples:
       | connection_state  |
-      | P2P::Failed    |
+      | P2P::Connected    |
     # TOOD: Implement for SFU.
     @sfu
     Examples:
@@ -25,7 +25,7 @@ Feature: `on_state_change` callback
     @mesh
     Examples:
       | connection_state  |
-      | P2P::Connected |
+      | P2P::Disconnected |
     # TOOD: Implement for SFU.
     @sfu
     Examples:
