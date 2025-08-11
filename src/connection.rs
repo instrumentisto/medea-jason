@@ -338,7 +338,9 @@ impl ClientConnectionQualityScore {
 /// [`Connection`]'s state.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum MemberConnectionState {
-    /// State in P2P mode.
+    /// State in [P2P mesh] mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
     P2P(PeerConnectionState),
 }
 
@@ -378,7 +380,7 @@ struct InnerConnection {
     /// Callback invoked when a [`ConnectionQualityScore`] is updated.
     on_quality_score_update: platform::Callback<u8>,
 
-    /// Callback invoked when a [`MemberConnectionState`] is updated.
+    /// Callback invoked whenever the [`MemberConnectionState`] is updated.
     on_state_change: platform::Callback<api::MemberConnectionState>,
 
     /// Indicator whether this [`Connection`] is working in a [P2P mesh] or
@@ -475,11 +477,11 @@ impl ConnectionHandleImpl {
             .map(|inner| inner.remote_id.0.clone())
     }
 
-    /// Returns [`MemberConnectionState`] if it's known.
+    /// Returns the [`MemberConnectionState`] if it's known.
     ///
     /// # Errors
     ///
-    /// See [`HandleDetachedError`] for details.
+    /// See the [`HandleDetachedError`] for details.
     pub fn get_state(
         &self,
     ) -> Result<Option<MemberConnectionState>, Traced<HandleDetachedError>>
@@ -495,7 +497,7 @@ impl ConnectionHandleImpl {
     ///
     /// # Errors
     ///
-    /// See [`HandleDetachedError`] for details.
+    /// See the [`HandleDetachedError`] for details.
     pub fn on_state_change(
         &self,
         f: platform::Function<api::MemberConnectionState>,
@@ -770,9 +772,9 @@ impl Connection {
     /// Updates the [`PeerConnectionState`] of this [`Connection`].
     pub fn update_peer_state(&self, state: PeerConnectionState) {
         if self.0.connection_mode != ConnectionMode::Mesh {
-            // `MemberConnectionState::SFU` isn't implemented.
-            // See instrumentisto/medea-jason#211 for the details:
-            // https://github.com/instrumentisto/medea-jason/issues/211
+            // TODO: `MemberConnectionState::SFU` isn't yet implemented.
+            //       See instrumentisto/medea-jason#211 for the details:
+            //       https://github.com/instrumentisto/medea-jason/issues/211
             return;
         }
 

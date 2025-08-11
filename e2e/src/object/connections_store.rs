@@ -41,8 +41,8 @@ impl Object<ConnectionStore> {
         Ok((!connection.is_undefined().await?).then_some(connection))
     }
 
-    /// Returns a [`Connection`] for the provided remote member, awaiting for it
-    /// if it doesn't exists at the moment.
+    /// Returns a [`Connection`] for the provided remote member, awaiting it, if
+    /// it doesn't exist at the moment.
     ///
     /// # Errors
     ///
@@ -72,8 +72,8 @@ impl Object<ConnectionStore> {
         .await
     }
 
-    /// Returns promise that resolves when [`MemberConnectionState`] is
-    /// in specific state.
+    /// Returns a promise resolving when a [`MemberConnectionState`] is in the
+    /// specified `state`.
     ///
     /// # Errors
     ///
@@ -118,7 +118,7 @@ impl Object<ConnectionStore> {
                     }
 
                     if (state.kind() !== kinds[expected.kind]) {
-                        throw new Error('Wrong MemberConnectionStateKind');
+                        throw new Error('Wrong `MemberConnectionStateKind`');
                     }
 
                     const value = values[expected.kind][expected.value];

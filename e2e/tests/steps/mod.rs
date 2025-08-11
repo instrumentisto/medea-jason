@@ -274,7 +274,7 @@ fn parse_media_kinds(
     Ok((media_kind, source_kind))
 }
 
-/// Parses a [`MemberConnectionState`] from the provided `str`.
+/// Parses a [`MemberConnectionState`] from the provided string.
 fn parse_connection_state(
     s: &str,
 ) -> Result<Option<MemberConnectionState>, ParsingFailedError> {

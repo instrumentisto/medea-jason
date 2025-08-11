@@ -12,10 +12,13 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- Library API:
-    - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` to track connection with the remote member in P2P mode. ([#229])
+- `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
 
+### Fixed
 
+- `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
+
+[#228]: https://github.com/instrumentisto/medea-jason/pull/228
 [#229]: https://github.com/instrumentisto/medea-jason/pull/229
 
 

@@ -36,7 +36,7 @@ async fn p2p_connection_state_accessible() {
     assert_eq!(state.kind(), api::MemberConnectionStateKind::P2P);
     assert_eq!(
         state.value(),
-        JsValue::from(api::PeerConnectionState::Connecting as u8)
+        JsValue::from(api::PeerConnectionState::Connecting as u8),
     );
 }
 
@@ -66,6 +66,6 @@ async fn callback_fires_on_p2p_state_change() {
     assert_eq!(state.kind(), api::MemberConnectionStateKind::P2P);
     assert_eq!(
         state.value(),
-        JsValue::from(api::PeerConnectionState::Connected as u8)
+        JsValue::from(api::PeerConnectionState::Connected as u8),
     );
 }

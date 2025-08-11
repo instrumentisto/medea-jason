@@ -93,47 +93,51 @@ enum NoiseSuppressionLevel {
   veryHigh,
 }
 
-/// `PeerConnection`'s connection state.
+/// Possible connection states of a `PeerConnection`.
 enum PeerConnectionState {
-  /// At least one of the connection's ICE transports are in the
-  /// [`IceConnectionState::New`] state, and none of them are in one
-  /// of the following states: [`IceConnectionState::Checking`],
-  /// [`IceConnectionState::Failed`], or
-  /// [`IceConnectionState::Disconnected`], or all of the connection's
-  /// transports are in the [`IceConnectionState::Closed`] state.
+  /// At least one of the connection's [ICE] transports are in the `new` state,
+  /// and none of them are in one of the following states: `checking`, `failed`,
+  /// or `disconnected`, or all of the connection's transports are in the
+  /// `closed` state.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
   new_,
 
-  /// One or more of the ICE transports are currently in the process of
-  /// establishing a connection; that is, their [`IceConnectionState`] is
-  /// either [`IceConnectionState::Checking`] or
-  /// [`IceConnectionState::Connected`], and no transports are in the
-  /// [`IceConnectionState::Failed`] state.
+  /// One or more of the [ICE] transports are currently in the process of
+  /// establishing a connection; that is, their state is either `checking` or
+  /// `connected`, and no transports are in the `failed` state.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
   connecting,
 
-  /// Every ICE transport used by the connection is either in use (state
-  /// [`IceConnectionState::Connected`] or [`IceConnectionState::Completed`])
-  /// or is closed ([`IceConnectionState::Closed`]); in addition,
-  /// at least one transport is either [`IceConnectionState::Connected`] or
-  /// [`IceConnectionState::Completed`].
+  /// Every [ICE] transport used by the connection is either in use (state
+  /// `connected` or `completed`) or is `closed`.
+  ///
+  /// In addition, at least one transport is either `connected` or `completed`.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
   connected,
 
-  /// At least one of the ICE transports for the connection is in the
-  /// [`IceConnectionState::Disconnected`] state and none of the other
-  /// transports are in the state [`IceConnectionState::Failed`] or
-  /// [`IceConnectionState::Checking`].
+  /// At least one of the [ICE] transports for the connection is in the
+  /// `disconnected` state and none of the other transports are in the state
+  /// `failed` or `checking`.
   ///
-  /// It's not a terminal state, and it can go back to `Connecting`
-  /// and then `Connected` on its own.
+  /// It's not a terminal state, and it can go back to [connecting] and then
+  /// [connected] on its own.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
   disconnected,
 
-  /// One or more of the ICE transports on the connection is in the
-  /// [`IceConnectionState::Failed`] state.
+  /// One or more of the [ICE] transports on the connection is in the `failed`
+  /// state.
   ///
-  /// It's not a terminal state, and it can be fixed with ICE restart if
+  /// It's not a terminal state, and it can be fixed with [ICE] restart if
   /// signalling connection is alive.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
   failed,
 
-  /// The `PeerConnection` is closed.
+  /// `PeerConnection` is closed.
   ///
   /// It's a terminal state.
   closed,

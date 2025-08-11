@@ -11,7 +11,7 @@ Feature: `on_state_change` callback
     Examples:
       | connection_state  |
       | P2P::Connected    |
-    # TOOD: Implement for SFU.
+    # TODO: Implement for SFU.
     @sfu
     Examples:
       | connection_state  |
@@ -26,7 +26,7 @@ Feature: `on_state_change` callback
     Examples:
       | connection_state  |
       | P2P::Disconnected |
-    # TOOD: Implement for SFU.
+    # TODO: Implement for SFU.
     @sfu
     Examples:
       | connection_state  |

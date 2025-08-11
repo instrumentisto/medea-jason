@@ -42,7 +42,7 @@ impl MediaManagerHandle {
     ///
     /// # Errors
     ///
-    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if the underlying object has been disposed, e.g.
     /// `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
     /// implicitly owns native object behind this [`MediaManagerHandle`].
     ///
@@ -79,7 +79,7 @@ impl MediaManagerHandle {
     ///
     /// # Errors
     ///
-    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if the underlying object has been disposed, e.g.
     /// `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
     /// implicitly owns native object behind this [`MediaManagerHandle`].
     ///
@@ -112,7 +112,7 @@ impl MediaManagerHandle {
     ///
     /// # Errors
     ///
-    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if the underlying object has been disposed, e.g.
     /// `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
     /// implicitly owns native object behind this [`MediaManagerHandle`].
     ///

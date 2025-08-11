@@ -118,7 +118,9 @@ impl Object<Connection> {
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
 #[serde(tag = "kind", content = "value")]
 pub enum MemberConnectionState {
-    /// State in `P2P` mode.
+    /// State in [P2P mesh] mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
     P2P(PeerConnectionState),
 }
 
@@ -139,10 +141,10 @@ impl FromStr for MemberConnectionState {
     }
 }
 
-/// [RTCPeerConnectionState][1] describes a state of a network connection
+/// [RTCPeerConnectionState][1] describing a state of a network connection
 /// between two peers.
 ///
-/// [1]: https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectionstate
+/// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnectionstate
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
 pub enum PeerConnectionState {
     /// The connection was just created and has not yet started negotiating.
@@ -165,6 +167,7 @@ pub enum PeerConnectionState {
     Closed,
 }
 
+// TODO: Use `derive_more` once its capable of it.
 impl FromStr for PeerConnectionState {
     type Err = ParsingFailedError;
 

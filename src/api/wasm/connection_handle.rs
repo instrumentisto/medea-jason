@@ -5,7 +5,7 @@ use js_sys::Promise;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
 
-use crate::{api, connection};
+use crate::{api::{self, MemberConnectionState}, connection};
 
 /// Connection with a specific remote `Member`, that is used on JS side.
 ///
@@ -22,7 +22,7 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if the underlying object has been disposed, e.g.
     /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].
@@ -39,7 +39,7 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if the underlying object has been disposed, e.g.
     /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].
@@ -54,13 +54,13 @@ impl ConnectionHandle {
             .map_err(Into::into)
     }
 
-    /// Returns `MemberConnectionState` of the [`Connection`].
+    /// Returns the [`MemberConnectionState`] of the associated [`Connection`].
     ///
-    /// __NOTE__: only works in `P2P` mode and is subject to change.
+    /// __NOTE__: Only works in [P2P mesh] mode and is subject to change.
     ///
     /// # Errors
     ///
-    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if the underlying object has been disposed, e.g.
     /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].
@@ -69,9 +69,10 @@ impl ConnectionHandle {
     /// [`Jason`]: api::Jason
     /// [`RoomHandle`]: api::RoomHandle
     /// [`StateError`]: crate::api::err::StateError
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
     pub fn get_state(
         &self,
-    ) -> Result<Option<api::MemberConnectionState>, JsValue> {
+    ) -> Result<Option<MemberConnectionState>, JsValue> {
         self.0
             .get_state()
             .map(|state| state.map(Into::into))
@@ -79,14 +80,14 @@ impl ConnectionHandle {
             .map_err(Into::into)
     }
 
-    /// Sets a callback to be invoked once a state of associated [`Connection`]
-    /// is changed.
+    /// Sets a callback to be invoked once a state of the associated 
+    /// [`Connection`] is changed.
     ///
-    /// __NOTE__: only works in `P2P` mode and is subject to change.
+    /// __NOTE__: Only works in [P2P mesh] mode and is subject to change.
     ///
     /// # Errors
     ///
-    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if the underlying object has been disposed, e.g.
     /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].
@@ -107,7 +108,7 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if the underlying object has been disposed, e.g.
     /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].
@@ -132,7 +133,7 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if the underlying object has been disposed, e.g.
     /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].

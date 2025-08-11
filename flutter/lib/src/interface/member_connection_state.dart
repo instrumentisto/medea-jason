@@ -1,17 +1,21 @@
 import 'enums.dart';
 
-/// State of a member `Connection`.
+/// State of member's `Connection`.
 sealed class MemberConnectionState {}
 
-/// State of a member `Connection` in `P2P` mode.
+/// State of member's `Connection` in [P2P mesh] mode.
+///
+/// [P2P mesh]: https://webrtcglossary.com/mesh
 class MemberConnectionStateP2P extends MemberConnectionState {
   final PeerConnectionState peerState;
 
   MemberConnectionStateP2P(this.peerState);
 }
 
-/// `Connection`'s state kind.
+/// Possible kinds of `Connection`'s state.
 enum MemberConnectionStateKind {
-  /// `Connection`'s state is in P2P mode.
+  /// `Connection`'s state is in [P2P mesh] mode.
+  ///
+  /// [P2P mesh]: https://webrtcglossary.com/mesh
   p2p,
 }

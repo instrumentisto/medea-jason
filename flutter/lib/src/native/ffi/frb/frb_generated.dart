@@ -5840,13 +5840,13 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
         that: this,
       );
 
-  /// Returns `MemberConnectionState` of the [`Connection`].
+  /// Returns the [`MemberConnectionState`] of the associated [`Connection`].
   ///
-  /// __NOTE__: only works in `P2P` mode and is subject to change.
+  /// __NOTE__: Only works in [P2P mesh] mode and is subject to change.
   ///
   /// # Errors
   ///
-  /// With a [`StateError`] if an underlying object has been disposed, e.g.
+  /// With a [`StateError`] if the underlying object has been disposed, e.g.
   /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
   /// a [`RoomHandle`] that implicitly owns native object behind this
   /// [`ConnectionHandle`].
@@ -5854,6 +5854,7 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   /// [`Jason`]: api::Jason
   /// [`RoomHandle`]: api::RoomHandle
   /// [`StateError`]: crate::api::err::StateError
+  /// [P2P mesh]: https://webrtcglossary.com/mesh
   MemberConnectionState? getState() => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleGetState(that: this);
 
@@ -5894,14 +5895,14 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
         f: f,
       );
 
-  /// Sets a callback to be invoked once a state of associated [`Connection`]
-  /// is changed.
+  /// Sets a callback to be invoked once a state of the associated
+  /// [`Connection`] is changed.
   ///
-  /// __NOTE__: only works in `P2P` mode and is subject to change.
+  /// __NOTE__: Only works in [P2P mesh] mode and is subject to change.
   ///
   /// # Errors
   ///
-  /// With a [`StateError`] if an underlying object has been disposed, e.g.
+  /// With a [`StateError`] if the underlying object has been disposed, e.g.
   /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
   /// a [`RoomHandle`] that implicitly owns native object behind this
   /// [`ConnectionHandle`].
@@ -5909,6 +5910,7 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   /// [`Jason`]: api::Jason
   /// [`RoomHandle`]: api::RoomHandle
   /// [`StateError`]: crate::api::err::StateError
+  /// [P2P mesh]: https://webrtcglossary.com/mesh
   void onStateChange({required Object f}) => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleOnStateChange(
         that: this,
