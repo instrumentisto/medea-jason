@@ -6,6 +6,19 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### Upgraded
+
+- Dependencies:
+    - [`prost`] to 0.14 version. ([todo])
+    - [`tonic`] to 0.14 version. ([todo])
+
+[todo]: https://github.com/instrumentisto/medea-jason/commit/todo
+
+
+
+
 ## [0.16.0] · 2025-03-29
 [0.16.0]: https://github.com/instrumentisto/medea-jason/tree/medea-control-api-proto-0.16.0/proto/control-api
 

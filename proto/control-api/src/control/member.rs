@@ -160,6 +160,7 @@ impl Sid {
         let mut sid =
             format!("{}/{}/{}", self.public_url, self.room_id, self.member_id);
         if let Some(plain) = &self.creds {
+            #[expect(clippy::expect_used, reason = "never fails")]
             write!(sid, "?token={}", plain.expose_str())
                 .expect("writing to `String` never fails");
         }
