@@ -4,9 +4,9 @@ use medea_client_api_proto as proto;
 #[cfg(doc)]
 use medea_client_api_proto::IceConnectionState;
 
+use crate::{api::dart::api::ForeignClass, connection as core};
 #[cfg(doc)]
 use crate::{connection::Connection, peer::PeerConnection};
-use crate::{api::dart::api::ForeignClass, connection as core};
 
 /// Possible connection states of a [`PeerConnection`].
 #[derive(Clone, Copy, Debug)]

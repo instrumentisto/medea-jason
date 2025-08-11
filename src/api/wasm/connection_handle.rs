@@ -5,7 +5,10 @@ use js_sys::Promise;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
 
-use crate::{api::{self, MemberConnectionState}, connection};
+use crate::{
+    api::{self, MemberConnectionState},
+    connection,
+};
 
 /// Connection with a specific remote `Member`, that is used on JS side.
 ///
@@ -70,9 +73,7 @@ impl ConnectionHandle {
     /// [`RoomHandle`]: api::RoomHandle
     /// [`StateError`]: crate::api::err::StateError
     /// [P2P mesh]: https://webrtcglossary.com/mesh
-    pub fn get_state(
-        &self,
-    ) -> Result<Option<MemberConnectionState>, JsValue> {
+    pub fn get_state(&self) -> Result<Option<MemberConnectionState>, JsValue> {
         self.0
             .get_state()
             .map(|state| state.map(Into::into))
@@ -80,7 +81,7 @@ impl ConnectionHandle {
             .map_err(Into::into)
     }
 
-    /// Sets a callback to be invoked once a state of the associated 
+    /// Sets a callback to be invoked once a state of the associated
     /// [`Connection`] is changed.
     ///
     /// __NOTE__: Only works in [P2P mesh] mode and is subject to change.
