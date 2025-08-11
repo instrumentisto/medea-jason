@@ -14,6 +14,7 @@
     clippy::cfg_not_test,
     clippy::clear_with_drain,
     clippy::clone_on_ref_ptr,
+    clippy::coerce_container_to_any,
     clippy::collection_is_never_read,
     clippy::create_dir,
     clippy::dbg_macro,
@@ -180,7 +181,7 @@ mod grpc {
         });
 
         for (proto, out) in grpc_spec_files.iter().zip(&out_files) {
-            tonic_build::configure()
+            tonic_prost_build::configure()
                 .out_dir(GRPC_DIR)
                 .build_client(
                     (cfg!(feature = "client") && out.ends_with("api.rs"))
@@ -193,7 +194,7 @@ mod grpc {
                             && out.ends_with("api.rs")),
                 )
                 .emit_rerun_if_changed(false)
-                .compile_protos(&[proto], &[GRPC_DIR.to_owned()])?;
+                .compile_protos(&[proto.as_str()], &[GRPC_DIR])?;
         }
 
         Ok(())

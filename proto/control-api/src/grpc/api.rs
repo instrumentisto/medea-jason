@@ -25,7 +25,7 @@ pub mod create_request {
     }
 }
 /// Request with many FIDs (Full IDs) of `Element`s.
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct IdRequest {
     /// List of `Element`s FIDs.
     #[prost(string, repeated, tag = "1")]
@@ -61,7 +61,7 @@ pub mod apply_request {
 ///
 /// If operation fails then an `Error` will be returned.
 /// The response is considered successful only if it doesn't contain an `Error`.
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct Response {
     /// Error of this `Response`.
     #[prost(message, optional, tag = "1")]
@@ -104,7 +104,7 @@ pub struct GetResponse {
 /// Error of a failed request.
 ///
 /// If an `Error` is not returned then a request is considered as successful.
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct Error {
     /// Concrete unique code of this `Error`.
     #[prost(uint32, tag = "1")]
@@ -230,14 +230,14 @@ pub struct Member {
 /// Nested message and enum types in `Member`.
 pub mod member {
     /// Elements which Member's pipeline can contain.
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
     pub struct Element {
         #[prost(oneof = "element::El", tags = "1, 2")]
         pub el: ::core::option::Option<element::El>,
     }
     /// Nested message and enum types in `Element`.
     pub mod element {
-        #[derive(Clone, PartialEq, ::prost::Oneof)]
+        #[derive(Clone, PartialEq, Eq, Hash, ::prost::Oneof)]
         pub enum El {
             #[prost(message, tag = "1")]
             WebrtcPlay(super::super::WebRtcPlayEndpoint),
@@ -254,7 +254,7 @@ pub mod member {
     /// Hashed variant only supports Argon2 hash at the moment.
     /// `Member` sid won't contain a `token` query parameter if hashed credentials
     /// are used, so it should be appended manually on a client side.
-    #[derive(Clone, PartialEq, ::prost::Oneof)]
+    #[derive(Clone, PartialEq, Eq, Hash, ::prost::Oneof)]
     pub enum Credentials {
         /// Argon2 hash of credentials.
         #[prost(string, tag = "4")]
@@ -266,7 +266,7 @@ pub mod member {
 }
 /// Media element receiving media data from a client via WebRTC (allows to
 /// publish media data).
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct WebRtcPublishEndpoint {
     /// ID of this `WebRtcPublishEndpoint`.
     #[prost(string, tag = "1")]
@@ -293,14 +293,14 @@ pub struct WebRtcPublishEndpoint {
 /// Nested message and enum types in `WebRtcPublishEndpoint`.
 pub mod web_rtc_publish_endpoint {
     /// Audio media type settings of a `WebRtcPublishEndpoint`.
-    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, Eq, Hash, ::prost::Message)]
     pub struct AudioSettings {
         /// Policy to publish the audio media type with.
         #[prost(enumeration = "PublishPolicy", tag = "1")]
         pub publish_policy: i32,
     }
     /// Video media type settings of `WebRtcPublishEndpoint`.
-    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, Eq, Hash, ::prost::Message)]
     pub struct VideoSettings {
         /// Policy to publish the video media type with.
         #[prost(enumeration = "PublishPolicy", tag = "1")]
@@ -410,7 +410,7 @@ pub mod web_rtc_publish_endpoint {
     }
 }
 /// Media element playing media data for a client via WebRTC.
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct WebRtcPlayEndpoint {
     /// ID of this `WebRtcPlayEndpoint`.
     #[prost(string, tag = "1")]
@@ -430,14 +430,14 @@ pub struct WebRtcPlayEndpoint {
 }
 /// Ping message received by a media server periodically for probing its
 /// healthiness.
-#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct Ping {
     /// Each new `Ping` should increment its nonce, starting with 0.
     #[prost(uint32, tag = "1")]
     pub nonce: u32,
 }
 /// Pong message sent by a media server in response to a received `Ping` message.
-#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct Pong {
     /// / Nonce of the answered `Ping` message.
     #[prost(uint32, tag = "1")]
@@ -551,7 +551,7 @@ pub mod control_api_client {
                         format!("Service was not ready: {}", e.into()),
                     )
                 })?;
-            let codec = tonic::codec::ProstCodec::default();
+            let codec = tonic_prost::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Create");
             let mut req = request.into_request();
             req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Create"));
@@ -573,7 +573,7 @@ pub mod control_api_client {
                         format!("Service was not ready: {}", e.into()),
                     )
                 })?;
-            let codec = tonic::codec::ProstCodec::default();
+            let codec = tonic_prost::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Delete");
             let mut req = request.into_request();
             req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Delete"));
@@ -594,7 +594,7 @@ pub mod control_api_client {
                         format!("Service was not ready: {}", e.into()),
                     )
                 })?;
-            let codec = tonic::codec::ProstCodec::default();
+            let codec = tonic_prost::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Get");
             let mut req = request.into_request();
             req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Get"));
@@ -619,7 +619,7 @@ pub mod control_api_client {
                         format!("Service was not ready: {}", e.into()),
                     )
                 })?;
-            let codec = tonic::codec::ProstCodec::default();
+            let codec = tonic_prost::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Apply");
             let mut req = request.into_request();
             req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Apply"));
@@ -640,7 +640,7 @@ pub mod control_api_client {
                         format!("Service was not ready: {}", e.into()),
                     )
                 })?;
-            let codec = tonic::codec::ProstCodec::default();
+            let codec = tonic_prost::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Healthz");
             let mut req = request.into_request();
             req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Healthz"));
@@ -808,7 +808,7 @@ pub mod control_api_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = CreateSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
+                        let codec = tonic_prost::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
                                 accept_compression_encodings,
@@ -851,7 +851,7 @@ pub mod control_api_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = DeleteSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
+                        let codec = tonic_prost::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
                                 accept_compression_encodings,
@@ -894,7 +894,7 @@ pub mod control_api_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = GetSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
+                        let codec = tonic_prost::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
                                 accept_compression_encodings,
@@ -937,7 +937,7 @@ pub mod control_api_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = ApplySvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
+                        let codec = tonic_prost::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
                                 accept_compression_encodings,
@@ -980,7 +980,7 @@ pub mod control_api_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = HealthzSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
+                        let codec = tonic_prost::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
                                 accept_compression_encodings,

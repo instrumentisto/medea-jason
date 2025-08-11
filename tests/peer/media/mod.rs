@@ -687,14 +687,24 @@ mod codec_probing {
         codecs_caps.sort();
         assert_eq!(
             codecs_caps,
-            vec![
-                "video/H264",
-                "video/VP8",
-                "video/VP9",
-                "video/red",
-                "video/rtx",
-                "video/ulpfec",
-            ],
+            if is_firefox() {
+                vec![
+                    "video/VP8",
+                    "video/VP9",
+                    "video/red",
+                    "video/rtx",
+                    "video/ulpfec",
+                ]
+            } else {
+                vec![
+                    "video/H264",
+                    "video/VP8",
+                    "video/VP9",
+                    "video/red",
+                    "video/rtx",
+                    "video/ulpfec",
+                ]
+            },
             "Browser available codecs are changed, check new codecs \
              and update this test",
         );
