@@ -8,6 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import '../../../frb_generated.dart';
 import '../../../media/track.dart';
 import '../api.dart';
+import 'member_connection_state.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
 
@@ -46,6 +47,23 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
   /// errors.
   String getRemoteMemberId();
 
+  /// Returns the [`MemberConnectionState`] of the associated [`Connection`].
+  ///
+  /// __NOTE__: Only works in [P2P mesh] mode and is subject to change.
+  ///
+  /// # Errors
+  ///
+  /// With a [`StateError`] if the underlying object has been disposed, e.g.
+  /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+  /// a [`RoomHandle`] that implicitly owns native object behind this
+  /// [`ConnectionHandle`].
+  ///
+  /// [`Jason`]: api::Jason
+  /// [`RoomHandle`]: api::RoomHandle
+  /// [`StateError`]: crate::api::err::StateError
+  /// [P2P mesh]: https://webrtcglossary.com/mesh
+  MemberConnectionState? getState();
+
   /// Sets a callback to be invoked once the associated [`Connection`] is
   /// closed.
   ///
@@ -73,4 +91,22 @@ abstract class ConnectionHandle implements RustOpaqueInterface, ForeignClass {
   ///
   /// [`remote::Track`]: media::track::remote::Track
   void onRemoteTrackAdded({required Object f});
+
+  /// Sets a callback to be invoked once a state of the associated
+  /// [`Connection`] is changed.
+  ///
+  /// __NOTE__: Only works in [P2P mesh] mode and is subject to change.
+  ///
+  /// # Errors
+  ///
+  /// With a [`StateError`] if the underlying object has been disposed, e.g.
+  /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+  /// a [`RoomHandle`] that implicitly owns native object behind this
+  /// [`ConnectionHandle`].
+  ///
+  /// [`Jason`]: api::Jason
+  /// [`RoomHandle`]: api::RoomHandle
+  /// [`StateError`]: crate::api::err::StateError
+  /// [P2P mesh]: https://webrtcglossary.com/mesh
+  void onStateChange({required Object f});
 }

@@ -12,8 +12,8 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- Ability to capture system audio tracks: ([#225])
-  - `MediaStreamSettings.displayAudio()` to set system audio constraints. (only for WASM platform)
+- `MediaStreamSettings.displayAudio()` to set system audio constraints on WASM platform. ([#225])
+- `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
 
 ### Changed
 
@@ -21,7 +21,13 @@ All user visible changes to this project will be documented in this file. This p
   - `MediaStreamSettings.audio()` renamed to `MediaStreamSettings.deviceAudio()`.
   - `RoomHandle.muteAudio()`, `RoomHandle.unmuteAudio()`, `RoomHandle.enableAudio()`, `RoomHandle.disableAudio()`, `RoomHandle.enableRemoteAudio()`, and `RoomHandle.disableRemoteAudio()` now receive an argument to specify `MediaSourceKind`.
 
+### Fixed
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
+
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
+[#228]: https://github.com/instrumentisto/medea-jason/pull/228
+[#229]: https://github.com/instrumentisto/medea-jason/pull/229
 
 
 
@@ -70,10 +76,6 @@ See also [`medea-jason` crate 0.10.0 changes](https://github.com/instrumentisto/
     - `LocalMediaTrack.setAutoGainControlEnabled()`, `LocalMediaTrack.isAutoGainControlEnabled()` to inspect and toggle auto gain control (supported on web and desktop platforms).
     - `LocalMediaTrack.setNoiseSuppressionLevel()`, `LocalMediaTrack.getNoiseSuppressionLevel()` to inspect and configure noise suppression level (only supported on desktop platforms).
     - `LocalMediaTrack.setHighPassFilterEnabled()`, `LocalMediaTrack.isHighPassFilterEnabledO()` to inspect and toggle high-pass filter (only supported on desktop platforms).
-
-### Changed
-
-- `ConnectionHandle.onQualityScoreUpdate()` callback now receives `0` quality score if peer is disconnected. ([#212])
 
 ### Upgraded
 

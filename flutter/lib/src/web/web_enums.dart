@@ -92,3 +92,53 @@ enum NoiseSuppressionLevel {
   /// Maximum suppression.
   veryHigh,
 }
+
+/// Possible connection states of a `PeerConnection`.
+enum PeerConnectionState {
+  /// At least one of the connection's [ICE] transports are in the `new` state,
+  /// and none of them are in one of the following states: `checking`, `failed`,
+  /// or `disconnected`, or all of the connection's transports are in the
+  /// `closed` state.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
+  new_,
+
+  /// One or more of the [ICE] transports are currently in the process of
+  /// establishing a connection; that is, their state is either `checking` or
+  /// `connected`, and no transports are in the `failed` state.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
+  connecting,
+
+  /// Every [ICE] transport used by the connection is either in use (state
+  /// `connected` or `completed`) or is `closed`.
+  ///
+  /// In addition, at least one transport is either `connected` or `completed`.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
+  connected,
+
+  /// At least one of the [ICE] transports for the connection is in the
+  /// `disconnected` state and none of the other transports are in the state
+  /// `failed` or `checking`.
+  ///
+  /// It's not a terminal state, and it can go back to [connecting] and then
+  /// [connected] on its own.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
+  disconnected,
+
+  /// One or more of the [ICE] transports on the connection is in the `failed`
+  /// state.
+  ///
+  /// It's not a terminal state, and it can be fixed with [ICE] restart if
+  /// signalling connection is alive.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
+  failed,
+
+  /// `PeerConnection` is closed.
+  ///
+  /// It's a terminal state.
+  closed,
+}

@@ -1,4 +1,7 @@
 export 'src/interface/connection_handle.dart';
+export 'src/interface/enums.dart' show PeerConnectionState;
+export 'src/interface/member_connection_state.dart'
+    show MemberConnectionState, MemberConnectionStateP2P;
 export 'src/interface/exceptions.dart';
 export 'src/interface/media_device_details.dart';
 export 'src/interface/media_manager.dart';

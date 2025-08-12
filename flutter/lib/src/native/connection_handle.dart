@@ -6,6 +6,9 @@ import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/frb/frb.dart' as frb;
 
+import '../interface/member_connection_state.dart'
+    show MemberConnectionState, MemberConnectionStateP2P;
+
 class NativeConnectionHandle implements ConnectionHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   final RustOpaque<frb.ConnectionHandle> opaque;
@@ -20,6 +23,25 @@ class NativeConnectionHandle implements ConnectionHandle {
   @override
   String getRemoteMemberId() {
     return opaque.inner.getRemoteMemberId();
+  }
+
+  @override
+  MemberConnectionState? getState() {
+    return convertState(opaque.inner.getState());
+  }
+
+  @override
+  void onStateChange(void Function(MemberConnectionState) f) {
+    opaque.inner.onStateChange(
+      f: (t) {
+        var state = convertState(
+          frb.MemberConnectionState.fromPtr(ptr: t.address),
+        );
+        if (state != null) {
+          f(state);
+        }
+      },
+    );
   }
 
   @override
@@ -69,5 +91,16 @@ class NativeConnectionHandle implements ConnectionHandle {
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
     await (opaque.inner.disableRemoteVideo(sourceKind: kind) as Future);
+  }
+}
+
+MemberConnectionState? convertState(frb.MemberConnectionState? state) {
+  if (state == null) {
+    return null;
+  }
+
+  switch (state) {
+    case frb.MemberConnectionState_P2P(:final field0):
+      return MemberConnectionStateP2P(field0);
   }
 }

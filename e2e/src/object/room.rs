@@ -346,6 +346,7 @@ impl Object<Room> {
     /// # Errors
     ///
     /// If failed to execute JS statement.
+    #[expect(clippy::too_many_lines, reason = "still easy to follow")]
     pub async fn connections_store(
         &self,
     ) -> Result<Object<ConnectionStore>, Error> {
@@ -366,10 +367,14 @@ impl Object<Room> {
                         tracks: [],
                         subs: []
                     };
+                    let stateListener = {
+                        subs: [],
+                    };
                     let connection = {
                         conn: conn,
                         tracksStore: tracksStore,
                         closeListener: closeListener,
+                        stateListener: stateListener,
                     };
                     conn.on_remote_track_added((t) => {
                         let track = {
@@ -428,6 +433,11 @@ impl Object<Room> {
                                 return sub(track);
                             });
                         tracksStore.subs = newStoreSubs;
+                    });
+                    conn.on_state_change((state) => {
+                        for (const sub of stateListener.subs) {
+                            sub(state);
+                        }
                     });
                     conn.on_close(() => {
                         closeListener.isClosed = true;

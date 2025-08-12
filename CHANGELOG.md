@@ -5,12 +5,13 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+
 ## master
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
 
 ### Added
- 
+
 - Ability to capture system audio tracks: ([#225])
     - `MediaStreamSettings.display_audio()` to set system audio constraints.
     - `MediaStreamSettings.get_display_audio()` to get system audio constraints.
@@ -19,6 +20,11 @@ All user visible changes to this project will be documented in this file. This p
     - `DisplayMediaStreamConstraints.audio()` to set system audio constraints. (only for WASM platform)
     - `TrackRequestError.ExpectedDisplayAudioTracks` to indicate invalid system audio tracks in `SimpleTracksRequest.parse_tracks()` and `SimpleTracksRequest.merge()`.
     - `TrackRequestError.TooManyDisplayAudioTracks` to indicate invalid conversion from `TrackRequest` with system audio tracks to `SimpleTracksRequest`.
+- `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
+
+### Fixed
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 
 ### Changed
 
@@ -30,25 +36,11 @@ All user visible changes to this project will be documented in this file. This p
     - `TrackRequestError.ExpectedAudioTracks` renamed to `TrackRequestError.ExpectedDeviceAudioTracks`.
     - `TrackRequestError.TooManyAudioTracks` renamed to `TrackRequestError.TooManyDeviceAudioTracks`.
     - `RoomHandle.mute_audio()`, `RoomHandle.unmute_audio()`, `RoomHandle.enable_audio()`, `RoomHandle.disable_audio()`, `RoomHandle.enable_remote_audio()`, and `RoomHandle.disable_remote_audio()` now receive an argument to specify `MediaSourceKind`.
-
-[#225]: https://github.com/instrumentisto/medea-jason/pull/225
-
-
-
-
-## master
-
-[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
-
-### Fixed
-
-- `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
-
-### Changed
-
 - Bumped up [MSRV] to 1.86 to be buildable by [`cargo-ndk` 4.0 version]. ([todo])
 
+[#225]: https://github.com/instrumentisto/medea-jason/pull/225
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
+[#229]: https://github.com/instrumentisto/medea-jason/pull/229
 [todo]: https://github.com/instrumentisto/medea-jason/commit/todo
 [`cargo-ndk` 4.0 version]: https://github.com/bbqsrc/cargo-ndk/blob/v4.0.0/CHANGELOG.md#v400---2025-07-30
 
