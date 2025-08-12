@@ -14,6 +14,7 @@ import 'api/dart/api/connection_handle.dart';
 import 'api/dart/api/jason.dart';
 import 'api/dart/api/local_media_track.dart';
 import 'api/dart/api/media_manager.dart';
+import 'api/dart/api/member_connection_state.dart';
 import 'api/dart/api/reconnect_handle.dart';
 import 'api/dart/api/remote_media_track.dart';
 import 'api/dart/api/room.dart';
@@ -255,6 +256,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   MediaSourceKind dco_decode_box_autoadd_media_source_kind(dynamic raw);
 
   @protected
+  MemberConnectionState dco_decode_box_autoadd_member_connection_state(
+    dynamic raw,
+  );
+
+  @protected
   NoiseSuppressionLevel dco_decode_box_autoadd_noise_suppression_level(
     dynamic raw,
   );
@@ -315,6 +321,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   MediaSourceKind dco_decode_media_source_kind(dynamic raw);
 
   @protected
+  MemberConnectionState dco_decode_member_connection_state(dynamic raw);
+
+  @protected
   NoiseSuppressionLevel dco_decode_noise_suppression_level(dynamic raw);
 
   @protected
@@ -348,12 +357,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   MediaSourceKind? dco_decode_opt_box_autoadd_media_source_kind(dynamic raw);
 
   @protected
+  MemberConnectionState? dco_decode_opt_box_autoadd_member_connection_state(
+    dynamic raw,
+  );
+
+  @protected
   NoiseSuppressionLevel? dco_decode_opt_box_autoadd_noise_suppression_level(
     dynamic raw,
   );
 
   @protected
   int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
+
+  @protected
+  PeerConnectionState dco_decode_peer_connection_state(dynamic raw);
 
   @protected
   RoomCloseReason dco_decode_room_close_reason(dynamic raw);
@@ -585,6 +602,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  MemberConnectionState sse_decode_box_autoadd_member_connection_state(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   NoiseSuppressionLevel sse_decode_box_autoadd_noise_suppression_level(
     SseDeserializer deserializer,
   );
@@ -645,6 +667,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   MediaSourceKind sse_decode_media_source_kind(SseDeserializer deserializer);
 
   @protected
+  MemberConnectionState sse_decode_member_connection_state(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   NoiseSuppressionLevel sse_decode_noise_suppression_level(
     SseDeserializer deserializer,
   );
@@ -690,12 +717,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  MemberConnectionState? sse_decode_opt_box_autoadd_member_connection_state(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   NoiseSuppressionLevel? sse_decode_opt_box_autoadd_noise_suppression_level(
     SseDeserializer deserializer,
   );
 
   @protected
   int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
+
+  @protected
+  PeerConnectionState sse_decode_peer_connection_state(
+    SseDeserializer deserializer,
+  );
 
   @protected
   RoomCloseReason sse_decode_room_close_reason(SseDeserializer deserializer);
@@ -962,6 +999,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_member_connection_state(
+    MemberConnectionState self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_noise_suppression_level(
     NoiseSuppressionLevel self,
     SseSerializer serializer,
@@ -1041,6 +1084,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_member_connection_state(
+    MemberConnectionState self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_noise_suppression_level(
     NoiseSuppressionLevel self,
     SseSerializer serializer,
@@ -1092,6 +1141,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_member_connection_state(
+    MemberConnectionState? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_noise_suppression_level(
     NoiseSuppressionLevel? self,
     SseSerializer serializer,
@@ -1099,6 +1154,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_peer_connection_state(
+    PeerConnectionState self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_room_close_reason(

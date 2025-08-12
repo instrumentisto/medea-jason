@@ -10,6 +10,7 @@ pub mod local_media_track;
 pub mod media_device_details;
 pub mod media_manager_handle;
 pub mod media_stream_settings;
+pub mod member_connection_state;
 pub mod reconnect_handle;
 pub mod remote_media_track;
 pub mod room_close_reason;
@@ -28,6 +29,9 @@ pub use self::{
     media_stream_settings::{
         AudioTrackConstraints, DeviceVideoTrackConstraints,
         DisplayVideoTrackConstraints, MediaStreamSettings,
+    },
+    member_connection_state::{
+        MemberConnectionState, MemberConnectionStateKind, PeerConnectionState,
     },
     reconnect_handle::ReconnectHandle,
     remote_media_track::RemoteMediaTrack,

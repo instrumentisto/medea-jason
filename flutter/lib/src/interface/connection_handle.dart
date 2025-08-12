@@ -1,19 +1,45 @@
 import '/src/util/rust_handles_storage.dart';
 import 'media_track.dart';
+import 'member_connection_state.dart';
 
 /// External handler to a `Connection` with a remote `Member`.
 abstract class ConnectionHandle implements SyncPlatformHandle {
   /// Returns ID of the remote `Member`.
   ///
-  /// Throws a [StateError] if an underlying object has been disposed, e.g.
+  /// Throws a [StateError] if the underlying object has been disposed, e.g.
   /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
   String getRemoteMemberId();
 
+  /// Returns [MemberConnectionState] of this `Connection`.
+  ///
+  /// NOTE: Only works in [P2P mesh] mode and is subject to change.
+  ///
+  /// Throws a [StateError] if the underlying object has been disposed, e.g.
+  /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
+  /// `RoomHandle` that implicitly owns native object behind this
+  /// [ConnectionHandle].
+  ///
+  /// [P2P mesh]: https://webrtcglossary.com/mesh
+  MemberConnectionState? getState();
+
+  /// Sets a callback to be invoked once a state of this `Connection` is
+  /// changed.
+  ///
+  /// NOTE: Only works in [P2P mesh] mode and is subject to change.
+  ///
+  /// Throws a [StateError] if the underlying object has been disposed, e.g.
+  /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
+  /// `RoomHandle` that implicitly owns native object behind this
+  /// [ConnectionHandle].
+  ///
+  /// [P2P mesh]: https://webrtcglossary.com/mesh
+  void onStateChange(void Function(MemberConnectionState) f);
+
   /// Sets callback, invoked when this `Connection` is closed.
   ///
-  /// Throws a [StateError] if an underlying object has been disposed, e.g.
+  /// Throws a [StateError] if the underlying object has been disposed, e.g.
   /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
@@ -22,7 +48,7 @@ abstract class ConnectionHandle implements SyncPlatformHandle {
   /// Sets callback, invoked when a new [RemoteMediaTrack] is added to this
   /// `Connection`.
   ///
-  /// Throws a [StateError] if an underlying object has been disposed, e.g.
+  /// Throws a [StateError] if the underlying object has been disposed, e.g.
   /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
@@ -31,7 +57,7 @@ abstract class ConnectionHandle implements SyncPlatformHandle {
   /// Sets callback, invoked when a connection quality score is updated by a
   /// server.
   ///
-  /// Throws a [StateError] if an underlying object has been disposed, e.g.
+  /// Throws a [StateError] if the underlying object has been disposed, e.g.
   /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
