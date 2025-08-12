@@ -348,10 +348,14 @@ abstract class RustLibApi extends BaseApi {
     required Object f,
   });
 
-  Object crateApiDartApiRoomRoomHandleDisableAudio({required RoomHandle that});
+  Object crateApiDartApiRoomRoomHandleDisableAudio({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
   Object crateApiDartApiRoomRoomHandleDisableRemoteAudio({
     required RoomHandle that,
+    MediaSourceKind? sourceKind,
   });
 
   Object crateApiDartApiRoomRoomHandleDisableRemoteVideo({
@@ -364,10 +368,14 @@ abstract class RustLibApi extends BaseApi {
     MediaSourceKind? sourceKind,
   });
 
-  Object crateApiDartApiRoomRoomHandleEnableAudio({required RoomHandle that});
+  Object crateApiDartApiRoomRoomHandleEnableAudio({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
   Object crateApiDartApiRoomRoomHandleEnableRemoteAudio({
     required RoomHandle that,
+    MediaSourceKind? sourceKind,
   });
 
   Object crateApiDartApiRoomRoomHandleEnableRemoteVideo({
@@ -385,7 +393,10 @@ abstract class RustLibApi extends BaseApi {
     required String token,
   });
 
-  Object crateApiDartApiRoomRoomHandleMuteAudio({required RoomHandle that});
+  Object crateApiDartApiRoomRoomHandleMuteAudio({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
   Object crateApiDartApiRoomRoomHandleMuteVideo({
     required RoomHandle that,
@@ -424,7 +435,10 @@ abstract class RustLibApi extends BaseApi {
     required bool rollbackOnFail,
   });
 
-  Object crateApiDartApiRoomRoomHandleUnmuteAudio({required RoomHandle that});
+  Object crateApiDartApiRoomRoomHandleUnmuteAudio({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  });
 
   Object crateApiDartApiRoomRoomHandleUnmuteVideo({
     required RoomHandle that,
@@ -2456,37 +2470,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleDisableAudio({required RoomHandle that}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that,
-            serializer,
-          );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 58)!;
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_DartOpaque,
-          decodeErrorData: null,
-        ),
-        constMeta: kCrateApiDartApiRoomRoomHandleDisableAudioConstMeta,
-        argValues: [that],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiDartApiRoomRoomHandleDisableAudioConstMeta =>
-      const TaskConstMeta(
-        debugName: "RoomHandle_disable_audio",
-        argNames: ["that"],
-      );
-
-  @override
-  Object crateApiDartApiRoomRoomHandleDisableRemoteAudio({
+  Object crateApiDartApiRoomRoomHandleDisableAudio({
     required RoomHandle that,
+    MediaSourceKind? sourceKind,
   }) {
     return handler.executeSync(
       SyncTask(
@@ -2496,6 +2482,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 58)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleDisableAudioConstMeta,
+        argValues: [that, sourceKind],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDartApiRoomRoomHandleDisableAudioConstMeta =>
+      const TaskConstMeta(
+        debugName: "RoomHandle_disable_audio",
+        argNames: ["that", "sourceKind"],
+      );
+
+  @override
+  Object crateApiDartApiRoomRoomHandleDisableRemoteAudio({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
           return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
         },
         codec: SseCodec(
@@ -2503,7 +2523,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiDartApiRoomRoomHandleDisableRemoteAudioConstMeta,
-        argValues: [that],
+        argValues: [that, sourceKind],
         apiImpl: this,
       ),
     );
@@ -2512,7 +2532,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleDisableRemoteAudioConstMeta =>
       const TaskConstMeta(
         debugName: "RoomHandle_disable_remote_audio",
-        argNames: ["that"],
+        argNames: ["that", "sourceKind"],
       );
 
   @override
@@ -2582,37 +2602,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleEnableAudio({required RoomHandle that}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
-            that,
-            serializer,
-          );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62)!;
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_DartOpaque,
-          decodeErrorData: null,
-        ),
-        constMeta: kCrateApiDartApiRoomRoomHandleEnableAudioConstMeta,
-        argValues: [that],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiDartApiRoomRoomHandleEnableAudioConstMeta =>
-      const TaskConstMeta(
-        debugName: "RoomHandle_enable_audio",
-        argNames: ["that"],
-      );
-
-  @override
-  Object crateApiDartApiRoomRoomHandleEnableRemoteAudio({
+  Object crateApiDartApiRoomRoomHandleEnableAudio({
     required RoomHandle that,
+    MediaSourceKind? sourceKind,
   }) {
     return handler.executeSync(
       SyncTask(
@@ -2622,6 +2614,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_DartOpaque,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleEnableAudioConstMeta,
+        argValues: [that, sourceKind],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDartApiRoomRoomHandleEnableAudioConstMeta =>
+      const TaskConstMeta(
+        debugName: "RoomHandle_enable_audio",
+        argNames: ["that", "sourceKind"],
+      );
+
+  @override
+  Object crateApiDartApiRoomRoomHandleEnableRemoteAudio({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
           return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 63)!;
         },
         codec: SseCodec(
@@ -2629,7 +2655,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiDartApiRoomRoomHandleEnableRemoteAudioConstMeta,
-        argValues: [that],
+        argValues: [that, sourceKind],
         apiImpl: this,
       ),
     );
@@ -2638,7 +2664,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleEnableRemoteAudioConstMeta =>
       const TaskConstMeta(
         debugName: "RoomHandle_enable_remote_audio",
-        argNames: ["that"],
+        argNames: ["that", "sourceKind"],
       );
 
   @override
@@ -2741,7 +2767,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleMuteAudio({required RoomHandle that}) {
+  Object crateApiDartApiRoomRoomHandleMuteAudio({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
@@ -2750,6 +2779,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
           return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 67)!;
         },
         codec: SseCodec(
@@ -2757,7 +2787,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiDartApiRoomRoomHandleMuteAudioConstMeta,
-        argValues: [that],
+        argValues: [that, sourceKind],
         apiImpl: this,
       ),
     );
@@ -2766,7 +2796,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleMuteAudioConstMeta =>
       const TaskConstMeta(
         debugName: "RoomHandle_mute_audio",
-        argNames: ["that"],
+        argNames: ["that", "sourceKind"],
       );
 
   @override
@@ -3009,7 +3039,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Object crateApiDartApiRoomRoomHandleUnmuteAudio({required RoomHandle that}) {
+  Object crateApiDartApiRoomRoomHandleUnmuteAudio({
+    required RoomHandle that,
+    MediaSourceKind? sourceKind,
+  }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
@@ -3018,6 +3051,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
+          sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
           return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 75)!;
         },
         codec: SseCodec(
@@ -3025,7 +3059,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiDartApiRoomRoomHandleUnmuteAudioConstMeta,
-        argValues: [that],
+        argValues: [that, sourceKind],
         apiImpl: this,
       ),
     );
@@ -3034,7 +3068,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiDartApiRoomRoomHandleUnmuteAudioConstMeta =>
       const TaskConstMeta(
         debugName: "RoomHandle_unmute_audio",
-        argNames: ["that"],
+        argNames: ["that", "sourceKind"],
       );
 
   @override
@@ -6392,12 +6426,18 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   );
 
   /// Disables outbound audio in the provided [`Room`].
-  Object disableAudio() => RustLib.instance.api
-      .crateApiDartApiRoomRoomHandleDisableAudio(that: this);
+  Object disableAudio({MediaSourceKind? sourceKind}) =>
+      RustLib.instance.api.crateApiDartApiRoomRoomHandleDisableAudio(
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Disables inbound audio in the provided [`Room`].
-  Object disableRemoteAudio() => RustLib.instance.api
-      .crateApiDartApiRoomRoomHandleDisableRemoteAudio(that: this);
+  Object disableRemoteAudio({MediaSourceKind? sourceKind}) =>
+      RustLib.instance.api.crateApiDartApiRoomRoomHandleDisableRemoteAudio(
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Disables inbound video in the provided [`Room`].
   ///
@@ -6426,12 +6466,18 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
       );
 
   /// Enables outbound audio in the provided [`Room`].
-  Object enableAudio() =>
-      RustLib.instance.api.crateApiDartApiRoomRoomHandleEnableAudio(that: this);
+  Object enableAudio({MediaSourceKind? sourceKind}) =>
+      RustLib.instance.api.crateApiDartApiRoomRoomHandleEnableAudio(
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Enables inbound audio in the provided [`Room`].
-  Object enableRemoteAudio() => RustLib.instance.api
-      .crateApiDartApiRoomRoomHandleEnableRemoteAudio(that: this);
+  Object enableRemoteAudio({MediaSourceKind? sourceKind}) =>
+      RustLib.instance.api.crateApiDartApiRoomRoomHandleEnableRemoteAudio(
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Enables inbound video in the provided [`Room`].
   ///
@@ -6469,8 +6515,11 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
       .crateApiDartApiRoomRoomHandleJoin(that: this, token: token);
 
   /// Mutes outbound audio in the provided [`Room`].
-  Object muteAudio() =>
-      RustLib.instance.api.crateApiDartApiRoomRoomHandleMuteAudio(that: this);
+  Object muteAudio({MediaSourceKind? sourceKind}) =>
+      RustLib.instance.api.crateApiDartApiRoomRoomHandleMuteAudio(
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Mutes outbound video in the provided [`Room`].
   ///
@@ -6583,8 +6632,11 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   );
 
   /// Unmutes outbound audio in the provided [`Room`].
-  Object unmuteAudio() =>
-      RustLib.instance.api.crateApiDartApiRoomRoomHandleUnmuteAudio(that: this);
+  Object unmuteAudio({MediaSourceKind? sourceKind}) =>
+      RustLib.instance.api.crateApiDartApiRoomRoomHandleUnmuteAudio(
+        that: this,
+        sourceKind: sourceKind,
+      );
 
   /// Unmutes outbound video in the provided [`Room`].
   ///

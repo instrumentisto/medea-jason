@@ -217,7 +217,7 @@ impl Member {
     pub fn count_of_tracks_between_members(&self, other: &Self) -> (u64, u64) {
         if env::var("SFU").is_ok() {
             // All transceivers are always `sendrecv` in SFU mode.
-            return (3, 3);
+            return (4, 4);
         }
 
         let send_count = self
@@ -253,10 +253,28 @@ impl Member {
         self.update_send_media_state(kind, source, enabled);
         if enabled {
             if let Some(kind) = kind {
-                self.room.enable_media_send(kind, source, maybe_await).await?;
                 match kind {
-                    MediaKind::Audio => self.enabled_audio = true,
-                    MediaKind::Video => self.enabled_video = true,
+                    MediaKind::Audio => match source {
+                        Some(MediaSourceKind::Device) | None => {
+                            self.room
+                                .enable_media_send(
+                                    kind,
+                                    Some(MediaSourceKind::Device),
+                                    maybe_await,
+                                )
+                                .await?;
+                            self.enabled_audio = true;
+                        }
+                        // Enabling `Display` audio without `Display` video
+                        // results in error.
+                        Some(MediaSourceKind::Display) => (),
+                    },
+                    MediaKind::Video => {
+                        self.room
+                            .enable_media_send(kind, source, maybe_await)
+                            .await?;
+                        self.enabled_video = true;
+                    }
                 }
             } else {
                 self.room

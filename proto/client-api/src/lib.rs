@@ -1138,6 +1138,9 @@ pub struct AudioSettings {
     ///
     /// If `false` then audio may be not published.
     pub required: bool,
+
+    /// Source kind of these [`AudioSettings`].
+    pub source_kind: MediaSourceKind,
 }
 
 /// Settings of a video [`Track`].

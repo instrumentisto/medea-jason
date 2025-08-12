@@ -12,12 +12,20 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
+- `MediaStreamSettings.displayAudio()` to set system audio constraints on WASM platform. ([#225])
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
+
+### Changed
+
+- Device audio tracks: ([#225])
+  - `MediaStreamSettings.audio()` renamed to `MediaStreamSettings.deviceAudio()`.
+  - `RoomHandle.muteAudio()`, `RoomHandle.unmuteAudio()`, `RoomHandle.enableAudio()`, `RoomHandle.disableAudio()`, `RoomHandle.enableRemoteAudio()`, and `RoomHandle.disableRemoteAudio()` now receive an argument to specify `MediaSourceKind`.
 
 ### Fixed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 
+[#225]: https://github.com/instrumentisto/medea-jason/pull/225
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
 [#229]: https://github.com/instrumentisto/medea-jason/pull/229
 

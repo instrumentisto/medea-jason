@@ -41,7 +41,7 @@ void main() {
     var devices = await mediaManager.enumerateDevices();
 
     var settings = MediaStreamSettings();
-    settings.audio(AudioTrackConstraints());
+    settings.deviceAudio(AudioTrackConstraints());
     settings.deviceVideo(DeviceVideoTrackConstraints());
     var tracks = await mediaManager.initLocalTracks(settings);
 
@@ -401,7 +401,7 @@ void main() {
     {
       // all enabled by default
       var settings = MediaStreamSettings();
-      settings.audio(AudioTrackConstraints());
+      settings.deviceAudio(AudioTrackConstraints());
       var track = (await mediaManager.initLocalTracks(settings))[0];
 
       expect(track.isAudioProcessingAvailable(), isTrue);
@@ -426,7 +426,7 @@ void main() {
       audio.exactNoiseSuppression(false);
       audio.noiseSuppressionLevel(NoiseSuppressionLevel.low);
       var settings = MediaStreamSettings();
-      settings.audio(audio);
+      settings.deviceAudio(audio);
       var track = (await mediaManager.initLocalTracks(settings))[0];
 
       expect(track.isAudioProcessingAvailable(), isTrue);
@@ -442,7 +442,7 @@ void main() {
     {
       // new track if different config
       var settings1 = MediaStreamSettings();
-      settings1.audio(AudioTrackConstraints());
+      settings1.deviceAudio(AudioTrackConstraints());
       var track1 = (await mediaManager.initLocalTracks(settings1))[0];
 
       expect(await track1.isNoiseSuppressionEnabled(), isTrue);
@@ -450,7 +450,7 @@ void main() {
       var settings2 = MediaStreamSettings();
       var audio = AudioTrackConstraints();
       audio.exactNoiseSuppression(false);
-      settings2.audio(audio);
+      settings2.deviceAudio(audio);
       var track2 = (await mediaManager.initLocalTracks(settings2))[0];
 
       expect(await track2.isNoiseSuppressionEnabled(), isFalse);
@@ -465,7 +465,7 @@ void main() {
       var settings1 = MediaStreamSettings();
       var audio1 = AudioTrackConstraints();
       audio1.exactNoiseSuppression(false);
-      settings1.audio(audio1);
+      settings1.deviceAudio(audio1);
       var track1 = (await mediaManager.initLocalTracks(settings1))[0];
 
       expect(await track1.isNoiseSuppressionEnabled(), isFalse);
@@ -473,7 +473,7 @@ void main() {
       var settings2 = MediaStreamSettings();
       var audio2 = AudioTrackConstraints();
       audio2.exactNoiseSuppression(false);
-      settings2.audio(audio2);
+      settings2.deviceAudio(audio2);
       var track2 = (await mediaManager.initLocalTracks(settings2))[0];
 
       expect(await track2.isNoiseSuppressionEnabled(), isFalse);
@@ -486,7 +486,7 @@ void main() {
     {
       // same track if ideal config changed
       var settings1 = MediaStreamSettings();
-      settings1.audio(AudioTrackConstraints());
+      settings1.deviceAudio(AudioTrackConstraints());
       var track1 = (await mediaManager.initLocalTracks(settings1))[0];
 
       expect(await track1.isNoiseSuppressionEnabled(), isTrue);
@@ -494,7 +494,7 @@ void main() {
       var settings2 = MediaStreamSettings();
       var audio = AudioTrackConstraints();
       audio.idealNoiseSuppression(false);
-      settings2.audio(audio);
+      settings2.deviceAudio(audio);
       var track2 = (await mediaManager.initLocalTracks(settings2))[0];
 
       expect(await track2.isNoiseSuppressionEnabled(), isTrue);
@@ -518,7 +518,7 @@ void main() {
     }
 
     var settings = MediaStreamSettings();
-    settings.audio(AudioTrackConstraints());
+    settings.deviceAudio(AudioTrackConstraints());
     var track = (await mediaManager.initLocalTracks(settings))[0];
 
     expect(track.isAudioProcessingAvailable(), isTrue);

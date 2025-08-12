@@ -1,6 +1,6 @@
 //! [`Object`] representing a `Room` JS object.
 
-use std::{borrow::Cow, str::FromStr};
+use std::str::FromStr;
 
 use super::{AwaitCompletion, Error};
 use crate::{
@@ -120,10 +120,12 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let disable: Cow<'_, _> = match kind {
-            MediaKind::Audio => "r.room.disable_audio()".into(),
+        let disable = match kind {
+            MediaKind::Audio => {
+                format!("r.room.disable_audio({media_source_kind})")
+            }
             MediaKind::Video => {
-                format!("r.room.disable_video({media_source_kind})").into()
+                format!("r.room.disable_video({media_source_kind})")
             }
         };
         self.execute(Statement::new(
@@ -158,10 +160,12 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let enable: Cow<'_, _> = match kind {
-            MediaKind::Audio => "r.room.enable_audio()".into(),
+        let enable = match kind {
+            MediaKind::Audio => {
+                format!("r.room.enable_audio({media_source_kind})")
+            }
             MediaKind::Video => {
-                format!("r.room.enable_video({media_source_kind})").into()
+                format!("r.room.enable_video({media_source_kind})")
             }
         };
         self.execute(Statement::new(
@@ -195,11 +199,12 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let disable: Cow<'_, _> = match kind {
-            MediaKind::Audio => "r.room.disable_remote_audio()".into(),
+        let disable = match kind {
+            MediaKind::Audio => {
+                format!("r.room.disable_remote_audio({media_source_kind})")
+            }
             MediaKind::Video => {
                 format!("r.room.disable_remote_video({media_source_kind})")
-                    .into()
             }
         };
         self.execute(Statement::new(
@@ -233,11 +238,12 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let enable: Cow<'_, _> = match kind {
-            MediaKind::Audio => "r.room.enable_remote_audio()".into(),
+        let enable = match kind {
+            MediaKind::Audio => {
+                format!("r.room.enable_remote_audio({media_source_kind})")
+            }
             MediaKind::Video => {
                 format!("r.room.enable_remote_video({media_source_kind})")
-                    .into()
             }
         };
         self.execute(Statement::new(
@@ -272,10 +278,12 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let mute: Cow<'_, _> = match kind {
-            MediaKind::Audio => "r.room.mute_audio()".into(),
+        let mute = match kind {
+            MediaKind::Audio => {
+                format!("r.room.mute_audio({media_source_kind})")
+            }
             MediaKind::Video => {
-                format!("r.room.mute_video({media_source_kind})").into()
+                format!("r.room.mute_video({media_source_kind})")
             }
         };
         self.execute(Statement::new(
@@ -283,7 +291,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {mute};
+                    {maybe_await} {mute}
                 }}
                 ",
             ),
@@ -310,10 +318,12 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let unmute: Cow<'_, _> = match kind {
-            MediaKind::Audio => "r.room.unmute_audio()".into(),
+        let unmute = match kind {
+            MediaKind::Audio => {
+                format!("r.room.unmute_audio({media_source_kind})")
+            }
             MediaKind::Video => {
-                format!("r.room.unmute_video({media_source_kind})").into()
+                format!("r.room.unmute_video({media_source_kind})")
             }
         };
         self.execute(Statement::new(
@@ -321,7 +331,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {unmute};
+                    {maybe_await} {unmute}
                 }}
                 ",
             ),
@@ -570,7 +580,7 @@ impl Object<Room> {
                 }
                 if (audio) {
                     let audio = new window.rust.AudioTrackConstraints();
-                    constraints.audio(audio);
+                    constraints.device_audio(audio);
                 }
                 let promise = room.room.set_local_media_settings(
                     constraints,
