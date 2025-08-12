@@ -16,7 +16,7 @@ abstract class MediaManagerHandle implements SyncPlatformHandle {
   /// Obtains [LocalMediaTrack]s objects from local media devices (or screen
   /// capture) basing on the provided [MediaStreamSettings].
   ///
-  /// Throws a [StateError] if an underlying object has been disposed, e.g.
+  /// Throws a [StateError] if the underlying object has been disposed, e.g.
   /// [free] was called on this [MediaManagerHandle], or on a [Jason] that
   /// implicitly owns native object behind this [MediaManagerHandle].
   ///
@@ -27,7 +27,7 @@ abstract class MediaManagerHandle implements SyncPlatformHandle {
   /// Returns a list of [MediaDeviceDetails] objects representing available media
   /// input devices, such as microphones, cameras, and so forth.
   ///
-  /// Throws a [StateError] if an underlying object has been disposed, e.g.
+  /// Throws a [StateError] if the underlying object has been disposed, e.g.
   /// [free] was called on this [MediaManagerHandle], or on a [Jason] that
   /// implicitly owns native object behind this [MediaManagerHandle].
   ///
@@ -41,7 +41,7 @@ abstract class MediaManagerHandle implements SyncPlatformHandle {
   /// This method is supported on Linux, macOS and Windows platforms only.
   /// Throws an [UnsupportedError] on other platforms.
   ///
-  /// Throws a [StateError] if an underlying object has been disposed, e.g.
+  /// Throws a [StateError] if the underlying object has been disposed, e.g.
   /// [free] was called on this [MediaManagerHandle], or on a [Jason] that
   /// implicitly owns native object behind this [MediaManagerHandle].
   ///

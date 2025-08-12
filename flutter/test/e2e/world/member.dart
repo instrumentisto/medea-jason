@@ -55,6 +55,9 @@ class ConnectionStore {
   /// [Completer]s waiting the [ConnectionHandle]s being closed.
   var closeConnect = HashMap<String, Completer>();
 
+  /// [Completer]s waiting state changes of the [ConnectionHandle]s.
+  var stateChange = HashMap<String, Function(MemberConnectionState)>();
+
   /// Callbacks calls after [RemoteMediaTrack.onMediaDirectionChanged], where
   /// the key is `track.id`.
   var onMediaDirectionChanged =
@@ -270,6 +273,12 @@ class Member {
         }
       });
 
+      connection.onStateChange((state) {
+        connectionStore.stateChange.forEach((id, callback) {
+          callback(state);
+        });
+      });
+
       connection.onClose(() {
         connectionStore.closeConnect[remoteMemberId]!.complete();
       });
@@ -296,6 +305,54 @@ class Member {
       };
       return conn.future;
     }
+  }
+
+  /// Waits for a specific `Connection` state with the [Member] with the
+  /// provided [id].
+  Future<void> waitForState(
+    String id,
+    MemberConnectionState? expectedState,
+  ) async {
+    var completer = Completer();
+    var conn = connectionStore.connections[id]!;
+    var state = conn.getState();
+
+    if (state != null) {
+      if (expectedState == null) {
+        completer.completeError('State must not be set');
+        return completer.future;
+      }
+
+      switch (state) {
+        case MemberConnectionStateP2P(:final peerState):
+          var isStateMatch =
+              expectedState is MemberConnectionStateP2P &&
+              peerState == expectedState.peerState;
+          if (isStateMatch) {
+            completer.complete();
+            return completer.future;
+          }
+      }
+    } else if (expectedState == null) {
+      completer.complete();
+      return completer.future;
+    }
+
+    connectionStore.stateChange[id] = (state) {
+      switch (state) {
+        case MemberConnectionStateP2P(:final peerState):
+          var isStateMatch =
+              expectedState is MemberConnectionStateP2P &&
+              peerState == expectedState.peerState;
+          if (isStateMatch) {
+            completer.complete();
+            connectionStore.stateChange[id] = (_) {};
+            return;
+          }
+      }
+    };
+
+    return completer.future;
   }
 
   /// Waits for a `count` of [RemoteMediaTrack]s from the [Member] with the

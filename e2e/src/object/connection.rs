@@ -1,9 +1,13 @@
 //! `Connection` JS object's representation.
 
+use std::str::FromStr;
+
+use serde::Serialize;
+
 use super::Error;
 use crate::{
     browser::Statement,
-    object::{MediaKind, Object, tracks_store},
+    object::{MediaKind, Object, room::ParsingFailedError, tracks_store},
 };
 
 /// Representation of a `Connection` JS object.
@@ -107,5 +111,75 @@ impl Object<Connection> {
         ))
         .await
         .map(drop)
+    }
+}
+
+/// [`Connection`]'s state.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[serde(tag = "kind", content = "value")]
+pub enum MemberConnectionState {
+    /// State in [P2P mesh] mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    P2P(PeerConnectionState),
+}
+
+impl FromStr for MemberConnectionState {
+    type Err = ParsingFailedError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parts = s.split("::").collect::<Vec<_>>();
+
+        if parts.len() != 2 {
+            return Err(ParsingFailedError);
+        }
+
+        match parts[0] {
+            "P2P" => Ok(Self::P2P(PeerConnectionState::from_str(parts[1])?)),
+            _ => Err(ParsingFailedError),
+        }
+    }
+}
+
+/// [RTCPeerConnectionState][1] describing a state of a network connection
+/// between two peers.
+///
+/// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnectionstate
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+pub enum PeerConnectionState {
+    /// The connection was just created and has not yet started negotiating.
+    New,
+
+    /// The ICE agent is trying to establish a connection with the remote peer.
+    Connecting,
+
+    /// A connection has been successfully established and media/data can flow.
+    Connected,
+
+    /// The connection has been temporarily lost (e.g., network issue). ICE
+    /// will try to reconnect.
+    Disconnected,
+
+    /// The connection failed completely (e.g., ICE failed, DTLS error).
+    Failed,
+
+    /// The connection has been closed.
+    Closed,
+}
+
+// TODO: Use `derive_more` once its capable of it.
+impl FromStr for PeerConnectionState {
+    type Err = ParsingFailedError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "New" => Self::New,
+            "Connecting" => Self::Connecting,
+            "Connected" => Self::Connected,
+            "Disconnected" => Self::Disconnected,
+            "Failed" => Self::Failed,
+            "Closed" => Self::Closed,
+            _ => return Err(ParsingFailedError),
+        })
     }
 }

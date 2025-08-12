@@ -80,6 +80,7 @@ class _CallState extends State<CallRoute> {
   final Map<String, ConnectWidgets> _widgets = {};
 
   Call? _call;
+  String _memberConnectionState = '';
   late String _roomId;
   late String _memberId;
 
@@ -182,6 +183,26 @@ class _CallState extends State<CallRoute> {
           setState(() {
             _widgets[remoteId] = remoteTracks!;
           });
+        });
+
+        conn.onStateChange((state) {
+          switch (state) {
+            case jason.MemberConnectionStateP2P(:final peerState):
+              switch (peerState) {
+                case jason.PeerConnectionState.new_:
+                  _memberConnectionState = 'P2P (New)';
+                case jason.PeerConnectionState.connecting:
+                  _memberConnectionState = 'P2P (Connecting)';
+                case jason.PeerConnectionState.connected:
+                  _memberConnectionState = 'P2P (Connected)';
+                case jason.PeerConnectionState.disconnected:
+                  _memberConnectionState = 'P2P (Disconnected)';
+                case jason.PeerConnectionState.failed:
+                  _memberConnectionState = 'P2P (Failed)';
+                case jason.PeerConnectionState.closed:
+                  _memberConnectionState = 'P2P (Closed)';
+              }
+          }
         });
       });
 
@@ -335,6 +356,7 @@ class _CallState extends State<CallRoute> {
                 value: currentAudioLevel,
                 minHeight: 10.0,
               ),
+              Text(_memberConnectionState),
               Expanded(
                 child: Row(
                   children: _widgets.values
