@@ -22,10 +22,6 @@ All user visible changes to this project will be documented in this file. This p
     - `TrackRequestError.TooManyDisplayAudioTracks` to indicate invalid conversion from `TrackRequest` with system audio tracks to `SimpleTracksRequest`.
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
 
-### Fixed
-
-- `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
-
 ### Changed
 
 - Device audio tracks: ([#225])
@@ -37,6 +33,10 @@ All user visible changes to this project will be documented in this file. This p
     - `TrackRequestError.TooManyAudioTracks` renamed to `TrackRequestError.TooManyDeviceAudioTracks`.
     - `RoomHandle.mute_audio()`, `RoomHandle.unmute_audio()`, `RoomHandle.enable_audio()`, `RoomHandle.disable_audio()`, `RoomHandle.enable_remote_audio()`, and `RoomHandle.disable_remote_audio()` now receive an argument to specify `MediaSourceKind`.
 - Bumped up [MSRV] to 1.86 to be buildable by [`cargo-ndk` 4.0 version]. ([todo])
+
+### Fixed
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
