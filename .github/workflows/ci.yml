@@ -625,7 +625,6 @@ jobs:
         with:
           os_version: '>=13.0'
           os: iOS
-          wait_for_boot: true
         if: ${{ matrix.platform == 'ios' }}
 
       - name: Test on iOS simulator
