@@ -868,7 +868,7 @@ endif
 
 test.flutter:
 	cd flutter/example/ && \
-	flutter drive --driver=test_driver/integration_test.dart \
+	flutter drive --verbose --driver=test_driver/integration_test.dart \
 	              --target=integration_test/jason.dart \
 	              $(if $(call eq,$(debug),yes),--debug,--profile) \
 	              $(if $(call eq,$(device),),,-d $(device))
