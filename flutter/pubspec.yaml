@@ -26,26 +26,17 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.4.15
   ffigen: ^19.0.0
-  flutter_gherkin: 3.0.0-rc.17
-  flutter_lints: ^5.0.0
+  flutter_gherkin:
+    git:
+      url: https://github.com/SleepySquash/flutter_gherkin.git
+      ref: upgrade-packages
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
   freezed: ^3.1.0
-  gherkin: ^3.1.0
+  gherkin: ^2.0.8
   import_sorter: ^4.6.0
   json_serializable: ^6.9.0
-
-dependency_overrides:
-  # Pinned until `flutter_gherkin` updates
-  analyzer: ^7.4.5
-  # Pinned until `flutter_gherkin` updates
-  dart_style: <3.1.2
-  # Pinned until `flutter_gherkin` updates
-  meta: ^1.14.0
-  # Pinned until `flutter_gherkin` updates
-  uuid: ^4.4.2
-  # Pinned until `flutter_gherkin` updates
-  source_gen: ^2.0.0
 
 
 flutter:

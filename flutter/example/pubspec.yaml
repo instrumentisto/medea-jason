@@ -30,22 +30,17 @@ dependencies:
 dev_dependencies:
   flutter_driver:
     sdk: flutter
-  flutter_gherkin: 3.0.0-rc.17
+  flutter_gherkin:
+    git:
+      url: https://github.com/SleepySquash/flutter_gherkin.git
+      ref: upgrade-packages
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-  gherkin: ^3.1.0
+  gherkin: ^2.0.8
   integration_test:
     sdk: flutter
   json_serializable: ^6.9.0
-
-dependency_overrides:
-  # TODO: Remove when `flutter_gherkin` updates.
-  analyzer: ^7.4.5
-  # TODO: Remove when `flutter_gherkin` updates.
-  uuid: ^4.4.2
-  # TODO: Remove when `flutter_gherkin` updates.
-  source_gen: ^2.0.0
 
 flutter:
   assets:
