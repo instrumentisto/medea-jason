@@ -619,6 +619,10 @@ jobs:
           xcode-version: latest-stable
         if: ${{ matrix.platform == 'ios' }}
 
+      - name: Install coreutils
+        run: brew install coreutils
+        if: ${{ matrix.platform == 'ios' }}
+
       - name: Start iOS simulator
         id: simulator
         uses: futureware-tech/simulator-action@v4
