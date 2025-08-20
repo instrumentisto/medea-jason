@@ -639,7 +639,7 @@ jobs:
         if: ${{ matrix.platform == 'ios' }}
 
       - name: Get iOS simulator logs
-        run: xcrun simctl spawn ${{ steps.simulator.outputs.udid }} log show --style syslog --last 1h
+        run: xcrun simctl spawn ${{ steps.simulator.outputs.udid }} log show --style compact --last 1h --info --debug --predicate 'subsystem == "com.instrumentisto.medeaJasonExample"'
         if: ${{ matrix.platform == 'ios' }}
 
 
