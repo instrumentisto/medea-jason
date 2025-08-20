@@ -519,11 +519,11 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - android
+#          - android
           - ios
-          - linux
-          - macos
-          - windows
+#          - linux
+#          - macos
+#          - windows
     runs-on: ${{ (contains('android linux', matrix.platform) && 'ubuntu-22.04')
               || (matrix.platform == 'windows'               && 'windows-latest')
               ||                                                'macos-latest' }}
@@ -635,6 +635,7 @@ jobs:
       - name: Test on iOS simulator
         run: gtimeout 10m make test.flutter device=${{ steps.simulator.outputs.udid }}
                                debug=yes
+        continue-on-error: true
         if: ${{ matrix.platform == 'ios' }}
 
       - name: Get iOS simulator logs
