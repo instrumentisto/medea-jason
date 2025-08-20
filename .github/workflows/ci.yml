@@ -629,10 +629,13 @@ jobs:
         if: ${{ matrix.platform == 'ios' }}
 
       - name: Test on iOS simulator
-        run: make test.flutter device=${{ steps.simulator.outputs.udid }}
+        run: timeout 10m make test.flutter device=${{ steps.simulator.outputs.udid }}
                                debug=yes
         if: ${{ matrix.platform == 'ios' }}
 
+      - name: Get iOS simulator logs
+        run: xcrun simctl spawn ${{ steps.simulator.outputs.udid }} log show --style syslog --last 1h
+        if: ${{ matrix.platform == 'ios' }}
 
 
 
