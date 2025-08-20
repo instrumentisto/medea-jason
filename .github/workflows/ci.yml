@@ -629,7 +629,7 @@ jobs:
         if: ${{ matrix.platform == 'ios' }}
 
       - name: Test on iOS simulator
-        run: timeout 10m make test.flutter device=${{ steps.simulator.outputs.udid }}
+        run: gtimeout 10m make test.flutter device=${{ steps.simulator.outputs.udid }}
                                debug=yes
         if: ${{ matrix.platform == 'ios' }}
 
