@@ -105,6 +105,8 @@ jobs:
       - run: make cargo.lint workspace=yes
         if: ${{ matrix.platform == 'workspace' }}
 
+      - run: false
+
   codegen:
     strategy:
       matrix:
