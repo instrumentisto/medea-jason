@@ -23,7 +23,7 @@ jobs:
   ################
 
   pr:
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ !cancelled() && github.event_name == 'pull_request' }}
     needs:
       - build-jason
       - build-jason-linux
