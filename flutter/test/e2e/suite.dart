@@ -90,31 +90,17 @@ class ExitOnFailureHook implements Hook {
   int get priority => 999;
 }
 
-final testConfigs = FlutterTestConfiguration(
-  stepDefinitions:
+final testConfigs = FlutterTestConfiguration()
+  ..stepDefinitions =
       control_api.steps() +
       connection.steps() +
       room.steps() +
       track.steps() +
       media_state.steps() +
       websocket.steps() +
-      given.steps(),
-  createWorld: (config) => Future.sync(() async {
-    await clearWorld();
-    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      await webrtc.initFfiBridge();
-      await webrtc.enableFakeMedia();
-    }
-
-    var world = CustomWorld();
-    oldWorld = world;
-    await world.controlClient.create(world.roomId, Room(world.roomId, {}));
-    return world;
-  }),
-  defaultTimeout: const Duration(seconds: 30),
-  tagExpression: 'not @${isSfu ? 'mesh' : 'sfu'}',
-  hooks: [ExitOnFailureHook()],
-  reporters: [
+      given.steps()
+  ..hooks = [ExitOnFailureHook()]
+  ..reporters = [
     StdoutReporter(MessageLevel.verbose)
       ..setWriteLineFn(print)
       ..setWriteFn(print),
@@ -125,10 +111,24 @@ final testConfigs = FlutterTestConfiguration(
       ..setWriteLineFn(print)
       ..setWriteFn(print),
     FlutterDriverReporter(logInfoMessages: true),
-  ],
-);
+  ]
+  ..semanticsEnabled = false
+  ..defaultTimeout = const Duration(seconds: 30)
+  ..tagExpression = 'not @${isSfu ? 'mesh' : 'sfu'}'
+  ..createWorld = (config) => Future.sync(() async {
+    await clearWorld();
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      await webrtc.initFfiBridge();
+      await webrtc.enableFakeMedia();
+    }
+
+    var world = CustomWorld();
+    oldWorld = world;
+    await world.controlClient.create(world.roomId, Room(world.roomId, {}));
+    return world;
+  });
 
 @GherkinTestSuite(featurePaths: ['../e2e/tests/features/**'])
 void main() {
-  executeTestSuite(configuration: testConfigs, appMainFunction: (_) async {});
+  executeTestSuite(testConfigs, (_) async {});
 }

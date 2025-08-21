@@ -333,7 +333,7 @@ void main() {
     fut() => Future.delayed(const Duration(milliseconds: 500), () async {
       return testObj;
     });
-    await (handleResolver(fut) as Future);
+    await (handleResolver(fut) as Future).timeout(const Duration(seconds: 5));
     expect(testObj.val, equals(45));
   });
 
@@ -348,7 +348,10 @@ void main() {
     fut() => Future.delayed(const Duration(milliseconds: 500), () async {
       throw Exception('Test Exception');
     });
-    var res = await (futureCatchesException(fut) as Future);
+    var res = await (futureCatchesException(fut) as Future).timeout(
+      const Duration(seconds: 5),
+    );
+
     expect(res as int, equals(1));
   });
 

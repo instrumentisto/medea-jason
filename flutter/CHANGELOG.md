@@ -10,6 +10,11 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
 
+### BC Breaks
+
+- Bumped up minimum supported [Flutter] version to 3.35. ([#231])
+- Bumped up minimum supported [Dart] version to 3.9. ([#231])
+
 ### Added
 
 - `MediaStreamSettings.displayAudio()` to set system audio constraints on WASM platform. ([#225])
@@ -25,9 +30,15 @@ All user visible changes to this project will be documented in this file. This p
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 
+### Upgraded
+
+- Dependencies:
+    - [`medea_flutter_webrtc`] to 0.16.0 version. ([#231])
+
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
 [#229]: https://github.com/instrumentisto/medea-jason/pull/229
+[#231]: https://github.com/instrumentisto/medea-jason/pull/231
 
 
 
