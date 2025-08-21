@@ -23,21 +23,7 @@ jobs:
   ################
 
   pr:
-    if: ${{ github.event_name == 'pull_request'
-         && needs.build-jason.result == 'success'
-         && needs.build-jason-linux.result == 'success'
-         && needs.clippy.result == 'success'
-         && needs.codegen.result == 'success'
-         && needs.dartanalyze.result == 'success'
-         && needs.dartfmt.result == 'success'
-         && needs.docker.result == 'success'
-         && needs.helm-lint.result == 'success'
-         && needs.rustdoc.result == 'success'
-         && needs.rustfmt.result == 'success'
-         && needs.test.result == 'success'
-         && needs.test-e2e-browser.result == 'success'
-         && needs.test-e2e-native.result == 'success'
-         && needs.test-flutter == 'success' }}
+    if: ${{ github.event_name == 'pull_request' }}
     needs:
       - build-jason
       - build-jason-linux
@@ -55,7 +41,20 @@ jobs:
       - test-flutter
     runs-on: ubuntu-latest
     steps:
-      - run: true
+      - run: ${{ needs.build-jason.result == 'success'
+              && needs.build-jason-linux.result == 'success'
+              && needs.clippy.result == 'success'
+              && needs.codegen.result == 'success'
+              && needs.dartanalyze.result == 'success'
+              && needs.dartfmt.result == 'success'
+              && needs.docker.result == 'success'
+              && needs.helm-lint.result == 'success'
+              && needs.rustdoc.result == 'success'
+              && needs.rustfmt.result == 'success'
+              && needs.test.result == 'success'
+              && needs.test-e2e-browser.result == 'success'
+              && needs.test-e2e-native.result == 'success'
+              && needs.test-flutter == 'success' }}
 
 
 
