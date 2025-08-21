@@ -10,6 +10,11 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
 
+### BC Breaks
+
+- Bumped up minimum supported [Flutter] version to 3.35. ([#231])
+- Bumped up minimum supported [Dart] version to 3.9. ([#231])
+
 ### Added
 
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
@@ -18,8 +23,14 @@ All user visible changes to this project will be documented in this file. This p
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 
+### Upgraded
+
+- Dependencies:
+    - [`medea_flutter_webrtc`] to 0.16.0 version. ([#231])
+
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
 [#229]: https://github.com/instrumentisto/medea-jason/pull/229
+[#231]: https://github.com/instrumentisto/medea-jason/pull/231
 
 
 
@@ -290,9 +301,10 @@ See also [`medea-jason` crate 0.5.0 changes](https://github.com/instrumentisto/m
 
 [`flutter_rust_bridge`]: https://pub.dev/packages/flutter_rust_bridge
 [`freezed_annotation`]: https://pub.dev/packages/freezed_annotation
-[macOS]: https://www.apple.com/macos
 [`medea_flutter_webrtc`]: https://pub.dev/packages/medea_flutter_webrtc
 [`medea-jason`]: https://docs.rs/medea-jason
+[Dart]: https://dart.dev
 [Flutter]: https://flutter.dev
+[macOS]: https://www.apple.com/macos
 [Semantic Versioning 2.0.0]: https://semver.org
 [SFU]: https://webrtcglossary.com/sfu
