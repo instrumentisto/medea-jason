@@ -41,20 +41,6 @@ jobs:
       - test-flutter
     runs-on: ubuntu-latest
     steps:
-      - run: echo "build-jason|${{ needs.build-jason.result }}"
-      - run: echo "build-jason-linux|${{ needs.build-jason-linux.result }}"
-      - run: echo "clippy|${{ needs.clippy.result }}"
-      - run: echo "codegen|${{ needs.codegen.result }}"
-      - run: echo "dartanalyze|${{ needs.dartanalyze.result }}"
-      - run: echo "dartfmt|${{ needs.dartfmt.result }}"
-      - run: echo "docker|${{ needs.docker.result }}"
-      - run: echo "helm-lint|${{ needs.helm-lint.result }}"
-      - run: echo "rustdoc|${{ needs.rustdoc.result }}"
-      - run: echo "test|${{ needs.test.result }}"
-      - run: echo "test-e2e-browse|${{ needs.test-e2e-browser.result }}"
-      - run: echo "test-e2e-native|${{ needs.test-e2e-native.result }}"
-      - run: echo "test-flutter|${{ needs.test-flutter.result }}"
-
       - run: ${{ needs.build-jason.result == 'success'
               && needs.build-jason-linux.result == 'success'
               && needs.clippy.result == 'success'
