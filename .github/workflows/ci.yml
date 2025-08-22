@@ -140,7 +140,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         if: ${{ matrix.crate == 'medea-jason' }}
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin  # Temurin is cached on GitHub Actions Runners.
           java-version: 17
@@ -413,7 +413,7 @@ jobs:
                        ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin  # Temurin is cached on GitHub Actions Runners.
           java-version: 17
@@ -541,7 +541,7 @@ jobs:
           tool-cache: false
         if: ${{ matrix.platform == 'android' }}
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin  # Temurin is cached on GitHub Actions Runners.
           java-version: 17
