@@ -826,7 +826,7 @@ pub enum NegotiationRole {
 ///
 /// [P2P mesh]: https://webrtcglossary.com/mesh
 /// [SFU]: https://webrtcglossary.com/sfu
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum ConnectionMode {
     /// `Peer` is configured to work in a [P2P mesh] mode.
     ///
@@ -968,7 +968,7 @@ pub struct TrackPatchEvent {
 }
 
 /// Media exchange direction of a `Track`.
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum MediaDirection {
     /// `Track` is enabled on both receiver and sender sides.
     SendRecv = 0,
@@ -1138,6 +1138,9 @@ pub struct AudioSettings {
     ///
     /// If `false` then audio may be not published.
     pub required: bool,
+
+    /// Source kind of these [`AudioSettings`].
+    pub source_kind: MediaSourceKind,
 }
 
 /// Settings of a video [`Track`].
@@ -1156,7 +1159,7 @@ pub struct VideoSettings {
 }
 
 /// Possible media sources of a video [`Track`].
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum MediaSourceKind {
     /// Media is sourced by some media device (webcam or microphone).
     Device,
@@ -1182,7 +1185,7 @@ pub enum MediaSourceKind {
 /// [SVC]: https://webrtcglossary.com/svc
 /// [0]: https://w3.org/TR/webrtc-svc#scalabilitymodes*
 #[derive(
-    Clone, Copy, Debug, Deserialize, Display, Eq, PartialEq, Serialize,
+    Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
 )]
 pub enum ScalabilityMode {
     /// [L1T1] mode.
@@ -1379,7 +1382,7 @@ pub struct Codec {
 /// Estimated connection quality.
 #[cfg_attr(feature = "client", derive(Deserialize))]
 #[cfg_attr(feature = "server", derive(Serialize))]
-#[derive(Clone, Copy, Debug, Display, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Display, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum ConnectionQualityScore {
     /// Nearly all users dissatisfied.
     Poor = 1,

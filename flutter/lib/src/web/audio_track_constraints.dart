@@ -3,8 +3,9 @@ import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
-class AudioTrackConstraints implements base.AudioTrackConstraints {
-  final wasm.AudioTrackConstraints obj = wasm.AudioTrackConstraints();
+class DeviceAudioTrackConstraints implements base.DeviceAudioTrackConstraints {
+  final wasm.DeviceAudioTrackConstraints obj =
+      wasm.DeviceAudioTrackConstraints();
 
   @override
   void deviceId(String deviceId) {
@@ -55,6 +56,18 @@ class AudioTrackConstraints implements base.AudioTrackConstraints {
   void noiseSuppressionLevel(base.NoiseSuppressionLevel noiseSuppressionLevel) {
     // Not supported on web.
   }
+
+  @moveSemantics
+  @override
+  void free() {
+    obj.free();
+  }
+}
+
+class DisplayAudioTrackConstraints
+    implements base.DisplayAudioTrackConstraints {
+  final wasm.DisplayAudioTrackConstraints obj =
+      wasm.DisplayAudioTrackConstraints();
 
   @moveSemantics
   @override

@@ -848,7 +848,7 @@ Future<void> mediaSettingDialog(BuildContext context, Call call) async {
                       );
                     }
 
-                    var audioTrack = jason.AudioTrackConstraints();
+                    var audioTrack = jason.DeviceAudioTrackConstraints();
                     audioTrack.deviceId(call.audioDeviceId!);
 
                     await call.setMedia(videoTrack, audioTrack, displayTrack);

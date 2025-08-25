@@ -3,8 +3,8 @@ import 'enums.dart' show NoiseSuppressionLevel;
 
 export 'enums.dart' show NoiseSuppressionLevel;
 
-/// Constraints applicable to audio tracks.
-abstract class AudioTrackConstraints implements SyncPlatformHandle {
+/// Constraints applicable to device audio tracks (microphone).
+abstract class DeviceAudioTrackConstraints implements SyncPlatformHandle {
   /// Sets an exact [`deviceId`][1] constraint.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
@@ -54,4 +54,10 @@ abstract class AudioTrackConstraints implements SyncPlatformHandle {
   ///
   /// __NOTE__: Only supported on desktop platforms, ignored otherwise.
   void idealHighPassFilter(bool autoGainControl);
+}
+
+/// Constraints applicable to display audio tracks (system audio capture).
+/// Display audio does not support audio processing features.
+abstract class DisplayAudioTrackConstraints implements SyncPlatformHandle {
+  // No methods - display audio doesn't support audio processing
 }

@@ -15,9 +15,21 @@ class MediaStreamSettings implements base.MediaStreamSettings {
   final wasm.MediaStreamSettings obj = wasm.MediaStreamSettings();
 
   @override
-  void audio(@moveSemantics base_audio.AudioTrackConstraints constraints) {
+  void deviceAudio(
+    @moveSemantics base_audio.DeviceAudioTrackConstraints constraints,
+  ) {
     fallibleFunction(
-      () => obj.audio((constraints as AudioTrackConstraints).obj),
+      () => obj.device_audio((constraints as DeviceAudioTrackConstraints).obj),
+    );
+  }
+
+  @override
+  void displayAudio(
+    @moveSemantics base_audio.DisplayAudioTrackConstraints constraints,
+  ) {
+    fallibleFunction(
+      () =>
+          obj.display_audio((constraints as DisplayAudioTrackConstraints).obj),
     );
   }
 

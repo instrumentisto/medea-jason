@@ -2,11 +2,10 @@ import '../interface/audio_track_constraints.dart' as base;
 import 'ffi/frb/frb.dart' as frb;
 import 'ffi/frb/media/constraints.dart';
 
-class AudioTrackConstraints implements base.AudioTrackConstraints {
+class DeviceAudioTrackConstraints implements base.DeviceAudioTrackConstraints {
   /// Rust `flutter_rust_bridge` API representation.
-  final frb.ApiAudioConstraints constraints = frb.ApiAudioConstraints(
-    deviceId: null,
-  );
+  final frb.ApiDeviceAudioTrackConstraints constraints =
+      frb.ApiDeviceAudioTrackConstraints(deviceId: null);
 
   @override
   void deviceId(String deviceId) {
@@ -57,6 +56,16 @@ class AudioTrackConstraints implements base.AudioTrackConstraints {
   void exactHighPassFilter(bool highPassFilter) {
     constraints.highPassFilter = ConstrainBoolean.exact(highPassFilter);
   }
+
+  @override
+  void free() {}
+}
+
+class DisplayAudioTrackConstraints
+    implements base.DisplayAudioTrackConstraints {
+  /// Rust `flutter_rust_bridge` API representation.
+  final frb.ApiDisplayAudioTrackConstraints constraints =
+      frb.ApiDisplayAudioTrackConstraints();
 
   @override
   void free() {}

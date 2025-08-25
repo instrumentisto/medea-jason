@@ -1283,7 +1283,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_disable_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_disable_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1294,7 +1295,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::disable_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::disable_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_disable_remote_audio_impl(
@@ -1305,7 +1306,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_disable_remote_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_disable_remote_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1316,7 +1318,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::disable_remote_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::disable_remote_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_disable_remote_video_impl(
@@ -1373,7 +1375,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_enable_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_enable_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1384,7 +1387,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::enable_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::enable_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_enable_remote_audio_impl(
@@ -1395,7 +1398,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_enable_remote_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_enable_remote_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1406,7 +1410,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::enable_remote_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::enable_remote_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_enable_remote_video_impl(
@@ -1486,7 +1490,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_mute_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_mute_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1497,7 +1502,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::mute_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::mute_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_mute_video_impl(
@@ -1671,7 +1676,8 @@ fn wire__crate__api__dart__api__room__RoomHandle_unmute_audio_impl(
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_unmute_audio", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);deserializer.end();
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_source_kind = <Option<crate::media::track::MediaSourceKind>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
                     let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -1682,7 +1688,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::unmute_audio(&*api_that_guard))?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::api::dart::api::room::RoomHandle::unmute_audio(&*api_that_guard, api_source_kind))?;   Ok(output_ok)
                 })()) })
 }
 fn wire__crate__api__dart__api__room__RoomHandle_unmute_video_impl(
@@ -2064,38 +2070,6 @@ impl SseDecode for String {
     }
 }
 
-impl SseDecode for crate::api::dart::api::ApiAudioConstraints {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(
-        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
-    ) -> Self {
-        let mut var_deviceId = <Option<String>>::sse_decode(deserializer);
-        let mut var_autoGainControl = <Option<
-            crate::media::constraints::ConstrainBoolean,
-        >>::sse_decode(deserializer);
-        let mut var_noiseSuppression = <Option<
-            crate::media::constraints::ConstrainBoolean,
-        >>::sse_decode(deserializer);
-        let mut var_noiseSuppressionLevel = <Option<
-            crate::media::constraints::NoiseSuppressionLevel,
-        >>::sse_decode(deserializer);
-        let mut var_echoCancellation = <Option<
-            crate::media::constraints::ConstrainBoolean,
-        >>::sse_decode(deserializer);
-        let mut var_highPassFilter = <Option<
-            crate::media::constraints::ConstrainBoolean,
-        >>::sse_decode(deserializer);
-        return crate::api::dart::api::ApiAudioConstraints {
-            device_id: var_deviceId,
-            auto_gain_control: var_autoGainControl,
-            noise_suppression: var_noiseSuppression,
-            noise_suppression_level: var_noiseSuppressionLevel,
-            echo_cancellation: var_echoCancellation,
-            high_pass_filter: var_highPassFilter,
-        };
-    }
-}
-
 impl SseDecode for crate::api::dart::api::ApiConstrainFacingMode {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(
@@ -2128,6 +2102,38 @@ impl SseDecode for crate::api::dart::api::ApiConstrainFacingMode {
     }
 }
 
+impl SseDecode for crate::api::dart::api::ApiDeviceAudioTrackConstraints {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut var_deviceId = <Option<String>>::sse_decode(deserializer);
+        let mut var_autoGainControl = <Option<
+            crate::media::constraints::ConstrainBoolean,
+        >>::sse_decode(deserializer);
+        let mut var_noiseSuppression = <Option<
+            crate::media::constraints::ConstrainBoolean,
+        >>::sse_decode(deserializer);
+        let mut var_noiseSuppressionLevel = <Option<
+            crate::media::constraints::NoiseSuppressionLevel,
+        >>::sse_decode(deserializer);
+        let mut var_echoCancellation = <Option<
+            crate::media::constraints::ConstrainBoolean,
+        >>::sse_decode(deserializer);
+        let mut var_highPassFilter = <Option<
+            crate::media::constraints::ConstrainBoolean,
+        >>::sse_decode(deserializer);
+        return crate::api::dart::api::ApiDeviceAudioTrackConstraints {
+            device_id: var_deviceId,
+            auto_gain_control: var_autoGainControl,
+            noise_suppression: var_noiseSuppression,
+            noise_suppression_level: var_noiseSuppressionLevel,
+            echo_cancellation: var_echoCancellation,
+            high_pass_filter: var_highPassFilter,
+        };
+    }
+}
+
 impl SseDecode for crate::api::dart::api::ApiDeviceVideoTrackConstraints {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(
@@ -2151,6 +2157,15 @@ impl SseDecode for crate::api::dart::api::ApiDeviceVideoTrackConstraints {
             height: var_height,
             width: var_width,
         };
+    }
+}
+
+impl SseDecode for crate::api::dart::api::ApiDisplayAudioTrackConstraints {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        return crate::api::dart::api::ApiDisplayAudioTrackConstraints {};
     }
 }
 
@@ -2221,10 +2236,12 @@ impl SseDecode for crate::api::dart::api::ApiMediaStreamSettings {
     fn sse_decode(
         deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
     ) -> Self {
-        let mut var_audio =
-            <Option<crate::api::dart::api::ApiAudioConstraints>>::sse_decode(
-                deserializer,
-            );
+        let mut var_deviceAudio = <Option<
+            crate::api::dart::api::ApiDeviceAudioTrackConstraints,
+        >>::sse_decode(deserializer);
+        let mut var_displayAudio = <Option<
+            crate::api::dart::api::ApiDisplayAudioTrackConstraints,
+        >>::sse_decode(deserializer);
         let mut var_deviceVideo = <Option<
             crate::api::dart::api::ApiDeviceVideoTrackConstraints,
         >>::sse_decode(deserializer);
@@ -2232,7 +2249,8 @@ impl SseDecode for crate::api::dart::api::ApiMediaStreamSettings {
             crate::api::dart::api::ApiDisplayVideoTrackConstraints,
         >>::sse_decode(deserializer);
         return crate::api::dart::api::ApiMediaStreamSettings {
-            audio: var_audio,
+            device_audio: var_deviceAudio,
+            display_audio: var_displayAudio,
             device_video: var_deviceVideo,
             display_video: var_displayVideo,
         };
@@ -2534,23 +2552,6 @@ impl SseDecode for Option<String> {
     }
 }
 
-impl SseDecode for Option<crate::api::dart::api::ApiAudioConstraints> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(
-        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
-    ) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(
-                <crate::api::dart::api::ApiAudioConstraints>::sse_decode(
-                    deserializer,
-                ),
-            );
-        } else {
-            return None;
-        }
-    }
-}
-
 impl SseDecode for Option<crate::api::dart::api::ApiConstrainFacingMode> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(
@@ -2569,6 +2570,21 @@ impl SseDecode for Option<crate::api::dart::api::ApiConstrainFacingMode> {
 }
 
 impl SseDecode
+    for Option<crate::api::dart::api::ApiDeviceAudioTrackConstraints>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::api::dart::api::ApiDeviceAudioTrackConstraints>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode
     for Option<crate::api::dart::api::ApiDeviceVideoTrackConstraints>
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2577,6 +2593,21 @@ impl SseDecode
     ) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(<crate::api::dart::api::ApiDeviceVideoTrackConstraints>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode
+    for Option<crate::api::dart::api::ApiDisplayAudioTrackConstraints>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::api::dart::api::ApiDisplayAudioTrackConstraints>::sse_decode(deserializer));
         } else {
             return None;
         }
@@ -3035,35 +3066,6 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<RoomHandle>> for RoomHandle {
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart
-    for crate::api::dart::api::ApiAudioConstraints
-{
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.device_id.into_into_dart().into_dart(),
-            self.auto_gain_control.into_into_dart().into_dart(),
-            self.noise_suppression.into_into_dart().into_dart(),
-            self.noise_suppression_level.into_into_dart().into_dart(),
-            self.echo_cancellation.into_into_dart().into_dart(),
-            self.high_pass_filter.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::dart::api::ApiAudioConstraints
-{
-}
-impl
-    flutter_rust_bridge::IntoIntoDart<
-        crate::api::dart::api::ApiAudioConstraints,
-    > for crate::api::dart::api::ApiAudioConstraints
-{
-    fn into_into_dart(self) -> crate::api::dart::api::ApiAudioConstraints {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart
     for crate::api::dart::api::ApiConstrainFacingMode
 {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
@@ -3095,6 +3097,37 @@ impl
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart
+    for crate::api::dart::api::ApiDeviceAudioTrackConstraints
+{
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.device_id.into_into_dart().into_dart(),
+            self.auto_gain_control.into_into_dart().into_dart(),
+            self.noise_suppression.into_into_dart().into_dart(),
+            self.noise_suppression_level.into_into_dart().into_dart(),
+            self.echo_cancellation.into_into_dart().into_dart(),
+            self.high_pass_filter.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::dart::api::ApiDeviceAudioTrackConstraints
+{
+}
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::api::dart::api::ApiDeviceAudioTrackConstraints,
+    > for crate::api::dart::api::ApiDeviceAudioTrackConstraints
+{
+    fn into_into_dart(
+        self,
+    ) -> crate::api::dart::api::ApiDeviceAudioTrackConstraints {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart
     for crate::api::dart::api::ApiDeviceVideoTrackConstraints
 {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
@@ -3119,6 +3152,29 @@ impl
     fn into_into_dart(
         self,
     ) -> crate::api::dart::api::ApiDeviceVideoTrackConstraints {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart
+    for crate::api::dart::api::ApiDisplayAudioTrackConstraints
+{
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        Vec::<u8>::new().into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::dart::api::ApiDisplayAudioTrackConstraints
+{
+}
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::api::dart::api::ApiDisplayAudioTrackConstraints,
+    > for crate::api::dart::api::ApiDisplayAudioTrackConstraints
+{
+    fn into_into_dart(
+        self,
+    ) -> crate::api::dart::api::ApiDisplayAudioTrackConstraints {
         self
     }
 }
@@ -3210,7 +3266,8 @@ impl flutter_rust_bridge::IntoDart
 {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.audio.into_into_dart().into_dart(),
+            self.device_audio.into_into_dart().into_dart(),
+            self.display_audio.into_into_dart().into_dart(),
             self.device_video.into_into_dart().into_dart(),
             self.display_video.into_into_dart().into_dart(),
         ]
@@ -3803,7 +3860,33 @@ impl SseEncode for String {
     }
 }
 
-impl SseEncode for crate::api::dart::api::ApiAudioConstraints {
+impl SseEncode for crate::api::dart::api::ApiConstrainFacingMode {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        match self {
+            crate::api::dart::api::ApiConstrainFacingMode::Exact(field0) => {
+                <i32>::sse_encode(0, serializer);
+                <crate::media::constraints::FacingMode>::sse_encode(
+                    field0, serializer,
+                );
+            }
+            crate::api::dart::api::ApiConstrainFacingMode::Ideal(field0) => {
+                <i32>::sse_encode(1, serializer);
+                <crate::media::constraints::FacingMode>::sse_encode(
+                    field0, serializer,
+                );
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
+impl SseEncode for crate::api::dart::api::ApiDeviceAudioTrackConstraints {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(
         self,
@@ -3833,32 +3916,6 @@ impl SseEncode for crate::api::dart::api::ApiAudioConstraints {
     }
 }
 
-impl SseEncode for crate::api::dart::api::ApiConstrainFacingMode {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(
-        self,
-        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
-    ) {
-        match self {
-            crate::api::dart::api::ApiConstrainFacingMode::Exact(field0) => {
-                <i32>::sse_encode(0, serializer);
-                <crate::media::constraints::FacingMode>::sse_encode(
-                    field0, serializer,
-                );
-            }
-            crate::api::dart::api::ApiConstrainFacingMode::Ideal(field0) => {
-                <i32>::sse_encode(1, serializer);
-                <crate::media::constraints::FacingMode>::sse_encode(
-                    field0, serializer,
-                );
-            }
-            _ => {
-                unimplemented!("");
-            }
-        }
-    }
-}
-
 impl SseEncode for crate::api::dart::api::ApiDeviceVideoTrackConstraints {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(
@@ -3877,6 +3934,15 @@ impl SseEncode for crate::api::dart::api::ApiDeviceVideoTrackConstraints {
         <Option<crate::media::constraints::ConstrainU32>>::sse_encode(
             self.width, serializer,
         );
+    }
+}
+
+impl SseEncode for crate::api::dart::api::ApiDisplayAudioTrackConstraints {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
     }
 }
 
@@ -3932,9 +3998,8 @@ impl SseEncode for crate::api::dart::api::ApiMediaStreamSettings {
         self,
         serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
     ) {
-        <Option<crate::api::dart::api::ApiAudioConstraints>>::sse_encode(
-            self.audio, serializer,
-        );
+        <Option<crate::api::dart::api::ApiDeviceAudioTrackConstraints>>::sse_encode(self.device_audio, serializer);
+        <Option<crate::api::dart::api::ApiDisplayAudioTrackConstraints>>::sse_encode(self.display_audio, serializer);
         <Option<crate::api::dart::api::ApiDeviceVideoTrackConstraints>>::sse_encode(self.device_video, serializer);
         <Option<crate::api::dart::api::ApiDisplayVideoTrackConstraints>>::sse_encode(self.display_video, serializer);
     }
@@ -4243,21 +4308,6 @@ impl SseEncode for Option<String> {
     }
 }
 
-impl SseEncode for Option<crate::api::dart::api::ApiAudioConstraints> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(
-        self,
-        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
-    ) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <crate::api::dart::api::ApiAudioConstraints>::sse_encode(
-                value, serializer,
-            );
-        }
-    }
-}
-
 impl SseEncode for Option<crate::api::dart::api::ApiConstrainFacingMode> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(
@@ -4267,6 +4317,23 @@ impl SseEncode for Option<crate::api::dart::api::ApiConstrainFacingMode> {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::api::dart::api::ApiConstrainFacingMode>::sse_encode(
+                value, serializer,
+            );
+        }
+    }
+}
+
+impl SseEncode
+    for Option<crate::api::dart::api::ApiDeviceAudioTrackConstraints>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::api::dart::api::ApiDeviceAudioTrackConstraints>::sse_encode(
                 value, serializer,
             );
         }
@@ -4286,6 +4353,21 @@ impl SseEncode
             <crate::api::dart::api::ApiDeviceVideoTrackConstraints>::sse_encode(
                 value, serializer,
             );
+        }
+    }
+}
+
+impl SseEncode
+    for Option<crate::api::dart::api::ApiDisplayAudioTrackConstraints>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::api::dart::api::ApiDisplayAudioTrackConstraints>::sse_encode(value, serializer);
         }
     }
 }

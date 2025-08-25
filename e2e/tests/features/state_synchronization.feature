@@ -89,7 +89,7 @@ Feature: State synchronization
     @sfu
     Examples:
       | tracks |
-      | 3      |
+      | 4      |
 
   Scenario Outline: Control API deletes WebRtcPlayEndpoint
     Given room with joined member Alice and Bob
@@ -106,7 +106,7 @@ Feature: State synchronization
     @sfu
     Examples:
       | tracks |
-      | 3      |
+      | 4      |
 
   Scenario: Control API deletes all endpoints
     Given room with joined member Alice and Bob

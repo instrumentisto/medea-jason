@@ -27,8 +27,9 @@ pub use self::{
     media_device_details::MediaDeviceDetails,
     media_manager_handle::MediaManagerHandle,
     media_stream_settings::{
-        AudioTrackConstraints, DeviceVideoTrackConstraints,
-        DisplayVideoTrackConstraints, MediaStreamSettings,
+        DeviceAudioTrackConstraints, DeviceVideoTrackConstraints,
+        DisplayAudioTrackConstraints, DisplayVideoTrackConstraints,
+        MediaStreamSettings,
     },
     member_connection_state::{
         MemberConnectionState, MemberConnectionStateKind, PeerConnectionState,
