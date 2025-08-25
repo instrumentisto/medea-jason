@@ -12,7 +12,7 @@ import '../../media/constraints.dart';
 
 part 'api.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
 // These functions are ignored (category: IgnoreBecauseExplicitAttribute): `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`, `into_ptr`
 // These functions are ignored (category: IgnoreBecauseNotAllowedOwner): `from_ptr`
 
@@ -47,8 +47,21 @@ void setDartOpaqueMessagePort({required PlatformInt64 dartHandlerPort}) =>
 
 abstract class ForeignClass {}
 
-/// Constraints applicable to audio tracks.
-class ApiAudioConstraints {
+@freezed
+sealed class ApiConstrainFacingMode with _$ApiConstrainFacingMode {
+  const ApiConstrainFacingMode._();
+
+  /// Exact value required for this property.
+  const factory ApiConstrainFacingMode.exact(FacingMode field0) =
+      ApiConstrainFacingMode_Exact;
+
+  /// Ideal (target) value for this property.
+  const factory ApiConstrainFacingMode.ideal(FacingMode field0) =
+      ApiConstrainFacingMode_Ideal;
+}
+
+/// Constraints applicable to device audio tracks (microphone).
+class ApiDeviceAudioTrackConstraints {
   /// Identifier of the device generating the content for the media track.
   String? deviceId;
 
@@ -75,7 +88,7 @@ class ApiAudioConstraints {
   /// __NOTE__: Only supported on desktop platforms.
   ConstrainBoolean? highPassFilter;
 
-  ApiAudioConstraints({
+  ApiDeviceAudioTrackConstraints({
     this.deviceId,
     this.autoGainControl,
     this.noiseSuppression,
@@ -96,7 +109,7 @@ class ApiAudioConstraints {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ApiAudioConstraints &&
+      other is ApiDeviceAudioTrackConstraints &&
           runtimeType == other.runtimeType &&
           deviceId == other.deviceId &&
           autoGainControl == other.autoGainControl &&
@@ -104,19 +117,6 @@ class ApiAudioConstraints {
           noiseSuppressionLevel == other.noiseSuppressionLevel &&
           echoCancellation == other.echoCancellation &&
           highPassFilter == other.highPassFilter;
-}
-
-@freezed
-sealed class ApiConstrainFacingMode with _$ApiConstrainFacingMode {
-  const ApiConstrainFacingMode._();
-
-  /// Exact value required for this property.
-  const factory ApiConstrainFacingMode.exact(FacingMode field0) =
-      ApiConstrainFacingMode_Exact;
-
-  /// Ideal (target) value for this property.
-  const factory ApiConstrainFacingMode.ideal(FacingMode field0) =
-      ApiConstrainFacingMode_Ideal;
 }
 
 /// Constraints applicable to video tracks that are sourced from some media
@@ -158,6 +158,20 @@ class ApiDeviceVideoTrackConstraints {
           facingMode == other.facingMode &&
           height == other.height &&
           width == other.width;
+}
+
+/// Constraints applicable to display audio tracks (system audio capture).
+class ApiDisplayAudioTrackConstraints {
+  const ApiDisplayAudioTrackConstraints();
+
+  @override
+  int get hashCode => 0;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ApiDisplayAudioTrackConstraints &&
+          runtimeType == other.runtimeType;
 }
 
 /// Constraints applicable to video tracks sourced from a screen capturing.
@@ -288,10 +302,17 @@ class ApiMediaDisplayDetails {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 class ApiMediaStreamSettings {
-  /// [MediaStreamConstraints][1] for the audio media type.
+  /// [MediaStreamConstraints][1] for the device audio media type
+  /// (microphone).
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-  ApiAudioConstraints? audio;
+  ApiDeviceAudioTrackConstraints? deviceAudio;
+
+  /// [MediaStreamConstraints][1] for the display audio media type
+  /// (system audio capture).
+  ///
+  /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
+  ApiDisplayAudioTrackConstraints? displayAudio;
 
   /// [MediaStreamConstraints][1] for the device video media type.
   ///
@@ -303,18 +324,27 @@ class ApiMediaStreamSettings {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
   ApiDisplayVideoTrackConstraints? displayVideo;
 
-  ApiMediaStreamSettings({this.audio, this.deviceVideo, this.displayVideo});
+  ApiMediaStreamSettings({
+    this.deviceAudio,
+    this.displayAudio,
+    this.deviceVideo,
+    this.displayVideo,
+  });
 
   @override
   int get hashCode =>
-      audio.hashCode ^ deviceVideo.hashCode ^ displayVideo.hashCode;
+      deviceAudio.hashCode ^
+      displayAudio.hashCode ^
+      deviceVideo.hashCode ^
+      displayVideo.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ApiMediaStreamSettings &&
           runtimeType == other.runtimeType &&
-          audio == other.audio &&
+          deviceAudio == other.deviceAudio &&
+          displayAudio == other.displayAudio &&
           deviceVideo == other.deviceVideo &&
           displayVideo == other.displayVideo;
 }

@@ -503,6 +503,10 @@ impl RoomHandleImpl {
 
     /// Mutes outbound audio in this [`Room`].
     ///
+    /// When `source_kind` is `None`, this will mute all audio tracks.
+    /// When `source_kind` is specified, only tracks of that source kind will
+    /// be muted.
+    ///
     /// # Errors
     ///
     /// With [`ChangeMediaStateError::Detached`] if an inner [`Weak`] pointer
@@ -525,6 +529,10 @@ impl RoomHandleImpl {
     }
 
     /// Unmutes outbound audio in this [`Room`].
+    ///
+    /// When `source_kind` is `None`, this will unmute all audio tracks.
+    /// When `source_kind` is specified, only tracks of that source kind will
+    /// be unmuted.
     ///
     /// # Errors
     ///

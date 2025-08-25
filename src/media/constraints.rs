@@ -5,8 +5,8 @@ use std::{cell::RefCell, rc::Rc};
 use derive_more::with_trait::Display;
 use futures::stream::LocalBoxStream;
 use medea_client_api_proto::{
-    AudioSettings as ProtoAudioConstraints, AudioSettings, MediaSourceKind,
-    MediaType as ProtoTrackConstraints, MediaType, VideoSettings,
+    AudioSettings, MediaSourceKind, MediaType as ProtoTrackConstraints,
+    MediaType, VideoSettings,
 };
 use medea_reactive::ObservableCell;
 
@@ -312,36 +312,116 @@ impl LocalTracksConstraints {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct AudioMediaTracksSettings {
-    /// Constraints applicable to video tracks.
-    constraints: AudioTrackConstraints,
+pub struct AudioTrackConstraints<C> {
+    /// Constraints applicable to audio tracks.
+    ///
+    /// If [`None`] then this kind of audio (device or display) is disabled by
+    /// [`MediaStreamSettings`].
+    constraints: Option<C>,
 
     /// Indicator whether audio is enabled and this constraints should be
     /// injected into `Peer`.
+    ///
+    /// Any action with this flag should be performed only while disable/enable
+    /// actions by [`Room`]. This flag can't be changed by
+    /// [`MediaStreamSettings`] updating.
+    ///
+    /// [`Room`]: crate::room::Room
     enabled: bool,
 
     /// Indicator whether audio should be muted.
     muted: bool,
 }
 
-impl Default for AudioMediaTracksSettings {
+impl<C: Default> Default for AudioTrackConstraints<C> {
     fn default() -> Self {
-        Self {
-            constraints: AudioTrackConstraints::default(),
-            enabled: true,
-            muted: false,
+        Self { constraints: None, enabled: true, muted: false }
+    }
+}
+
+impl<C> AudioTrackConstraints<C> {
+    /// Returns `true` if this [`AudioTrackConstraints`] are enabled by the
+    /// [`Room`] and constrained with [`AudioTrackConstraints::constraints`].
+    ///
+    /// [`Room`]: crate::room::Room
+    const fn enabled(&self) -> bool {
+        self.enabled && self.is_constrained()
+    }
+
+    /// Sets these [`AudioTrackConstraints::constraints`] to the provided
+    /// `cons`.
+    fn set(&mut self, cons: C) {
+        self.enabled = true;
+        self.constraints = Some(cons);
+    }
+
+    /// Resets these [`AudioTrackConstraints::constraints`] to [`None`].
+    fn unconstrain(&mut self) {
+        drop(self.constraints.take());
+    }
+
+    /// Returns `true` if these [`AudioTrackConstraints::constraints`] are set
+    /// to [`Some`] value.
+    const fn is_constrained(&self) -> bool {
+        self.constraints.is_some()
+    }
+
+    /// Constraints these [`AudioTrackConstraints`] with a provided `other`
+    /// [`AudioTrackConstraints`].
+    fn constrain(&mut self, other: Self) {
+        // `&=` cause we should not enable disabled Room, but we can disable
+        // enabled room.
+        self.enabled &= other.enabled;
+        self.constraints = other.constraints;
+    }
+}
+
+impl AudioTrackConstraints<DeviceAudioTrackConstraints> {
+    /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies
+    /// these [`AudioTrackConstraints`].
+    ///
+    /// Returns `false` if these [`AudioTrackConstraints`] don't have any
+    /// constraints configured.
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+        &self,
+        track: T,
+    ) -> bool {
+        if let Some(constraints) = &self.constraints {
+            self.enabled() && constraints.satisfies(track).await
+        } else {
+            false
+        }
+    }
+}
+
+impl AudioTrackConstraints<DisplayAudioTrackConstraints> {
+    /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies
+    /// these [`AudioTrackConstraints`].
+    ///
+    /// Returns `false` if these [`AudioTrackConstraints`] don't have any
+    /// constraints configured.
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+        &self,
+        track: T,
+    ) -> bool {
+        if let Some(constraints) = &self.constraints {
+            self.enabled() && constraints.satisfies(track).await
+        } else {
+            false
         }
     }
 }
 
 /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies any
-/// constraints with the provided [`MediaKind`].
+/// constraints with the provided [`MediaKind`] and [`MediaSourceKind`].
 async fn satisfies_track(
     track: &platform::MediaStreamTrack,
     kind: MediaKind,
+    source_kind: MediaSourceKind,
 ) -> bool {
     track.kind() == kind
         && track.ready_state().await == MediaStreamTrackState::Live
+        && track.source_kind() == Some(source_kind.into())
 }
 
 /// [MediaStreamConstraints][1] for the video media type.
@@ -371,7 +451,7 @@ pub struct VideoTrackConstraints<C> {
 
 impl<C: Default> Default for VideoTrackConstraints<C> {
     fn default() -> Self {
-        Self { constraints: Some(C::default()), enabled: true, muted: false }
+        Self { constraints: None, enabled: true, muted: false }
     }
 }
 
@@ -387,6 +467,7 @@ impl<C> VideoTrackConstraints<C> {
     /// Sets these [`VideoTrackConstraints::constraints`] to the provided
     /// `cons`.
     fn set(&mut self, cons: C) {
+        self.enabled = true;
         self.constraints = Some(cons);
     }
 
@@ -404,6 +485,8 @@ impl<C> VideoTrackConstraints<C> {
     /// Constraints these [`VideoTrackConstraints`] with a provided `other`
     /// [`VideoTrackConstraints`].
     fn constrain(&mut self, other: Self) {
+        // `&=` cause we should not enable disabled Room, but we can disable
+        // enabled room.
         self.enabled &= other.enabled;
         self.constraints = other.constraints;
     }
@@ -453,12 +536,12 @@ pub struct MediaStreamSettings {
     /// [MediaStreamConstraints][1] for the device audio media type.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-    device_audio: AudioMediaTracksSettings,
+    device_audio: AudioTrackConstraints<DeviceAudioTrackConstraints>,
 
     /// [MediaStreamConstraints][1] for the display audio media type.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-    display_audio: AudioMediaTracksSettings,
+    display_audio: AudioTrackConstraints<DisplayAudioTrackConstraints>,
 
     /// [MediaStreamConstraints][1] for the device video media type.
     ///
@@ -472,45 +555,16 @@ pub struct MediaStreamSettings {
 }
 
 impl MediaStreamSettings {
-    /// Creates new [`MediaStreamSettings`] with none constraints configured.
-    #[must_use]
-    pub fn new() -> Self {
-        Self {
-            device_audio: AudioMediaTracksSettings {
-                constraints: AudioTrackConstraints::default(),
-                enabled: false,
-                muted: false,
-            },
-            display_audio: AudioMediaTracksSettings {
-                constraints: AudioTrackConstraints::default(),
-                enabled: false,
-                muted: false,
-            },
-            display_video: VideoTrackConstraints {
-                enabled: true,
-                constraints: None,
-                muted: false,
-            },
-            device_video: VideoTrackConstraints {
-                enabled: true,
-                constraints: None,
-                muted: false,
-            },
-        }
-    }
-
     /// Specifies the nature and settings of the device audio
     /// [`platform::MediaStreamTrack`].
-    pub fn device_audio(&mut self, constraints: AudioTrackConstraints) {
-        self.device_audio.enabled = true;
-        self.device_audio.constraints = constraints;
+    pub fn device_audio(&mut self, constraints: DeviceAudioTrackConstraints) {
+        self.device_audio.set(constraints);
     }
 
     /// Specifies the nature and settings of the display (system) audio
     /// [`platform::MediaStreamTrack`].
-    pub fn display_audio(&mut self, constraints: AudioTrackConstraints) {
-        self.display_audio.enabled = true;
-        self.display_audio.constraints = constraints;
+    pub fn display_audio(&mut self, constraints: DisplayAudioTrackConstraints) {
+        self.display_audio.set(constraints);
     }
 
     /// Set constraints that will be used to obtain local video sourced from
@@ -545,6 +599,26 @@ impl MediaStreamSettings {
         }
     }
 
+    /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies
+    /// some of the [`AudioTrackConstraints`] from this [`MediaStreamSettings`].
+    ///
+    /// Unconstrains [`AudioTrackConstraints`] which this
+    /// [`platform::MediaStreamTrack`] satisfies.
+    pub async fn unconstrain_if_satisfies_audio<T>(&mut self, track: T) -> bool
+    where
+        T: AsRef<platform::MediaStreamTrack>,
+    {
+        if self.device_audio.satisfies(&track).await {
+            self.device_audio.unconstrain();
+            true
+        } else if self.display_audio.satisfies(&track).await {
+            self.display_audio.unconstrain();
+            true
+        } else {
+            false
+        }
+    }
+
     /// Returns [`LocalStreamUpdateCriteria`] with [`MediaKind`] and
     /// [`MediaSourceKind`] which are different in the provided
     /// [`MediaStreamSettings`].
@@ -554,19 +628,15 @@ impl MediaStreamSettings {
         another: &Self,
     ) -> LocalStreamUpdateCriteria {
         let mut kinds = LocalStreamUpdateCriteria::empty();
-
         if self.device_video != another.device_video {
             kinds.add(MediaKind::Video, MediaSourceKind::Device);
         }
-
         if self.display_video != another.display_video {
             kinds.add(MediaKind::Video, MediaSourceKind::Display);
         }
-
         if self.device_audio != another.device_audio {
             kinds.add(MediaKind::Audio, MediaSourceKind::Device);
         }
-
         if self.display_audio != another.display_audio {
             kinds.add(MediaKind::Audio, MediaSourceKind::Display);
         }
@@ -576,14 +646,18 @@ impl MediaStreamSettings {
 
     /// Returns only device audio constraints.
     #[must_use]
-    pub const fn get_device_audio(&self) -> &AudioTrackConstraints {
-        &self.device_audio.constraints
+    pub const fn get_device_audio(
+        &self,
+    ) -> Option<&DeviceAudioTrackConstraints> {
+        self.device_audio.constraints.as_ref()
     }
 
     /// Returns only display audio constraints.
     #[must_use]
-    pub const fn get_display_audio(&self) -> &AudioTrackConstraints {
-        &self.display_audio.constraints
+    pub const fn get_display_audio(
+        &self,
+    ) -> Option<&DisplayAudioTrackConstraints> {
+        self.display_audio.constraints.as_ref()
     }
 
     /// Returns reference to [`DisplayVideoTrackConstraints`] from this
@@ -659,19 +733,15 @@ impl MediaStreamSettings {
         kinds: LocalStreamUpdateCriteria,
     ) {
         let enabled = state == media_exchange_state::Stable::Enabled;
-
         if kinds.has(MediaKind::Audio, MediaSourceKind::Device) {
             self.set_audio_publish(enabled, Some(MediaSourceKind::Device));
         }
-
         if kinds.has(MediaKind::Audio, MediaSourceKind::Display) {
             self.set_audio_publish(enabled, Some(MediaSourceKind::Display));
         }
-
         if kinds.has(MediaKind::Video, MediaSourceKind::Device) {
             self.set_video_publish(enabled, Some(MediaSourceKind::Device));
         }
-
         if kinds.has(MediaKind::Video, MediaSourceKind::Display) {
             self.set_video_publish(enabled, Some(MediaSourceKind::Display));
         }
@@ -765,14 +835,14 @@ impl MediaStreamSettings {
     /// [`MediaStreamSettings`].
     #[must_use]
     pub const fn is_device_audio_enabled(&self) -> bool {
-        self.device_audio.enabled
+        self.device_audio.enabled()
     }
 
     /// Indicates whether display audio is enabled in this
     /// [`MediaStreamSettings`].
     #[must_use]
     pub const fn is_display_audio_enabled(&self) -> bool {
-        self.display_audio.enabled
+        self.display_audio.enabled()
     }
 
     /// Returns `true` if [`DeviceVideoTrackConstraints`] are currently
@@ -840,13 +910,13 @@ impl MediaStreamSettings {
                 self.display_video.enabled() && self.device_video.enabled()
             }
             (MediaKind::Audio, Some(MediaSourceKind::Device)) => {
-                self.device_audio.enabled
+                self.device_audio.enabled()
             }
             (MediaKind::Audio, Some(MediaSourceKind::Display)) => {
-                self.display_audio.enabled
+                self.display_audio.enabled()
             }
             (MediaKind::Audio, None) => {
-                self.device_audio.enabled && self.display_audio.enabled
+                self.device_audio.enabled() && self.display_audio.enabled()
             }
         }
     }
@@ -884,12 +954,9 @@ impl MediaStreamSettings {
     /// Constrains this [`MediaStreamSettings`] with the given `other`
     /// [`MediaStreamSettings`].
     fn constrain(&mut self, other: Self) {
-        // `&=` cause we should not enable disabled Room, but we can disable
-        // enabled room.
-        self.device_audio.enabled &= other.device_audio.enabled;
-        self.device_audio.constraints = other.device_audio.constraints;
-        self.display_audio.enabled = other.display_audio.enabled;
-        self.display_audio.constraints = other.display_audio.constraints;
+        self.device_audio.constrain(other.device_audio);
+        self.display_audio.constrain(other.display_audio);
+
         self.display_video.constrain(other.display_video);
         self.device_video.constrain(other.device_video);
     }
@@ -927,9 +994,6 @@ impl From<MediaStreamSettings> for Option<MultiSourceTracksConstraints> {
         let is_device_video_enabled = constraints.is_device_video_enabled();
         let is_display_video_enabled = constraints.is_display_video_enabled();
         let is_device_audio_enabled = constraints.is_device_audio_enabled();
-        // TODO: implement for Dart platform when
-        //       `instrumentisto/medea-flutter-webrtc#244` will be resolved.
-        #[cfg(target_family = "wasm")]
         let is_display_audio_enabled = constraints.is_display_audio_enabled();
 
         let mut device_cons = None;
@@ -944,7 +1008,6 @@ impl From<MediaStreamSettings> for Option<MultiSourceTracksConstraints> {
                     .video(device_video_cons);
             }
         }
-
         if is_display_video_enabled {
             if let Some(display_video_cons) =
                 constraints.display_video.constraints
@@ -956,22 +1019,25 @@ impl From<MediaStreamSettings> for Option<MultiSourceTracksConstraints> {
                     .video(display_video_cons);
             }
         }
-
         if is_device_audio_enabled {
-            device_cons
-                .get_or_insert_with(platform::MediaStreamConstraints::new)
-                .audio(constraints.device_audio.constraints);
+            if let Some(device_audio_cons) =
+                constraints.device_audio.constraints
+            {
+                device_cons
+                    .get_or_insert_with(platform::MediaStreamConstraints::new)
+                    .audio(device_audio_cons);
+            }
         }
-
-        // TODO: implement for Dart platform when
-        //       `instrumentisto/medea-flutter-webrtc#244` will be resolved.
-        #[cfg(target_family = "wasm")]
         if is_display_audio_enabled {
-            display_cons
-                .get_or_insert_with(
-                    platform::DisplayMediaStreamConstraints::new,
-                )
-                .audio(constraints.display_audio.constraints);
+            if let Some(display_audio_cons) =
+                constraints.display_audio.constraints
+            {
+                display_cons
+                    .get_or_insert_with(
+                        platform::DisplayMediaStreamConstraints::new,
+                    )
+                    .audio(display_audio_cons);
+            }
         }
 
         match (device_cons, display_cons) {
@@ -1068,12 +1134,12 @@ pub enum AudioSource {
     /// [`local::Track`] should be received from the `getUserMedia` request.
     ///
     /// [`local::Track`]: crate::media::track::local::Track
-    Device(AudioTrackConstraints),
+    Device(DeviceAudioTrackConstraints),
 
     /// [`local::Track`] should be received from the `getDisplayMedia` request.
     ///
     /// [`local::Track`]: crate::media::track::local::Track
-    Display(AudioTrackConstraints),
+    Display(DisplayAudioTrackConstraints),
 }
 
 impl AudioSource {
@@ -1106,8 +1172,12 @@ impl AudioSource {
 impl From<AudioSettings> for AudioSource {
     fn from(settings: AudioSettings) -> Self {
         match settings.source_kind {
-            MediaSourceKind::Device => Self::Device(settings.into()),
-            MediaSourceKind::Display => Self::Display(settings.into()),
+            MediaSourceKind::Device => {
+                Self::Device(DeviceAudioTrackConstraints::from(settings))
+            }
+            MediaSourceKind::Display => {
+                Self::Display(DisplayAudioTrackConstraints::from(settings))
+            }
         }
     }
 }
@@ -1186,15 +1256,15 @@ impl From<ProtoTrackConstraints> for TrackConstraints {
     }
 }
 
-/// Constraints applicable to audio tracks.
+/// Constraints applicable to device audio tracks (microphone).
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
-pub struct AudioTrackConstraints {
+pub struct DeviceAudioTrackConstraints {
     /// Identifier of the device generating the content for the media track.
     pub device_id: Option<ConstrainString<String>>,
 
-    /// Importance of this [`AudioTrackConstraints`].
+    /// Importance of this [`DeviceAudioTrackConstraints`].
     ///
-    /// If `true` then without this [`AudioTrackConstraints`] call session
+    /// If `true` then without this [`DeviceAudioTrackConstraints`] call session
     /// can't be started.
     pub required: bool,
 
@@ -1222,8 +1292,20 @@ pub struct AudioTrackConstraints {
     pub high_pass_filter: Option<ConstrainBoolean>,
 }
 
-impl AudioTrackConstraints {
-    /// Creates new [`AudioTrackConstraints`] with none constraints configured.
+/// Constraints applicable to display audio tracks (system audio capture).
+/// Display audio does not support audio processing features.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct DisplayAudioTrackConstraints {
+    /// Importance of this [`DisplayAudioTrackConstraints`].
+    ///
+    /// If `true` then without this [`DisplayAudioTrackConstraints`] call
+    /// session can't be started.
+    pub required: bool,
+}
+
+impl DeviceAudioTrackConstraints {
+    /// Creates new [`DeviceAudioTrackConstraints`] with none constraints
+    /// configured.
     #[must_use]
     pub fn new() -> Self {
         Self::default()
@@ -1244,7 +1326,9 @@ impl AudioTrackConstraints {
     ) -> bool {
         let track = track.as_ref();
 
-        if !satisfies_track(track, MediaKind::Audio).await {
+        if !satisfies_track(track, MediaKind::Audio, MediaSourceKind::Device)
+            .await
+        {
             return false;
         }
 
@@ -1298,9 +1382,9 @@ impl AudioTrackConstraints {
         true
     }
 
-    /// Merges these [`AudioTrackConstraints`] with `another` ones, meaning that
-    /// if some constraints are not set on these ones, then they will be applied
-    /// from `another`.
+    /// Merges these [`DeviceAudioTrackConstraints`] with `another` ones,
+    /// meaning that if some constraints are not set on these ones, then they
+    /// will be applied from `another`.
     pub fn merge(&mut self, another: Self) {
         if self.device_id.is_none() && another.device_id.is_some() {
             self.device_id = another.device_id;
@@ -1310,18 +1394,56 @@ impl AudioTrackConstraints {
         }
     }
 
-    /// Returns an importance of these [`AudioTrackConstraints`].
+    /// Returns an importance of these [`DeviceAudioTrackConstraints`].
     ///
-    /// If these [`AudioTrackConstraints`] are important then without them a
-    /// session call can't be started.
+    /// If these [`DeviceAudioTrackConstraints`] are important then without
+    /// them a session call can't be started.
     #[must_use]
     pub const fn required(&self) -> bool {
         self.required
     }
 }
 
-impl From<ProtoAudioConstraints> for AudioTrackConstraints {
-    fn from(caps: ProtoAudioConstraints) -> Self {
+impl DisplayAudioTrackConstraints {
+    /// Creates new [`DisplayAudioTrackConstraints`] with none constraints
+    /// configured.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Returns an importance of these [`DisplayAudioTrackConstraints`].
+    ///
+    /// If these [`DisplayAudioTrackConstraints`] are important then without
+    /// them a session call can't be started.
+    #[must_use]
+    pub const fn required(&self) -> bool {
+        self.required
+    }
+
+    /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies the
+    /// contained constraints.
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+        &self,
+        track: T,
+    ) -> bool {
+        let track = track.as_ref();
+
+        satisfies_track(track, MediaKind::Audio, MediaSourceKind::Display).await
+    }
+
+    /// Merges these [`DisplayAudioTrackConstraints`] with `another` ones,
+    /// meaning that if some constraints are not set on these ones, then they
+    /// will be applied from `another`.
+    pub const fn merge(&mut self, another: Self) {
+        if !self.required && another.required {
+            self.required = another.required;
+        }
+    }
+}
+
+impl From<AudioSettings> for DeviceAudioTrackConstraints {
+    fn from(caps: AudioSettings) -> Self {
         Self {
             required: caps.required,
             device_id: None,
@@ -1331,6 +1453,12 @@ impl From<ProtoAudioConstraints> for AudioTrackConstraints {
             echo_cancellation: None,
             high_pass_filter: None,
         }
+    }
+}
+
+impl From<AudioSettings> for DisplayAudioTrackConstraints {
+    fn from(caps: AudioSettings) -> Self {
+        Self { required: caps.required }
     }
 }
 
@@ -1524,7 +1652,7 @@ impl DeviceVideoTrackConstraints {
         track: T,
     ) -> bool {
         let track = track.as_ref();
-        satisfies_track(track, MediaKind::Video).await
+        satisfies_track(track, MediaKind::Video, MediaSourceKind::Device).await
             && ConstrainString::satisfies(
                 self.device_id.as_ref(),
                 track.device_id().as_ref(),
@@ -1535,7 +1663,6 @@ impl DeviceVideoTrackConstraints {
             )
             && ConstrainU32::satisfies(self.height, track.height())
             && ConstrainU32::satisfies(self.width, track.width())
-            && !track.guess_is_from_display()
     }
 
     /// Merges these [`DeviceVideoTrackConstraints`] with `another` ones,
@@ -1612,14 +1739,13 @@ impl DisplayVideoTrackConstraints {
         track: T,
     ) -> bool {
         let track = track.as_ref();
-        satisfies_track(track, MediaKind::Video).await
+        satisfies_track(track, MediaKind::Video, MediaSourceKind::Display).await
             && ConstrainString::satisfies(
                 self.device_id.as_ref(),
                 track.device_id().as_ref(),
             )
             && ConstrainU32::satisfies(self.height, track.height())
             && ConstrainU32::satisfies(self.width, track.width())
-            && track.guess_is_from_display()
     }
 
     /// Merges these [`DisplayVideoTrackConstraints`] with `another` ones,

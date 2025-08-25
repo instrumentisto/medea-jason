@@ -2588,7 +2588,7 @@ mod set_local_media_settings {
         let (audio_track, video_track) = get_test_required_tracks();
 
         let mut constraints = api::MediaStreamSettings::new();
-        constraints.device_audio(api::AudioTrackConstraints::new());
+        constraints.device_audio(api::DeviceAudioTrackConstraints::new());
 
         JsFuture::from(room_handle.set_local_media_settings(
             &constraints,
@@ -2638,7 +2638,7 @@ mod set_local_media_settings {
                 .await;
 
         let mut constraints = api::MediaStreamSettings::new();
-        constraints.device_audio(api::AudioTrackConstraints::new());
+        constraints.device_audio(api::DeviceAudioTrackConstraints::new());
 
         let room_handle = api::RoomHandle::from(room.new_handle());
         room_handle.on_failed_local_media(cb.into()).unwrap();
@@ -2690,7 +2690,8 @@ mod set_local_media_settings {
 
             let mut constraints = api::MediaStreamSettings::new();
             if add_audio {
-                constraints.device_audio(api::AudioTrackConstraints::new());
+                constraints
+                    .device_audio(api::DeviceAudioTrackConstraints::new());
             }
             if add_video {
                 constraints

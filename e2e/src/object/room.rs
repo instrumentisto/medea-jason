@@ -291,7 +291,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {mute}
+                    {maybe_await} {mute};
                 }}
                 ",
             ),
@@ -331,7 +331,7 @@ impl Object<Room> {
             &format!(
                 "
                 async (r) => {{
-                    {maybe_await} {unmute}
+                    {maybe_await} {unmute};
                 }}
                 ",
             ),
@@ -579,7 +579,7 @@ impl Object<Room> {
                     constraints.device_video(video);
                 }
                 if (audio) {
-                    let audio = new window.rust.AudioTrackConstraints();
+                    let audio = new window.rust.DeviceAudioTrackConstraints();
                     constraints.device_audio(audio);
                 }
                 let promise = room.room.set_local_media_settings(

@@ -25,14 +25,14 @@ impl MediaStreamSettings {
     #[must_use]
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        media::MediaStreamSettings::new().into()
+        media::MediaStreamSettings::default().into()
     }
 
     /// Specifies the nature and settings of a device audio
     /// [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    pub fn device_audio(&mut self, constraints: AudioTrackConstraints) {
+    pub fn device_audio(&mut self, constraints: DeviceAudioTrackConstraints) {
         self.0.device_audio(constraints.into());
     }
 
@@ -40,7 +40,7 @@ impl MediaStreamSettings {
     /// [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    pub fn display_audio(&mut self, constraints: AudioTrackConstraints) {
+    pub fn display_audio(&mut self, constraints: DisplayAudioTrackConstraints) {
         self.0.display_audio(constraints.into());
     }
 
@@ -57,22 +57,23 @@ impl MediaStreamSettings {
     }
 }
 
-/// Constraints applicable to audio tracks.
+/// Constraints applicable to device audio tracks (microphone).
 #[wasm_bindgen]
 #[derive(Debug, From, Into)]
-pub struct AudioTrackConstraints(media::AudioTrackConstraints);
+pub struct DeviceAudioTrackConstraints(media::DeviceAudioTrackConstraints);
 
 #[expect( // `wasm_bindgen` doesn't support `const fn`
     clippy::missing_const_for_fn,
     reason = "`wasm_bindgen` doesn't support `const fn`"
 )]
 #[wasm_bindgen]
-impl AudioTrackConstraints {
-    /// Creates new [`AudioTrackConstraints`] with none constraints configured.
+impl DeviceAudioTrackConstraints {
+    /// Creates new [`DeviceAudioTrackConstraints`] with none
+    /// constraints configured.
     #[must_use]
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        media::AudioTrackConstraints::new().into()
+        media::DeviceAudioTrackConstraints::new().into()
     }
 
     /// Sets an exact [deviceId][1] constraint.
@@ -122,6 +123,23 @@ impl AudioTrackConstraints {
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-echocancellation
     pub fn ideal_echo_cancellation(&mut self, aec: bool) {
         self.0.echo_cancellation = Some(ConstrainBoolean::Ideal(aec));
+    }
+}
+
+/// Constraints applicable to display audio tracks (system audio capture).
+/// Display audio does not support audio processing features.
+#[wasm_bindgen]
+#[derive(Copy, Clone, Debug, From, Into)]
+pub struct DisplayAudioTrackConstraints(media::DisplayAudioTrackConstraints);
+
+#[wasm_bindgen]
+impl DisplayAudioTrackConstraints {
+    /// Creates new [`DisplayAudioTrackConstraints`] with none constraints
+    /// configured.
+    #[must_use]
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        media::DisplayAudioTrackConstraints::new().into()
     }
 }
 

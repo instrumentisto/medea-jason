@@ -22,7 +22,7 @@ use crate::{get_audio_track, timeout};
 #[wasm_bindgen_test]
 async fn track_autostop() {
     let media_manager = MediaManager::default();
-    let mut caps = MediaStreamSettings::new();
+    let mut caps = MediaStreamSettings::default();
     caps.device_video(DeviceVideoTrackConstraints::new());
 
     let mut tracks = media_manager.get_tracks(caps).await.unwrap();
@@ -122,7 +122,7 @@ mod audio_processing {
 
     async fn audio_track_for_caps(
         media_manager: Option<MediaManager>,
-        caps: api::AudioTrackConstraints,
+        caps: api::DeviceAudioTrackConstraints,
     ) -> JsValue {
         let media_manager = media_manager.unwrap_or_default();
         let constraints = {
@@ -159,7 +159,8 @@ mod audio_processing {
         }
 
         let track = jsval_cast::<api::LocalMediaTrack>(
-            audio_track_for_caps(None, api::AudioTrackConstraints::new()).await,
+            audio_track_for_caps(None, api::DeviceAudioTrackConstraints::new())
+                .await,
             "LocalMediaTrack",
         )
         .unwrap();
@@ -197,7 +198,8 @@ mod audio_processing {
         }
 
         let track = jsval_cast::<api::LocalMediaTrack>(
-            audio_track_for_caps(None, api::AudioTrackConstraints::new()).await,
+            audio_track_for_caps(None, api::DeviceAudioTrackConstraints::new())
+                .await,
             "LocalMediaTrack",
         )
         .unwrap();
@@ -219,7 +221,7 @@ mod audio_processing {
 
     #[wasm_bindgen_test]
     async fn ap_disabled_via_ideal_caps() {
-        let mut audio_caps = api::AudioTrackConstraints::new();
+        let mut audio_caps = api::DeviceAudioTrackConstraints::new();
         audio_caps.ideal_auto_gain_control(false);
         audio_caps.ideal_noise_suppression(false);
         audio_caps.ideal_echo_cancellation(false);
@@ -254,7 +256,7 @@ mod audio_processing {
             return;
         }
 
-        let mut audio_caps = api::AudioTrackConstraints::new();
+        let mut audio_caps = api::DeviceAudioTrackConstraints::new();
         audio_caps.ideal_auto_gain_control(true);
         audio_caps.ideal_noise_suppression(true);
         audio_caps.ideal_echo_cancellation(true);
@@ -282,7 +284,7 @@ mod audio_processing {
 
     #[wasm_bindgen_test]
     async fn ap_disabled_via_exact_caps() {
-        let mut audio_caps = api::AudioTrackConstraints::new();
+        let mut audio_caps = api::DeviceAudioTrackConstraints::new();
         audio_caps.exact_auto_gain_control(false);
         audio_caps.exact_noise_suppression(false);
         audio_caps.exact_echo_cancellation(false);
@@ -317,7 +319,7 @@ mod audio_processing {
             return;
         }
 
-        let mut audio_caps = api::AudioTrackConstraints::new();
+        let mut audio_caps = api::DeviceAudioTrackConstraints::new();
         audio_caps.exact_auto_gain_control(true);
         audio_caps.exact_noise_suppression(true);
         audio_caps.exact_echo_cancellation(true);
@@ -353,7 +355,7 @@ mod audio_processing {
         }
 
         let media_manager = MediaManager::default();
-        let mut audio_caps = api::AudioTrackConstraints::new();
+        let mut audio_caps = api::DeviceAudioTrackConstraints::new();
         audio_caps.exact_auto_gain_control(false);
         audio_caps.exact_noise_suppression(false);
         audio_caps.exact_echo_cancellation(false);
@@ -383,7 +385,7 @@ mod audio_processing {
             JsValue::FALSE
         );
 
-        let mut audio_caps = api::AudioTrackConstraints::new();
+        let mut audio_caps = api::DeviceAudioTrackConstraints::new();
         audio_caps.exact_auto_gain_control(true);
         audio_caps.exact_noise_suppression(true);
         audio_caps.exact_echo_cancellation(true);
@@ -419,7 +421,7 @@ mod audio_processing {
     #[wasm_bindgen_test]
     async fn same_track_when_same_ap_constraints() {
         let media_manager = MediaManager::default();
-        let mut audio_caps = api::AudioTrackConstraints::new();
+        let mut audio_caps = api::DeviceAudioTrackConstraints::new();
         audio_caps.exact_auto_gain_control(false);
         audio_caps.exact_noise_suppression(false);
         audio_caps.exact_echo_cancellation(false);
@@ -449,7 +451,7 @@ mod audio_processing {
             JsValue::FALSE
         );
 
-        let mut audio_caps = api::AudioTrackConstraints::new();
+        let mut audio_caps = api::DeviceAudioTrackConstraints::new();
         audio_caps.exact_auto_gain_control(false);
         audio_caps.exact_noise_suppression(false);
         audio_caps.exact_echo_cancellation(false);

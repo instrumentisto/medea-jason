@@ -8,9 +8,10 @@ use medea_jason::{
         LocalMediaInitExceptionKind,
     },
     media::{
-        AudioTrackConstraints, DeviceVideoTrackConstraints,
-        DisplayVideoTrackConstraints, GetUserMediaError, InitLocalTracksError,
-        MediaKind, MediaManager, MediaStreamSettings,
+        DeviceAudioTrackConstraints, DeviceVideoTrackConstraints,
+        DisplayAudioTrackConstraints, DisplayVideoTrackConstraints,
+        GetUserMediaError, InitLocalTracksError, MediaKind, MediaManager,
+        MediaStreamSettings,
     },
 };
 use wasm_bindgen_futures::JsFuture;
@@ -69,7 +70,7 @@ async fn failed_get_user_media() {
     let media_manager = MediaManager::default();
     let constraints = {
         let mut constraints = api::MediaStreamSettings::new();
-        constraints.device_audio(api::AudioTrackConstraints::new());
+        constraints.device_audio(api::DeviceAudioTrackConstraints::new());
         constraints.device_video(api::DeviceVideoTrackConstraints::new());
         constraints
     };
@@ -115,7 +116,7 @@ async fn failed_get_user_media2() {
     let media_manager = MediaManager::default();
     let constraints = {
         let mut constraints = api::MediaStreamSettings::new();
-        constraints.device_audio(api::AudioTrackConstraints::new());
+        constraints.device_audio(api::DeviceAudioTrackConstraints::new());
         constraints.device_video(api::DeviceVideoTrackConstraints::new());
         constraints
     };
@@ -163,8 +164,8 @@ async fn same_track_for_same_constraints() {
 
     let media_manager = MediaManager::default();
     let constraints = {
-        let mut constraints = MediaStreamSettings::new();
-        constraints.device_audio(AudioTrackConstraints::new());
+        let mut constraints = MediaStreamSettings::default();
+        constraints.device_audio(DeviceAudioTrackConstraints::new());
         constraints
     };
 
@@ -203,8 +204,8 @@ async fn new_track_if_previous_dropped() {
 
     let media_manager = MediaManager::default();
     let constraints = {
-        let mut constraints = MediaStreamSettings::new();
-        constraints.device_audio(AudioTrackConstraints::new());
+        let mut constraints = MediaStreamSettings::default();
+        constraints.device_audio(DeviceAudioTrackConstraints::new());
         constraints
     };
 
@@ -246,8 +247,8 @@ async fn request_audio_video_then_audio_then_video() {
 
     let media_manager = MediaManager::default();
     let constraints = {
-        let mut constraints = MediaStreamSettings::new();
-        constraints.device_audio(AudioTrackConstraints::new());
+        let mut constraints = MediaStreamSettings::default();
+        constraints.device_audio(DeviceAudioTrackConstraints::new());
         constraints.device_video(DeviceVideoTrackConstraints::new());
         constraints
     };
@@ -266,8 +267,8 @@ async fn request_audio_video_then_audio_then_video() {
 
     // request audio only
     let audio_constraints = {
-        let mut constraints = MediaStreamSettings::new();
-        constraints.device_audio(AudioTrackConstraints::new());
+        let mut constraints = MediaStreamSettings::default();
+        constraints.device_audio(DeviceAudioTrackConstraints::new());
         constraints
     };
     let mut tracks = media_manager.get_tracks(audio_constraints).await.unwrap();
@@ -277,7 +278,7 @@ async fn request_audio_video_then_audio_then_video() {
 
     // request video only
     let video_constraints = {
-        let mut constraints = MediaStreamSettings::new();
+        let mut constraints = MediaStreamSettings::default();
         constraints.device_video(DeviceVideoTrackConstraints::new());
         constraints
     };
@@ -306,8 +307,8 @@ async fn display_track_is_cached() {
 
     let media_manager = MediaManager::default();
     let constraints = {
-        let mut constraints = MediaStreamSettings::new();
-        constraints.device_audio(AudioTrackConstraints::new());
+        let mut constraints = MediaStreamSettings::default();
+        constraints.device_audio(DeviceAudioTrackConstraints::new());
         constraints.display_video(DisplayVideoTrackConstraints::new());
         constraints
     };
@@ -324,7 +325,7 @@ async fn display_track_is_cached() {
 
     // do second request
     let constraints = {
-        let mut constraints = MediaStreamSettings::new();
+        let mut constraints = MediaStreamSettings::default();
         constraints.display_video(DisplayVideoTrackConstraints::new());
         constraints
     };
@@ -356,8 +357,8 @@ async fn display_audio_track_is_cached() {
 
     let media_manager = MediaManager::default();
     let constraints = {
-        let mut constraints = MediaStreamSettings::new();
-        constraints.display_audio(AudioTrackConstraints::new());
+        let mut constraints = MediaStreamSettings::default();
+        constraints.display_audio(DisplayAudioTrackConstraints::new());
         constraints.display_video(DisplayVideoTrackConstraints::new());
         constraints
     };
@@ -380,8 +381,8 @@ async fn display_audio_track_is_cached() {
 
     // do second request
     let constraints = {
-        let mut constraints = MediaStreamSettings::new();
-        constraints.display_audio(AudioTrackConstraints::new());
+        let mut constraints = MediaStreamSettings::default();
+        constraints.display_audio(DisplayAudioTrackConstraints::new());
         constraints.display_video(DisplayVideoTrackConstraints::new());
         constraints
     };
@@ -414,8 +415,8 @@ async fn display_audio_track_is_cached() {
 #[wasm_bindgen_test]
 async fn new_tracks_should_be_live() {
     let media_manager = MediaManager::default();
-    let mut constraints = MediaStreamSettings::new();
-    constraints.device_audio(AudioTrackConstraints::new());
+    let mut constraints = MediaStreamSettings::default();
+    constraints.device_audio(DeviceAudioTrackConstraints::new());
 
     let track: web_sys::MediaStreamTrack = Clone::clone(
         media_manager

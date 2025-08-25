@@ -41,7 +41,7 @@ void main() {
     var devices = await mediaManager.enumerateDevices();
 
     var settings = MediaStreamSettings();
-    settings.deviceAudio(AudioTrackConstraints());
+    settings.deviceAudio(DeviceAudioTrackConstraints());
     settings.deviceVideo(DeviceVideoTrackConstraints());
     var tracks = await mediaManager.initLocalTracks(settings);
 
@@ -404,7 +404,7 @@ void main() {
     {
       // all enabled by default
       var settings = MediaStreamSettings();
-      settings.deviceAudio(AudioTrackConstraints());
+      settings.deviceAudio(DeviceAudioTrackConstraints());
       var track = (await mediaManager.initLocalTracks(settings))[0];
 
       expect(track.isAudioProcessingAvailable(), isTrue);
@@ -422,7 +422,7 @@ void main() {
 
     {
       // disable via gum
-      var audio = AudioTrackConstraints();
+      var audio = DeviceAudioTrackConstraints();
       audio.exactAutoGainControl(false);
       audio.exactEchoCancellation(false);
       audio.exactHighPassFilter(false);
@@ -445,13 +445,13 @@ void main() {
     {
       // new track if different config
       var settings1 = MediaStreamSettings();
-      settings1.deviceAudio(AudioTrackConstraints());
+      settings1.deviceAudio(DeviceAudioTrackConstraints());
       var track1 = (await mediaManager.initLocalTracks(settings1))[0];
 
       expect(await track1.isNoiseSuppressionEnabled(), isTrue);
 
       var settings2 = MediaStreamSettings();
-      var audio = AudioTrackConstraints();
+      var audio = DeviceAudioTrackConstraints();
       audio.exactNoiseSuppression(false);
       settings2.deviceAudio(audio);
       var track2 = (await mediaManager.initLocalTracks(settings2))[0];
@@ -466,7 +466,7 @@ void main() {
     {
       // same track if same config
       var settings1 = MediaStreamSettings();
-      var audio1 = AudioTrackConstraints();
+      var audio1 = DeviceAudioTrackConstraints();
       audio1.exactNoiseSuppression(false);
       settings1.deviceAudio(audio1);
       var track1 = (await mediaManager.initLocalTracks(settings1))[0];
@@ -474,7 +474,7 @@ void main() {
       expect(await track1.isNoiseSuppressionEnabled(), isFalse);
 
       var settings2 = MediaStreamSettings();
-      var audio2 = AudioTrackConstraints();
+      var audio2 = DeviceAudioTrackConstraints();
       audio2.exactNoiseSuppression(false);
       settings2.deviceAudio(audio2);
       var track2 = (await mediaManager.initLocalTracks(settings2))[0];
@@ -489,13 +489,13 @@ void main() {
     {
       // same track if ideal config changed
       var settings1 = MediaStreamSettings();
-      settings1.deviceAudio(AudioTrackConstraints());
+      settings1.deviceAudio(DeviceAudioTrackConstraints());
       var track1 = (await mediaManager.initLocalTracks(settings1))[0];
 
       expect(await track1.isNoiseSuppressionEnabled(), isTrue);
 
       var settings2 = MediaStreamSettings();
-      var audio = AudioTrackConstraints();
+      var audio = DeviceAudioTrackConstraints();
       audio.idealNoiseSuppression(false);
       settings2.deviceAudio(audio);
       var track2 = (await mediaManager.initLocalTracks(settings2))[0];
@@ -521,7 +521,7 @@ void main() {
     }
 
     var settings = MediaStreamSettings();
-    settings.deviceAudio(AudioTrackConstraints());
+    settings.deviceAudio(DeviceAudioTrackConstraints());
     var track = (await mediaManager.initLocalTracks(settings))[0];
 
     expect(track.isAudioProcessingAvailable(), isTrue);
@@ -572,6 +572,36 @@ void main() {
     expect(await track.isEchoCancellationEnabled(), isTrue);
 
     await track.free();
+    jason.free();
+    mediaManager.free();
+  });
+
+  testWidgets('getDisplayMedia with display video and audio', (
+    WidgetTester tester,
+  ) async {
+    var jason = await Jason.init();
+    var mediaManager = jason.mediaManager();
+
+    // Configure settings with both display video and audio
+    var settings = MediaStreamSettings();
+    settings.displayVideo(DisplayVideoTrackConstraints());
+    settings.displayAudio(DisplayAudioTrackConstraints());
+
+    var tracks = await mediaManager.initLocalTracks(settings);
+
+    expect(tracks.where((track) => track.kind() == MediaKind.video).length, 1);
+    expect(tracks.where((track) => track.kind() == MediaKind.audio).length, 1);
+
+    // Check that both tracks are from display source
+    for (var track in tracks) {
+      expect(track.mediaSourceKind(), equals(MediaSourceKind.display));
+      expect(await track.state(), webrtc.MediaStreamTrackState.live);
+    }
+
+    for (var track in tracks) {
+      await track.free();
+    }
+
     jason.free();
     mediaManager.free();
   });

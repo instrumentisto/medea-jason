@@ -115,7 +115,7 @@ class Call {
               (element) => element.kind() == MediaDeviceKind.audioInput,
             )
             .deviceId();
-        constraints.deviceAudio(AudioTrackConstraints());
+        constraints.deviceAudio(DeviceAudioTrackConstraints());
       }
 
       var tracks = await _mediaManager.initLocalTracks(constraints);
@@ -191,7 +191,7 @@ class Call {
   /// Sets media tracks according to the passed settings.
   Future<void> setMedia(
     DeviceVideoTrackConstraints video,
-    AudioTrackConstraints audio,
+    DeviceAudioTrackConstraints audio,
     DisplayVideoTrackConstraints display,
   ) async {
     for (var t in _tracks) {

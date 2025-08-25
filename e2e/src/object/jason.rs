@@ -80,7 +80,7 @@ impl Object<Jason> {
                 });
 
                 let constraints = new rust.MediaStreamSettings();
-                let audio = new window.rust.AudioTrackConstraints();
+                let audio = new window.rust.DeviceAudioTrackConstraints();
                 constraints.device_audio(audio);
                 let video = new window.rust.DeviceVideoTrackConstraints();
                 constraints.device_video(video);

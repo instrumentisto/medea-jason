@@ -46,9 +46,9 @@ extension type MemberConnectionState._(JSObject _) implements JSObject {
 }
 
 @JS()
-extension type AudioTrackConstraints._(JSObject _) implements JSObject {
+extension type DeviceAudioTrackConstraints._(JSObject _) implements JSObject {
   external void free();
-  external factory AudioTrackConstraints();
+  external factory DeviceAudioTrackConstraints();
   external void device_id(String device_id);
   external void exact_auto_gain_control(bool auto_gain_control);
   external void ideal_auto_gain_control(bool auto_gain_control);
@@ -56,6 +56,12 @@ extension type AudioTrackConstraints._(JSObject _) implements JSObject {
   external void exact_echo_cancellation(bool echo_cancellation);
   external void ideal_noise_suppression(bool noise_suppression);
   external void exact_noise_suppression(bool noise_suppression);
+}
+
+@JS()
+extension type DisplayAudioTrackConstraints._(JSObject _) implements JSObject {
+  external factory DisplayAudioTrackConstraints();
+  external void free();
 }
 
 @JS()
@@ -200,8 +206,8 @@ extension type MediaStateTransitionException._(JSObject _) implements JSObject {
 extension type MediaStreamSettings._(JSObject _) implements JSObject {
   external void free();
   external factory MediaStreamSettings();
-  external void device_audio(AudioTrackConstraints constraints);
-  external void display_audio(AudioTrackConstraints constraints);
+  external void device_audio(DeviceAudioTrackConstraints constraints);
+  external void display_audio(DisplayAudioTrackConstraints constraints);
   external void device_video(DeviceVideoTrackConstraints constraints);
   external void display_video(DisplayVideoTrackConstraints constraints);
 }

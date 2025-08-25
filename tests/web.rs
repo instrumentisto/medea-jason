@@ -92,7 +92,7 @@ use medea_client_api_proto::{
 use medea_jason::{
     api,
     media::{
-        AudioTrackConstraints, DeviceVideoTrackConstraints,
+        DeviceAudioTrackConstraints, DeviceVideoTrackConstraints,
         LocalTracksConstraints, MediaDirection, MediaKind, MediaManager,
         MediaStreamSettings, track::remote,
     },
@@ -290,8 +290,8 @@ fn media_stream_settings(
 ) -> api::MediaStreamSettings {
     let mut settings = api::MediaStreamSettings::new();
     if is_audio_enabled {
-        settings.device_audio(api::AudioTrackConstraints::new());
-        settings.display_audio(api::AudioTrackConstraints::new());
+        settings.device_audio(api::DeviceAudioTrackConstraints::new());
+        settings.display_audio(api::DisplayAudioTrackConstraints::new());
     }
     if is_video_enabled {
         settings.device_video(api::DeviceVideoTrackConstraints::new());
@@ -338,7 +338,7 @@ async fn wait_and_check_test_result(
 #[expect(dead_code, reason = "preserved for future tests")]
 async fn get_video_track() -> api::RemoteMediaTrack {
     let manager = MediaManager::default();
-    let mut settings = MediaStreamSettings::new();
+    let mut settings = MediaStreamSettings::default();
     settings.device_video(DeviceVideoTrackConstraints::new());
     let mut tracks = manager.get_tracks(settings).await.unwrap();
     let track = tracks.pop().unwrap().0.as_ref().as_ref().fork().await;
@@ -353,8 +353,8 @@ async fn get_video_track() -> api::RemoteMediaTrack {
 
 async fn get_audio_track() -> api::RemoteMediaTrack {
     let manager = MediaManager::default();
-    let mut settings = MediaStreamSettings::new();
-    settings.device_audio(AudioTrackConstraints::new());
+    let mut settings = MediaStreamSettings::default();
+    settings.device_audio(DeviceAudioTrackConstraints::new());
     let mut tracks = manager.get_tracks(settings).await.unwrap();
     let track = tracks.pop().unwrap().0.as_ref().as_ref().fork().await;
     remote::Track::new(

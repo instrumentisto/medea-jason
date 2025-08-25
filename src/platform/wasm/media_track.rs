@@ -212,6 +212,14 @@ impl MediaStreamTrack {
         self.sys_track.enabled()
     }
 
+    /// Returns the media source kind of this [`MediaStreamTrack`].
+    ///
+    /// Returns [`None`] for remote tracks.
+    #[must_use]
+    pub const fn source_kind(&self) -> Option<MediaSourceKind> {
+        self.source_kind
+    }
+
     /// Detects whether a video track captured from display searching
     /// [specific fields][1] in its settings.
     ///

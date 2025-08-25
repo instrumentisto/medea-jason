@@ -10,9 +10,9 @@ use tracerr::Traced;
 
 use crate::{
     media::{
-        AudioSource, AudioTrackConstraints, DeviceVideoTrackConstraints,
-        DisplayVideoTrackConstraints, MediaKind, MediaStreamSettings,
-        TrackConstraints, VideoSource, track::local,
+        AudioSource, DeviceAudioTrackConstraints, DeviceVideoTrackConstraints,
+        DisplayAudioTrackConstraints, DisplayVideoTrackConstraints, MediaKind,
+        MediaStreamSettings, TrackConstraints, VideoSource, track::local,
     },
     platform,
     utils::Caused,
@@ -79,11 +79,13 @@ pub enum TracksRequestError {
 /// [3]: https://w3.org/TR/mediacapture-streams#mediastream
 #[derive(Debug, Default)]
 pub struct TracksRequest {
-    /// Device [`AudioTrackConstraints`] of [`local::Track`]s to be applied.
-    device_audio: HashMap<TrackId, AudioTrackConstraints>,
+    /// Device [`DeviceAudioTrackConstraints`] of [`local::Track`]s to be
+    /// applied.
+    device_audio: HashMap<TrackId, DeviceAudioTrackConstraints>,
 
-    /// Display [`AudioTrackConstraints`] of [`local::Track`]s to be applied.
-    display_audio: HashMap<TrackId, AudioTrackConstraints>,
+    /// Display [`DisplayAudioTrackConstraints`] of [`local::Track`]s to be
+    /// applied.
+    display_audio: HashMap<TrackId, DisplayAudioTrackConstraints>,
 
     /// [`DeviceVideoTrackConstraints`] of [`local::Track`]s to be applied.
     device_video: HashMap<TrackId, DeviceVideoTrackConstraints>,
@@ -105,7 +107,7 @@ impl TracksRequest {
                     drop(self.device_audio.insert(track_id, device));
                 }
                 AudioSource::Display(display) => {
-                    drop(self.display_audio.insert(track_id, display));
+                    _ = self.display_audio.insert(track_id, display);
                 }
             },
             TrackConstraints::Video(video) => match video {
@@ -124,11 +126,13 @@ impl TracksRequest {
 /// and must have at least one track of any kind.
 #[derive(Debug)]
 pub struct SimpleTracksRequest {
-    /// Display [`AudioTrackConstraints`] of a [`local::Track`] to be applied.
-    display_audio: Option<(TrackId, AudioTrackConstraints)>,
+    /// Display [`DisplayAudioTrackConstraints`] of a [`local::Track`] to be
+    /// applied.
+    display_audio: Option<(TrackId, DisplayAudioTrackConstraints)>,
 
-    /// Device [`AudioTrackConstraints`] of a [`local::Track`] to be applied.
-    device_audio: Option<(TrackId, AudioTrackConstraints)>,
+    /// Device [`DeviceAudioTrackConstraints`] of a [`local::Track`] to be
+    /// applied.
+    device_audio: Option<(TrackId, DeviceAudioTrackConstraints)>,
 
     /// [`DisplayVideoTrackConstraints`] of a [`local::Track`] to be applied.
     display_video: Option<(TrackId, DisplayVideoTrackConstraints)>,
@@ -221,7 +225,6 @@ impl SimpleTracksRequest {
                 }
             }
         }
-
         if let Some((id, display_video)) = &self.display_video {
             if let Some(track) = display_video_tracks.into_iter().next() {
                 if display_video.satisfies(track.as_ref()).await {
@@ -282,7 +285,7 @@ impl SimpleTracksRequest {
                         TracksRequestError::ExpectedDisplayAudioTracks
                     ));
                 }
-                drop(self.display_audio.take());
+                _ = self.display_audio.take();
             }
         }
         if let Some((_, device_video_caps)) = &self.device_video {
@@ -308,12 +311,16 @@ impl SimpleTracksRequest {
 
         if other.is_device_audio_enabled() {
             if let Some((_, device_audio)) = self.device_audio.as_mut() {
-                device_audio.merge(other.get_device_audio().clone());
+                if let Some(other_device_audio) = other.get_device_audio() {
+                    device_audio.merge(other_device_audio.clone());
+                }
             }
         }
         if other.is_display_audio_enabled() {
             if let Some((_, display_audio)) = self.display_audio.as_mut() {
-                display_audio.merge(other.get_display_audio().clone());
+                if let Some(other_display_audio) = other.get_display_audio() {
+                    display_audio.merge(*other_display_audio);
+                }
             }
         }
         if other.is_display_video_enabled() {
@@ -373,7 +380,7 @@ impl TryFrom<TracksRequest> for SimpleTracksRequest {
         }
         #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for (id, display) in value.display_audio {
-            drop(req.display_audio.replace((id, display)));
+            _ = req.display_audio.replace((id, display));
         }
         #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
         for (id, device) in value.device_video {
@@ -390,20 +397,17 @@ impl TryFrom<TracksRequest> for SimpleTracksRequest {
 
 impl From<&SimpleTracksRequest> for MediaStreamSettings {
     fn from(request: &SimpleTracksRequest) -> Self {
-        let mut constraints = Self::new();
+        let mut constraints = Self::default();
 
         if let Some((_, device_audio)) = &request.device_audio {
             constraints.device_audio(device_audio.clone());
         }
-
         if let Some((_, display_audio)) = &request.display_audio {
-            constraints.display_audio(display_audio.clone());
+            constraints.display_audio(*display_audio);
         }
-
         if let Some((_, device_video)) = &request.device_video {
             constraints.device_video(device_video.clone());
         }
-
         if let Some((_, display_video)) = &request.display_video {
             constraints.display_video(display_video.clone());
         }

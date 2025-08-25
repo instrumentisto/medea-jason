@@ -3605,24 +3605,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ApiAudioConstraints dco_decode_api_audio_constraints(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
-    return ApiAudioConstraints(
-      deviceId: dco_decode_opt_String(arr[0]),
-      autoGainControl: dco_decode_opt_box_autoadd_constrain_boolean(arr[1]),
-      noiseSuppression: dco_decode_opt_box_autoadd_constrain_boolean(arr[2]),
-      noiseSuppressionLevel: dco_decode_opt_box_autoadd_noise_suppression_level(
-        arr[3],
-      ),
-      echoCancellation: dco_decode_opt_box_autoadd_constrain_boolean(arr[4]),
-      highPassFilter: dco_decode_opt_box_autoadd_constrain_boolean(arr[5]),
-    );
-  }
-
-  @protected
   ApiConstrainFacingMode dco_decode_api_constrain_facing_mode(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
@@ -3633,6 +3615,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       default:
         throw Exception("unreachable");
     }
+  }
+
+  @protected
+  ApiDeviceAudioTrackConstraints dco_decode_api_device_audio_track_constraints(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return ApiDeviceAudioTrackConstraints(
+      deviceId: dco_decode_opt_String(arr[0]),
+      autoGainControl: dco_decode_opt_box_autoadd_constrain_boolean(arr[1]),
+      noiseSuppression: dco_decode_opt_box_autoadd_constrain_boolean(arr[2]),
+      noiseSuppressionLevel: dco_decode_opt_box_autoadd_noise_suppression_level(
+        arr[3],
+      ),
+      echoCancellation: dco_decode_opt_box_autoadd_constrain_boolean(arr[4]),
+      highPassFilter: dco_decode_opt_box_autoadd_constrain_boolean(arr[5]),
+    );
   }
 
   @protected
@@ -3649,6 +3651,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       height: dco_decode_opt_box_autoadd_constrain_u_32(arr[2]),
       width: dco_decode_opt_box_autoadd_constrain_u_32(arr[3]),
     );
+  }
+
+  @protected
+  ApiDisplayAudioTrackConstraints
+  dco_decode_api_display_audio_track_constraints(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 0)
+      throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
+    return ApiDisplayAudioTrackConstraints();
   }
 
   @protected
@@ -3697,15 +3709,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ApiMediaStreamSettings dco_decode_api_media_stream_settings(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return ApiMediaStreamSettings(
-      audio: dco_decode_opt_box_autoadd_api_audio_constraints(arr[0]),
+      deviceAudio:
+          dco_decode_opt_box_autoadd_api_device_audio_track_constraints(arr[0]),
+      displayAudio:
+          dco_decode_opt_box_autoadd_api_display_audio_track_constraints(
+            arr[1],
+          ),
       deviceVideo:
-          dco_decode_opt_box_autoadd_api_device_video_track_constraints(arr[1]),
+          dco_decode_opt_box_autoadd_api_device_video_track_constraints(arr[2]),
       displayVideo:
           dco_decode_opt_box_autoadd_api_display_video_track_constraints(
-            arr[2],
+            arr[3],
           ),
     );
   }
@@ -3717,14 +3734,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ApiAudioConstraints dco_decode_box_autoadd_api_audio_constraints(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_api_audio_constraints(raw);
-  }
-
-  @protected
   ApiConstrainFacingMode dco_decode_box_autoadd_api_constrain_facing_mode(
     dynamic raw,
   ) {
@@ -3733,10 +3742,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ApiDeviceAudioTrackConstraints
+  dco_decode_box_autoadd_api_device_audio_track_constraints(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_api_device_audio_track_constraints(raw);
+  }
+
+  @protected
   ApiDeviceVideoTrackConstraints
   dco_decode_box_autoadd_api_device_video_track_constraints(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_api_device_video_track_constraints(raw);
+  }
+
+  @protected
+  ApiDisplayAudioTrackConstraints
+  dco_decode_box_autoadd_api_display_audio_track_constraints(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_api_display_audio_track_constraints(raw);
   }
 
   @protected
@@ -3944,16 +3967,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ApiAudioConstraints? dco_decode_opt_box_autoadd_api_audio_constraints(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null
-        ? null
-        : dco_decode_box_autoadd_api_audio_constraints(raw);
-  }
-
-  @protected
   ApiConstrainFacingMode? dco_decode_opt_box_autoadd_api_constrain_facing_mode(
     dynamic raw,
   ) {
@@ -3964,12 +3977,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ApiDeviceAudioTrackConstraints?
+  dco_decode_opt_box_autoadd_api_device_audio_track_constraints(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_api_device_audio_track_constraints(raw);
+  }
+
+  @protected
   ApiDeviceVideoTrackConstraints?
   dco_decode_opt_box_autoadd_api_device_video_track_constraints(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null
         ? null
         : dco_decode_box_autoadd_api_device_video_track_constraints(raw);
+  }
+
+  @protected
+  ApiDisplayAudioTrackConstraints?
+  dco_decode_opt_box_autoadd_api_display_audio_track_constraints(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_api_display_audio_track_constraints(raw);
   }
 
   @protected
@@ -4342,36 +4373,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ApiAudioConstraints sse_decode_api_audio_constraints(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_deviceId = sse_decode_opt_String(deserializer);
-    var var_autoGainControl = sse_decode_opt_box_autoadd_constrain_boolean(
-      deserializer,
-    );
-    var var_noiseSuppression = sse_decode_opt_box_autoadd_constrain_boolean(
-      deserializer,
-    );
-    var var_noiseSuppressionLevel =
-        sse_decode_opt_box_autoadd_noise_suppression_level(deserializer);
-    var var_echoCancellation = sse_decode_opt_box_autoadd_constrain_boolean(
-      deserializer,
-    );
-    var var_highPassFilter = sse_decode_opt_box_autoadd_constrain_boolean(
-      deserializer,
-    );
-    return ApiAudioConstraints(
-      deviceId: var_deviceId,
-      autoGainControl: var_autoGainControl,
-      noiseSuppression: var_noiseSuppression,
-      noiseSuppressionLevel: var_noiseSuppressionLevel,
-      echoCancellation: var_echoCancellation,
-      highPassFilter: var_highPassFilter,
-    );
-  }
-
-  @protected
   ApiConstrainFacingMode sse_decode_api_constrain_facing_mode(
     SseDeserializer deserializer,
   ) {
@@ -4391,6 +4392,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ApiDeviceAudioTrackConstraints sse_decode_api_device_audio_track_constraints(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_deviceId = sse_decode_opt_String(deserializer);
+    var var_autoGainControl = sse_decode_opt_box_autoadd_constrain_boolean(
+      deserializer,
+    );
+    var var_noiseSuppression = sse_decode_opt_box_autoadd_constrain_boolean(
+      deserializer,
+    );
+    var var_noiseSuppressionLevel =
+        sse_decode_opt_box_autoadd_noise_suppression_level(deserializer);
+    var var_echoCancellation = sse_decode_opt_box_autoadd_constrain_boolean(
+      deserializer,
+    );
+    var var_highPassFilter = sse_decode_opt_box_autoadd_constrain_boolean(
+      deserializer,
+    );
+    return ApiDeviceAudioTrackConstraints(
+      deviceId: var_deviceId,
+      autoGainControl: var_autoGainControl,
+      noiseSuppression: var_noiseSuppression,
+      noiseSuppressionLevel: var_noiseSuppressionLevel,
+      echoCancellation: var_echoCancellation,
+      highPassFilter: var_highPassFilter,
+    );
+  }
+
+  @protected
   ApiDeviceVideoTrackConstraints sse_decode_api_device_video_track_constraints(
     SseDeserializer deserializer,
   ) {
@@ -4407,6 +4438,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       height: var_height,
       width: var_width,
     );
+  }
+
+  @protected
+  ApiDisplayAudioTrackConstraints
+  sse_decode_api_display_audio_track_constraints(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ApiDisplayAudioTrackConstraints();
   }
 
   @protected
@@ -4459,9 +4497,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_audio = sse_decode_opt_box_autoadd_api_audio_constraints(
-      deserializer,
-    );
+    var var_deviceAudio =
+        sse_decode_opt_box_autoadd_api_device_audio_track_constraints(
+          deserializer,
+        );
+    var var_displayAudio =
+        sse_decode_opt_box_autoadd_api_display_audio_track_constraints(
+          deserializer,
+        );
     var var_deviceVideo =
         sse_decode_opt_box_autoadd_api_device_video_track_constraints(
           deserializer,
@@ -4471,7 +4514,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           deserializer,
         );
     return ApiMediaStreamSettings(
-      audio: var_audio,
+      deviceAudio: var_deviceAudio,
+      displayAudio: var_displayAudio,
       deviceVideo: var_deviceVideo,
       displayVideo: var_displayVideo,
     );
@@ -4484,19 +4528,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ApiAudioConstraints sse_decode_box_autoadd_api_audio_constraints(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_api_audio_constraints(deserializer));
-  }
-
-  @protected
   ApiConstrainFacingMode sse_decode_box_autoadd_api_constrain_facing_mode(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_api_constrain_facing_mode(deserializer));
+  }
+
+  @protected
+  ApiDeviceAudioTrackConstraints
+  sse_decode_box_autoadd_api_device_audio_track_constraints(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_api_device_audio_track_constraints(deserializer));
   }
 
   @protected
@@ -4506,6 +4551,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_api_device_video_track_constraints(deserializer));
+  }
+
+  @protected
+  ApiDisplayAudioTrackConstraints
+  sse_decode_box_autoadd_api_display_audio_track_constraints(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_api_display_audio_track_constraints(deserializer));
   }
 
   @protected
@@ -4759,19 +4813,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ApiAudioConstraints? sse_decode_opt_box_autoadd_api_audio_constraints(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_api_audio_constraints(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
   ApiConstrainFacingMode? sse_decode_opt_box_autoadd_api_constrain_facing_mode(
     SseDeserializer deserializer,
   ) {
@@ -4779,6 +4820,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_api_constrain_facing_mode(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ApiDeviceAudioTrackConstraints?
+  sse_decode_opt_box_autoadd_api_device_audio_track_constraints(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_api_device_audio_track_constraints(
+        deserializer,
+      ));
     } else {
       return null;
     }
@@ -4793,6 +4850,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_api_device_video_track_constraints(
+        deserializer,
+      ));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ApiDisplayAudioTrackConstraints?
+  sse_decode_opt_box_autoadd_api_display_audio_track_constraints(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_api_display_audio_track_constraints(
         deserializer,
       ));
     } else {
@@ -5238,8 +5311,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_api_audio_constraints(
-    ApiAudioConstraints self,
+  void sse_encode_api_constrain_facing_mode(
+    ApiConstrainFacingMode self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case ApiConstrainFacingMode_Exact(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_facing_mode(field0, serializer);
+      case ApiConstrainFacingMode_Ideal(field0: final field0):
+        sse_encode_i_32(1, serializer);
+        sse_encode_facing_mode(field0, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_api_device_audio_track_constraints(
+    ApiDeviceAudioTrackConstraints self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -5267,22 +5356,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_api_constrain_facing_mode(
-    ApiConstrainFacingMode self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    switch (self) {
-      case ApiConstrainFacingMode_Exact(field0: final field0):
-        sse_encode_i_32(0, serializer);
-        sse_encode_facing_mode(field0, serializer);
-      case ApiConstrainFacingMode_Ideal(field0: final field0):
-        sse_encode_i_32(1, serializer);
-        sse_encode_facing_mode(field0, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_api_device_video_track_constraints(
     ApiDeviceVideoTrackConstraints self,
     SseSerializer serializer,
@@ -5295,6 +5368,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
     sse_encode_opt_box_autoadd_constrain_u_32(self.height, serializer);
     sse_encode_opt_box_autoadd_constrain_u_32(self.width, serializer);
+  }
+
+  @protected
+  void sse_encode_api_display_audio_track_constraints(
+    ApiDisplayAudioTrackConstraints self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
   }
 
   @protected
@@ -5338,7 +5419,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_opt_box_autoadd_api_audio_constraints(self.audio, serializer);
+    sse_encode_opt_box_autoadd_api_device_audio_track_constraints(
+      self.deviceAudio,
+      serializer,
+    );
+    sse_encode_opt_box_autoadd_api_display_audio_track_constraints(
+      self.displayAudio,
+      serializer,
+    );
     sse_encode_opt_box_autoadd_api_device_video_track_constraints(
       self.deviceVideo,
       serializer,
@@ -5356,15 +5444,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_api_audio_constraints(
-    ApiAudioConstraints self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_api_audio_constraints(self, serializer);
-  }
-
-  @protected
   void sse_encode_box_autoadd_api_constrain_facing_mode(
     ApiConstrainFacingMode self,
     SseSerializer serializer,
@@ -5374,12 +5453,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_api_device_audio_track_constraints(
+    ApiDeviceAudioTrackConstraints self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_api_device_audio_track_constraints(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_api_device_video_track_constraints(
     ApiDeviceVideoTrackConstraints self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_api_device_video_track_constraints(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_api_display_audio_track_constraints(
+    ApiDisplayAudioTrackConstraints self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_api_display_audio_track_constraints(self, serializer);
   }
 
   @protected
@@ -5630,19 +5727,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_opt_box_autoadd_api_audio_constraints(
-    ApiAudioConstraints? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_api_audio_constraints(self, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_opt_box_autoadd_api_constrain_facing_mode(
     ApiConstrainFacingMode? self,
     SseSerializer serializer,
@@ -5656,6 +5740,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_api_device_audio_track_constraints(
+    ApiDeviceAudioTrackConstraints? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_api_device_audio_track_constraints(
+        self,
+        serializer,
+      );
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_api_device_video_track_constraints(
     ApiDeviceVideoTrackConstraints? self,
     SseSerializer serializer,
@@ -5665,6 +5765,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_api_device_video_track_constraints(
+        self,
+        serializer,
+      );
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_api_display_audio_track_constraints(
+    ApiDisplayAudioTrackConstraints? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_api_display_audio_track_constraints(
         self,
         serializer,
       );

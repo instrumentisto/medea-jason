@@ -7,8 +7,8 @@ use web_sys::{
 };
 
 use crate::media::{
-    AudioTrackConstraints, DeviceVideoTrackConstraints,
-    DisplayVideoTrackConstraints,
+    DeviceAudioTrackConstraints, DeviceVideoTrackConstraints,
+    DisplayAudioTrackConstraints, DisplayVideoTrackConstraints,
     constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
 };
 
@@ -28,7 +28,7 @@ impl MediaStreamConstraints {
     /// Specifies the nature and settings of the `audio` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
-    pub fn audio(&self, audio: AudioTrackConstraints) {
+    pub fn audio(&self, audio: DeviceAudioTrackConstraints) {
         self.0.set_audio(&MediaTrackConstraints::from(audio).into());
     }
 
@@ -46,8 +46,8 @@ impl Default for MediaStreamConstraints {
     }
 }
 
-impl From<AudioTrackConstraints> for MediaTrackConstraints {
-    fn from(track_constraints: AudioTrackConstraints) -> Self {
+impl From<DeviceAudioTrackConstraints> for MediaTrackConstraints {
+    fn from(track_constraints: DeviceAudioTrackConstraints) -> Self {
         // Noise suppression level cannot be set via web API, and
         // `googHighPassFilter` has been removed:
         // https://chromium.googlesource.com/chromium/src/+/4a7eeb8c
@@ -170,7 +170,7 @@ impl DisplayMediaStreamConstraints {
     /// Specifies the nature and settings of the `audio` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
-    pub fn audio(&self, audio: AudioTrackConstraints) {
+    pub fn audio(&self, audio: DisplayAudioTrackConstraints) {
         self.0.set_audio(&MediaTrackConstraints::from(audio).into());
     }
 }
@@ -190,5 +190,11 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
         }
 
         constraints
+    }
+}
+
+impl From<DisplayAudioTrackConstraints> for MediaTrackConstraints {
+    fn from(_: DisplayAudioTrackConstraints) -> Self {
+        Self::new()
     }
 }

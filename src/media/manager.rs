@@ -310,42 +310,10 @@ impl InnerMediaManager {
             .collect();
 
         let mut tracks = Vec::new();
-        if caps.is_device_audio_enabled() {
-            for track in &storage {
-                let is_satisfy = track.media_source_kind()
-                    == MediaSourceKind::Device
-                    && caps.get_device_audio().satisfies(track.as_ref()).await;
-
-                if is_satisfy {
-                    caps.set_audio_publish(
-                        false,
-                        Some(MediaSourceKind::Device),
-                    );
-                    tracks.push(Rc::clone(track));
-                    break;
-                }
-            }
-        }
-
-        if caps.is_display_audio_enabled() {
-            for track in &storage {
-                let is_satisfy = track.media_source_kind()
-                    == MediaSourceKind::Display
-                    && caps.get_display_audio().satisfies(track.as_ref()).await;
-
-                if is_satisfy {
-                    caps.set_audio_publish(
-                        false,
-                        Some(MediaSourceKind::Display),
-                    );
-                    tracks.push(Rc::clone(track));
-                    break;
-                }
-            }
-        }
-
         for track in storage {
-            if caps.unconstrain_if_satisfies_video(track.as_ref()).await {
+            if caps.unconstrain_if_satisfies_audio(track.as_ref()).await
+                || caps.unconstrain_if_satisfies_video(track.as_ref()).await
+            {
                 tracks.push(track);
             }
         }

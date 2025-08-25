@@ -153,10 +153,10 @@ pub struct ApiMediaDisplayDetails {
     pub title: Option<String>,
 }
 
-/// Constraints applicable to audio tracks.
+/// Constraints applicable to device audio tracks (microphone).
 #[derive(Debug)]
 #[frb]
-pub struct ApiAudioConstraints {
+pub struct ApiDeviceAudioTrackConstraints {
     /// Identifier of the device generating the content for the media track.
     #[frb(non_final)]
     pub device_id: Option<String>,
@@ -190,8 +190,10 @@ pub struct ApiAudioConstraints {
     pub high_pass_filter: Option<ConstrainBoolean>,
 }
 
-impl From<ApiAudioConstraints> for media::AudioTrackConstraints {
-    fn from(v: ApiAudioConstraints) -> Self {
+impl From<ApiDeviceAudioTrackConstraints>
+    for media::DeviceAudioTrackConstraints
+{
+    fn from(v: ApiDeviceAudioTrackConstraints) -> Self {
         Self {
             device_id: v.device_id.map(ConstrainString::Exact),
             required: false,
@@ -201,6 +203,21 @@ impl From<ApiAudioConstraints> for media::AudioTrackConstraints {
             echo_cancellation: v.echo_cancellation,
             high_pass_filter: v.high_pass_filter,
         }
+    }
+}
+
+/// Constraints applicable to display audio tracks (system audio capture).
+#[derive(Debug)]
+#[frb]
+pub struct ApiDisplayAudioTrackConstraints {
+    // No option at the moment.
+}
+
+impl From<ApiDisplayAudioTrackConstraints>
+    for media::DisplayAudioTrackConstraints
+{
+    fn from(_: ApiDisplayAudioTrackConstraints) -> Self {
+        Self { required: false }
     }
 }
 
@@ -345,11 +362,19 @@ impl From<ApiDisplayVideoTrackConstraints>
 #[derive(Debug)]
 #[frb]
 pub struct ApiMediaStreamSettings {
-    /// [MediaStreamConstraints][1] for the audio media type.
+    /// [MediaStreamConstraints][1] for the device audio media type
+    /// (microphone).
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     #[frb(non_final)]
-    pub audio: Option<ApiAudioConstraints>,
+    pub device_audio: Option<ApiDeviceAudioTrackConstraints>,
+
+    /// [MediaStreamConstraints][1] for the display audio media type
+    /// (system audio capture).
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
+    #[frb(non_final)]
+    pub display_audio: Option<ApiDisplayAudioTrackConstraints>,
 
     /// [MediaStreamConstraints][1] for the device video media type.
     ///
@@ -366,11 +391,12 @@ pub struct ApiMediaStreamSettings {
 
 impl From<ApiMediaStreamSettings> for media::MediaStreamSettings {
     fn from(value: ApiMediaStreamSettings) -> Self {
-        let mut res = Self::new();
-        // TODO: implement for display audio when
-        //       `instrumentisto/medea-flutter-webrtc#244` will be resolved.
-        if let Some(audio) = value.audio {
-            res.device_audio(audio.into());
+        let mut res = Self::default();
+        if let Some(device_audio) = value.device_audio {
+            res.device_audio(device_audio.into());
+        }
+        if let Some(display_audio) = value.display_audio {
+            res.display_audio(display_audio.into());
         }
         if let Some(device) = value.device_video {
             res.device_video(device.into());

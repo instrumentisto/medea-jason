@@ -719,7 +719,7 @@ window.onload = async function() {
   async function build_constraints(audio_select, video_select) {
     let constraints = new rust.MediaStreamSettings();
     if (audio_select != null) {
-      let audio = new rust.AudioTrackConstraints();
+      let audio = new rust.DeviceAudioTrackConstraints();
       let audioSource = audio_select.options[audio_select.selectedIndex];
       if (audioSource) {
         audio.device_id(audioSource.value);
@@ -746,7 +746,7 @@ window.onload = async function() {
           constraints.device_video(video);
           if (screenshareSwitchEl.checked) {
             constraints.display_video(new rust.DisplayVideoTrackConstraints());
-            constraints.display_audio(new rust.AudioTrackConstraints());
+            constraints.display_audio(new rust.DisplayAudioTrackConstraints());
           }
         }
       } else {

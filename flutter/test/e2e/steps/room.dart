@@ -86,7 +86,7 @@ StepDefinitionGeneric whenMemberEnablesViaLocalMediaSettings =
           setting.deviceVideo(DeviceVideoTrackConstraints());
         }
         if (kind.contains('audio')) {
-          setting.deviceAudio(AudioTrackConstraints());
+          setting.deviceAudio(DeviceAudioTrackConstraints());
         }
         await member.room.setLocalMediaSettings(setting, true, true);
       },

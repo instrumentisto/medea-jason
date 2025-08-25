@@ -19,8 +19,9 @@ void registerFunctions(DynamicLibrary dl) {
     setVideoConstraintValue: _setVideoConstraintValue,
     setAudioConstraintValue: _setAudioConstraintValue,
     setVideoConstraint: _setVideoConstraint,
-    setAudioConstraint: _setAudioConstraint,
+    setDeviceAudioConstraint: _setDeviceAudioConstraint,
     setDisplayVideoConstraint: _setDisplayVideoConstraint,
+    setDisplayAudioConstraint: _setDisplayAudioConstraint,
   );
 }
 
@@ -146,9 +147,25 @@ void _setDisplayVideoConstraint(Object cons, int type, Object video) {
   }
 }
 
+/// Specifies the provided nature and settings of a display audio track to the
+/// given [DisplayConstraints].
+void _setDisplayAudioConstraint(Object cons, int type, Object audio) {
+  cons as webrtc.DisplayConstraints;
+  audio as webrtc.AudioConstraints;
+
+  switch (ConstraintType.values[type]) {
+    case ConstraintType.optional:
+      cons.audio.optional = audio;
+      break;
+    case ConstraintType.mandatory:
+      cons.audio.mandatory = audio;
+      break;
+  }
+}
+
 /// Specifies the provided nature and settings of a audio track to the given
 /// [DeviceConstraints].
-void _setAudioConstraint(Object cons, int type, Object audio) {
+void _setDeviceAudioConstraint(Object cons, int type, Object audio) {
   cons as webrtc.DeviceConstraints;
   audio as webrtc.AudioConstraints;
 
