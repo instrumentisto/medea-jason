@@ -22,7 +22,7 @@ use crate::{get_audio_track, timeout};
 #[wasm_bindgen_test]
 async fn track_autostop() {
     let media_manager = MediaManager::default();
-    let mut caps = MediaStreamSettings::default();
+    let mut caps = MediaStreamSettings::new();
     caps.device_video(DeviceVideoTrackConstraints::new());
 
     let mut tracks = media_manager.get_tracks(caps).await.unwrap();

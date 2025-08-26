@@ -25,7 +25,7 @@ impl MediaStreamSettings {
     #[must_use]
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        media::MediaStreamSettings::default().into()
+        media::MediaStreamSettings::new().into()
     }
 
     /// Specifies the nature and settings of a device audio

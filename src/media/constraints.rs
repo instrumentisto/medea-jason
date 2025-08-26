@@ -335,7 +335,7 @@ pub struct AudioTrackConstraints<C> {
 
 impl<C: Default> Default for AudioTrackConstraints<C> {
     fn default() -> Self {
-        Self { constraints: None, enabled: true, muted: false }
+        Self { constraints: Some(C::default()), enabled: true, muted: false }
     }
 }
 
@@ -351,7 +351,6 @@ impl<C> AudioTrackConstraints<C> {
     /// Sets these [`AudioTrackConstraints::constraints`] to the provided
     /// `cons`.
     fn set(&mut self, cons: C) {
-        self.enabled = true;
         self.constraints = Some(cons);
     }
 
@@ -451,7 +450,7 @@ pub struct VideoTrackConstraints<C> {
 
 impl<C: Default> Default for VideoTrackConstraints<C> {
     fn default() -> Self {
-        Self { constraints: None, enabled: true, muted: false }
+        Self { constraints: Some(C::default()), enabled: true, muted: false }
     }
 }
 
@@ -467,7 +466,6 @@ impl<C> VideoTrackConstraints<C> {
     /// Sets these [`VideoTrackConstraints::constraints`] to the provided
     /// `cons`.
     fn set(&mut self, cons: C) {
-        self.enabled = true;
         self.constraints = Some(cons);
     }
 
@@ -555,6 +553,33 @@ pub struct MediaStreamSettings {
 }
 
 impl MediaStreamSettings {
+    /// Creates new [`MediaStreamSettings`] with none constraints configured.
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            device_audio: AudioTrackConstraints {
+                enabled: false,
+                constraints: None,
+                muted: false,
+            },
+            display_audio: AudioTrackConstraints {
+                enabled: false,
+                constraints: None,
+                muted: false,
+            },
+            display_video: VideoTrackConstraints {
+                enabled: true,
+                constraints: None,
+                muted: false,
+            },
+            device_video: VideoTrackConstraints {
+                enabled: true,
+                constraints: None,
+                muted: false,
+            },
+        }
+    }
+
     /// Specifies the nature and settings of the device audio
     /// [`platform::MediaStreamTrack`].
     pub fn device_audio(&mut self, constraints: DeviceAudioTrackConstraints) {
@@ -747,7 +772,7 @@ impl MediaStreamSettings {
         }
     }
 
-    /// Sets the underlying [`AudioMediaTracksSettings::muted`] to the provided
+    /// Sets the underlying [`AudioTrackConstraints::muted`] to the provided
     /// value.
     const fn set_audio_muted(
         &mut self,
@@ -790,7 +815,7 @@ impl MediaStreamSettings {
     }
 
     /// Sets the underlying `enabled` field of these
-    /// [`AudioMediaTracksSettings`] to the given value.
+    /// [`AudioTrackConstraints`] to the given value.
     pub const fn set_audio_publish(
         &mut self,
         enabled: bool,

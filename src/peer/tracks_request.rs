@@ -23,11 +23,13 @@ use crate::{
 #[derive(Caused, Clone, Copy, Debug, Display, Eq, PartialEq)]
 #[cause(error = platform::Error)]
 pub enum TracksRequestError {
-    /// [`TracksRequest`] contains multiple Device [`AudioTrackConstraints`].
+    /// [`TracksRequest`] contains multiple Device
+    /// [`DeviceAudioTrackConstraints`].
     #[display("only one device audio track is allowed in SimpleTracksRequest")]
     TooManyDeviceAudioTracks,
 
-    /// [`TracksRequest`] contains multiple Display [`AudioTrackConstraints`].
+    /// [`TracksRequest`] contains multiple Display
+    /// [`DisplayAudioTrackConstraints`].
     #[display("only one display audio track is allowed in SimpleTracksRequest")]
     TooManyDisplayAudioTracks,
 
@@ -247,13 +249,15 @@ impl SimpleTracksRequest {
     /// # Errors
     ///
     /// - [`TracksRequestError::ExpectedDeviceAudioTracks`] when
-    ///   [`SimpleTracksRequest`] contains Device [`AudioTrackConstraints`],
-    ///   but the provided [`MediaStreamSettings`] doesn't and these Device
-    ///   [`AudioTrackConstraints`] are important.
+    ///   [`SimpleTracksRequest`] contains Device
+    ///   [`DeviceAudioTrackConstraints`], but the provided
+    ///   [`MediaStreamSettings`] doesn't and these Device
+    ///   [`DeviceAudioTrackConstraints`] are important.
     /// - [`TracksRequestError::ExpectedDisplayAudioTracks`] when
-    ///   [`SimpleTracksRequest`] contains Display [`AudioTrackConstraints`],
-    ///   but the provided [`MediaStreamSettings`] doesn't and these Display
-    ///   [`AudioTrackConstraints`] are important.
+    ///   [`SimpleTracksRequest`] contains Display
+    ///   [`DisplayAudioTrackConstraints`], but the provided
+    ///   [`MediaStreamSettings`] doesn't and these Display
+    ///   [`DisplayAudioTrackConstraints`] are important.
     /// - [`TracksRequestError::ExpectedDeviceVideoTracks`] when
     ///   [`SimpleTracksRequest`] contains [`DeviceVideoTrackConstraints`], but
     ///   the provided [`MediaStreamSettings`] doesn't and these
@@ -397,7 +401,7 @@ impl TryFrom<TracksRequest> for SimpleTracksRequest {
 
 impl From<&SimpleTracksRequest> for MediaStreamSettings {
     fn from(request: &SimpleTracksRequest) -> Self {
-        let mut constraints = Self::default();
+        let mut constraints = Self::new();
 
         if let Some((_, device_audio)) = &request.device_audio {
             constraints.device_audio(device_audio.clone());

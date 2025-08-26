@@ -338,7 +338,7 @@ async fn wait_and_check_test_result(
 #[expect(dead_code, reason = "preserved for future tests")]
 async fn get_video_track() -> api::RemoteMediaTrack {
     let manager = MediaManager::default();
-    let mut settings = MediaStreamSettings::default();
+    let mut settings = MediaStreamSettings::new();
     settings.device_video(DeviceVideoTrackConstraints::new());
     let mut tracks = manager.get_tracks(settings).await.unwrap();
     let track = tracks.pop().unwrap().0.as_ref().as_ref().fork().await;
@@ -353,7 +353,7 @@ async fn get_video_track() -> api::RemoteMediaTrack {
 
 async fn get_audio_track() -> api::RemoteMediaTrack {
     let manager = MediaManager::default();
-    let mut settings = MediaStreamSettings::default();
+    let mut settings = MediaStreamSettings::new();
     settings.device_audio(DeviceAudioTrackConstraints::new());
     let mut tracks = manager.get_tracks(settings).await.unwrap();
     let track = tracks.pop().unwrap().0.as_ref().as_ref().fork().await;

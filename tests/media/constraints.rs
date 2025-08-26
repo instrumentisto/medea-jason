@@ -24,7 +24,7 @@ wasm_bindgen_test_configure!(run_in_browser);
 async fn video_constraints_satisfies() {
     let video_device = video_devices().await.unwrap().pop().unwrap();
 
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     let mut track_constraints = DeviceVideoTrackConstraints::new();
     track_constraints.device_id(video_device.device_id());
     constraints.device_video(track_constraints.clone());
@@ -49,7 +49,7 @@ async fn video_constraints_satisfies() {
 async fn audio_constraints_satisfies() {
     let audio_device = audio_devices().await.unwrap().pop().unwrap();
 
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     let mut track_constraints = DeviceAudioTrackConstraints::new();
     track_constraints.device_id(audio_device.device_id());
     constraints.device_audio(track_constraints.clone());
@@ -79,7 +79,7 @@ async fn both_constraints_satisfies() {
     let video_device = video_devices().await.unwrap().pop().unwrap();
 
     let constraints = {
-        let mut constraints = MediaStreamSettings::default();
+        let mut constraints = MediaStreamSettings::new();
 
         let mut audio_constraints = DeviceAudioTrackConstraints::new();
         audio_constraints.device_id(audio_device.device_id());
@@ -204,7 +204,7 @@ async fn different_constraints_produce_different_streams() {
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build1() {
     let constraints: Option<MultiSourceTracksConstraints> =
-        MediaStreamSettings::default().into();
+        MediaStreamSettings::new().into();
 
     assert!(constraints.is_none());
 }
@@ -213,7 +213,7 @@ async fn multi_source_media_stream_constraints_build1() {
 // Device({audio:true, video:false})
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build2() {
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     constraints.device_audio(DeviceAudioTrackConstraints::new());
 
     let constraints: Option<MultiSourceTracksConstraints> = constraints.into();
@@ -236,7 +236,7 @@ async fn multi_source_media_stream_constraints_build2() {
 // Device({audio:true, video:true})
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build3() {
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     constraints.device_audio(DeviceAudioTrackConstraints::new());
     constraints.device_video(DeviceVideoTrackConstraints::new());
 
@@ -260,7 +260,7 @@ async fn multi_source_media_stream_constraints_build3() {
 // DeviceAndDisplay({audio:true, video:false}, {audio:false, video:display})
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build4() {
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     constraints.device_audio(DeviceAudioTrackConstraints::new());
     constraints.display_video(DisplayVideoTrackConstraints::new());
 
@@ -293,7 +293,7 @@ async fn multi_source_media_stream_constraints_build4() {
 // Device({audio:false, video:true})
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build5() {
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     constraints.device_video(DeviceVideoTrackConstraints::new());
 
     let constraints: Option<MultiSourceTracksConstraints> = constraints.into();
@@ -316,7 +316,7 @@ async fn multi_source_media_stream_constraints_build5() {
 // Display({audio:false, video:true})
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build6() {
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     constraints.display_video(DisplayVideoTrackConstraints::new());
 
     let constraints: Option<MultiSourceTracksConstraints> = constraints.into();
@@ -350,7 +350,7 @@ fn get_device_video_track_constraints() -> DeviceVideoTrackConstraints {
 // Device({audio:true, video:true})
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build7() {
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     constraints.device_audio(DeviceAudioTrackConstraints::new());
     constraints.device_video(get_device_video_track_constraints());
 
@@ -374,7 +374,7 @@ async fn multi_source_media_stream_constraints_build7() {
 // Device({audio:false, video:true})
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build8() {
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     constraints.device_video(get_device_video_track_constraints());
 
     let constraints: Option<MultiSourceTracksConstraints> = constraints.into();
@@ -513,7 +513,7 @@ fn build_constraints(
     audio_device: Option<MediaDeviceInfo>,
     video_device: Option<MediaDeviceInfo>,
 ) -> MediaStreamSettings {
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     if let Some(audio) = audio_device {
         let mut track_constraints = DeviceAudioTrackConstraints::new();
         track_constraints.device_id(audio.device_id());
@@ -537,7 +537,7 @@ async fn simultaneous_device_and_display() {
     let video_device = video_devices().await.unwrap().pop().unwrap();
 
     let constraints = {
-        let mut constraints = MediaStreamSettings::default();
+        let mut constraints = MediaStreamSettings::new();
 
         let mut audio_constraints = DeviceAudioTrackConstraints::new();
         audio_constraints.device_id(audio_device.device_id());
