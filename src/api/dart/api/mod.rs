@@ -391,7 +391,7 @@ pub struct ApiMediaStreamSettings {
 
 impl From<ApiMediaStreamSettings> for media::MediaStreamSettings {
     fn from(value: ApiMediaStreamSettings) -> Self {
-        let mut res = Self::default();
+        let mut res = Self::new();
         if let Some(device_audio) = value.device_audio {
             res.device_audio(device_audio.into());
         }

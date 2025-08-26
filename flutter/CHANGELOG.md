@@ -14,19 +14,13 @@ All user visible changes to this project will be documented in this file. This p
 
 - Bumped up minimum supported [Flutter] version to 3.35. ([#231])
 - Bumped up minimum supported [Dart] version to 3.9. ([#231])
-- Rename `MediaStreamSettings.audio()` to `MediaStreamSettings.deviceAudio()`. ([#225])
-- `RoomHandle.muteAudio()`, `RoomHandle.unmuteAudio()`, `RoomHandle.enableAudio()`, `RoomHandle.disableAudio()`, `RoomHandle.enableRemoteAudio()`, and `RoomHandle.disableRemoteAudio()` now receive an argument to specify `MediaSourceKind`. ([#225])
+- Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.deviceAudio()`. ([#225])
+- `RoomHandle`s `muteAudio`, `unmuteAudio`, `disableAudio`, `enableAudio`, `disableRemoteAudio`, `enableRemoteAudio` no also accept optional `MediaSourceKind`. ([#225])
 
 ### Added
 
-- `MediaStreamSettings.displayAudio()` to configure system audio capture. ([#225])
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
-
-### Changed
-
-- Device audio tracks: ([#225])
-  - `MediaStreamSettings.audio()` renamed to `MediaStreamSettings.deviceAudio()`.
-  - `RoomHandle.muteAudio()`, `RoomHandle.unmuteAudio()`, `RoomHandle.enableAudio()`, `RoomHandle.disableAudio()`, `RoomHandle.enableRemoteAudio()`, and `RoomHandle.disableRemoteAudio()` now receive an argument to specify `MediaSourceKind`.
+- `DisplayAudioTrackConstraints` and `MediaStreamSettings.displayAudio()` to capture system audio (only works in Chrome and Windows desktop). ([#225])
 
 ### Fixed
 

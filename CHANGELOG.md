@@ -10,33 +10,24 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.11.0...master)
 
+### BC Breaks
+
+- Minimal supported version of [`medea-client-api-proto`] is `0.9.0`. ([#199])
+- Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.device_audio()`. ([#225])
+- `RoomHandle`s `mute_audio`, `unmute_audio`, `disable_audio`, `enable_audio`, `disable_remote_audio`, `enable_remote_audio` no also accept optional `MediaSourceKind`. ([#225]) 
+
 ### Added
 
-- Ability to capture system audio tracks: ([#225])
-    - `MediaStreamSettings.display_audio()` to set system audio constraints.
-    - `MediaStreamSettings.get_display_audio()` to get system audio constraints.
-    - `MediaStreamSettings.is_display_audio_enabled()` to indicate whether system audio is enabled.
-    - `AudioSource` to distinguish system audio and device audio in `TrackConstraints`.
-    - `DisplayMediaStreamConstraints.audio()` to set system audio constraints. (only for WASM platform)
-    - `TrackRequestError.ExpectedDisplayAudioTracks` to indicate invalid system audio tracks in `SimpleTracksRequest.parse_tracks()` and `SimpleTracksRequest.merge()`.
-    - `TrackRequestError.TooManyDisplayAudioTracks` to indicate invalid conversion from `TrackRequest` with system audio tracks to `SimpleTracksRequest`.
+- `DisplayAudioTrackConstraints` and `MediaStreamSettings.display_audio()` to capture system audio (only works in Chrome and Windows desktop). ([#225])
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
-
-### Changed
-
-- Device audio tracks: ([#225])
-    - `MediaStreamSettings.audio()` renamed to `MediaStreamSettings.device_audio()`.
-    - `MediaStreamSettings.get_audio()` renamed to `MediaStreamSettings.get_device_audio()`.
-    - `MediaStreamSettings.set_audio_publish()` now receives third argument for source kind of track.
-    - `MediaStreamSettings.is_audio_enabled()` renamed to `MediaStreamSettings.is_device_audio_enabled()`.
-    - `TrackRequestError.ExpectedAudioTracks` renamed to `TrackRequestError.ExpectedDeviceAudioTracks`.
-    - `TrackRequestError.TooManyAudioTracks` renamed to `TrackRequestError.TooManyDeviceAudioTracks`.
-    - `RoomHandle.mute_audio()`, `RoomHandle.unmute_audio()`, `RoomHandle.enable_audio()`, `RoomHandle.disable_audio()`, `RoomHandle.enable_remote_audio()`, and `RoomHandle.disable_remote_audio()` now receive an argument to specify `MediaSourceKind`.
-- Bumped up [MSRV] to 1.86 to be buildable by [`cargo-ndk` 4.0 version]. ([todo])
 
 ### Fixed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
+
+### Changed
+
+- Bumped up [MSRV] to 1.86 to be buildable by [`cargo-ndk` 4.0 version]. ([todo])
 
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
