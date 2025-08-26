@@ -348,7 +348,6 @@ impl State {
     ) -> Result<(), Traced<UpdateLocalStreamError>> {
         let mut criteria = LocalStreamUpdateCriteria::empty();
         let senders = self.senders.get_outdated();
-        log::error!("update_local_stream for {} senders", senders.len());
         for s in &senders {
             criteria.add(s.media_kind(), s.media_source());
         }

@@ -555,15 +555,15 @@ pub struct MediaStreamSettings {
 impl MediaStreamSettings {
     /// Creates new [`MediaStreamSettings`] with none constraints configured.
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             device_audio: AudioTrackConstraints {
-                enabled: false,
+                enabled: true,
                 constraints: None,
                 muted: false,
             },
             display_audio: AudioTrackConstraints {
-                enabled: false,
+                enabled: true,
                 constraints: None,
                 muted: false,
             },
