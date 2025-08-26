@@ -357,7 +357,7 @@ async fn display_audio_track_is_cached() {
 
     let media_manager = MediaManager::default();
     let constraints = {
-        let mut constraints = MediaStreamSettings::default();
+        let mut constraints = MediaStreamSettings::new();
         constraints.display_audio(DisplayAudioTrackConstraints::new());
         constraints.display_video(DisplayVideoTrackConstraints::new());
         constraints
@@ -365,7 +365,7 @@ async fn display_audio_track_is_cached() {
 
     let tracks = media_manager.get_tracks(constraints).await.unwrap();
 
-    assert_eq!(tracks.len(), 2);
+    assert_eq!(tracks.len(), 2); // asdasdasdasdasd
 
     let (mut audio, mut video): (Vec<_>, Vec<_>) =
         tracks.into_iter().partition(|(track, _)| match track.kind() {
@@ -381,7 +381,7 @@ async fn display_audio_track_is_cached() {
 
     // do second request
     let constraints = {
-        let mut constraints = MediaStreamSettings::default();
+        let mut constraints = MediaStreamSettings::new();
         constraints.display_audio(DisplayAudioTrackConstraints::new());
         constraints.display_video(DisplayVideoTrackConstraints::new());
         constraints

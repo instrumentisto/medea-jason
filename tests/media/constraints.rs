@@ -397,7 +397,7 @@ async fn multi_source_media_stream_constraints_build8() {
 // Display({audio:true, video:true})
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build9() {
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     constraints.display_audio(DisplayAudioTrackConstraints::new());
     constraints.display_video(DisplayVideoTrackConstraints::new());
 
@@ -421,7 +421,7 @@ async fn multi_source_media_stream_constraints_build9() {
 // DeviceAndDisplay({audio:true, video:true}, {audio:display, video:display})
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build10() {
-    let mut constraints = MediaStreamSettings::default();
+    let mut constraints = MediaStreamSettings::new();
     constraints.display_audio(DisplayAudioTrackConstraints::new());
     constraints.display_video(DisplayVideoTrackConstraints::new());
     constraints.device_audio(DeviceAudioTrackConstraints::new());
