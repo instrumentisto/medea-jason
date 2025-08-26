@@ -365,7 +365,7 @@ async fn display_audio_track_is_cached() {
 
     let tracks = media_manager.get_tracks(constraints).await.unwrap();
 
-    assert_eq!(tracks.len(), 2); // asdasdasdasdasd
+    assert_eq!(tracks.len(), 2);
 
     let (mut audio, mut video): (Vec<_>, Vec<_>) =
         tracks.into_iter().partition(|(track, _)| match track.kind() {
