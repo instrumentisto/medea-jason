@@ -2232,17 +2232,19 @@ async fn no_updates_sent_if_gum_fails_on_enable() {
     );
 }
 
-/// Tests that error from gUM/gDM request will be returned from the
-/// [`RoomHandle::enable_audio`]/[`RoomHandle::enable_video`].
+/// Tests that error from gUM request will be returned from the
+/// [`RoomHandle::enable_audio`].
 #[wasm_bindgen_test]
-async fn set_media_state_return_media_error() {
+async fn set_media_state_return_media_error_device_audio() {
     const ERROR_MSG: &str = "set_media_state_return_media_error";
 
     let mock = MockNavigator::new();
+    mock.error_get_user_media(ERROR_MSG.into());
+
     let (audio_track, video_track) = get_test_tracks(false, false);
     let (room, _peer, _event_tx, _) = get_test_room_and_exist_peer(
         vec![audio_track, video_track],
-        Some(media_stream_settings(false, false)),
+        Some(media_stream_settings(true, false)),
     )
     .await;
     let room_handle = api::RoomHandle::from(room.new_handle());
@@ -2251,8 +2253,6 @@ async fn set_media_state_return_media_error() {
     )
     .await
     .unwrap();
-
-    mock.error_get_user_media(ERROR_MSG.into());
 
     let err = jsval_cast::<LocalMediaInitException>(
         JsFuture::from(
@@ -2270,6 +2270,66 @@ async fn set_media_state_return_media_error() {
         format!(
             "Failed to get local tracks: MediaDevices.getUserMedia() failed: \
              Error: {ERROR_MSG}",
+        )
+    );
+
+    mock.stop();
+}
+
+/// Tests that error from gDM request will be returned from the
+/// [`RoomHandle::enable_video`].
+#[wasm_bindgen_test]
+async fn set_media_state_return_media_error_display_video() {
+    const ERROR_MSG: &str = "set_media_state_return_media_error";
+
+    let mock = MockNavigator::new();
+    mock.error_get_display_media(ERROR_MSG.into());
+
+    let (audio_track, video_track) = get_test_tracks(false, false);
+    let display_track = Track {
+        id: TrackId(1),
+        direction: Direction::Send {
+            receivers: vec![MemberId::from("bob")],
+            mid: None,
+        },
+        media_direction: medea_jason::media::MediaDirection::SendRecv.into(),
+        muted: false,
+        media_type: MediaType::Video(VideoSettings {
+            required: false,
+            source_kind: MediaSourceKind::Display,
+            encoding_parameters: vec![],
+        }),
+    };
+
+    let (room, _peer, _event_tx, _) = get_test_room_and_exist_peer(
+        vec![audio_track, video_track, display_track],
+        Some(media_stream_settings(false, true)),
+    )
+    .await;
+
+    let room_handle = api::RoomHandle::from(room.new_handle());
+    JsFuture::from(
+        room_handle.disable_video(Some(api::MediaSourceKind::Display)),
+    )
+    .await
+    .unwrap();
+
+    let err = jsval_cast::<LocalMediaInitException>(
+        JsFuture::from(
+            room_handle.enable_video(Some(api::MediaSourceKind::Display)),
+        )
+        .await
+        .unwrap_err(),
+        "LocalMediaInitException",
+    )
+    .unwrap();
+
+    assert_eq!(err.kind(), LocalMediaInitExceptionKind::GetDisplayMediaFailed);
+    assert_eq!(
+        err.message(),
+        format!(
+            "Failed to get local tracks: `MediaDevices.getDisplayMedia()` \
+            failed: Error: {ERROR_MSG}",
         )
     );
 

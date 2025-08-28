@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use medea_client_api_proto::{MediaSourceKind, VideoSettings};
+use medea_client_api_proto::MediaSourceKind;
 use medea_jason::media::{
     DeviceAudioTrackConstraints, DeviceVideoTrackConstraints,
     DisplayAudioTrackConstraints, DisplayVideoTrackConstraints, MediaKind,
@@ -335,24 +335,13 @@ async fn multi_source_media_stream_constraints_build6() {
     };
 }
 
-fn get_device_video_track_constraints() -> DeviceVideoTrackConstraints {
-    match VideoSource::from(VideoSettings {
-        required: true,
-        source_kind: MediaSourceKind::Device,
-        encoding_parameters: Vec::new(),
-    }) {
-        VideoSource::Device(device) => device,
-        _ => unreachable!(),
-    }
-}
-
 // Make sure that MediaStreamConstraints{audio:true, video:any} =>
 // Device({audio:true, video:true})
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build7() {
     let mut constraints = MediaStreamSettings::new();
     constraints.device_audio(DeviceAudioTrackConstraints::new());
-    constraints.device_video(get_device_video_track_constraints());
+    constraints.device_video(DeviceVideoTrackConstraints::new());
 
     let constraints: Option<MultiSourceTracksConstraints> = constraints.into();
 
@@ -370,12 +359,12 @@ async fn multi_source_media_stream_constraints_build7() {
     };
 }
 
-// Make sure that MediaStreamConstraints{audio:false, video:any} =>
-// Device({audio:false, video:true})
+// Make sure that MediaStreamConstraints { audio: false, video: any } =>
+// MultiSourceTracksConstraints::Device({ audio: false, video: true}).
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build8() {
     let mut constraints = MediaStreamSettings::new();
-    constraints.device_video(get_device_video_track_constraints());
+    constraints.device_video(DeviceVideoTrackConstraints::new());
 
     let constraints: Option<MultiSourceTracksConstraints> = constraints.into();
 
@@ -393,8 +382,8 @@ async fn multi_source_media_stream_constraints_build8() {
     };
 }
 
-// Make sure that MediaStreamConstraints{audio:display, video:display} =>
-// Display({audio:true, video:true})
+// Make sure that MediaStreamConstraints {audio:display, video:display } =>
+// MultiSourceTracksConstraints::Display({audio:true, video:true}).
 #[wasm_bindgen_test]
 async fn multi_source_media_stream_constraints_build9() {
     let mut constraints = MediaStreamSettings::new();
@@ -425,7 +414,7 @@ async fn multi_source_media_stream_constraints_build10() {
     constraints.display_audio(DisplayAudioTrackConstraints::new());
     constraints.display_video(DisplayVideoTrackConstraints::new());
     constraints.device_audio(DeviceAudioTrackConstraints::new());
-    constraints.device_video(get_device_video_track_constraints());
+    constraints.device_video(DeviceVideoTrackConstraints::new());
 
     let constraints: Option<MultiSourceTracksConstraints> = constraints.into();
 
