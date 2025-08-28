@@ -227,6 +227,8 @@ impl LocalTracksConstraints {
     /// Returns [`LocalStreamUpdateCriteria`] with [`MediaKind`] and
     /// [`MediaSourceKind`] which are different in the provided
     /// [`MediaStreamSettings`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub fn calculate_kinds_diff(
         &self,
@@ -270,6 +272,8 @@ impl LocalTracksConstraints {
 
     /// Indicates whether provided [`MediaType`] is enabled in the underlying
     /// [`MediaStreamSettings`].
+    ///
+    /// [`MediaType`]: proto::MediaType
     #[must_use]
     pub fn enabled(&self, kind: &proto::MediaType) -> bool {
         self.0.borrow().enabled(kind)
@@ -277,6 +281,8 @@ impl LocalTracksConstraints {
 
     /// Indicates whether provided [`MediaType`] is muted in the underlying
     /// [`MediaStreamSettings`].
+    ///
+    /// [`MediaType`]: proto::MediaType
     #[must_use]
     pub fn muted(&self, kind: &proto::MediaType) -> bool {
         self.0.borrow().muted(kind)
@@ -284,6 +290,8 @@ impl LocalTracksConstraints {
 
     /// Indicates whether the provided [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled and constrained in this [`LocalTracksConstraints`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub fn is_track_enabled_and_constrained(
         &self,
@@ -295,6 +303,8 @@ impl LocalTracksConstraints {
 
     /// Indicates whether the provided [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled in this [`LocalTracksConstraints`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub fn is_track_enabled(
         &self,
@@ -305,11 +315,10 @@ impl LocalTracksConstraints {
     }
 }
 
-/// [MediaTrackConstraints][1] for a media track of a specific type
-/// ([`DeviceAudioTrackConstraints`], [`DisplayAudioTrackConstraints`],
-/// [`DeviceVideoTrackConstraints`], [`DeviceVideoTrackConstraints`]) with
+/// [MediaTrackConstraints][1] for a media track of a specific type with
 /// additional runtime indications of whether this track is `enabled` or
 /// `muted`.
+///
 /// [1]: https://w3.org/TR/mediacapture-streams#media-track-constraints
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MediaTrackConstraints<C> {
@@ -580,6 +589,8 @@ impl MediaStreamSettings {
     /// Returns [`LocalStreamUpdateCriteria`] with [`MediaKind`] and
     /// [`MediaSourceKind`] which are different in the provided
     /// [`MediaStreamSettings`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub fn calculate_kinds_diff(
         &self,
@@ -782,6 +793,8 @@ impl MediaStreamSettings {
 
     /// Sets the underlying [`MediaTrackConstraints`] basing on the provided
     /// [`MediaSourceKind`] to the given value.
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     pub const fn set_video_publish(
         &mut self,
         enabled: bool,
@@ -831,6 +844,8 @@ impl MediaStreamSettings {
 
     /// Indicates whether the given [`MediaType`] is enabled and constrained in
     /// this [`MediaStreamSettings`].
+    ///
+    /// [`MediaType`]: proto::MediaType
     #[must_use]
     pub const fn enabled(&self, kind: &proto::MediaType) -> bool {
         match kind {
@@ -849,6 +864,8 @@ impl MediaStreamSettings {
 
     /// Indicates whether the given [`MediaType`] is muted in this
     /// [`MediaStreamSettings`].
+    ///
+    /// [`MediaType`]: proto::MediaType
     #[must_use]
     pub const fn muted(&self, kind: &proto::MediaType) -> bool {
         match kind {
@@ -865,6 +882,8 @@ impl MediaStreamSettings {
 
     /// Indicates whether the given [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled and constrained in this [`MediaStreamSettings`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub const fn is_track_enabled_and_constrained(
         &self,
@@ -895,6 +914,8 @@ impl MediaStreamSettings {
 
     /// Indicates whether the given [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled in this [`MediaStreamSettings`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub const fn is_track_enabled(
         &self,
