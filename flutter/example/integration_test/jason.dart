@@ -579,6 +579,11 @@ void main() {
   testWidgets('getDisplayMedia with display video and audio', (
     WidgetTester tester,
   ) async {
+    if (Platform.isIOS || Platform.isAndroid) {
+      // Screen-sharing not supported on mobile platforms.
+      return;
+    }
+
     var jason = await Jason.init();
     var mediaManager = jason.mediaManager();
 
