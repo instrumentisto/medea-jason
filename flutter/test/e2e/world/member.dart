@@ -358,7 +358,7 @@ class Member {
   /// Waits for a `count` of [RemoteMediaTrack]s from the [Member] with the
   /// provided [id].
   Future<void> waitForTrackCount(String id, int count) async {
-    if (connectionStore.remoteTracks[id]!.length != count) {
+    if (connectionStore.remoteTracks[id]!.length < count) {
       var trackCompl = Completer();
       connectionStore.onRemoteTrack[id] = (_) {
         if (connectionStore.remoteTracks[id]!.length >= count) {

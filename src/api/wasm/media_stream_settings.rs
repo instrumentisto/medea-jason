@@ -39,6 +39,18 @@ impl MediaStreamSettings {
     /// Specifies the nature and settings of a display audio
     /// [MediaStreamTrack][1].
     ///
+    /// __NOTE__: Behaviour is platform dependent and there is no propper
+    /// feature check. It is known to only work in Chrome and Chrome-based
+    /// browsers. It must always be coupled with a
+    /// [`DisplayVideoTrackConstraints`], meaning that system audio capture
+    /// prompt is a part of the screen-sharing prompt, so if you try to request
+    /// `display_audio` without `display_video` the request will be rejected by
+    /// UA.
+    ///
+    /// It is also OS dependent:
+    /// 1. Only `Chrome-tab` audio can be captured on macOS and Linux.
+    /// 2. Both `Chrome-tab` and `Entire screen` audio can be captured on
+    ///    Windows.
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     pub fn display_audio(&mut self, constraints: DisplayAudioTrackConstraints) {
         self.0.display_audio(constraints.into());

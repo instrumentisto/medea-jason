@@ -12,7 +12,6 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Minimal supported version of [`medea-client-api-proto`] is `0.9.0`. ([#199])
 - Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.device_audio()`. ([#225])
 - `RoomHandle`s `mute_audio`, `unmute_audio`, `disable_audio`, `enable_audio`, `disable_remote_audio`, `enable_remote_audio` no also accept optional `MediaSourceKind`. ([#225]) 
 
