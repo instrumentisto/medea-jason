@@ -18,8 +18,8 @@ abstract class MediaStreamSettings implements SyncPlatformHandle {
   /// check. It is known to only work in Chrome and Chrome-based browsers. It
   /// must always be coupled with a `DisplayVideoTrackConstraints`, meaning
   /// that system audio capture prompt is a part of the screen-sharing prompt,
-  /// so if you try to request `displayAudio` without `deviceVideo` the request
-  /// will be rejected by UA.
+  /// so if you try to request `displayAudio` without `deviceVideo` the UA will
+  /// ask user for screen capture track anyway.
   ///
   /// It is also OS dependent:
   /// 1. Only `Chrome-tab` audio can be captured on macOS and Linux.

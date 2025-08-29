@@ -87,7 +87,7 @@ mod constraints {
             video: Dart_Handle,
         ) -> Result<(), Error>;
 
-        /// Specifies the provided nature and settings of an `audio`
+        /// Specifies the provided nature and settings of a device `audio`
         /// [MediaStreamTrack][1] to the given [MediaStreamConstraints][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints

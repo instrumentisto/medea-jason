@@ -217,7 +217,6 @@ impl SimpleTracksRequest {
                 }
             }
         }
-
         if let Some((id, device_video)) = &self.device_video {
             if let Some(track) = device_video_tracks.into_iter().next() {
                 if device_video.satisfies(track.as_ref()).await {

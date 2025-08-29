@@ -1286,7 +1286,6 @@ pub struct DeviceAudioTrackConstraints {
 }
 
 /// Constraints applicable to display audio tracks (system audio capture).
-/// Display audio does not support audio processing features.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct DisplayAudioTrackConstraints {
     /// Importance of this [`DisplayAudioTrackConstraints`].

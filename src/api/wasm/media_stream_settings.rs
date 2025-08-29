@@ -44,8 +44,8 @@ impl MediaStreamSettings {
     /// browsers. It must always be coupled with a
     /// [`DisplayVideoTrackConstraints`], meaning that system audio capture
     /// prompt is a part of the screen-sharing prompt, so if you try to request
-    /// `display_audio` without `display_video` the request will be rejected by
-    /// UA.
+    /// `display_audio` without `display_video` the UA will ask user for screen
+    /// capture track anyway.
     ///
     /// It is also OS dependent:
     /// 1. Only `Chrome-tab` audio can be captured on macOS and Linux.
@@ -140,7 +140,6 @@ impl DeviceAudioTrackConstraints {
 }
 
 /// Constraints applicable to display audio tracks (system audio capture).
-/// Display audio does not support audio processing features.
 #[wasm_bindgen]
 #[derive(Copy, Clone, Debug, From, Into)]
 pub struct DisplayAudioTrackConstraints(media::DisplayAudioTrackConstraints);
@@ -156,8 +155,8 @@ impl DisplayAudioTrackConstraints {
     }
 }
 
-/// Constraints applicable to video tracks that are sourced from some media
-/// device.
+/// Constraints applicable to audio tracks sourced from a system audio recording
+/// device, usually a microphone.
 #[wasm_bindgen]
 #[derive(Debug, From, Into)]
 pub struct DeviceVideoTrackConstraints(media::DeviceVideoTrackConstraints);

@@ -60,7 +60,8 @@ sealed class ApiConstrainFacingMode with _$ApiConstrainFacingMode {
       ApiConstrainFacingMode_Ideal;
 }
 
-/// Constraints applicable to device audio tracks (microphone).
+/// Constraints applicable to audio tracks sourced from a system audio recodring
+/// device, usually a microphone.
 class ApiDeviceAudioTrackConstraints {
   /// Identifier of the device generating the content for the media track.
   String? deviceId;

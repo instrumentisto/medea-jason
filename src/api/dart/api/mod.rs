@@ -153,7 +153,8 @@ pub struct ApiMediaDisplayDetails {
     pub title: Option<String>,
 }
 
-/// Constraints applicable to device audio tracks (microphone).
+/// Constraints applicable to audio tracks sourced from a system audio recodring
+/// device, usually a microphone.
 #[derive(Debug)]
 #[frb]
 pub struct ApiDeviceAudioTrackConstraints {
@@ -210,7 +211,7 @@ impl From<ApiDeviceAudioTrackConstraints>
 #[derive(Debug)]
 #[frb]
 pub struct ApiDisplayAudioTrackConstraints {
-    // No option at the moment.
+    // No options at the moment.
 }
 
 impl From<ApiDisplayAudioTrackConstraints>
