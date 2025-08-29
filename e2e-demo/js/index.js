@@ -154,6 +154,7 @@ let closeApp = document.getElementById('control__close_app');
 let audioSelect = document.getElementById('connect__select-device_audio');
 let videoSelect = document.getElementById('connect__select-device_video');
 let screenshareSwitchEl = document.getElementById('connection-settings__screenshare');
+let screenshareAudioSwitchEl = document.getElementById('connection-settings__screenshare-audio');
 let disableAudioGainControlSwitchEl = document.getElementById('connection-settings__audio_gain_control');
 let localVideo = document.getElementById('local-video');
 
@@ -746,7 +747,9 @@ window.onload = async function() {
           constraints.device_video(video);
           if (screenshareSwitchEl.checked) {
             constraints.display_video(new rust.DisplayVideoTrackConstraints());
-            constraints.display_audio(new rust.DisplayAudioTrackConstraints());
+            if (screenshareAudioSwitchEl.checked) {
+              constraints.display_audio(new rust.DisplayAudioTrackConstraints());
+            }
           }
         }
       } else {
@@ -1034,19 +1037,19 @@ window.onload = async function() {
   try {
     let audioSwitch = async () => {
       try {
-            let constraints = await build_constraints(audioSelect, videoSelect);
-            for (const track of localTracks) {
-              if (track.ptr > 0) {
-                track.free();
-              }
-            }
-            if (!isAudioSendEnabled) {
-              constraints = await initLocalStream();
-            }
-            await room.set_local_media_settings(constraints, true, true);
-          } catch (e) {
-            console.error('Changing audio source failed: ' + e);
+        let constraints = await build_constraints(audioSelect, videoSelect);
+        for (const track of localTracks) {
+          if (track.ptr > 0) {
+            track.free();
           }
+        }
+        if (!isAudioSendEnabled) {
+          constraints = await initLocalStream();
+        }
+        await room.set_local_media_settings(constraints, true, true);
+      } catch (e) {
+        console.error('Changing audio source failed: ' + e);
+      }
     };
     audioSelect.addEventListener('change', audioSwitch);
     disableAudioGainControlSwitchEl.addEventListener('change', audioSwitch);
@@ -1065,8 +1068,10 @@ window.onload = async function() {
           }
           await room.set_local_media_settings(constraints, true, true);
           if (screenshareSwitchEl.checked) {
-              await room.enable_video(rust.MediaSourceKind.Display);
+            await room.enable_video(rust.MediaSourceKind.Display);
+            if (screenshareAudioSwitchEl.checked) {
               await room.enable_audio(rust.MediaSourceKind.Display);
+            }
           }
         } catch (e) {
           let name = e.kind();
@@ -1242,8 +1247,8 @@ window.onload = async function() {
     usernameInput.value = faker.name.firstName();
     usernameMenuButton.innerHTML = usernameInput.value;
 
-    let bindJoinButtons = function(roomId) {
-      joinCallerButton.onclick = async function() {
+    let bindJoinButtons = function (roomId) {
+      joinCallerButton.onclick = async function () {
         $('#connection-settings').modal('hide');
         $('.control').css('display', 'flex');
         $('#connect-btn').hide();
@@ -1264,8 +1269,8 @@ window.onload = async function() {
         } catch (e) {
           console.error(e);
           console.error(
-            'Join to room failed: Error[name:[', e.kind(), '], ',
-            '[msg:', e.message(), '], [source', e.cause(), ']]',
+              'Join to room failed: Error[name:[', e.kind(), '], ',
+              '[msg:', e.message(), '], [source', e.cause(), ']]',
           );
           console.error(e.trace());
         }
