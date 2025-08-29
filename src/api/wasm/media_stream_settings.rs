@@ -51,6 +51,7 @@ impl MediaStreamSettings {
     /// 1. Only `Chrome-tab` audio can be captured on macOS and Linux.
     /// 2. Both `Chrome-tab` and `Entire screen` audio can be captured on
     ///    Windows.
+    ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     pub fn display_audio(&mut self, constraints: DisplayAudioTrackConstraints) {
         self.0.display_audio(constraints.into());
