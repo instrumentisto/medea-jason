@@ -963,6 +963,13 @@ window.onload = async function() {
         remote_videos[remoteMemberId].remove();
         delete remote_videos[remoteMemberId];
       });
+
+      connection.on_state_change((state) => {
+        console.info(
+            `Connection with ${remoteMemberId} on_state_change to ` +
+              `${rust.MemberConnectionStateKind[state.kind()]}::${rust.PeerConnectionState[state.value()]}`
+        );
+      })
     });
 
     room.on_local_track((track) => {

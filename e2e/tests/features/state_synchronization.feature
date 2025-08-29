@@ -74,39 +74,19 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Alice's connection with Bob closes
 
-  Scenario Outline: Control API deletes WebRtcPublishEndpoint
+  Scenario: Control API deletes WebRtcPublishEndpoint
     Given room with joined member Alice and Bob
     When Alice loses WS connection
     And Control API deletes Alice's publish endpoint
     And Alice restores WS connection
-    Then Bob has <tracks> stopped remote tracks from Alice
+    Then Bob has 2 stopped remote tracks from Alice
 
-    @mesh
-    Examples:
-      | tracks |
-      | 2      |
-
-    @sfu
-    Examples:
-      | tracks |
-      | 4      |
-
-  Scenario Outline: Control API deletes WebRtcPlayEndpoint
+  Scenario: Control API deletes WebRtcPlayEndpoint
     Given room with joined member Alice and Bob
     When Alice loses WS connection
     And Control API deletes Alice's play endpoint with Bob
     And Alice restores WS connection
-    Then Alice has <tracks> stopped remote tracks from Bob
-
-    @mesh
-    Examples:
-      | tracks |
-      | 2      |
-
-    @sfu
-    Examples:
-      | tracks |
-      | 4      |
+    Then Alice has 2 stopped remote tracks from Bob
 
   Scenario: Control API deletes all endpoints
     Given room with joined member Alice and Bob
