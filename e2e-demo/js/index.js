@@ -1037,19 +1037,19 @@ window.onload = async function() {
   try {
     let audioSwitch = async () => {
       try {
-        let constraints = await build_constraints(audioSelect, videoSelect);
-        for (const track of localTracks) {
-          if (track.ptr > 0) {
-            track.free();
+            let constraints = await build_constraints(audioSelect, videoSelect);
+            for (const track of localTracks) {
+              if (track.ptr > 0) {
+                track.free();
+              }
+            }
+            if (!isAudioSendEnabled) {
+              constraints = await initLocalStream();
+            }
+            await room.set_local_media_settings(constraints, true, true);
+          } catch (e) {
+            console.error('Changing audio source failed: ' + e);
           }
-        }
-        if (!isAudioSendEnabled) {
-          constraints = await initLocalStream();
-        }
-        await room.set_local_media_settings(constraints, true, true);
-      } catch (e) {
-        console.error('Changing audio source failed: ' + e);
-      }
     };
     audioSelect.addEventListener('change', audioSwitch);
     disableAudioGainControlSwitchEl.addEventListener('change', audioSwitch);
@@ -1247,8 +1247,8 @@ window.onload = async function() {
     usernameInput.value = faker.name.firstName();
     usernameMenuButton.innerHTML = usernameInput.value;
 
-    let bindJoinButtons = function (roomId) {
-      joinCallerButton.onclick = async function () {
+    let bindJoinButtons = function(roomId) {
+      joinCallerButton.onclick = async function() {
         $('#connection-settings').modal('hide');
         $('.control').css('display', 'flex');
         $('#connect-btn').hide();
@@ -1269,8 +1269,8 @@ window.onload = async function() {
         } catch (e) {
           console.error(e);
           console.error(
-              'Join to room failed: Error[name:[', e.kind(), '], ',
-              '[msg:', e.message(), '], [source', e.cause(), ']]',
+            'Join to room failed: Error[name:[', e.kind(), '], ',
+            '[msg:', e.message(), '], [source', e.cause(), ']]',
           );
           console.error(e.trace());
         }
