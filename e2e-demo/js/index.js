@@ -143,6 +143,8 @@ let usernameMenuButton = document.getElementById('username-menu-button');
 let disableAudioSend = document.getElementById('control__disable_audio_send');
 let disableVideoSend = document.getElementById('control__disable_video_send');
 let disableAudioRecv = document.getElementById('control__disable_audio_recv');
+let disableDisplayAudioRecv = document.getElementById('control__disable_display_audio_recv');
+let disableDeviceAudioRecv = document.getElementById('control__disable_device_audio_recv');
 let disableVideoRecv = document.getElementById('control__disable_video_recv');
 let disableDisplayVideoRecv = document.getElementById('control__disable_display_video_recv');
 let disableCameraDisplayVideoRecv = document.getElementById('control__disable_camera_video_recv');
@@ -152,6 +154,7 @@ let closeApp = document.getElementById('control__close_app');
 let audioSelect = document.getElementById('connect__select-device_audio');
 let videoSelect = document.getElementById('connect__select-device_video');
 let screenshareSwitchEl = document.getElementById('connection-settings__screenshare');
+let screenshareAudioSwitchEl = document.getElementById('connection-settings__screenshare-audio');
 let disableAudioGainControlSwitchEl = document.getElementById('connection-settings__audio_gain_control');
 let localVideo = document.getElementById('local-video');
 
@@ -633,6 +636,8 @@ window.onload = async function() {
   let isAudioSendEnabled = true;
   let isVideoSendEnabled = true;
   let isAudioRecvEnabled = true;
+  let isDisplayAudioRecvEnabled = true;
+  let isDeviceAudioRecvEnabled = true;
   let isVideoRecvEnabled = true;
   let isDisplayVideoRecvEnabled = true;
   let isCameraVideoRecvEnabled = true;
@@ -715,13 +720,13 @@ window.onload = async function() {
   async function build_constraints(audio_select, video_select) {
     let constraints = new rust.MediaStreamSettings();
     if (audio_select != null) {
-      let audio = new rust.AudioTrackConstraints();
+      let audio = new rust.DeviceAudioTrackConstraints();
       let audioSource = audio_select.options[audio_select.selectedIndex];
       if (audioSource) {
         audio.device_id(audioSource.value);
       }
       audio.exact_auto_gain_control(!disableAudioGainControlSwitchEl.checked);
-      constraints.audio(audio);
+      constraints.device_audio(audio);
     }
 
     if (video_select != null) {
@@ -742,6 +747,9 @@ window.onload = async function() {
           constraints.device_video(video);
           if (screenshareSwitchEl.checked) {
             constraints.display_video(new rust.DisplayVideoTrackConstraints());
+            if (screenshareAudioSwitchEl.checked) {
+              constraints.display_audio(new rust.DisplayAudioTrackConstraints());
+            }
           }
         }
       } else {
@@ -893,21 +901,39 @@ window.onload = async function() {
             playElement.firstChild.srcObject = mediaStream;
           }
         } else {
-          playElement = memberVideoDiv.getElementsByClassName('audio')[0];
-          if (playElement === undefined) {
-            playElement = document.createElement('audio');
-            playElement.classList.add('audio', 'order-3');
-            playElement.controls = 'true';
-            playElement.autoplay = 'true';
-            if (track.media_direction() != 0) {
-              playElement.pause();
-              playElement.style.display = 'none';
+          if (track.media_source_kind() === rust.MediaSourceKind.Display) {
+            playElement = memberVideoDiv.getElementsByClassName('display-audio')[0];
+            if (playElement === undefined) {
+              playElement = document.createElement('audio');
+              playElement.classList.add('display-audio', 'order-3');
+              playElement.controls = 'true';
+              playElement.autoplay = 'true';
+              if (track.media_direction() !== 0) {
+                playElement.pause();
+                playElement.style.display = 'none';
+              }
+              memberVideoDiv.appendChild(playElement);
             }
-            memberVideoDiv.appendChild(playElement);
+            let mediaStream = new MediaStream();
+            mediaStream.addTrack(track.get_track());
+            playElement.srcObject = mediaStream;
+          } else {
+            playElement = memberVideoDiv.getElementsByClassName('device-audio')[0];
+            if (playElement === undefined) {
+              playElement = document.createElement('audio');
+              playElement.classList.add('device-audio', 'order-3');
+              playElement.controls = 'true';
+              playElement.autoplay = 'true';
+              if (track.media_direction() !== 0) {
+                playElement.pause();
+                playElement.style.display = 'none';
+              }
+              memberVideoDiv.appendChild(playElement);
+            }
+            let mediaStream = new MediaStream();
+            mediaStream.addTrack(track.get_track());
+            playElement.srcObject = mediaStream;
           }
-          let mediaStream = new MediaStream();
-          mediaStream.addTrack(track.get_track());
-          playElement.srcObject = mediaStream;
         }
 
         track.on_media_direction_changed(async (direction) => {
@@ -940,6 +966,13 @@ window.onload = async function() {
         remote_videos[remoteMemberId].remove();
         delete remote_videos[remoteMemberId];
       });
+
+      connection.on_state_change((state) => {
+        console.info(
+            `Connection with ${remoteMemberId} on_state_change to ` +
+              `${rust.MemberConnectionStateKind[state.kind()]}::${rust.PeerConnectionState[state.value()]}`
+        );
+      })
     });
 
     room.on_local_track((track) => {
@@ -1036,6 +1069,9 @@ window.onload = async function() {
           await room.set_local_media_settings(constraints, true, true);
           if (screenshareSwitchEl.checked) {
             await room.enable_video(rust.MediaSourceKind.Display);
+            if (screenshareAudioSwitchEl.checked) {
+              await room.enable_audio(rust.MediaSourceKind.Display);
+            }
           }
         } catch (e) {
           let name = e.kind();
@@ -1142,44 +1178,66 @@ window.onload = async function() {
       if (isAudioRecvEnabled) {
         await room.disable_remote_audio();
         isAudioRecvEnabled = false;
-        disableAudioRecv.textContent = 'Enable audio recv'
+        disableAudioRecv.textContent = 'Enable audio recv';
       } else {
         await room.enable_remote_audio();
         isAudioRecvEnabled = true;
-        disableAudioRecv.textContent = 'Disable audio recv'
+        disableAudioRecv.textContent = 'Disable audio recv';
+      }
+    });
+    disableDisplayAudioRecv.addEventListener('click', async () => {
+      if (isDisplayAudioRecvEnabled) {
+        await room.disable_remote_audio(rust.MediaSourceKind.Display);
+        isDisplayAudioRecvEnabled = false;
+        disableDisplayAudioRecv.textContent = 'Enable display audio recv';
+      } else {
+        await room.enable_remote_audio(rust.MediaSourceKind.Display);
+        isDisplayAudioRecvEnabled = true;
+        disableDisplayAudioRecv.textContent = 'Disable display audio recv';
+      }
+    });
+    disableDeviceAudioRecv.addEventListener('click', async () => {
+      if (isDeviceAudioRecvEnabled) {
+        await room.disable_remote_audio(rust.MediaSourceKind.Device);
+        isDeviceAudioRecvEnabled = false;
+        disableDeviceAudioRecv.textContent = 'Enable device audio recv';
+      } else {
+        await room.enable_remote_audio(rust.MediaSourceKind.Device);
+        isDeviceAudioRecvEnabled = true;
+        disableDeviceAudioRecv.textContent = 'Disable device audio recv';
       }
     });
     disableVideoRecv.addEventListener('click', async () => {
       if (isVideoRecvEnabled) {
         await room.disable_remote_video();
         isVideoRecvEnabled = false;
-        disableVideoRecv.textContent = 'Enable video recv'
+        disableVideoRecv.textContent = 'Enable video recv';
       } else {
         await room.enable_remote_video();
         isVideoRecvEnabled = true;
-        disableVideoRecv.textContent = 'Disable video recv'
+        disableVideoRecv.textContent = 'Disable video recv';
       }
     });
     disableDisplayVideoRecv.addEventListener('click', async () => {
       if (isDisplayVideoRecvEnabled) {
         await room.disable_remote_video(rust.MediaSourceKind.Display);
         isDisplayVideoRecvEnabled = false;
-        disableDisplayVideoRecv.textContent = 'Enable display video recv'
+        disableDisplayVideoRecv.textContent = 'Enable display video recv';
       } else {
         await room.enable_remote_video(rust.MediaSourceKind.Display);
         isDisplayVideoRecvEnabled = true;
-        disableDisplayVideoRecv.textContent = 'Disable display video recv'
+        disableDisplayVideoRecv.textContent = 'Disable display video recv';
       }
     });
     disableCameraDisplayVideoRecv.addEventListener('click', async () => {
       if (isCameraVideoRecvEnabled) {
         await room.disable_remote_video(rust.MediaSourceKind.Device);
         isCameraVideoRecvEnabled = false;
-        disableCameraDisplayVideoRecv.textContent = 'Enable camera video recv'
+        disableCameraDisplayVideoRecv.textContent = 'Enable camera video recv';
       } else {
         await room.enable_remote_video(rust.MediaSourceKind.Device);
         isCameraVideoRecvEnabled = true;
-        disableCameraDisplayVideoRecv.textContent = 'Disable camera video recv'
+        disableCameraDisplayVideoRecv.textContent = 'Disable camera video recv';
       }
     });
     closeApp.addEventListener('click', () => {

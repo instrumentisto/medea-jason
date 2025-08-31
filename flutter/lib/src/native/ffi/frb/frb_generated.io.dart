@@ -199,15 +199,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ForeignClass dco_decode_TraitDef_ForeignClass(dynamic raw);
 
   @protected
-  ApiAudioConstraints dco_decode_api_audio_constraints(dynamic raw);
+  ApiConstrainFacingMode dco_decode_api_constrain_facing_mode(dynamic raw);
 
   @protected
-  ApiConstrainFacingMode dco_decode_api_constrain_facing_mode(dynamic raw);
+  ApiDeviceAudioTrackConstraints dco_decode_api_device_audio_track_constraints(
+    dynamic raw,
+  );
 
   @protected
   ApiDeviceVideoTrackConstraints dco_decode_api_device_video_track_constraints(
     dynamic raw,
   );
+
+  @protected
+  ApiDisplayAudioTrackConstraints
+  dco_decode_api_display_audio_track_constraints(dynamic raw);
 
   @protected
   ApiDisplayVideoTrackConstraints
@@ -226,16 +232,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_bool(dynamic raw);
 
   @protected
-  ApiAudioConstraints dco_decode_box_autoadd_api_audio_constraints(dynamic raw);
-
-  @protected
   ApiConstrainFacingMode dco_decode_box_autoadd_api_constrain_facing_mode(
     dynamic raw,
   );
 
   @protected
+  ApiDeviceAudioTrackConstraints
+  dco_decode_box_autoadd_api_device_audio_track_constraints(dynamic raw);
+
+  @protected
   ApiDeviceVideoTrackConstraints
   dco_decode_box_autoadd_api_device_video_track_constraints(dynamic raw);
+
+  @protected
+  ApiDisplayAudioTrackConstraints
+  dco_decode_box_autoadd_api_display_audio_track_constraints(dynamic raw);
 
   @protected
   ApiDisplayVideoTrackConstraints
@@ -330,18 +341,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String? dco_decode_opt_String(dynamic raw);
 
   @protected
-  ApiAudioConstraints? dco_decode_opt_box_autoadd_api_audio_constraints(
-    dynamic raw,
-  );
-
-  @protected
   ApiConstrainFacingMode? dco_decode_opt_box_autoadd_api_constrain_facing_mode(
     dynamic raw,
   );
 
   @protected
+  ApiDeviceAudioTrackConstraints?
+  dco_decode_opt_box_autoadd_api_device_audio_track_constraints(dynamic raw);
+
+  @protected
   ApiDeviceVideoTrackConstraints?
   dco_decode_opt_box_autoadd_api_device_video_track_constraints(dynamic raw);
+
+  @protected
+  ApiDisplayAudioTrackConstraints?
+  dco_decode_opt_box_autoadd_api_display_audio_track_constraints(dynamic raw);
 
   @protected
   ApiDisplayVideoTrackConstraints?
@@ -523,12 +537,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
-  ApiAudioConstraints sse_decode_api_audio_constraints(
+  ApiConstrainFacingMode sse_decode_api_constrain_facing_mode(
     SseDeserializer deserializer,
   );
 
   @protected
-  ApiConstrainFacingMode sse_decode_api_constrain_facing_mode(
+  ApiDeviceAudioTrackConstraints sse_decode_api_device_audio_track_constraints(
     SseDeserializer deserializer,
   );
 
@@ -536,6 +550,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ApiDeviceVideoTrackConstraints sse_decode_api_device_video_track_constraints(
     SseDeserializer deserializer,
   );
+
+  @protected
+  ApiDisplayAudioTrackConstraints
+  sse_decode_api_display_audio_track_constraints(SseDeserializer deserializer);
 
   @protected
   ApiDisplayVideoTrackConstraints
@@ -560,18 +578,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
-  ApiAudioConstraints sse_decode_box_autoadd_api_audio_constraints(
+  ApiConstrainFacingMode sse_decode_box_autoadd_api_constrain_facing_mode(
     SseDeserializer deserializer,
   );
 
   @protected
-  ApiConstrainFacingMode sse_decode_box_autoadd_api_constrain_facing_mode(
+  ApiDeviceAudioTrackConstraints
+  sse_decode_box_autoadd_api_device_audio_track_constraints(
     SseDeserializer deserializer,
   );
 
   @protected
   ApiDeviceVideoTrackConstraints
   sse_decode_box_autoadd_api_device_video_track_constraints(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ApiDisplayAudioTrackConstraints
+  sse_decode_box_autoadd_api_display_audio_track_constraints(
     SseDeserializer deserializer,
   );
 
@@ -680,18 +705,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String? sse_decode_opt_String(SseDeserializer deserializer);
 
   @protected
-  ApiAudioConstraints? sse_decode_opt_box_autoadd_api_audio_constraints(
+  ApiConstrainFacingMode? sse_decode_opt_box_autoadd_api_constrain_facing_mode(
     SseDeserializer deserializer,
   );
 
   @protected
-  ApiConstrainFacingMode? sse_decode_opt_box_autoadd_api_constrain_facing_mode(
+  ApiDeviceAudioTrackConstraints?
+  sse_decode_opt_box_autoadd_api_device_audio_track_constraints(
     SseDeserializer deserializer,
   );
 
   @protected
   ApiDeviceVideoTrackConstraints?
   sse_decode_opt_box_autoadd_api_device_video_track_constraints(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ApiDisplayAudioTrackConstraints?
+  sse_decode_opt_box_autoadd_api_display_audio_track_constraints(
     SseDeserializer deserializer,
   );
 
@@ -906,20 +938,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
-  void sse_encode_api_audio_constraints(
-    ApiAudioConstraints self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_api_constrain_facing_mode(
     ApiConstrainFacingMode self,
     SseSerializer serializer,
   );
 
   @protected
+  void sse_encode_api_device_audio_track_constraints(
+    ApiDeviceAudioTrackConstraints self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_api_device_video_track_constraints(
     ApiDeviceVideoTrackConstraints self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_api_display_audio_track_constraints(
+    ApiDisplayAudioTrackConstraints self,
     SseSerializer serializer,
   );
 
@@ -951,20 +989,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
-  void sse_encode_box_autoadd_api_audio_constraints(
-    ApiAudioConstraints self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_box_autoadd_api_constrain_facing_mode(
     ApiConstrainFacingMode self,
     SseSerializer serializer,
   );
 
   @protected
+  void sse_encode_box_autoadd_api_device_audio_track_constraints(
+    ApiDeviceAudioTrackConstraints self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_api_device_video_track_constraints(
     ApiDeviceVideoTrackConstraints self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_api_display_audio_track_constraints(
+    ApiDisplayAudioTrackConstraints self,
     SseSerializer serializer,
   );
 
@@ -1099,20 +1143,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_String(String? self, SseSerializer serializer);
 
   @protected
-  void sse_encode_opt_box_autoadd_api_audio_constraints(
-    ApiAudioConstraints? self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_opt_box_autoadd_api_constrain_facing_mode(
     ApiConstrainFacingMode? self,
     SseSerializer serializer,
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_api_device_audio_track_constraints(
+    ApiDeviceAudioTrackConstraints? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_api_device_video_track_constraints(
     ApiDeviceVideoTrackConstraints? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_api_display_audio_track_constraints(
+    ApiDisplayAudioTrackConstraints? self,
     SseSerializer serializer,
   );
 

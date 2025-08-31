@@ -224,6 +224,8 @@
     </div>
     <div class="mb-3">
       <button id="control__disable_audio_recv" class="btn btn-secondary">Disable audio recv</button>
+      <button id="control__disable_display_audio_recv" class="btn btn-secondary">Disable display audio recv</button>
+      <button id="control__disable_device_audio_recv" class="btn btn-secondary">Disable device audio recv</button>
       <button id="control__disable_video_recv" class="btn btn-secondary">Disable video recv</button>
       <button id="control__disable_display_video_recv" class="btn btn-secondary">Disable display video recv</button>
       <button id="control__disable_camera_video_recv" class="btn btn-secondary">Disable camera video recv</button>
@@ -789,6 +791,17 @@
             <label for="connection-settings__screenshare"
                    class="custom-control-label">
               Screenshare
+            </label>
+          </div>
+
+          <div class="custom-control custom-switch" style="margin-top: 10px">
+            <input type="checkbox"
+                   id="connection-settings__screenshare-audio"
+                   class="custom-control-input"
+                   autocomplete="off">
+            <label for="connection-settings__screenshare-audio"
+                   class="custom-control-label">
+              System audio capture
             </label>
           </div>
         </div>

@@ -11,8 +11,8 @@ use medea_macro::dart_bridge;
 use crate::{
     api::DartValue,
     media::{
-        AudioTrackConstraints, DeviceVideoTrackConstraints,
-        DisplayVideoTrackConstraints,
+        DeviceAudioTrackConstraints, DeviceVideoTrackConstraints,
+        DisplayAudioTrackConstraints, DisplayVideoTrackConstraints,
         constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
     },
     platform::dart::utils::handle::DartHandle,
@@ -87,15 +87,26 @@ mod constraints {
             video: Dart_Handle,
         ) -> Result<(), Error>;
 
-        /// Specifies the provided nature and settings of an `audio`
+        /// Specifies the provided nature and settings of a device `audio`
         /// [MediaStreamTrack][1] to the given [MediaStreamConstraints][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
         /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-        pub fn set_audio_constraint(
+        pub fn set_device_audio_constraint(
             constraints: Dart_Handle,
             ty: i64,
             audio: Dart_Handle,
+        ) -> Result<(), Error>;
+
+        /// Specifies the provided nature and settings of a display `audio`
+        /// [MediaStreamTrack][1] to the given [MediaStreamConstraints][0].
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
+        /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+        pub fn set_display_audio_constraint(
+            constraints: Dart_Handle,
+            ty: i64,
+            video: Dart_Handle,
         ) -> Result<(), Error>;
     }
 }
@@ -181,10 +192,10 @@ impl MediaStreamConstraints {
     /// [MediaStreamTrack][1] to these [`MediaStreamConstraints`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    pub fn audio(&mut self, audio: AudioTrackConstraints) {
+    pub fn audio(&mut self, audio: DeviceAudioTrackConstraints) {
         let audio = MediaTrackConstraints::from(audio);
         unsafe {
-            constraints::set_audio_constraint(
+            constraints::set_device_audio_constraint(
                 self.0.get(),
                 ConstraintType::Mandatory as i64,
                 audio.mandatory.get(),
@@ -192,7 +203,7 @@ impl MediaStreamConstraints {
         }
         .unwrap();
         unsafe {
-            constraints::set_audio_constraint(
+            constraints::set_device_audio_constraint(
                 self.0.get(),
                 ConstraintType::Optional as i64,
                 audio.optional.get(),
@@ -276,11 +287,35 @@ impl DisplayMediaStreamConstraints {
         }
         .unwrap();
     }
+
+    /// Specifies the provided nature and settings of an `audio`
+    /// [MediaStreamTrack][1] to these [`DisplayMediaStreamConstraints`].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    pub fn audio(&mut self, audio: DisplayAudioTrackConstraints) {
+        let audio = MediaTrackConstraints::from(audio);
+        unsafe {
+            constraints::set_display_audio_constraint(
+                self.0.get(),
+                ConstraintType::Mandatory as i64,
+                audio.mandatory.get(),
+            )
+        }
+        .unwrap();
+        unsafe {
+            constraints::set_display_audio_constraint(
+                self.0.get(),
+                ConstraintType::Optional as i64,
+                audio.optional.get(),
+            )
+        }
+        .unwrap();
+    }
 }
 
 #[expect(clippy::fallible_impl_from, reason = "FFI error is unexpected")]
-impl From<AudioTrackConstraints> for MediaTrackConstraints {
-    fn from(from: AudioTrackConstraints) -> Self {
+impl From<DeviceAudioTrackConstraints> for MediaTrackConstraints {
+    fn from(from: DeviceAudioTrackConstraints) -> Self {
         let optional = {
             let audio =
                 unsafe { constraints::new_audio_constraints() }.unwrap();
@@ -376,6 +411,24 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
                 .unwrap();
             }
         }
+
+        Self { optional, mandatory }
+    }
+}
+
+#[expect(clippy::fallible_impl_from, reason = "FFI error is unexpected")]
+impl From<DisplayAudioTrackConstraints> for MediaTrackConstraints {
+    fn from(_: DisplayAudioTrackConstraints) -> Self {
+        let optional = {
+            let audio =
+                unsafe { constraints::new_audio_constraints() }.unwrap();
+            unsafe { DartHandle::new(audio) }
+        };
+        let mandatory = {
+            let audio =
+                unsafe { constraints::new_audio_constraints() }.unwrap();
+            unsafe { DartHandle::new(audio) }
+        };
 
         Self { optional, mandatory }
     }

@@ -35,7 +35,8 @@
     import init, {
       Jason,
       MediaStreamSettings,
-      AudioTrackConstraints,
+      DeviceAudioTrackConstraints,
+      DisplayAudioTrackConstraints,
       DeviceVideoTrackConstraints,
       DisplayVideoTrackConstraints,
       FacingMode,
@@ -47,7 +48,8 @@
       await init();
       window.Jason = Jason;
       window.MediaStreamSettings = MediaStreamSettings;
-      window.AudioTrackConstraints = AudioTrackConstraints;
+      window.DeviceAudioTrackConstraints = DeviceAudioTrackConstraints;
+      window.DisplayAudioTrackConstraints = DisplayAudioTrackConstraints;
       window.DeviceVideoTrackConstraints = DeviceVideoTrackConstraints;
       window.DisplayVideoTrackConstraints = DisplayVideoTrackConstraints;
       window.FacingMode = FacingMode;

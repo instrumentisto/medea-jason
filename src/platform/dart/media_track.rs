@@ -389,6 +389,14 @@ impl MediaStreamTrack {
         }
     }
 
+    /// Returns the [`MediaSourceKind`] of this [`MediaStreamTrack`].
+    ///
+    /// [`None`] for remote [`MediaStreamTrack`]s.
+    #[must_use]
+    pub const fn source_kind(&self) -> Option<MediaSourceKind> {
+        self.source_kind
+    }
+
     /// Detects whether this video [`MediaStreamTrack`] is captured from
     /// display, searching for [specific fields][1] in its settings.
     ///

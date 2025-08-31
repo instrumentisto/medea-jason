@@ -69,8 +69,8 @@ impl LocalStreamUpdateCriteria {
             .filter(|t| matches!(t.direction, Direction::Send { .. }))
         {
             match &track.media_type {
-                MediaType::Audio(_) => {
-                    result.add(MediaKind::Audio, MediaSourceKind::Device);
+                MediaType::Audio(audio) => {
+                    result.add(MediaKind::Audio, audio.source_kind);
                 }
                 MediaType::Video(video) => {
                     result.add(MediaKind::Video, video.source_kind);

@@ -28,11 +28,32 @@ impl MediaStreamSettings {
         media::MediaStreamSettings::new().into()
     }
 
-    /// Specifies the nature and settings of an audio [MediaStreamTrack][1].
+    /// Specifies the nature and settings of a device audio
+    /// [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    pub fn audio(&mut self, constraints: AudioTrackConstraints) {
-        self.0.audio(constraints.into());
+    pub fn device_audio(&mut self, constraints: DeviceAudioTrackConstraints) {
+        self.0.device_audio(constraints.into());
+    }
+
+    /// Specifies the nature and settings of a display audio
+    /// [MediaStreamTrack][1].
+    ///
+    /// Behaviour is platform dependent and there is no propper feature check.
+    /// It's known to only work in Chrome and Chrome-based browsers. It must
+    /// always be coupled with [`DisplayVideoTrackConstraints`], meaning that
+    /// system audio capture prompt is a part of the screen-sharing prompt, so
+    /// if you try to request `display_audio` without `display_video` the UA
+    /// will ask user for screen capture track anyway.
+    ///
+    /// It is also OS-dependent:
+    /// 1. Only `Chrome-tab` audio can be captured on macOS and Linux.
+    /// 2. Both `Chrome-tab` and `Entire screen` audio can be captured on
+    ///    Windows.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    pub fn display_audio(&mut self, constraints: DisplayAudioTrackConstraints) {
+        self.0.display_audio(constraints.into());
     }
 
     /// Set constraints that will be used to obtain a local video sourced from
@@ -48,22 +69,23 @@ impl MediaStreamSettings {
     }
 }
 
-/// Constraints applicable to audio tracks.
+/// Constraints applicable to device audio tracks (microphone).
 #[wasm_bindgen]
 #[derive(Debug, From, Into)]
-pub struct AudioTrackConstraints(media::AudioTrackConstraints);
+pub struct DeviceAudioTrackConstraints(media::DeviceAudioTrackConstraints);
 
 #[expect( // `wasm_bindgen` doesn't support `const fn`
     clippy::missing_const_for_fn,
     reason = "`wasm_bindgen` doesn't support `const fn`"
 )]
 #[wasm_bindgen]
-impl AudioTrackConstraints {
-    /// Creates new [`AudioTrackConstraints`] with none constraints configured.
+impl DeviceAudioTrackConstraints {
+    /// Creates new [`DeviceAudioTrackConstraints`] with none constraints
+    /// configured.
     #[must_use]
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        media::AudioTrackConstraints::new().into()
+        media::DeviceAudioTrackConstraints::new().into()
     }
 
     /// Sets an exact [deviceId][1] constraint.
@@ -116,8 +138,24 @@ impl AudioTrackConstraints {
     }
 }
 
-/// Constraints applicable to video tracks that are sourced from some media
-/// device.
+/// Constraints applicable to display audio tracks (system audio capture).
+#[wasm_bindgen]
+#[derive(Copy, Clone, Debug, From, Into)]
+pub struct DisplayAudioTrackConstraints(media::DisplayAudioTrackConstraints);
+
+#[wasm_bindgen]
+impl DisplayAudioTrackConstraints {
+    /// Creates new [`DisplayAudioTrackConstraints`] with none constraints
+    /// configured.
+    #[must_use]
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        media::DisplayAudioTrackConstraints::new().into()
+    }
+}
+
+/// Constraints applicable to audio tracks, sourced from a system audio
+/// recording device (usually a microphone).
 #[wasm_bindgen]
 #[derive(Debug, From, Into)]
 pub struct DeviceVideoTrackConstraints(media::DeviceVideoTrackConstraints);

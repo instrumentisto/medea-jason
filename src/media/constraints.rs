@@ -4,10 +4,7 @@ use std::{cell::RefCell, rc::Rc};
 
 use derive_more::with_trait::Display;
 use futures::stream::LocalBoxStream;
-use medea_client_api_proto::{
-    AudioSettings as ProtoAudioConstraints, MediaSourceKind,
-    MediaType as ProtoTrackConstraints, MediaType, VideoSettings,
-};
+use medea_client_api_proto as proto;
 use medea_reactive::ObservableCell;
 
 use crate::{
@@ -75,8 +72,11 @@ pub struct LocalTracksConstraints(Rc<RefCell<MediaStreamSettings>>);
 )]
 #[derive(Debug)]
 pub struct RecvConstraints {
-    /// Indicator whether audio receiving is enabled.
-    audio_enabled: ObservableCell<bool>,
+    /// Indicator whether device audio receiving is enabled.
+    audio_device_enabled: ObservableCell<bool>,
+
+    /// Indicator whether display audio receiving is enabled.
+    audio_display_enabled: ObservableCell<bool>,
 
     /// Indicator whether device video receiving is enabled.
     video_device_enabled: ObservableCell<bool>,
@@ -88,7 +88,12 @@ pub struct RecvConstraints {
 impl Clone for RecvConstraints {
     fn clone(&self) -> Self {
         Self {
-            audio_enabled: ObservableCell::new(self.audio_enabled.get()),
+            audio_device_enabled: ObservableCell::new(
+                self.audio_device_enabled.get(),
+            ),
+            audio_display_enabled: ObservableCell::new(
+                self.audio_display_enabled.get(),
+            ),
             video_device_enabled: ObservableCell::new(
                 self.video_device_enabled.get(),
             ),
@@ -102,7 +107,8 @@ impl Clone for RecvConstraints {
 impl Default for RecvConstraints {
     fn default() -> Self {
         Self {
-            audio_enabled: ObservableCell::new(true),
+            audio_device_enabled: ObservableCell::new(true),
+            audio_display_enabled: ObservableCell::new(true),
             video_device_enabled: ObservableCell::new(true),
             video_display_enabled: ObservableCell::new(true),
         }
@@ -115,22 +121,33 @@ impl RecvConstraints {
         &self,
         enabled: bool,
         kind: MediaKind,
-        source_kind: Option<MediaSourceKind>,
+        source_kind: Option<proto::MediaSourceKind>,
     ) {
         match kind {
-            MediaKind::Audio => {
-                self.audio_enabled.set(enabled);
-            }
+            MediaKind::Audio => source_kind.map_or_else(
+                || {
+                    self.audio_device_enabled.set(enabled);
+                    self.audio_display_enabled.set(enabled);
+                },
+                |sk| match sk {
+                    proto::MediaSourceKind::Device => {
+                        self.audio_device_enabled.set(enabled);
+                    }
+                    proto::MediaSourceKind::Display => {
+                        self.audio_display_enabled.set(enabled);
+                    }
+                },
+            ),
             MediaKind::Video => source_kind.map_or_else(
                 || {
                     self.video_device_enabled.set(enabled);
                     self.video_display_enabled.set(enabled);
                 },
                 |sk| match sk {
-                    MediaSourceKind::Device => {
+                    proto::MediaSourceKind::Device => {
                         self.video_device_enabled.set(enabled);
                     }
-                    MediaSourceKind::Display => {
+                    proto::MediaSourceKind::Display => {
                         self.video_display_enabled.set(enabled);
                     }
                 },
@@ -138,9 +155,14 @@ impl RecvConstraints {
         }
     }
 
-    /// Indicates whether audio receiving is enabled.
-    pub fn is_audio_enabled(&self) -> bool {
-        self.audio_enabled.get()
+    /// Indicates whether device audio receiving is enabled.
+    pub fn is_audio_device_enabled(&self) -> bool {
+        self.audio_device_enabled.get()
+    }
+
+    /// Indicates whether display audio receiving is enabled.
+    pub fn is_audio_display_enabled(&self) -> bool {
+        self.audio_display_enabled.get()
     }
 
     /// Indicates whether device video receiving is enabled.
@@ -153,12 +175,24 @@ impl RecvConstraints {
         self.video_display_enabled.get()
     }
 
-    /// Returns [`LocalBoxStream`] into which all [`is_audio_enabled`] updates
-    /// will be sent.
+    /// Returns [`LocalBoxStream`] into which all [`is_audio_device_enabled`]
+    /// updates will be sent.
     ///
-    /// [`is_audio_enabled`]: RecvConstraints::is_audio_enabled()
-    pub fn on_audio_enabled_change(&self) -> LocalBoxStream<'static, bool> {
-        self.audio_enabled.subscribe()
+    /// [`is_audio_device_enabled`]: Self::is_audio_device_enabled()
+    pub fn on_audio_device_enabled_change(
+        &self,
+    ) -> LocalBoxStream<'static, bool> {
+        self.audio_device_enabled.subscribe()
+    }
+
+    /// Returns [`LocalBoxStream`] into which all [`is_audio_display_enabled`]
+    /// updates will be sent.
+    ///
+    /// [`is_audio_display_enabled`]: Self::is_audio_display_enabled()
+    pub fn on_audio_display_enabled_change(
+        &self,
+    ) -> LocalBoxStream<'static, bool> {
+        self.audio_display_enabled.subscribe()
     }
 
     /// Returns [`LocalBoxStream`] into which all [`is_video_device_enabled`]
@@ -193,6 +227,8 @@ impl LocalTracksConstraints {
     /// Returns [`LocalStreamUpdateCriteria`] with [`MediaKind`] and
     /// [`MediaSourceKind`] which are different in the provided
     /// [`MediaStreamSettings`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub fn calculate_kinds_diff(
         &self,
@@ -219,7 +255,7 @@ impl LocalTracksConstraints {
         &self,
         state: MediaState,
         kind: MediaKind,
-        source_kind: Option<MediaSourceKind>,
+        source_kind: Option<proto::MediaSourceKind>,
     ) {
         self.0.borrow_mut().set_track_media_state(state, kind, source_kind);
     }
@@ -236,89 +272,63 @@ impl LocalTracksConstraints {
 
     /// Indicates whether provided [`MediaType`] is enabled in the underlying
     /// [`MediaStreamSettings`].
+    ///
+    /// [`MediaType`]: proto::MediaType
     #[must_use]
-    pub fn enabled(&self, kind: &MediaType) -> bool {
+    pub fn enabled(&self, kind: &proto::MediaType) -> bool {
         self.0.borrow().enabled(kind)
     }
 
     /// Indicates whether provided [`MediaType`] is muted in the underlying
     /// [`MediaStreamSettings`].
+    ///
+    /// [`MediaType`]: proto::MediaType
     #[must_use]
-    pub fn muted(&self, kind: &MediaType) -> bool {
+    pub fn muted(&self, kind: &proto::MediaType) -> bool {
         self.0.borrow().muted(kind)
     }
 
     /// Indicates whether the provided [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled and constrained in this [`LocalTracksConstraints`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub fn is_track_enabled_and_constrained(
         &self,
         kind: MediaKind,
-        source: Option<MediaSourceKind>,
+        source: Option<proto::MediaSourceKind>,
     ) -> bool {
         self.0.borrow().is_track_enabled_and_constrained(kind, source)
     }
 
     /// Indicates whether the provided [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled in this [`LocalTracksConstraints`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub fn is_track_enabled(
         &self,
         kind: MediaKind,
-        source: Option<MediaSourceKind>,
+        source: Option<proto::MediaSourceKind>,
     ) -> bool {
         self.0.borrow().is_track_enabled(kind, source)
     }
 }
 
-/// [MediaStreamConstraints][1] for the audio media type.
+/// [MediaTrackConstraints][1] for a media track of specific type with
+/// additional runtime indications of whether this track is `enabled` or
+/// `muted`.
 ///
-/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
+/// [1]: https://w3.org/TR/mediacapture-streams#media-track-constraints
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct AudioMediaTracksSettings {
-    /// Constraints applicable to video tracks.
-    constraints: AudioTrackConstraints,
-
-    /// Indicator whether audio is enabled and this constraints should be
-    /// injected into `Peer`.
-    enabled: bool,
-
-    /// Indicator whether audio should be muted.
-    muted: bool,
-}
-
-impl Default for AudioMediaTracksSettings {
-    fn default() -> Self {
-        Self {
-            constraints: AudioTrackConstraints::default(),
-            enabled: true,
-            muted: false,
-        }
-    }
-}
-
-/// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies any
-/// constraints with the provided [`MediaKind`].
-async fn satisfies_track(
-    track: &platform::MediaStreamTrack,
-    kind: MediaKind,
-) -> bool {
-    track.kind() == kind
-        && track.ready_state().await == MediaStreamTrackState::Live
-}
-
-/// [MediaStreamConstraints][1] for the video media type.
-///
-/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct VideoTrackConstraints<C> {
-    /// Constraints applicable to video tracks.
+pub struct MediaTrackConstraints<C> {
+    /// Constraints applicable to media tracks.
     ///
-    /// If [`None`] then this kind of video (device or display) is disabled by
+    /// If [`None`] then this kind of media track is disabled by
     /// [`MediaStreamSettings`].
     constraints: Option<C>,
 
-    /// Indicator whether video is enabled and this constraints should be
+    /// Indicator whether the track is enabled and this constraints should be
     /// injected into `Peer`.
     ///
     /// Any action with this flag should be performed only while disable/enable
@@ -328,55 +338,57 @@ pub struct VideoTrackConstraints<C> {
     /// [`Room`]: crate::room::Room
     enabled: bool,
 
-    /// Indicator whether video should be muted.
+    /// Indicator whether the track should be muted.
     muted: bool,
 }
 
-impl<C: Default> Default for VideoTrackConstraints<C> {
+impl<C: Default> Default for MediaTrackConstraints<C> {
     fn default() -> Self {
         Self { constraints: Some(C::default()), enabled: true, muted: false }
     }
 }
 
-impl<C> VideoTrackConstraints<C> {
-    /// Returns `true` if this [`VideoTrackConstraints`] are enabled by the
-    /// [`Room`] and constrained with [`VideoTrackConstraints::constraints`].
+impl<C> MediaTrackConstraints<C> {
+    /// Indicates whether these [`MediaTrackConstraints`] are enabled by the
+    /// [`Room`] and constrained with [`MediaTrackConstraints::constraints`].
     ///
     /// [`Room`]: crate::room::Room
     const fn enabled(&self) -> bool {
         self.enabled && self.is_constrained()
     }
 
-    /// Sets these [`VideoTrackConstraints::constraints`] to the provided
+    /// Sets these [`MediaTrackConstraints::constraints`] to the provided
     /// `cons`.
     fn set(&mut self, cons: C) {
         self.constraints = Some(cons);
     }
 
-    /// Resets these [`VideoTrackConstraints::constraints`] to [`None`].
+    /// Resets these [`MediaTrackConstraints::constraints`] to [`None`].
     fn unconstrain(&mut self) {
         drop(self.constraints.take());
     }
 
-    /// Returns `true` if these [`VideoTrackConstraints::constraints`] are set
+    /// Indicates whether these [`MediaTrackConstraints::constraints`] are set
     /// to [`Some`] value.
     const fn is_constrained(&self) -> bool {
         self.constraints.is_some()
     }
 
-    /// Constraints these [`VideoTrackConstraints`] with a provided `other`
-    /// [`VideoTrackConstraints`].
+    /// Constraints these [`MediaTrackConstraints`] with a provided `other`
+    /// [`MediaTrackConstraints`].
     fn constrain(&mut self, other: Self) {
+        // `&=` is used, because a disabled `Room` shouldn't be enabled, but an
+        // enabled `Room` could be disabled.
         self.enabled &= other.enabled;
         self.constraints = other.constraints;
     }
 }
 
-impl VideoTrackConstraints<DeviceVideoTrackConstraints> {
+impl MediaTrackConstraints<DeviceAudioTrackConstraints> {
     /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies
-    /// these [`VideoTrackConstraints`].
+    /// these [`MediaTrackConstraints`].
     ///
-    /// Returns `false` if these [`VideoTrackConstraints`] don't have any
+    /// Returns `false` if these [`MediaTrackConstraints`] don't have any
     /// constraints configured.
     pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
@@ -390,11 +402,11 @@ impl VideoTrackConstraints<DeviceVideoTrackConstraints> {
     }
 }
 
-impl VideoTrackConstraints<DisplayVideoTrackConstraints> {
+impl MediaTrackConstraints<DisplayAudioTrackConstraints> {
     /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies
-    /// these [`VideoTrackConstraints`].
+    /// these [`MediaTrackConstraints`].
     ///
-    /// Returns `false` if these [`VideoTrackConstraints`] don't have any
+    /// Returns `false` if these [`MediaTrackConstraints`] don't have any
     /// constraints configured.
     pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
@@ -406,6 +418,54 @@ impl VideoTrackConstraints<DisplayVideoTrackConstraints> {
             false
         }
     }
+}
+
+impl MediaTrackConstraints<DeviceVideoTrackConstraints> {
+    /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies
+    /// these [`MediaTrackConstraints`].
+    ///
+    /// Returns `false` if these [`MediaTrackConstraints`] don't have any
+    /// constraints configured.
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+        &self,
+        track: T,
+    ) -> bool {
+        if let Some(constraints) = &self.constraints {
+            self.enabled() && constraints.satisfies(track).await
+        } else {
+            false
+        }
+    }
+}
+
+impl MediaTrackConstraints<DisplayVideoTrackConstraints> {
+    /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies
+    /// these [`MediaTrackConstraints`].
+    ///
+    /// Returns `false` if these [`MediaTrackConstraints`] don't have any
+    /// constraints configured.
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+        &self,
+        track: T,
+    ) -> bool {
+        if let Some(constraints) = &self.constraints {
+            self.enabled() && constraints.satisfies(track).await
+        } else {
+            false
+        }
+    }
+}
+
+/// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies any
+/// constraints with the provided [`MediaKind`] and [`MediaSourceKind`].
+async fn satisfies_track(
+    track: &platform::MediaStreamTrack,
+    kind: MediaKind,
+    source_kind: proto::MediaSourceKind,
+) -> bool {
+    track.kind() == kind
+        && track.ready_state().await == MediaStreamTrackState::Live
+        && track.source_kind() == Some(source_kind.into())
 }
 
 /// [MediaStreamConstraints][1] wrapper.
@@ -413,38 +473,48 @@ impl VideoTrackConstraints<DisplayVideoTrackConstraints> {
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct MediaStreamSettings {
-    /// [MediaStreamConstraints][1] for the audio media type.
+    /// [MediaStreamConstraints][1] for the device audio media type.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-    audio: AudioMediaTracksSettings,
+    device_audio: MediaTrackConstraints<DeviceAudioTrackConstraints>,
+
+    /// [MediaStreamConstraints][1] for the display audio media type.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
+    display_audio: MediaTrackConstraints<DisplayAudioTrackConstraints>,
 
     /// [MediaStreamConstraints][1] for the device video media type.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-    device_video: VideoTrackConstraints<DeviceVideoTrackConstraints>,
+    device_video: MediaTrackConstraints<DeviceVideoTrackConstraints>,
 
     /// [MediaStreamConstraints][1] for the display video media type.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-    display_video: VideoTrackConstraints<DisplayVideoTrackConstraints>,
+    display_video: MediaTrackConstraints<DisplayVideoTrackConstraints>,
 }
 
 impl MediaStreamSettings {
     /// Creates new [`MediaStreamSettings`] with none constraints configured.
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
-            audio: AudioMediaTracksSettings {
-                constraints: AudioTrackConstraints::default(),
-                enabled: false,
-                muted: false,
-            },
-            display_video: VideoTrackConstraints {
+            device_audio: MediaTrackConstraints {
                 enabled: true,
                 constraints: None,
                 muted: false,
             },
-            device_video: VideoTrackConstraints {
+            display_audio: MediaTrackConstraints {
+                enabled: true,
+                constraints: None,
+                muted: false,
+            },
+            display_video: MediaTrackConstraints {
+                enabled: true,
+                constraints: None,
+                muted: false,
+            },
+            device_video: MediaTrackConstraints {
                 enabled: true,
                 constraints: None,
                 muted: false,
@@ -452,11 +522,16 @@ impl MediaStreamSettings {
         }
     }
 
-    /// Specifies the nature and settings of the audio
+    /// Specifies the nature and settings of the device audio
     /// [`platform::MediaStreamTrack`].
-    pub fn audio(&mut self, constraints: AudioTrackConstraints) {
-        self.audio.enabled = true;
-        self.audio.constraints = constraints;
+    pub fn device_audio(&mut self, constraints: DeviceAudioTrackConstraints) {
+        self.device_audio.set(constraints);
+    }
+
+    /// Specifies the nature and settings of the display (system) audio
+    /// [`platform::MediaStreamTrack`].
+    pub fn display_audio(&mut self, constraints: DisplayAudioTrackConstraints) {
+        self.display_audio.set(constraints);
     }
 
     /// Set constraints that will be used to obtain local video sourced from
@@ -472,9 +547,9 @@ impl MediaStreamSettings {
     }
 
     /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies
-    /// some of the [`VideoTrackConstraints`] from this [`MediaStreamSettings`].
+    /// some of the [`MediaTrackConstraints`] from this [`MediaStreamSettings`].
     ///
-    /// Unconstrains [`VideoTrackConstraints`] which this
+    /// Unconstrains [`MediaTrackConstraints`] which this
     /// [`platform::MediaStreamTrack`] satisfies.
     pub async fn unconstrain_if_satisfies_video<T>(&mut self, track: T) -> bool
     where
@@ -491,9 +566,31 @@ impl MediaStreamSettings {
         }
     }
 
+    /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies
+    /// some of the [`MediaTrackConstraints`] from this [`MediaStreamSettings`].
+    ///
+    /// Unconstrains [`MediaTrackConstraints`] which this
+    /// [`platform::MediaStreamTrack`] satisfies.
+    pub async fn unconstrain_if_satisfies_audio<T>(&mut self, track: T) -> bool
+    where
+        T: AsRef<platform::MediaStreamTrack>,
+    {
+        if self.device_audio.satisfies(&track).await {
+            self.device_audio.unconstrain();
+            true
+        } else if self.display_audio.satisfies(&track).await {
+            self.display_audio.unconstrain();
+            true
+        } else {
+            false
+        }
+    }
+
     /// Returns [`LocalStreamUpdateCriteria`] with [`MediaKind`] and
     /// [`MediaSourceKind`] which are different in the provided
     /// [`MediaStreamSettings`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub fn calculate_kinds_diff(
         &self,
@@ -501,22 +598,35 @@ impl MediaStreamSettings {
     ) -> LocalStreamUpdateCriteria {
         let mut kinds = LocalStreamUpdateCriteria::empty();
         if self.device_video != another.device_video {
-            kinds.add(MediaKind::Video, MediaSourceKind::Device);
+            kinds.add(MediaKind::Video, proto::MediaSourceKind::Device);
         }
         if self.display_video != another.display_video {
-            kinds.add(MediaKind::Video, MediaSourceKind::Display);
+            kinds.add(MediaKind::Video, proto::MediaSourceKind::Display);
         }
-        if self.audio != another.audio {
-            kinds.add(MediaKind::Audio, MediaSourceKind::Device);
+        if self.device_audio != another.device_audio {
+            kinds.add(MediaKind::Audio, proto::MediaSourceKind::Device);
+        }
+        if self.display_audio != another.display_audio {
+            kinds.add(MediaKind::Audio, proto::MediaSourceKind::Display);
         }
 
         kinds
     }
 
-    /// Returns only audio constraints.
+    /// Returns only [`DeviceAudioTrackConstraints`].
     #[must_use]
-    pub const fn get_audio(&self) -> &AudioTrackConstraints {
-        &self.audio.constraints
+    pub const fn get_device_audio(
+        &self,
+    ) -> Option<&DeviceAudioTrackConstraints> {
+        self.device_audio.constraints.as_ref()
+    }
+
+    /// Returns only [`DisplayAudioTrackConstraints`].
+    #[must_use]
+    pub const fn get_display_audio(
+        &self,
+    ) -> Option<&DisplayAudioTrackConstraints> {
+        self.display_audio.constraints.as_ref()
     }
 
     /// Returns reference to [`DisplayVideoTrackConstraints`] from this
@@ -550,16 +660,20 @@ impl MediaStreamSettings {
         &mut self,
         state: MediaState,
         kind: MediaKind,
-        source_kind: Option<MediaSourceKind>,
+        source_kind: Option<proto::MediaSourceKind>,
     ) {
         match kind {
             MediaKind::Audio => match state {
                 MediaState::Mute(muted) => {
-                    self.set_audio_muted(muted == mute_state::Stable::Muted);
+                    self.set_audio_muted(
+                        muted == mute_state::Stable::Muted,
+                        source_kind,
+                    );
                 }
                 MediaState::MediaExchange(media_exchange) => {
                     self.set_audio_publish(
                         media_exchange == media_exchange_state::Stable::Enabled,
+                        source_kind,
                     );
                 }
             },
@@ -588,75 +702,130 @@ impl MediaStreamSettings {
         kinds: LocalStreamUpdateCriteria,
     ) {
         let enabled = state == media_exchange_state::Stable::Enabled;
-        if kinds.has(MediaKind::Audio, MediaSourceKind::Device) {
-            self.set_audio_publish(enabled);
+        if kinds.has(MediaKind::Audio, proto::MediaSourceKind::Device) {
+            self.set_audio_publish(
+                enabled,
+                Some(proto::MediaSourceKind::Device),
+            );
         }
-        if kinds.has(MediaKind::Video, MediaSourceKind::Device) {
-            self.set_video_publish(enabled, Some(MediaSourceKind::Device));
+        if kinds.has(MediaKind::Audio, proto::MediaSourceKind::Display) {
+            self.set_audio_publish(
+                enabled,
+                Some(proto::MediaSourceKind::Display),
+            );
         }
-        if kinds.has(MediaKind::Video, MediaSourceKind::Display) {
-            self.set_video_publish(enabled, Some(MediaSourceKind::Display));
+        if kinds.has(MediaKind::Video, proto::MediaSourceKind::Device) {
+            self.set_video_publish(
+                enabled,
+                Some(proto::MediaSourceKind::Device),
+            );
+        }
+        if kinds.has(MediaKind::Video, proto::MediaSourceKind::Display) {
+            self.set_video_publish(
+                enabled,
+                Some(proto::MediaSourceKind::Display),
+            );
         }
     }
 
-    /// Sets the underlying [`AudioMediaTracksSettings::muted`] to the provided
+    /// Sets the underlying [`MediaTrackConstraints::muted`] to the provided
     /// value.
-    const fn set_audio_muted(&mut self, muted: bool) {
-        self.audio.muted = muted;
+    const fn set_audio_muted(
+        &mut self,
+        muted: bool,
+        source_kind: Option<proto::MediaSourceKind>,
+    ) {
+        match source_kind {
+            None => {
+                self.display_audio.muted = muted;
+                self.device_audio.muted = muted;
+            }
+            Some(proto::MediaSourceKind::Device) => {
+                self.device_audio.muted = muted;
+            }
+            Some(proto::MediaSourceKind::Display) => {
+                self.display_audio.muted = muted;
+            }
+        }
     }
 
-    /// Sets the underlying [`VideoTrackConstraints::muted`] basing on the
+    /// Sets the underlying [`MediaTrackConstraints::muted`] basing on the
     /// provided [`MediaSourceKind`] to the given value.
     const fn set_video_muted(
         &mut self,
         muted: bool,
-        source_kind: Option<MediaSourceKind>,
+        source_kind: Option<proto::MediaSourceKind>,
     ) {
         match source_kind {
             None => {
                 self.display_video.muted = muted;
                 self.device_video.muted = muted;
             }
-            Some(MediaSourceKind::Device) => {
+            Some(proto::MediaSourceKind::Device) => {
                 self.device_video.muted = muted;
             }
-            Some(MediaSourceKind::Display) => {
+            Some(proto::MediaSourceKind::Display) => {
                 self.display_video.muted = muted;
             }
         }
     }
 
-    /// Sets the underlying `enabled` field of these
-    /// [`AudioMediaTracksSettings`] to the given value.
-    pub const fn set_audio_publish(&mut self, enabled: bool) {
-        self.audio.enabled = enabled;
+    /// Sets the underlying `enabled` field of these [`MediaTrackConstraints`]
+    /// to the provided value.
+    pub const fn set_audio_publish(
+        &mut self,
+        enabled: bool,
+        source_kind: Option<proto::MediaSourceKind>,
+    ) {
+        match source_kind {
+            None => {
+                self.display_audio.enabled = enabled;
+                self.device_audio.enabled = enabled;
+            }
+            Some(proto::MediaSourceKind::Device) => {
+                self.device_audio.enabled = enabled;
+            }
+            Some(proto::MediaSourceKind::Display) => {
+                self.display_audio.enabled = enabled;
+            }
+        }
     }
 
-    /// Sets the underlying [`VideoTrackConstraints`] basing on the provided
+    /// Sets the underlying [`MediaTrackConstraints`] basing on the provided
     /// [`MediaSourceKind`] to the given value.
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     pub const fn set_video_publish(
         &mut self,
         enabled: bool,
-        source_kind: Option<MediaSourceKind>,
+        source_kind: Option<proto::MediaSourceKind>,
     ) {
         match source_kind {
             None => {
                 self.display_video.enabled = enabled;
                 self.device_video.enabled = enabled;
             }
-            Some(MediaSourceKind::Device) => {
+            Some(proto::MediaSourceKind::Device) => {
                 self.device_video.enabled = enabled;
             }
-            Some(MediaSourceKind::Display) => {
+            Some(proto::MediaSourceKind::Display) => {
                 self.display_video.enabled = enabled;
             }
         }
     }
 
-    /// Indicates whether audio is enabled in this [`MediaStreamSettings`].
+    /// Indicates whether device audio is enabled in these
+    /// [`MediaStreamSettings`].
     #[must_use]
-    pub const fn is_audio_enabled(&self) -> bool {
-        self.audio.enabled
+    pub const fn is_device_audio_enabled(&self) -> bool {
+        self.device_audio.enabled()
+    }
+
+    /// Indicates whether display audio is enabled in these
+    /// [`MediaStreamSettings`].
+    #[must_use]
+    pub const fn is_display_audio_enabled(&self) -> bool {
+        self.display_audio.enabled()
     }
 
     /// Returns `true` if [`DeviceVideoTrackConstraints`] are currently
@@ -675,84 +844,112 @@ impl MediaStreamSettings {
 
     /// Indicates whether the given [`MediaType`] is enabled and constrained in
     /// this [`MediaStreamSettings`].
+    ///
+    /// [`MediaType`]: proto::MediaType
     #[must_use]
-    pub const fn enabled(&self, kind: &MediaType) -> bool {
+    pub const fn enabled(&self, kind: &proto::MediaType) -> bool {
         match kind {
-            MediaType::Video(video) => self.is_track_enabled_and_constrained(
-                MediaKind::Video,
-                Some(video.source_kind),
-            ),
-            MediaType::Audio(_) => self.is_track_enabled_and_constrained(
-                MediaKind::Audio,
-                Some(MediaSourceKind::Device),
-            ),
+            proto::MediaType::Video(video) => self
+                .is_track_enabled_and_constrained(
+                    MediaKind::Video,
+                    Some(video.source_kind),
+                ),
+            proto::MediaType::Audio(audio) => self
+                .is_track_enabled_and_constrained(
+                    MediaKind::Audio,
+                    Some(audio.source_kind),
+                ),
         }
     }
 
     /// Indicates whether the given [`MediaType`] is muted in this
     /// [`MediaStreamSettings`].
+    ///
+    /// [`MediaType`]: proto::MediaType
     #[must_use]
-    pub const fn muted(&self, kind: &MediaType) -> bool {
+    pub const fn muted(&self, kind: &proto::MediaType) -> bool {
         match kind {
-            MediaType::Video(video) => match video.source_kind {
-                MediaSourceKind::Device => self.device_video.muted,
-                MediaSourceKind::Display => self.display_video.muted,
+            proto::MediaType::Video(video) => match video.source_kind {
+                proto::MediaSourceKind::Device => self.device_video.muted,
+                proto::MediaSourceKind::Display => self.display_video.muted,
             },
-            MediaType::Audio(_) => self.audio.muted,
+            proto::MediaType::Audio(audio) => match audio.source_kind {
+                proto::MediaSourceKind::Device => self.device_audio.muted,
+                proto::MediaSourceKind::Display => self.display_audio.muted,
+            },
         }
     }
 
     /// Indicates whether the given [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled and constrained in this [`MediaStreamSettings`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub const fn is_track_enabled_and_constrained(
         &self,
         kind: MediaKind,
-        source: Option<MediaSourceKind>,
+        source: Option<proto::MediaSourceKind>,
     ) -> bool {
         match (kind, source) {
-            (MediaKind::Video, Some(MediaSourceKind::Device)) => {
+            (MediaKind::Video, Some(proto::MediaSourceKind::Device)) => {
                 self.device_video.enabled()
             }
-            (MediaKind::Video, Some(MediaSourceKind::Display)) => {
+            (MediaKind::Video, Some(proto::MediaSourceKind::Display)) => {
                 self.display_video.enabled()
             }
             (MediaKind::Video, None) => {
                 self.display_video.enabled() && self.device_video.enabled()
             }
-            (MediaKind::Audio, _) => self.audio.enabled,
+            (MediaKind::Audio, Some(proto::MediaSourceKind::Device)) => {
+                self.device_audio.enabled()
+            }
+            (MediaKind::Audio, Some(proto::MediaSourceKind::Display)) => {
+                self.display_audio.enabled()
+            }
+            (MediaKind::Audio, None) => {
+                self.device_audio.enabled() && self.display_audio.enabled()
+            }
         }
     }
 
     /// Indicates whether the given [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled in this [`MediaStreamSettings`].
+    ///
+    /// [`MediaSourceKind`]: proto::MediaSourceKind
     #[must_use]
     pub const fn is_track_enabled(
         &self,
         kind: MediaKind,
-        source: Option<MediaSourceKind>,
+        source: Option<proto::MediaSourceKind>,
     ) -> bool {
         match (kind, source) {
-            (MediaKind::Video, Some(MediaSourceKind::Device)) => {
+            (MediaKind::Video, Some(proto::MediaSourceKind::Device)) => {
                 self.device_video.enabled
             }
-            (MediaKind::Video, Some(MediaSourceKind::Display)) => {
+            (MediaKind::Video, Some(proto::MediaSourceKind::Display)) => {
                 self.display_video.enabled
             }
             (MediaKind::Video, None) => {
                 self.display_video.enabled && self.device_video.enabled
             }
-            (MediaKind::Audio, _) => self.audio.enabled,
+            (MediaKind::Audio, Some(proto::MediaSourceKind::Device)) => {
+                self.device_audio.enabled
+            }
+            (MediaKind::Audio, Some(proto::MediaSourceKind::Display)) => {
+                self.display_audio.enabled
+            }
+            (MediaKind::Audio, None) => {
+                self.device_audio.enabled && self.display_audio.enabled
+            }
         }
     }
 
     /// Constrains this [`MediaStreamSettings`] with the given `other`
     /// [`MediaStreamSettings`].
     fn constrain(&mut self, other: Self) {
-        // `&=` cause we should not enable disabled Room, but we can disable
-        // enabled room.
-        self.audio.enabled &= other.audio.enabled;
-        self.audio.constraints = other.audio.constraints;
+        self.device_audio.constrain(other.device_audio);
+        self.display_audio.constrain(other.display_audio);
+
         self.display_video.constrain(other.display_video);
         self.device_video.constrain(other.device_video);
     }
@@ -789,7 +986,8 @@ impl From<MediaStreamSettings> for Option<MultiSourceTracksConstraints> {
     fn from(constraints: MediaStreamSettings) -> Self {
         let is_device_video_enabled = constraints.is_device_video_enabled();
         let is_display_video_enabled = constraints.is_display_video_enabled();
-        let is_device_audio_enabled = constraints.is_audio_enabled();
+        let is_device_audio_enabled = constraints.is_device_audio_enabled();
+        let is_display_audio_enabled = constraints.is_display_audio_enabled();
 
         let mut device_cons = None;
         let mut display_cons = None;
@@ -815,9 +1013,24 @@ impl From<MediaStreamSettings> for Option<MultiSourceTracksConstraints> {
             }
         }
         if is_device_audio_enabled {
-            device_cons
-                .get_or_insert_with(platform::MediaStreamConstraints::new)
-                .audio(constraints.audio.constraints);
+            if let Some(device_audio_cons) =
+                constraints.device_audio.constraints
+            {
+                device_cons
+                    .get_or_insert_with(platform::MediaStreamConstraints::new)
+                    .audio(device_audio_cons);
+            }
+        }
+        if is_display_audio_enabled {
+            if let Some(display_audio_cons) =
+                constraints.display_audio.constraints
+            {
+                display_cons
+                    .get_or_insert_with(
+                        platform::DisplayMediaStreamConstraints::new,
+                    )
+                    .audio(display_audio_cons);
+            }
         }
 
         match (device_cons, display_cons) {
@@ -881,10 +1094,10 @@ impl VideoSource {
     }
 }
 
-impl From<VideoSettings> for VideoSource {
-    fn from(settings: VideoSettings) -> Self {
+impl From<proto::VideoSettings> for VideoSource {
+    fn from(settings: proto::VideoSettings) -> Self {
         match settings.source_kind {
-            MediaSourceKind::Device => {
+            proto::MediaSourceKind::Device => {
                 Self::Device(DeviceVideoTrackConstraints {
                     device_id: None,
                     facing_mode: None,
@@ -893,7 +1106,7 @@ impl From<VideoSettings> for VideoSource {
                     required: settings.required,
                 })
             }
-            MediaSourceKind::Display => {
+            proto::MediaSourceKind::Display => {
                 Self::Display(DisplayVideoTrackConstraints {
                     height: None,
                     width: None,
@@ -906,13 +1119,73 @@ impl From<VideoSettings> for VideoSource {
     }
 }
 
+/// Constraints for a [`MediaKind::Audio`] [`local::Track`].
+///
+/// [`local::Track`]: crate::media::track::local::Track
+#[derive(Clone, Debug)]
+pub enum AudioSource {
+    /// [`local::Track`] should be received from the [getUserMedia()][1]
+    /// request.
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
+    /// [1]:https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
+    Device(DeviceAudioTrackConstraints),
+
+    /// [`local::Track`] should be received from the [getDisplayMedia()][2]
+    /// request.
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
+    /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
+    Display(DisplayAudioTrackConstraints),
+}
+
+impl AudioSource {
+    /// Returns an importance of this [`AudioSource`].
+    ///
+    /// If this [`AudioSource`] is important then without this [`AudioSource`]
+    /// call session can't be started.
+    #[expect(clippy::use_self, reason = "because of `const` only")]
+    #[must_use]
+    pub const fn required(&self) -> bool {
+        match self {
+            AudioSource::Device(device) => device.required,
+            AudioSource::Display(display) => display.required,
+        }
+    }
+
+    /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
+    /// this [`AudioSource`].
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+        &self,
+        track: T,
+    ) -> bool {
+        match self {
+            Self::Display(display) => display.satisfies(&track).await,
+            Self::Device(device) => device.satisfies(track).await,
+        }
+    }
+}
+
+impl From<proto::AudioSettings> for AudioSource {
+    fn from(settings: proto::AudioSettings) -> Self {
+        match settings.source_kind {
+            proto::MediaSourceKind::Device => {
+                Self::Device(DeviceAudioTrackConstraints::from(settings))
+            }
+            proto::MediaSourceKind::Display => {
+                Self::Display(DisplayAudioTrackConstraints::from(settings))
+            }
+        }
+    }
+}
+
 /// Wrapper around [MediaTrackConstraints][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#media-track-constraints
 #[derive(Clone, Debug)]
 pub enum TrackConstraints {
     /// Audio constraints.
-    Audio(AudioTrackConstraints),
+    Audio(AudioSource),
 
     /// Video constraints.
     Video(VideoSource),
@@ -940,21 +1213,22 @@ impl TrackConstraints {
     pub const fn required(&self) -> bool {
         match self {
             TrackConstraints::Video(video) => video.required(),
-            TrackConstraints::Audio(audio) => audio.required,
+            TrackConstraints::Audio(audio) => audio.required(),
         }
     }
 
     /// Returns these [`TrackConstraints`] media source kind.
     #[expect(clippy::use_self, reason = "because of `const` only")]
     #[must_use]
-    pub const fn media_source_kind(&self) -> MediaSourceKind {
+    pub const fn media_source_kind(&self) -> proto::MediaSourceKind {
         match &self {
-            TrackConstraints::Audio(..) => MediaSourceKind::Device,
-            TrackConstraints::Video(VideoSource::Device(..)) => {
-                MediaSourceKind::Device
+            TrackConstraints::Audio(AudioSource::Device(..))
+            | TrackConstraints::Video(VideoSource::Device(..)) => {
+                proto::MediaSourceKind::Device
             }
-            TrackConstraints::Video(VideoSource::Display(..)) => {
-                MediaSourceKind::Display
+            TrackConstraints::Audio(AudioSource::Display(..))
+            | TrackConstraints::Video(VideoSource::Display(..)) => {
+                proto::MediaSourceKind::Display
             }
         }
     }
@@ -970,25 +1244,25 @@ impl TrackConstraints {
     }
 }
 
-impl From<ProtoTrackConstraints> for TrackConstraints {
-    fn from(caps: ProtoTrackConstraints) -> Self {
+impl From<proto::MediaType> for TrackConstraints {
+    fn from(caps: proto::MediaType) -> Self {
         match caps {
-            ProtoTrackConstraints::Audio(audio) => Self::Audio(audio.into()),
-            ProtoTrackConstraints::Video(video) => Self::Video(video.into()),
+            proto::MediaType::Audio(audio) => Self::Audio(audio.into()),
+            proto::MediaType::Video(video) => Self::Video(video.into()),
         }
     }
 }
 
-/// Constraints applicable to audio tracks.
+/// Constraints applicable to device audio tracks (microphone).
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
-pub struct AudioTrackConstraints {
+pub struct DeviceAudioTrackConstraints {
     /// Identifier of the device generating the content for the media track.
     pub device_id: Option<ConstrainString<String>>,
 
-    /// Importance of this [`AudioTrackConstraints`].
+    /// Importance of these [`DeviceAudioTrackConstraints`].
     ///
-    /// If `true` then without this [`AudioTrackConstraints`] call session
-    /// can't be started.
+    /// If `true` then without these [`DeviceAudioTrackConstraints`] call
+    /// session can't be started.
     pub required: bool,
 
     /// Automatically manages changes in the volume of its source media to
@@ -1015,8 +1289,19 @@ pub struct AudioTrackConstraints {
     pub high_pass_filter: Option<ConstrainBoolean>,
 }
 
-impl AudioTrackConstraints {
-    /// Creates new [`AudioTrackConstraints`] with none constraints configured.
+/// Constraints applicable to display audio tracks (system audio capture).
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct DisplayAudioTrackConstraints {
+    /// Importance of these [`DisplayAudioTrackConstraints`].
+    ///
+    /// If `true` then without these [`DisplayAudioTrackConstraints`] call
+    /// session can't be started.
+    pub required: bool,
+}
+
+impl DeviceAudioTrackConstraints {
+    /// Creates new [`DeviceAudioTrackConstraints`] with none constraints
+    /// configured.
     #[must_use]
     pub fn new() -> Self {
         Self::default()
@@ -1037,7 +1322,13 @@ impl AudioTrackConstraints {
     ) -> bool {
         let track = track.as_ref();
 
-        if !satisfies_track(track, MediaKind::Audio).await {
+        if !satisfies_track(
+            track,
+            MediaKind::Audio,
+            proto::MediaSourceKind::Device,
+        )
+        .await
+        {
             return false;
         }
 
@@ -1091,9 +1382,9 @@ impl AudioTrackConstraints {
         true
     }
 
-    /// Merges these [`AudioTrackConstraints`] with `another` ones, meaning that
-    /// if some constraints are not set on these ones, then they will be applied
-    /// from `another`.
+    /// Merges these [`DeviceAudioTrackConstraints`] with `another` ones,
+    /// meaning that if some constraints are not set on these, then they will be
+    /// applied from `another`.
     pub fn merge(&mut self, another: Self) {
         if self.device_id.is_none() && another.device_id.is_some() {
             self.device_id = another.device_id;
@@ -1103,18 +1394,61 @@ impl AudioTrackConstraints {
         }
     }
 
-    /// Returns an importance of these [`AudioTrackConstraints`].
+    /// Returns an importance of these [`DeviceAudioTrackConstraints`].
     ///
-    /// If these [`AudioTrackConstraints`] are important then without them a
-    /// session call can't be started.
+    /// If these [`DeviceAudioTrackConstraints`] are important then without
+    /// them a session call can't be started.
     #[must_use]
     pub const fn required(&self) -> bool {
         self.required
     }
 }
 
-impl From<ProtoAudioConstraints> for AudioTrackConstraints {
-    fn from(caps: ProtoAudioConstraints) -> Self {
+impl DisplayAudioTrackConstraints {
+    /// Creates new [`DisplayAudioTrackConstraints`] with none constraints
+    /// configured.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Returns an importance of these [`DisplayAudioTrackConstraints`].
+    ///
+    /// If these [`DisplayAudioTrackConstraints`] are important then without
+    /// them a session call can't be started.
+    #[must_use]
+    pub const fn required(&self) -> bool {
+        self.required
+    }
+
+    /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies the
+    /// contained constraints.
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+        &self,
+        track: T,
+    ) -> bool {
+        let track = track.as_ref();
+
+        satisfies_track(
+            track,
+            MediaKind::Audio,
+            proto::MediaSourceKind::Display,
+        )
+        .await
+    }
+
+    /// Merges these [`DisplayAudioTrackConstraints`] with `another` ones,
+    /// meaning that if some constraints are not set on these, then they will be
+    /// applied from `another`.
+    pub const fn merge(&mut self, another: Self) {
+        if !self.required && another.required {
+            self.required = another.required;
+        }
+    }
+}
+
+impl From<proto::AudioSettings> for DeviceAudioTrackConstraints {
+    fn from(caps: proto::AudioSettings) -> Self {
         Self {
             required: caps.required,
             device_id: None,
@@ -1124,6 +1458,12 @@ impl From<ProtoAudioConstraints> for AudioTrackConstraints {
             echo_cancellation: None,
             high_pass_filter: None,
         }
+    }
+}
+
+impl From<proto::AudioSettings> for DisplayAudioTrackConstraints {
+    fn from(caps: proto::AudioSettings) -> Self {
+        Self { required: caps.required }
     }
 }
 
@@ -1317,7 +1657,8 @@ impl DeviceVideoTrackConstraints {
         track: T,
     ) -> bool {
         let track = track.as_ref();
-        satisfies_track(track, MediaKind::Video).await
+        satisfies_track(track, MediaKind::Video, proto::MediaSourceKind::Device)
+            .await
             && ConstrainString::satisfies(
                 self.device_id.as_ref(),
                 track.device_id().as_ref(),
@@ -1328,7 +1669,6 @@ impl DeviceVideoTrackConstraints {
             )
             && ConstrainU32::satisfies(self.height, track.height())
             && ConstrainU32::satisfies(self.width, track.width())
-            && !track.guess_is_from_display()
     }
 
     /// Merges these [`DeviceVideoTrackConstraints`] with `another` ones,
@@ -1405,14 +1745,18 @@ impl DisplayVideoTrackConstraints {
         track: T,
     ) -> bool {
         let track = track.as_ref();
-        satisfies_track(track, MediaKind::Video).await
+        satisfies_track(
+            track,
+            MediaKind::Video,
+            proto::MediaSourceKind::Display,
+        )
+        .await
             && ConstrainString::satisfies(
                 self.device_id.as_ref(),
                 track.device_id().as_ref(),
             )
             && ConstrainU32::satisfies(self.height, track.height())
             && ConstrainU32::satisfies(self.width, track.width())
-            && track.guess_is_from_display()
     }
 
     /// Merges these [`DisplayVideoTrackConstraints`] with `another` ones,

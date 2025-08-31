@@ -6,6 +6,18 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### BC Breaks
+
+- Added `source_kind` to `AudioSettings`. ([#225], [#224])
+
+[#224]: https://github.com/instrumentisto/medea-jason/issues/224
+[#225]: https://github.com/instrumentisto/medea-jason/pull/225
+
+
+
+
 ## [0.9.0] · 2025-03-29
 [0.9.0]: https://github.com/instrumentisto/medea-jason/tree/medea-client-api-proto-0.9.0/proto/client-api
 

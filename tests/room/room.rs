@@ -317,7 +317,7 @@ mod disable_recv_tracks {
         let (room, mut commands_rx) = get_test_room(Box::pin(event_rx));
         let room_handle = api::RoomHandle::from(room.new_handle());
 
-        JsFuture::from(room_handle.disable_remote_audio()).await.unwrap();
+        JsFuture::from(room_handle.disable_remote_audio(None)).await.unwrap();
 
         event_tx
             .unbounded_send(Event::PeerCreated {
@@ -334,6 +334,7 @@ mod disable_recv_tracks {
                         muted: false,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
+                            source_kind: MediaSourceKind::Device,
                         }),
                     },
                     Track {
@@ -360,6 +361,7 @@ mod disable_recv_tracks {
                         muted: false,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
+                            source_kind: MediaSourceKind::Device,
                         }),
                     },
                 ],
@@ -429,7 +431,10 @@ mod init_track_states {
                 },
                 media_direction: *media_direction,
                 muted: false,
-                media_type: MediaType::Audio(AudioSettings { required: true }),
+                media_type: MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
             })
             .collect();
 
@@ -487,7 +492,10 @@ mod init_track_states {
                 },
                 media_direction: *media_direction,
                 muted: false,
-                media_type: MediaType::Audio(AudioSettings { required: true }),
+                media_type: MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
             })
             .collect();
 
@@ -552,6 +560,7 @@ mod receivers_patch_send_tracks {
                     muted: false,
                     media_type: MediaType::Audio(AudioSettings {
                         required: true,
+                        source_kind: MediaSourceKind::Device,
                     }),
                 }]),
                 ice_servers: Vec::new(),
@@ -625,7 +634,7 @@ mod disable_send_tracks {
     };
 
     use super::*;
-    use crate::is_firefox;
+    use crate::{MediaSourceKind, is_firefox};
 
     #[wasm_bindgen_test]
     async fn disable_enable_audio() {
@@ -637,10 +646,18 @@ mod disable_send_tracks {
         .await;
 
         let room_handle = api::RoomHandle::from(room.new_handle());
-        JsFuture::from(room_handle.disable_audio()).await.unwrap();
+        JsFuture::from(
+            room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
 
         assert!(!peer.is_send_audio_enabled());
-        JsFuture::from(room_handle.enable_audio()).await.unwrap();
+        JsFuture::from(
+            room_handle.enable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
         assert!(peer.is_send_audio_enabled());
     }
 
@@ -670,7 +687,10 @@ mod disable_send_tracks {
             },
             media_direction: MediaDirection::SendRecv,
             muted: false,
-            media_type: MediaType::Audio(AudioSettings { required }),
+            media_type: MediaType::Audio(AudioSettings {
+                required,
+                source_kind: MediaSourceKind::Device,
+            }),
         }
     }
 
@@ -797,8 +817,12 @@ mod disable_send_tracks {
 
         let room_handle = api::RoomHandle::from(room.new_handle());
         let (first, second) = futures::future::join(
-            JsFuture::from(room_handle.disable_audio()),
-            JsFuture::from(room_handle.disable_audio()),
+            JsFuture::from(
+                room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+            ),
+            JsFuture::from(
+                room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+            ),
         )
         .await;
         first.unwrap();
@@ -881,8 +905,14 @@ mod disable_send_tracks {
         let room_handle = api::RoomHandle::from(room.new_handle());
         let (disable_audio_result, enable_audio_result) =
             futures::future::join(
-                JsFuture::from(room_handle.disable_audio()),
-                JsFuture::from(room_handle.enable_audio()),
+                JsFuture::from(
+                    room_handle
+                        .disable_audio(Some(api::MediaSourceKind::Device)),
+                ),
+                JsFuture::from(
+                    room_handle
+                        .enable_audio(Some(api::MediaSourceKind::Device)),
+                ),
             )
             .await;
         disable_audio_result.unwrap_err();
@@ -976,7 +1006,11 @@ mod disable_send_tracks {
         ));
 
         let room_handle = api::RoomHandle::from(room.new_handle());
-        JsFuture::from(room_handle.disable_audio()).await.unwrap();
+        JsFuture::from(
+            room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
 
         assert!(peer.is_all_transceiver_sides_in_media_state(
             MediaKind::Audio,
@@ -987,8 +1021,14 @@ mod disable_send_tracks {
 
         let (disable_audio_result, enable_audio_result) =
             futures::future::join(
-                JsFuture::from(room_handle.disable_audio()),
-                JsFuture::from(room_handle.enable_audio()),
+                JsFuture::from(
+                    room_handle
+                        .disable_audio(Some(api::MediaSourceKind::Device)),
+                ),
+                JsFuture::from(
+                    room_handle
+                        .enable_audio(Some(api::MediaSourceKind::Device)),
+                ),
             )
             .await;
         disable_audio_result.unwrap();
@@ -1016,7 +1056,11 @@ mod disable_send_tracks {
         .await
         .unwrap();
 
-        JsFuture::from(room_handle.disable_audio()).await.unwrap();
+        JsFuture::from(
+            room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
 
         let (audio_track, video_track) = get_test_tracks(false, false);
         event_tx
@@ -1095,7 +1139,11 @@ mod disable_send_tracks {
         .await
         .unwrap();
 
-        JsFuture::from(room_handle.mute_audio()).await.unwrap();
+        JsFuture::from(
+            room_handle.mute_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap();
 
         let (audio_track, video_track) = get_test_tracks(false, false);
         event_tx
@@ -1448,12 +1496,15 @@ mod patches_generation {
     use wasm_bindgen_futures::spawn_local;
 
     use super::*;
-    use crate::{is_firefox, timeout};
+    use crate::{MediaSourceKind, is_firefox, timeout};
 
     fn audio_and_device_video_tracks_content() -> Vec<(MediaType, Direction)> {
         vec![
             (
-                MediaType::Audio(AudioSettings { required: false }),
+                MediaType::Audio(AudioSettings {
+                    required: false,
+                    source_kind: MediaSourceKind::Device,
+                }),
                 Direction::Send { receivers: Vec::new(), mid: None },
             ),
             (
@@ -1593,7 +1644,11 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.disable_audio()).await.unwrap_err();
+            JsFuture::from(
+                room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+            )
+            .await
+            .unwrap_err();
         });
 
         assert_eq!(
@@ -1633,7 +1688,11 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.disable_audio()).await.unwrap_err();
+            JsFuture::from(
+                room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+            )
+            .await
+            .unwrap_err();
         });
 
         let mut commands = HashMap::new();
@@ -1689,7 +1748,11 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.enable_audio()).await.unwrap();
+            JsFuture::from(
+                room_handle.enable_audio(Some(api::MediaSourceKind::Device)),
+            )
+            .await
+            .unwrap();
         });
 
         assert!(timeout(5, command_rx.next()).await.is_err());
@@ -1845,7 +1908,11 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.mute_audio()).await.unwrap_err();
+            JsFuture::from(
+                room_handle.mute_audio(Some(api::MediaSourceKind::Device)),
+            )
+            .await
+            .unwrap_err();
         });
 
         assert_eq!(
@@ -1873,7 +1940,11 @@ mod patches_generation {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         spawn_local(async move {
-            JsFuture::from(room_handle.unmute_audio()).await.unwrap_err();
+            JsFuture::from(
+                room_handle.unmute_audio(Some(api::MediaSourceKind::Device)),
+            )
+            .await
+            .unwrap_err();
         });
 
         assert_eq!(
@@ -1901,9 +1972,15 @@ async fn mute_unmute_audio() {
     .await;
 
     let room_handle = api::RoomHandle::from(room.new_handle());
-    JsFuture::from(room_handle.mute_audio()).await.unwrap();
+    JsFuture::from(room_handle.mute_audio(Some(api::MediaSourceKind::Device)))
+        .await
+        .unwrap();
     assert!(!peer.is_send_audio_unmuted());
-    JsFuture::from(room_handle.unmute_audio()).await.unwrap();
+    JsFuture::from(
+        room_handle.unmute_audio(Some(api::MediaSourceKind::Device)),
+    )
+    .await
+    .unwrap();
     assert!(peer.is_send_audio_unmuted());
 }
 
@@ -1918,9 +1995,22 @@ async fn remote_disable_enable_audio() {
     .await;
 
     let room_handle = api::RoomHandle::from(room.new_handle());
-    assert!(JsFuture::from(room_handle.disable_remote_audio()).await.is_ok());
+    assert!(
+        JsFuture::from(
+            room_handle
+                .disable_remote_audio(Some(api::MediaSourceKind::Device))
+        )
+        .await
+        .is_ok()
+    );
     assert!(!peer.is_recv_audio_enabled());
-    assert!(JsFuture::from(room_handle.enable_remote_audio()).await.is_ok());
+    assert!(
+        JsFuture::from(
+            room_handle.enable_remote_audio(Some(api::MediaSourceKind::Device))
+        )
+        .await
+        .is_ok()
+    );
     assert!(peer.is_recv_audio_enabled());
 }
 
@@ -2078,7 +2168,11 @@ async fn only_one_gum_performed_on_enable() {
             })],
         })
         .unwrap();
-    JsFuture::from(room_handle.enable_audio()).await.unwrap_err();
+    JsFuture::from(
+        room_handle.enable_audio(Some(api::MediaSourceKind::Device)),
+    )
+    .await
+    .unwrap_err();
 
     assert_eq!(mock.get_user_media_requests_count(), 1);
     mock.stop();
@@ -2097,13 +2191,21 @@ async fn no_updates_sent_if_gum_fails_on_enable() {
     assert_eq!(mock.get_user_media_requests_count(), 1);
     assert!(peer.is_send_audio_enabled());
 
-    JsFuture::from(room_handle.disable_audio()).await.unwrap();
+    JsFuture::from(
+        room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+    )
+    .await
+    .unwrap();
     assert!(!peer.is_send_audio_enabled());
 
     mock.error_get_user_media("gum error".into());
 
     let err = jsval_cast::<LocalMediaInitException>(
-        JsFuture::from(room_handle.enable_audio()).await.unwrap_err(),
+        JsFuture::from(
+            room_handle.enable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap_err(),
         "LocalMediaInitException",
     )
     .unwrap();
@@ -2130,26 +2232,34 @@ async fn no_updates_sent_if_gum_fails_on_enable() {
     );
 }
 
-/// Tests that error from gUM/gDM request will be returned from the
-/// [`RoomHandle::enable_audio`]/[`RoomHandle::enable_video`].
+/// Tests that error from gUM request will be returned from the
+/// [`RoomHandle::enable_audio`].
 #[wasm_bindgen_test]
-async fn set_media_state_return_media_error() {
+async fn set_media_state_return_media_error_device_audio() {
     const ERROR_MSG: &str = "set_media_state_return_media_error";
 
     let mock = MockNavigator::new();
+    mock.error_get_user_media(ERROR_MSG.into());
+
     let (audio_track, video_track) = get_test_tracks(false, false);
     let (room, _peer, _event_tx, _) = get_test_room_and_exist_peer(
         vec![audio_track, video_track],
-        Some(media_stream_settings(false, false)),
+        Some(media_stream_settings(true, false)),
     )
     .await;
     let room_handle = api::RoomHandle::from(room.new_handle());
-    JsFuture::from(room_handle.disable_audio()).await.unwrap();
-
-    mock.error_get_user_media(ERROR_MSG.into());
+    JsFuture::from(
+        room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+    )
+    .await
+    .unwrap();
 
     let err = jsval_cast::<LocalMediaInitException>(
-        JsFuture::from(room_handle.enable_audio()).await.unwrap_err(),
+        JsFuture::from(
+            room_handle.enable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await
+        .unwrap_err(),
         "LocalMediaInitException",
     )
     .unwrap();
@@ -2160,6 +2270,66 @@ async fn set_media_state_return_media_error() {
         format!(
             "Failed to get local tracks: MediaDevices.getUserMedia() failed: \
              Error: {ERROR_MSG}",
+        )
+    );
+
+    mock.stop();
+}
+
+/// Tests that error from gDM request will be returned from the
+/// [`RoomHandle::enable_video`].
+#[wasm_bindgen_test]
+async fn set_media_state_return_media_error_display_video() {
+    const ERROR_MSG: &str = "set_media_state_return_media_error";
+
+    let mock = MockNavigator::new();
+    mock.error_get_display_media(ERROR_MSG.into());
+
+    let (audio_track, video_track) = get_test_tracks(false, false);
+    let display_track = Track {
+        id: TrackId(1),
+        direction: Direction::Send {
+            receivers: vec![MemberId::from("bob")],
+            mid: None,
+        },
+        media_direction: medea_jason::media::MediaDirection::SendRecv.into(),
+        muted: false,
+        media_type: MediaType::Video(VideoSettings {
+            required: false,
+            source_kind: MediaSourceKind::Display,
+            encoding_parameters: vec![],
+        }),
+    };
+
+    let (room, _peer, _event_tx, _) = get_test_room_and_exist_peer(
+        vec![audio_track, video_track, display_track],
+        Some(media_stream_settings(false, true)),
+    )
+    .await;
+
+    let room_handle = api::RoomHandle::from(room.new_handle());
+    JsFuture::from(
+        room_handle.disable_video(Some(api::MediaSourceKind::Display)),
+    )
+    .await
+    .unwrap();
+
+    let err = jsval_cast::<LocalMediaInitException>(
+        JsFuture::from(
+            room_handle.enable_video(Some(api::MediaSourceKind::Display)),
+        )
+        .await
+        .unwrap_err(),
+        "LocalMediaInitException",
+    )
+    .unwrap();
+
+    assert_eq!(err.kind(), LocalMediaInitExceptionKind::GetDisplayMediaFailed);
+    assert_eq!(
+        err.message(),
+        format!(
+            "Failed to get local tracks: `MediaDevices.getDisplayMedia()` \
+            failed: Error: {ERROR_MSG}",
         )
     );
 
@@ -2478,7 +2648,7 @@ mod set_local_media_settings {
         let (audio_track, video_track) = get_test_required_tracks();
 
         let mut constraints = api::MediaStreamSettings::new();
-        constraints.audio(api::AudioTrackConstraints::new());
+        constraints.device_audio(api::DeviceAudioTrackConstraints::new());
 
         JsFuture::from(room_handle.set_local_media_settings(
             &constraints,
@@ -2528,7 +2698,7 @@ mod set_local_media_settings {
                 .await;
 
         let mut constraints = api::MediaStreamSettings::new();
-        constraints.audio(api::AudioTrackConstraints::new());
+        constraints.device_audio(api::DeviceAudioTrackConstraints::new());
 
         let room_handle = api::RoomHandle::from(room.new_handle());
         room_handle.on_failed_local_media(cb.into()).unwrap();
@@ -2580,7 +2750,8 @@ mod set_local_media_settings {
 
             let mut constraints = api::MediaStreamSettings::new();
             if add_audio {
-                constraints.audio(api::AudioTrackConstraints::new());
+                constraints
+                    .device_audio(api::DeviceAudioTrackConstraints::new());
             }
             if add_video {
                 constraints
@@ -2864,7 +3035,7 @@ mod state_synchronization {
     };
     use wasm_bindgen_test::*;
 
-    use crate::{get_test_tracks, timeout};
+    use crate::{MediaSourceKind, get_test_tracks, timeout};
 
     /// Checks whether [`state::Room`] update can create a [`PeerConnection`]
     /// and its [`Sender`]s/[`Receiver`]s.
@@ -2896,7 +3067,10 @@ mod state_synchronization {
                 muted: false,
                 media_direction: MediaDirection::SendRecv,
                 receivers: vec![MemberId::from("Test")],
-                media_type: MediaType::Audio(AudioSettings { required: true }),
+                media_type: MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
                 mid: None,
                 connection_mode: ConnectionMode::Mesh,
             },
@@ -2909,7 +3083,10 @@ mod state_synchronization {
                 muted: false,
                 media_direction: MediaDirection::SendRecv,
                 sender_id: "".into(),
-                media_type: MediaType::Audio(AudioSettings { required: true }),
+                media_type: MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
                 mid: None,
                 connection_mode: ConnectionMode::Mesh,
             },
@@ -3120,7 +3297,10 @@ async fn intentions_are_sent_on_reconnect() {
     peer_state.connection_lost();
 
     spawn_local(async move {
-        let _ = JsFuture::from(room_handle.disable_audio()).await;
+        let _ = JsFuture::from(
+            room_handle.disable_audio(Some(api::MediaSourceKind::Device)),
+        )
+        .await;
     });
     timeout(1000, async {
         while let Some(cmd) = commands_rx.next().await {
@@ -3196,6 +3376,7 @@ async fn sender_answerer() {
                     muted: false,
                     media_type: MediaType::Audio(AudioSettings {
                         required: true,
+                        source_kind: MediaSourceKind::Device,
                     }),
                 },
                 Track {

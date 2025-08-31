@@ -45,23 +45,23 @@ class NativeRoomHandle implements RoomHandle {
   }
 
   @override
-  Future<void> muteAudio() async {
-    await (opaque.inner.muteAudio() as Future);
+  Future<void> muteAudio([MediaSourceKind? kind]) async {
+    await (opaque.inner.muteAudio(sourceKind: kind) as Future);
   }
 
   @override
-  Future<void> unmuteAudio() async {
-    await (opaque.inner.unmuteAudio() as Future);
+  Future<void> unmuteAudio([MediaSourceKind? kind]) async {
+    await (opaque.inner.unmuteAudio(sourceKind: kind) as Future);
   }
 
   @override
-  Future<void> enableAudio() async {
-    await (opaque.inner.enableAudio() as Future);
+  Future<void> enableAudio([MediaSourceKind? kind]) async {
+    await (opaque.inner.enableAudio(sourceKind: kind) as Future);
   }
 
   @override
-  Future<void> disableAudio() async {
-    await (opaque.inner.disableAudio() as Future);
+  Future<void> disableAudio([MediaSourceKind? kind]) async {
+    await (opaque.inner.disableAudio(sourceKind: kind) as Future);
   }
 
   @override
@@ -85,13 +85,13 @@ class NativeRoomHandle implements RoomHandle {
   }
 
   @override
-  Future<void> enableRemoteAudio() async {
-    await (opaque.inner.enableRemoteAudio() as Future);
+  Future<void> enableRemoteAudio([MediaSourceKind? kind]) async {
+    await (opaque.inner.enableRemoteAudio(sourceKind: kind) as Future);
   }
 
   @override
-  Future<void> disableRemoteAudio() async {
-    await (opaque.inner.disableRemoteAudio() as Future);
+  Future<void> disableRemoteAudio([MediaSourceKind? kind]) async {
+    await (opaque.inner.disableRemoteAudio(sourceKind: kind) as Future);
   }
 
   @override

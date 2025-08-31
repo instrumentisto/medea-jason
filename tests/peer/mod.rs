@@ -781,7 +781,10 @@ impl InterconnectedPeers {
                 },
                 media_direction: MediaDirection::SendRecv,
                 muted: false,
-                media_type: MediaType::Audio(AudioSettings { required: true }),
+                media_type: MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
             },
             Track {
                 id: TrackId(2),
@@ -811,7 +814,10 @@ impl InterconnectedPeers {
                 },
                 media_direction: MediaDirection::SendRecv,
                 muted: false,
-                media_type: MediaType::Audio(AudioSettings { required: true }),
+                media_type: MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
             },
             Track {
                 id: TrackId(2),
@@ -1279,7 +1285,10 @@ async fn new_remote_track() {
                 },
                 media_direction: MediaDirection::SendRecv,
                 muted: false,
-                media_type: MediaType::Audio(AudioSettings { required: true }),
+                media_type: MediaType::Audio(AudioSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
             },
             LocalTracksConstraints::default(),
         );

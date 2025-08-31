@@ -15,10 +15,10 @@ import '../api.dart';
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>
 abstract class RoomHandle implements RustOpaqueInterface {
   /// Disables outbound audio in the provided [`Room`].
-  Object disableAudio();
+  Object disableAudio({MediaSourceKind? sourceKind});
 
   /// Disables inbound audio in the provided [`Room`].
-  Object disableRemoteAudio();
+  Object disableRemoteAudio({MediaSourceKind? sourceKind});
 
   /// Disables inbound video in the provided [`Room`].
   ///
@@ -39,10 +39,10 @@ abstract class RoomHandle implements RustOpaqueInterface {
   Object disableVideo({MediaSourceKind? sourceKind});
 
   /// Enables outbound audio in the provided [`Room`].
-  Object enableAudio();
+  Object enableAudio({MediaSourceKind? sourceKind});
 
   /// Enables inbound audio in the provided [`Room`].
-  Object enableRemoteAudio();
+  Object enableRemoteAudio({MediaSourceKind? sourceKind});
 
   /// Enables inbound video in the provided [`Room`].
   ///
@@ -71,7 +71,7 @@ abstract class RoomHandle implements RustOpaqueInterface {
   Object join({required String token});
 
   /// Mutes outbound audio in the provided [`Room`].
-  Object muteAudio();
+  Object muteAudio({MediaSourceKind? sourceKind});
 
   /// Mutes outbound video in the provided [`Room`].
   ///
@@ -170,7 +170,7 @@ abstract class RoomHandle implements RustOpaqueInterface {
   });
 
   /// Unmutes outbound audio in the provided [`Room`].
-  Object unmuteAudio();
+  Object unmuteAudio({MediaSourceKind? sourceKind});
 
   /// Unmutes outbound video in the provided [`Room`].
   ///

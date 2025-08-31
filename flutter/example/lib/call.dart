@@ -115,7 +115,7 @@ class Call {
               (element) => element.kind() == MediaDeviceKind.audioInput,
             )
             .deviceId();
-        constraints.audio(AudioTrackConstraints());
+        constraints.deviceAudio(DeviceAudioTrackConstraints());
       }
 
       var tracks = await _mediaManager.initLocalTracks(constraints);
@@ -191,7 +191,7 @@ class Call {
   /// Sets media tracks according to the passed settings.
   Future<void> setMedia(
     DeviceVideoTrackConstraints video,
-    AudioTrackConstraints audio,
+    DeviceAudioTrackConstraints audio,
     DisplayVideoTrackConstraints display,
   ) async {
     for (var t in _tracks) {
@@ -200,7 +200,7 @@ class Call {
 
     var constraints = MediaStreamSettings();
     constraints.deviceVideo(video);
-    constraints.audio(audio);
+    constraints.deviceAudio(audio);
     if (screenShare) {
       constraints.displayVideo(display);
     }

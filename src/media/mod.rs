@@ -12,11 +12,11 @@ use medea_client_api_proto::MediaType;
 #[doc(inline)]
 pub use self::{
     constraints::{
-        AudioMediaTracksSettings, AudioTrackConstraints,
-        DeviceVideoTrackConstraints, DisplayVideoTrackConstraints, FacingMode,
-        LocalTracksConstraints, MediaStreamSettings,
+        AudioSource, DeviceAudioTrackConstraints, DeviceVideoTrackConstraints,
+        DisplayAudioTrackConstraints, DisplayVideoTrackConstraints, FacingMode,
+        LocalTracksConstraints, MediaStreamSettings, MediaTrackConstraints,
         MultiSourceTracksConstraints, NoiseSuppressionLevel, RecvConstraints,
-        TrackConstraints, VideoSource, VideoTrackConstraints,
+        TrackConstraints, VideoSource,
     },
     manager::{
         EnumerateDevicesError, EnumerateDisplaysError, GetDisplayMediaError,
