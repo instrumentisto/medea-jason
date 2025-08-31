@@ -17,7 +17,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- `DisplayAudioTrackConstraints` and `MediaStreamSettings.display_audio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
+- `DisplayAudioTrackConstraints` and `MediaStreamSettings.displayAudio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
 
 ### Fixed
