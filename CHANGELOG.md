@@ -12,12 +12,12 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.deviceAudio()`. ([#225])
-- Made `RoomHandle`'s `muteAudio()`, `unmuteAudio()`, `disableAudio()`, `enableAudio()`, `disableRemoteAudio()`, `enableRemoteAudio()` to accept optional `MediaSourceKind`. ([#225])
+- Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.deviceAudio()`. ([#225], [#224])
+- Made `RoomHandle`'s `muteAudio()`, `unmuteAudio()`, `disableAudio()`, `enableAudio()`, `disableRemoteAudio()`, `enableRemoteAudio()` to accept optional `MediaSourceKind`. ([#225], [#224])
 
 ### Added
 
-- `DisplayAudioTrackConstraints` and `MediaStreamSettings.display_audio()` to capture system audio (only works in Chrome and Windows desktop). ([#225])
+- `DisplayAudioTrackConstraints` and `MediaStreamSettings.display_audio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
 
 ### Fixed
@@ -28,6 +28,7 @@ All user visible changes to this project will be documented in this file. This p
 
 - Bumped up [MSRV] to 1.86 to be buildable by [`cargo-ndk` 4.0 version]. ([todo])
 
+[#224]: https://github.com/instrumentisto/medea-jason/issues/224
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
 [#229]: https://github.com/instrumentisto/medea-jason/pull/229

@@ -14,13 +14,13 @@ All user visible changes to this project will be documented in this file. This p
 
 - Bumped up minimum supported [Flutter] version to 3.35. ([#231])
 - Bumped up minimum supported [Dart] version to 3.9. ([#231])
-- Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.deviceAudio()`. ([#225])
-- Made `RoomHandle`'s `muteAudio()`, `unmuteAudio()`, `disableAudio()`, `enableAudio()`, `disableRemoteAudio()`, `enableRemoteAudio()` to accept optional `MediaSourceKind`. ([#225])
+- Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.deviceAudio()`. ([#225], [#224])
+- Made `RoomHandle`'s `muteAudio()`, `unmuteAudio()`, `disableAudio()`, `enableAudio()`, `disableRemoteAudio()`, `enableRemoteAudio()` to accept optional `MediaSourceKind`. ([#225], [#224])
 
 ### Added
 
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
-- `DisplayAudioTrackConstraints` and `MediaStreamSettings.displayAudio()` to capture system audio (only works in Chrome and Windows desktop). ([#225])
+- `DisplayAudioTrackConstraints` and `MediaStreamSettings.displayAudio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
 
 ### Fixed
 
@@ -31,6 +31,7 @@ All user visible changes to this project will be documented in this file. This p
 - Dependencies:
     - [`medea_flutter_webrtc`] to 0.16.0 version. ([#231])
 
+[#224]: https://github.com/instrumentisto/medea-jason/issues/224
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
 [#229]: https://github.com/instrumentisto/medea-jason/pull/229
