@@ -60,8 +60,8 @@ sealed class ApiConstrainFacingMode with _$ApiConstrainFacingMode {
       ApiConstrainFacingMode_Ideal;
 }
 
-/// Constraints applicable to audio tracks sourced from a system audio recodring
-/// device, usually a microphone.
+/// Constraints applicable to audio tracks, sourced from a system audio
+/// recording device (usually a microphone).
 class ApiDeviceAudioTrackConstraints {
   /// Identifier of the device generating the content for the media track.
   String? deviceId;
@@ -309,8 +309,8 @@ class ApiMediaStreamSettings {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
   ApiDeviceAudioTrackConstraints? deviceAudio;
 
-  /// [MediaStreamConstraints][1] for the display audio media type
-  /// (system audio capture).
+  /// [MediaStreamConstraints][1] for the display audio media type (system
+  /// audio capture).
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
   ApiDisplayAudioTrackConstraints? displayAudio;

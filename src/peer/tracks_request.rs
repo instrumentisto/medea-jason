@@ -23,13 +23,11 @@ use crate::{
 #[derive(Caused, Clone, Copy, Debug, Display, Eq, PartialEq)]
 #[cause(error = platform::Error)]
 pub enum TracksRequestError {
-    /// [`TracksRequest`] contains multiple Device
-    /// [`DeviceAudioTrackConstraints`].
+    /// [`TracksRequest`] contains multiple [`DeviceAudioTrackConstraints`].
     #[display("only one device audio track is allowed in SimpleTracksRequest")]
     TooManyDeviceAudioTracks,
 
-    /// [`TracksRequest`] contains multiple Display
-    /// [`DisplayAudioTrackConstraints`].
+    /// [`TracksRequest`] contains multiple [`DisplayAudioTrackConstraints`].
     #[display("only one display audio track is allowed in SimpleTracksRequest")]
     TooManyDisplayAudioTracks,
 
@@ -81,12 +79,10 @@ pub enum TracksRequestError {
 /// [3]: https://w3.org/TR/mediacapture-streams#mediastream
 #[derive(Debug, Default)]
 pub struct TracksRequest {
-    /// Device [`DeviceAudioTrackConstraints`] of [`local::Track`]s to be
-    /// applied.
+    /// [`DeviceAudioTrackConstraints`] of [`local::Track`]s to be applied.
     device_audio: HashMap<TrackId, DeviceAudioTrackConstraints>,
 
-    /// Display [`DisplayAudioTrackConstraints`] of [`local::Track`]s to be
-    /// applied.
+    /// [`DisplayAudioTrackConstraints`] of [`local::Track`]s to be applied.
     display_audio: HashMap<TrackId, DisplayAudioTrackConstraints>,
 
     /// [`DeviceVideoTrackConstraints`] of [`local::Track`]s to be applied.
@@ -128,12 +124,10 @@ impl TracksRequest {
 /// and must have at least one track of any kind.
 #[derive(Debug)]
 pub struct SimpleTracksRequest {
-    /// Display [`DisplayAudioTrackConstraints`] of a [`local::Track`] to be
-    /// applied.
+    /// [`DisplayAudioTrackConstraints`] of a [`local::Track`] to be applied.
     display_audio: Option<(TrackId, DisplayAudioTrackConstraints)>,
 
-    /// Device [`DeviceAudioTrackConstraints`] of a [`local::Track`] to be
-    /// applied.
+    /// [`DeviceAudioTrackConstraints`] of a [`local::Track`] to be applied.
     device_audio: Option<(TrackId, DeviceAudioTrackConstraints)>,
 
     /// [`DisplayVideoTrackConstraints`] of a [`local::Track`] to be applied.
@@ -247,23 +241,21 @@ impl SimpleTracksRequest {
     ///
     /// # Errors
     ///
-    /// - [`TracksRequestError::ExpectedDeviceAudioTracks`] when
-    ///   [`SimpleTracksRequest`] contains Device
-    ///   [`DeviceAudioTrackConstraints`], but the provided
-    ///   [`MediaStreamSettings`] doesn't and these Device
+    /// - [`TracksRequestError::ExpectedDeviceAudioTracks`] when a
+    ///   [`SimpleTracksRequest`] contains [`DeviceAudioTrackConstraints`], but
+    ///   the provided [`MediaStreamSettings`] don't and these
     ///   [`DeviceAudioTrackConstraints`] are important.
-    /// - [`TracksRequestError::ExpectedDisplayAudioTracks`] when
-    ///   [`SimpleTracksRequest`] contains Display
-    ///   [`DisplayAudioTrackConstraints`], but the provided
-    ///   [`MediaStreamSettings`] doesn't and these Display
+    /// - [`TracksRequestError::ExpectedDisplayAudioTracks`] when a
+    ///   [`SimpleTracksRequest`] contains [`DisplayAudioTrackConstraints`], but
+    ///   the provided [`MediaStreamSettings`] don't and these
     ///   [`DisplayAudioTrackConstraints`] are important.
-    /// - [`TracksRequestError::ExpectedDeviceVideoTracks`] when
+    /// - [`TracksRequestError::ExpectedDeviceVideoTracks`] when a
     ///   [`SimpleTracksRequest`] contains [`DeviceVideoTrackConstraints`], but
-    ///   the provided [`MediaStreamSettings`] doesn't and these
+    ///   the provided [`MediaStreamSettings`] don't and these
     ///   [`DeviceVideoTrackConstraints`] are important.
-    /// - [`TracksRequestError::ExpectedDisplayVideoTracks`] when
+    /// - [`TracksRequestError::ExpectedDisplayVideoTracks`] when a
     ///   [`SimpleTracksRequest`] contains [`DisplayVideoTrackConstraints`], but
-    ///   the provided [`MediaStreamSettings`] doesn't and these
+    ///   the provided [`MediaStreamSettings`] don't and these
     ///   [`DisplayVideoTrackConstraints`] are important.
     pub fn merge<T: Into<MediaStreamSettings>>(
         &mut self,

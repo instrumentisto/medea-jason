@@ -212,9 +212,9 @@ impl MediaStreamTrack {
         self.sys_track.enabled()
     }
 
-    /// Returns the media source kind of this [`MediaStreamTrack`].
+    /// Returns the [`MediaSourceKind`] of this [`MediaStreamTrack`].
     ///
-    /// Returns [`None`] for remote tracks.
+    /// [`None`] for remote [`MediaStreamTrack`]s.
     #[must_use]
     pub const fn source_kind(&self) -> Option<MediaSourceKind> {
         self.source_kind

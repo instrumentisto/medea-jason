@@ -153,8 +153,8 @@ pub struct ApiMediaDisplayDetails {
     pub title: Option<String>,
 }
 
-/// Constraints applicable to audio tracks sourced from a system audio recodring
-/// device, usually a microphone.
+/// Constraints applicable to audio tracks, sourced from a system audio
+/// recording device (usually a microphone).
 #[derive(Debug)]
 #[frb]
 pub struct ApiDeviceAudioTrackConstraints {
@@ -370,8 +370,8 @@ pub struct ApiMediaStreamSettings {
     #[frb(non_final)]
     pub device_audio: Option<ApiDeviceAudioTrackConstraints>,
 
-    /// [MediaStreamConstraints][1] for the display audio media type
-    /// (system audio capture).
+    /// [MediaStreamConstraints][1] for the display audio media type (system
+    /// audio capture).
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     #[frb(non_final)]

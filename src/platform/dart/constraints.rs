@@ -288,7 +288,7 @@ impl DisplayMediaStreamConstraints {
         .unwrap();
     }
 
-    /// Specifies the provided nature and settings of a `audio`
+    /// Specifies the provided nature and settings of an `audio`
     /// [MediaStreamTrack][1] to these [`DisplayMediaStreamConstraints`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack

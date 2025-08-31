@@ -39,15 +39,14 @@ impl MediaStreamSettings {
     /// Specifies the nature and settings of a display audio
     /// [MediaStreamTrack][1].
     ///
-    /// __NOTE__: Behaviour is platform dependent and there is no propper
-    /// feature check. It is known to only work in Chrome and Chrome-based
-    /// browsers. It must always be coupled with a
-    /// [`DisplayVideoTrackConstraints`], meaning that system audio capture
-    /// prompt is a part of the screen-sharing prompt, so if you try to request
-    /// `display_audio` without `display_video` the UA will ask user for screen
-    /// capture track anyway.
+    /// Behaviour is platform dependent and there is no propper feature check.
+    /// It's known to only work in Chrome and Chrome-based browsers. It must
+    /// always be coupled with [`DisplayVideoTrackConstraints`], meaning that
+    /// system audio capture prompt is a part of the screen-sharing prompt, so
+    /// if you try to request `display_audio` without `display_video` the UA
+    /// will ask user for screen capture track anyway.
     ///
-    /// It is also OS dependent:
+    /// It is also OS-dependent:
     /// 1. Only `Chrome-tab` audio can be captured on macOS and Linux.
     /// 2. Both `Chrome-tab` and `Entire screen` audio can be captured on
     ///    Windows.
@@ -81,8 +80,8 @@ pub struct DeviceAudioTrackConstraints(media::DeviceAudioTrackConstraints);
 )]
 #[wasm_bindgen]
 impl DeviceAudioTrackConstraints {
-    /// Creates new [`DeviceAudioTrackConstraints`] with none
-    /// constraints configured.
+    /// Creates new [`DeviceAudioTrackConstraints`] with none constraints
+    /// configured.
     #[must_use]
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
@@ -155,8 +154,8 @@ impl DisplayAudioTrackConstraints {
     }
 }
 
-/// Constraints applicable to audio tracks sourced from a system audio recording
-/// device, usually a microphone.
+/// Constraints applicable to audio tracks, sourced from a system audio
+/// recording device (usually a microphone).
 #[wasm_bindgen]
 #[derive(Debug, From, Into)]
 pub struct DeviceVideoTrackConstraints(media::DeviceVideoTrackConstraints);

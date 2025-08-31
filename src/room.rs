@@ -503,9 +503,9 @@ impl RoomHandleImpl {
 
     /// Mutes outbound audio in this [`Room`].
     ///
-    /// When `source_kind` is `None`, this will mute all audio tracks.
-    /// When `source_kind` is specified, only tracks of that source kind will
-    /// be muted.
+    /// When `source_kind` is [`None`], this will mute all audio tracks.
+    /// When `source_kind` is [`Some`], only tracks of that [`MediaSourceKind`]
+    /// will be muted.
     ///
     /// # Errors
     ///
@@ -530,9 +530,9 @@ impl RoomHandleImpl {
 
     /// Unmutes outbound audio in this [`Room`].
     ///
-    /// When `source_kind` is `None`, this will unmute all audio tracks.
-    /// When `source_kind` is specified, only tracks of that source kind will
-    /// be unmuted.
+    /// When `source_kind` is [`None`], this will mute all audio tracks.
+    /// When `source_kind` is [`Some`], only tracks of that [`MediaSourceKind`]
+    /// will be muted.
     ///
     /// # Errors
     ///

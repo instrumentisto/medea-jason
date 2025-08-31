@@ -1178,66 +1178,66 @@ window.onload = async function() {
       if (isAudioRecvEnabled) {
         await room.disable_remote_audio();
         isAudioRecvEnabled = false;
-        disableAudioRecv.textContent = 'Enable audio recv'
+        disableAudioRecv.textContent = 'Enable audio recv';
       } else {
         await room.enable_remote_audio();
         isAudioRecvEnabled = true;
-        disableAudioRecv.textContent = 'Disable audio recv'
+        disableAudioRecv.textContent = 'Disable audio recv';
       }
     });
     disableDisplayAudioRecv.addEventListener('click', async () => {
       if (isDisplayAudioRecvEnabled) {
         await room.disable_remote_audio(rust.MediaSourceKind.Display);
         isDisplayAudioRecvEnabled = false;
-        disableDisplayAudioRecv.textContent = 'Enable display audio recv'
+        disableDisplayAudioRecv.textContent = 'Enable display audio recv';
       } else {
         await room.enable_remote_audio(rust.MediaSourceKind.Display);
         isDisplayAudioRecvEnabled = true;
-        disableDisplayAudioRecv.textContent = 'Disable display audio recv'
+        disableDisplayAudioRecv.textContent = 'Disable display audio recv';
       }
     });
     disableDeviceAudioRecv.addEventListener('click', async () => {
       if (isDeviceAudioRecvEnabled) {
         await room.disable_remote_audio(rust.MediaSourceKind.Device);
         isDeviceAudioRecvEnabled = false;
-        disableDeviceAudioRecv.textContent = 'Enable device audio recv'
+        disableDeviceAudioRecv.textContent = 'Enable device audio recv';
       } else {
         await room.enable_remote_audio(rust.MediaSourceKind.Device);
         isDeviceAudioRecvEnabled = true;
-        disableDeviceAudioRecv.textContent = 'Disable device audio recv'
+        disableDeviceAudioRecv.textContent = 'Disable device audio recv';
       }
     });
     disableVideoRecv.addEventListener('click', async () => {
       if (isVideoRecvEnabled) {
         await room.disable_remote_video();
         isVideoRecvEnabled = false;
-        disableVideoRecv.textContent = 'Enable video recv'
+        disableVideoRecv.textContent = 'Enable video recv';
       } else {
         await room.enable_remote_video();
         isVideoRecvEnabled = true;
-        disableVideoRecv.textContent = 'Disable video recv'
+        disableVideoRecv.textContent = 'Disable video recv';
       }
     });
     disableDisplayVideoRecv.addEventListener('click', async () => {
       if (isDisplayVideoRecvEnabled) {
         await room.disable_remote_video(rust.MediaSourceKind.Display);
         isDisplayVideoRecvEnabled = false;
-        disableDisplayVideoRecv.textContent = 'Enable display video recv'
+        disableDisplayVideoRecv.textContent = 'Enable display video recv';
       } else {
         await room.enable_remote_video(rust.MediaSourceKind.Display);
         isDisplayVideoRecvEnabled = true;
-        disableDisplayVideoRecv.textContent = 'Disable display video recv'
+        disableDisplayVideoRecv.textContent = 'Disable display video recv';
       }
     });
     disableCameraDisplayVideoRecv.addEventListener('click', async () => {
       if (isCameraVideoRecvEnabled) {
         await room.disable_remote_video(rust.MediaSourceKind.Device);
         isCameraVideoRecvEnabled = false;
-        disableCameraDisplayVideoRecv.textContent = 'Enable camera video recv'
+        disableCameraDisplayVideoRecv.textContent = 'Enable camera video recv';
       } else {
         await room.enable_remote_video(rust.MediaSourceKind.Device);
         isCameraVideoRecvEnabled = true;
-        disableCameraDisplayVideoRecv.textContent = 'Disable camera video recv'
+        disableCameraDisplayVideoRecv.textContent = 'Disable camera video recv';
       }
     });
     closeApp.addEventListener('click', () => {

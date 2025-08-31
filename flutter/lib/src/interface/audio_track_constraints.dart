@@ -57,7 +57,8 @@ abstract class DeviceAudioTrackConstraints implements SyncPlatformHandle {
 }
 
 /// Constraints applicable to display audio tracks (system audio capture).
-/// Display audio does not support audio processing features.
+///
+/// Display audio doesn't support audio processing features.
 abstract class DisplayAudioTrackConstraints implements SyncPlatformHandle {
   // No methods - display audio doesn't support audio processing
 }

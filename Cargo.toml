@@ -1,6 +1,6 @@
 [package]
 name = "medea-jason"
-version = "0.11.0"
+version = "0.12.0-dev"
 edition = "2024"
 rust-version = "1.86"
 description = "Client library for Medea media server."
@@ -48,7 +48,7 @@ derive_more = { version = "2.0", features = ["as_ref", "debug", "deref", "displa
 flutter_rust_bridge = { version = "=2.11.1", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
 futures = "0.3"
 log = "0.4"
-medea-client-api-proto = { version = "0.9", path = "proto/client-api" }
+medea-client-api-proto = { version = "0.10.0-dev", path = "proto/client-api" }
 medea-macro = { version = "0.3", path = "crates/medea-macro" }
 medea-reactive = { version = "0.1", path = "crates/medea-reactive" }
 mockall = { version = "0.13", optional = true }
