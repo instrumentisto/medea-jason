@@ -314,7 +314,6 @@ async fn jason_network_changed_errors_on_failed_reconnect() {
         Rc::new(t) as Rc<dyn RpcTransport>
     };
 
-    log::error!("0000");
     let ws = Rc::new(WebSocketRpcClient::new({
         let created_count = created_count.clone();
         Box::new(move || {
@@ -329,10 +328,8 @@ async fn jason_network_changed_errors_on_failed_reconnect() {
     let room = jason.init_room();
     room.on_failed_local_media(Closure::once_into_js(|| {}).into()).unwrap();
     room.on_connection_loss(Closure::once_into_js(|| {}).into()).unwrap();
-    log::error!("1111");
+
     JsFuture::from(room.join(TEST_ROOM_URL.to_string())).await.unwrap();
-    log::error!("2222");
     // This should error due to failed reconnect
     assert!(JsFuture::from(jason.network_changed()).await.is_err());
-    log::error!("3333");
 }
