@@ -21,6 +21,7 @@ All user visible changes to this project will be documented in this file. This p
 
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
 - `DisplayAudioTrackConstraints` and `MediaStreamSettings.displayAudio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
+- `Jason::networkChanged()` to instantly reconnect all signalling and ICE transports. ([#236])
 
 ### Fixed
 
@@ -36,6 +37,7 @@ All user visible changes to this project will be documented in this file. This p
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
 [#229]: https://github.com/instrumentisto/medea-jason/pull/229
 [#231]: https://github.com/instrumentisto/medea-jason/pull/231
+[#236]: https://github.com/instrumentisto/medea-jason/pull/236
 
 
 
