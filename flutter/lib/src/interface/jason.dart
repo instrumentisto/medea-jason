@@ -16,4 +16,12 @@ abstract class Jason implements SyncPlatformHandle {
 
   /// Closes the `Room` by the provided [RoomHandle].
   void closeRoom(@moveSemantics RoomHandle room);
+
+  /// Notifies Jason about a network change event (e.g., interface switch).
+  ///
+  /// Drops and recreates active WebSocket connections and schedules ICE
+  /// restart after reconnection.
+  ///
+  /// Throws `RpcClientException` if reconnect attempt fails.
+  Future<void> networkChanged();
 }

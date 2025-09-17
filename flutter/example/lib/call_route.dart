@@ -297,6 +297,24 @@ class _CallState extends State<CallRoute> {
           TextButton(
             style: TextButton.styleFrom(
               foregroundColor: Colors.white,
+              backgroundColor: Colors.orange,
+            ),
+            child: const Text('Network changed'),
+            onPressed: () async {
+              try {
+                await _call!.networkChanged();
+                var snackBar = const SnackBar(content: Text('Reconnecting...'));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Network change failed: $e')),
+                );
+              }
+            },
+          ),
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
               backgroundColor: Colors.blue,
             ),
             child: const Text('MediaSetting'),

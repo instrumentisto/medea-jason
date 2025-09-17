@@ -25,6 +25,12 @@ abstract class Jason implements RustOpaqueInterface {
   /// Returns a [`MediaManagerHandle`].
   MediaManagerHandle jasonMediaManager();
 
+  /// Notifies Jason about a network change event (e.g., interface switch).
+  ///
+  /// Drops and recreates active WebSocket connections and schedules ICE
+  /// restart after reconnection.
+  Object jasonNetworkChanged();
+
   /// Instantiates a new [`Jason`] interface to interact with this library.
   factory Jason() => RustLib.instance.api.crateApiDartApiJasonJasonNew();
 }

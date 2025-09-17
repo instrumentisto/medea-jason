@@ -667,22 +667,6 @@ impl PeerConnection {
         }));
     }
 
-    /// Sends [`PeerConnection`]'s connection state and ICE connection state to
-    /// the server.
-    fn send_current_connection_states(&self) {
-        Self::on_ice_connection_state_changed(
-            self.id,
-            &self.peer_events_sender,
-            self.peer.ice_connection_state(),
-        );
-
-        Self::on_connection_state_changed(
-            self.id,
-            &self.peer_events_sender,
-            self.peer.connection_state(),
-        );
-    }
-
     /// Marks [`PeerConnection`] to trigger ICE restart.
     ///
     /// After this function returns, the generated offer is automatically

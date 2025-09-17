@@ -149,6 +149,14 @@ pub trait RpcSession {
     /// This will fire when connection to RPC server is reestablished after
     /// connection loss.
     fn on_reconnected(&self) -> LocalBoxStream<'static, ()>;
+
+    /// Notifies the session that network connectivity has changed.
+    ///
+    /// Implementations should force-close the underlying transport so that
+    /// reconnection logic can re-establish the session on the new network.
+    async fn network_changed(
+        self: Rc<Self>,
+    ) -> Result<(), Traced<SessionError>>;
 }
 
 /// Client to talk with server via Client API RPC.
@@ -513,6 +521,33 @@ impl RpcSession for WebSocketRpcSession {
                 }
             })
             .boxed_local()
+    }
+
+    /// Drops current transport and initiates connections with a new one.
+    async fn network_changed(
+        self: Rc<Self>,
+    ) -> Result<(), Traced<SessionError>> {
+        use SessionError as E;
+        use SessionState as S;
+
+        match self.state.get() {
+            S::Connecting(_)
+            | S::Authorizing(_)
+            | S::Lost(..)
+            | S::Initialized(_) => {}
+            S::Opened(info) => {
+                self.can_reconnect.set(true);
+                self.client.close_for_reconnect();
+                self.state.set(S::Connecting(info));
+            }
+            S::Uninitialized => {
+                return Err(tracerr::new!(E::NoCredentials));
+            }
+            S::Finished(reason) => {
+                return Err(tracerr::new!(E::SessionFinished(reason)));
+            }
+        }
+        self.inner_connect().await.map_err(tracerr::map_from_and_wrap!())
     }
 }
 

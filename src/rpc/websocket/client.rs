@@ -50,6 +50,9 @@ pub enum ClientDisconnect {
     ///
     /// [`WebSocketRpcSession`]: crate::rpc::WebSocketRpcSession
     SessionUnexpectedlyDropped,
+
+    /// Client initiated reconnect for whatever reason.
+    CloseForReconnect,
 }
 
 impl ClientDisconnect {
@@ -61,7 +64,25 @@ impl ClientDisconnect {
             | Self::RpcClientUnexpectedlyDropped
             | Self::RpcTransportUnexpectedlyDropped
             | Self::SessionUnexpectedlyDropped => true,
-            Self::RoomClosed => false,
+            Self::CloseForReconnect | Self::RoomClosed => false,
+        }
+    }
+
+    /// Returns a close code for this [`ClientDisconnect`] reason.
+    #[must_use]
+    pub const fn code(self) -> u16 {
+        match self {
+            Self::RoomClosed
+            | Self::RoomUnexpectedlyDropped
+            | Self::RpcClientUnexpectedlyDropped
+            | Self::RpcTransportUnexpectedlyDropped
+            | Self::SessionUnexpectedlyDropped => 1000,
+            Self::CloseForReconnect => {
+                // We can only use 1000 or [3000;4999] with 1000 being a normal
+                // disconnect and everything else is protocol defined, which is
+                // abnormal in our case.
+                3000
+            }
         }
     }
 }
@@ -277,6 +298,16 @@ impl WebSocketRpcClient {
                 }
             },
             CloseMsg::Abnormal(_) => {
+                if self.0.borrow_mut().close_reason
+                    == ClientDisconnect::CloseForReconnect
+                {
+                    // Client-side initiated reconnect. Not checking the actual
+                    // close code since we can't know whether server was able
+                    // to handle out close frame and send it back or connection
+                    // was broken, so any non-1000 code is ok her.
+                    return;
+                }
+
                 self.handle_connection_loss(ConnectionLostReason::WithMessage(
                     close_msg,
                 ));
@@ -457,12 +488,13 @@ impl WebSocketRpcClient {
                 ClientState::Open => {
                     return Ok(());
                 }
+                ClientState::Closed(ClosedStateReason::ClosedForReconnect)
+                | ClientState::Connecting => (),
                 ClientState::Closed(reason) => {
                     return Err(tracerr::new!(
                         RpcClientError::ConnectionFailed(reason)
                     ));
                 }
-                ClientState::Connecting => (),
             }
         }
         Err(tracerr::new!(RpcClientError::RpcClientGone))
@@ -555,6 +587,26 @@ impl WebSocketRpcClient {
         let (tx, rx) = mpsc::unbounded();
         self.0.borrow_mut().on_connection_loss_subs.push(tx);
         Box::pin(rx)
+    }
+
+    /// Forces the underlying transport to close immediately.
+    ///
+    /// This will trigger normal or abnormal close handling and propagate to
+    /// session watchers.
+    pub fn close_for_reconnect(&self) {
+        drop(self.0.borrow_mut().heartbeat.take());
+        self.set_close_reason(ClientDisconnect::CloseForReconnect);
+        if let Some(sock) = self.0.borrow_mut().sock.take() {
+            sock.set_close_reason(ClientDisconnect::CloseForReconnect);
+        }
+        self.0.borrow().state.set(ClientState::Closed(
+            ClosedStateReason::ConnectionLost(
+                ConnectionLostReason::WithMessage(CloseMsg::Normal(
+                    1000,
+                    CloseByServerReason::Reconnected,
+                )),
+            ),
+        ));
     }
 
     /// Sets reason being passed to the underlying transport when this client is

@@ -153,6 +153,11 @@ class Jason implements base.Jason {
   }
 
   @override
+  Future<void> networkChanged() async {
+    await (opaque.inner.jasonNetworkChanged() as Future);
+  }
+
+  @override
   @moveSemantics
   void free() {
     if (!opaque.isDisposed) {

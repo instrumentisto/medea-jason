@@ -1,10 +1,12 @@
 //! General JS side library interface.
 
 use derive_more::with_trait::From;
+use js_sys::Promise;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::future_to_promise;
 
 use crate::{
-    api::{MediaManagerHandle, RoomHandle},
+    api::{Error, MediaManagerHandle, RoomHandle},
     jason,
 };
 
@@ -40,6 +42,19 @@ impl Jason {
     /// Closes the provided [`RoomHandle`].
     pub fn close_room(&self, room_to_delete: RoomHandle) {
         self.0.close_room(&room_to_delete.into());
+    }
+
+    /// Notifies Jason about a network change event (e.g., interface switch).
+    ///
+    /// Drops and recreates active WebSocket connections and schedules ICE
+    /// restart after reconnection.
+    pub fn network_changed(&self) -> Promise {
+        let fut = self.0.network_changed();
+
+        future_to_promise(async move {
+            fut.await.map_err(Error::from)?;
+            Ok(JsValue::UNDEFINED)
+        })
     }
 
     /// Drops [`Jason`] API object, so all the related objects (rooms,

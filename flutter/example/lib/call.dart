@@ -229,6 +229,11 @@ class Call {
     _jason.closeRoom(_room);
   }
 
+  /// Reconnects RPC and ICE transports.
+  Future<void> networkChanged() async {
+    await _jason.networkChanged();
+  }
+
   /// Sets the callback for a new local audio track.
   void onLocalAudioTrack(Function(LocalMediaTrack) f) {
     _onLocalAudioTrack = f;

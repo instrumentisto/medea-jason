@@ -197,6 +197,12 @@ impl State {
         self.0.borrow().get(&peer_id).cloned()
     }
 
+    /// Returns a snapshot of all peer states currently stored.
+    #[must_use]
+    pub fn all(&self) -> Vec<Rc<peer::State>> {
+        self.0.borrow().values().map(Rc::clone).collect()
+    }
+
     /// Removes [`peer::State`] with the provided [`PeerId`].
     pub fn remove(&self, peer_id: PeerId) {
         drop(self.0.borrow_mut().remove(&peer_id));

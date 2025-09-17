@@ -629,6 +629,13 @@ window.onload = async function() {
     await startPublishing();
   });
 
+  const networkChangedBtn = document.getElementById('control__network_changed');
+  if (networkChangedBtn) {
+    networkChangedBtn.addEventListener('click', async () => {
+      await jason.network_changed();
+    });
+  }
+
   Object.values(controlDebugWindows).forEach(s => s());
 
   let isCallStarted = false;

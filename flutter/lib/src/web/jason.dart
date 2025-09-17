@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
@@ -30,6 +32,11 @@ class Jason extends base.Jason {
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
     fallibleFunction(() => obj.close_room((room as WebRoomHandle).obj));
+  }
+
+  @override
+  Future<void> networkChanged() async {
+    await fallibleFuture(obj.network_changed().toDart);
   }
 
   @override
