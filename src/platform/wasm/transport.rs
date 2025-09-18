@@ -110,7 +110,7 @@ impl Drop for InnerSocket {
             let code = self.close_reason.code();
             let rsn =
                 serde_json::to_string(&self.close_reason).unwrap_or_else(|e| {
-                    panic!("Could not serialize close message: {e}")
+                    panic!("cannot serialize close message: {e}")
                 });
             if let Some(socket) = self.socket.borrow().as_ref() {
                 if let Err(e) = socket.close_with_code_and_reason(code, &rsn) {

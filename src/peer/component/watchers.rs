@@ -477,7 +477,7 @@ impl Component {
         state: &State,
         sync_phase: SyncPhase,
     ) {
-        // Triggers after successful RPC reconnect.
+        // Triggers after successful RPC reconnection.
         if sync_phase == SyncPhase::Synced {
             PeerConnection::on_ice_connection_state_changed(
                 peer.id(),
@@ -486,10 +486,10 @@ impl Component {
             );
 
             if state.network_changed.get() {
-                // We are sure that network configuration was changed and
-                // current ICE transports won't survive that, so we send
-                // `PeerConnectionState::Failed` right away since actual
-                // connection state might be lagging behind.
+                // Network configuration was changed and the current ICE
+                // transports won't survive that, so the
+                // `PeerConnectionState::Failed` is sent right away, since
+                // the actual connection state might be lagging behind.
                 state.network_changed.set(false);
                 PeerConnection::on_connection_state_changed(
                     peer.id(),

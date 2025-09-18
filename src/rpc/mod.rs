@@ -176,8 +176,8 @@ pub enum ClosedStateReason {
     /// [1]: medea_client_api_proto::ServerMsg::RpcSettings
     FirstServerMsgIsNotRpcSettings,
 
-    /// Client wants to create a new connection so the current was closed.
-    ClosedForReconnect,
+    /// Client wants to recreate a new connection, so the current was closed.
+    ClosedForReconnection,
 }
 
 /// Reason of why [`WebSocketRpcClient`]/[`platform::RpcTransport`] lost

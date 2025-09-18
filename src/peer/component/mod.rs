@@ -134,8 +134,10 @@ pub struct State {
     /// All [`IceCandidate`]s of this [`Component`].
     ice_candidates: IceCandidates,
 
-    /// Network connectivity was changed so old ICE transports are considered
-    /// to be dead.
+    /// Network connectivity was changed so old [ICE] transports are considered
+    /// dead.
+    ///
+    /// [ICE]: https://webrtcglossary.com/ice
     network_changed: Cell<bool>,
 
     /// Indicator whether [`State::update_local_stream`] method should be
@@ -450,8 +452,11 @@ impl State {
         self.local_sdp.current()
     }
 
-    /// Marks this peer's state as affected by a network change. This schedules
-    /// ICE restart after state resynchronization.
+    /// Marks this [`State`] as affected by a network change.
+    ///
+    /// This schedules [ICE] restarts after this [`State`]'s resynchronization.
+    ///
+    /// [ICE]: https://webrtcglossary.com/ice
     pub fn set_network_changed(&self) {
         self.network_changed.set(true);
     }

@@ -6137,10 +6137,13 @@ class JasonImpl extends RustOpaque implements Jason {
   MediaManagerHandle jasonMediaManager() => RustLib.instance.api
       .crateApiDartApiJasonJasonJasonMediaManager(that: this);
 
-  /// Notifies Jason about a network change event (e.g., interface switch).
+  /// Notifies [`Jason`] about a network change event (interface switch or
+  /// similar).
   ///
-  /// Drops and recreates active WebSocket connections and schedules ICE
-  /// restart after reconnection.
+  /// Drops and recreates active connections and schedules [ICE] restart after
+  /// reconnection.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
   Object jasonNetworkChanged() => RustLib.instance.api
       .crateApiDartApiJasonJasonJasonNetworkChanged(that: this);
 }

@@ -12,30 +12,30 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.deviceAudio()`. ([#225], [#224])
-- Made `RoomHandle`'s `muteAudio()`, `unmuteAudio()`, `disableAudio()`, `enableAudio()`, `disableRemoteAudio()`, `enableRemoteAudio()` to accept optional `MediaSourceKind`. ([#225], [#224])
 - Bumped up minimum supported iOS deployment target to 15. ([#236])
+- Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.device_audio()`. ([#225], [#224])
+- Made `RoomHandle`'s `mute_audio()`, `unmute_audio()`, `disable_audio()`, `enable_audio()`, `disable_remote_audio()`, `enable_remote_audio()` to accept optional `MediaSourceKind`. ([#225], [#224])
 
 ### Added
 
-- `DisplayAudioTrackConstraints` and `MediaStreamSettings.displayAudio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
-- `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
-- `Jason::network_changed()` to instantly reconnect all signalling and ICE transports. ([#236])
+- `DisplayAudioTrackConstraints` and `MediaStreamSettings.display_audio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
+- `ConnectionHandle.get_state()` and `ConnectionHandle.on_state_change()` for tracking connection with remote member in P2P mode. ([#229])
+- `Jason.network_changed()` for instant reconnection of all signalling and ICE transports. ([#236])
 
 ### Fixed
 
-- `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
+- `ConnectionHandle.on_quality_score_update()` callback being called when `Connection` is in [SFU] mode. ([#228])
 
 ### Changed
 
-- Bumped up [MSRV] to 1.86 to be buildable by [`cargo-ndk` 4.0 version]. ([todo])
+- Bumped up [MSRV] to 1.86 to be buildable by [`cargo-ndk` 4.0 version]. ([095368cb])
 
 [#224]: https://github.com/instrumentisto/medea-jason/issues/224
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
 [#229]: https://github.com/instrumentisto/medea-jason/pull/229
 [#236]: https://github.com/instrumentisto/medea-jason/pull/236
-[todo]: https://github.com/instrumentisto/medea-jason/commit/todo
+[095368cb]: https://github.com/instrumentisto/medea-jason/commit/095368cb2e5dd6faca44882955b7cab6b19d8ad2
 [`cargo-ndk` 4.0 version]: https://github.com/bbqsrc/cargo-ndk/blob/v4.0.0/CHANGELOG.md#v400---2025-07-30
 
 

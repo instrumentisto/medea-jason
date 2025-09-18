@@ -934,16 +934,18 @@ impl Room {
         RoomHandleImpl(Rc::downgrade(&self.0))
     }
 
-    /// Notifies this room about a network change and re-establishes RPC.
+    /// Notifies this [`Room`] about a network change and re-establishes RPC.
     ///
-    /// Sets the network-changed flag for all peers to trigger ICE restart on
-    /// reconnection and then asks the underlying RPC session to drop current
-    /// transport and create a new one.
+    /// Sets the network-changed flag for all peers to trigger [ICE] restart on
+    /// reconnection and then asks the underlying RPC session to drop the
+    /// current transport and re-create a new one.
     ///
     /// # Errors
     ///
     /// With a [`ReconnectError`] if could not establish new signalling
     /// transport.
+    ///
+    /// [ICE]: https://webrtcglossary.com/ice
     pub async fn network_changed(&self) -> Result<(), Traced<ReconnectError>> {
         for p in self.0.peers.state().all() {
             p.set_network_changed();

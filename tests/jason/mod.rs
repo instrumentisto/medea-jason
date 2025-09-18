@@ -29,15 +29,15 @@ use crate::{TEST_ROOM_URL, delay_for, rpc::RPC_SETTINGS, timeout};
 
 wasm_bindgen_test_configure!(run_in_browser);
 
-/// Setup jason with one room and one peer, then call
-/// [`JasonImpl::network_changed`].
+/// Setups a [`JasonImpl`] with one room and one peer, then calls
+/// [`JasonImpl::network_changed()`].
 ///
 /// Asserts:
 ///
 /// 1. First RPC transport is dropped and the second is created.
 /// 2. [`Command::SynchronizeMe`] is sent via second transport.
 /// 3. [`PeerConnectionState::Failed`] is sent via second transport.
-/// 4. A total of two [`Command::JoinRoom`] is sent. One for each transport
+/// 4. Total of two [`Command::JoinRoom`] is sent. One for each transport
 ///    created.
 /// 5. [`RoomHandle::on_connection_loss`] is not called since transport drop is
 ///    initiated by user.
@@ -46,11 +46,11 @@ async fn jason_network_changed() {
     // Captures commands sent by room.
     let (cmd_tx, mut cmd_rx) = mpsc::unbounded::<ClientMsg>();
 
-    // Track how many transports were created and whether first got dropped
+    // Track how many transports were created and whether first got dropped.
     let t1_dropped = Rc::new(RefCell::new(false));
     let created_count = Rc::new(RefCell::new(0));
 
-    // First RPC transport that will be dropped after network_changed call
+    // First RPC transport that will be dropped after `network_changed()` call.
     let t1 = {
         let cmd_tx = cmd_tx.clone();
         let t1_dropped = t1_dropped.clone();
@@ -58,11 +58,11 @@ async fn jason_network_changed() {
             let mut t = MockRpcTransport::new();
             t.expect_connect()
                 .return_once(|_| Box::pin(futures::future::ok(())));
-            // Open once
+            // Open once.
             t.expect_on_state_change().return_once(|| {
                 Box::pin(stream::once(async { TransportState::Open }))
             });
-            // Send RpcSettings and then pending
+            // Send` RpcSettings` and then pending.
             t.expect_on_message().returning(|| {
                 Box::pin(
                     stream::iter(vec![
@@ -88,7 +88,7 @@ async fn jason_network_changed() {
                     .chain(stream::pending()),
                 )
             });
-            // Forward all client messages into cmd_tx
+            // Forward all client messages into `cmd_tx`.
             let cmd_tx = cmd_tx.clone();
             t.expect_send().returning(move |msg| {
                 cmd_tx.unbounded_send(msg.clone()).ok();
@@ -104,7 +104,8 @@ async fn jason_network_changed() {
         }
     };
 
-    // Second RPC transport mock that will be created after network_changed call
+    // Second RPC transport mock that will be created after `network_changed()`
+    // call.
     let t2 = {
         let cmd_tx = cmd_tx.clone();
         // Channel used to push server messages after transport is created.
@@ -114,12 +115,13 @@ async fn jason_network_changed() {
             let mut t = MockRpcTransport::new();
             t.expect_connect()
                 .return_once(|_| Box::pin(futures::future::ok(())));
-            // Open once
+            // Open once.
             t.expect_on_state_change().return_once(|| {
                 Box::pin(stream::once(async { TransportState::Open }))
             });
-            // RpcSettings, RoomJoined, and then allow further messages to be
-            // pushed (e.g., StateSynchronized in response to SynchronizeMe).
+            // `RpcSettings`, `RoomJoined`, and then allow further messages to
+            // be pushed (e.g., `StateSynchronized` in response to
+            // `SynchronizeMe`).
             t.expect_on_message().returning_st({
                 let t2_srv_tx = t2_srv_tx.clone();
                 move || {
@@ -136,15 +138,15 @@ async fn jason_network_changed() {
                     Box::pin(rx)
                 }
             });
-            // Forward sends to the same sink
+            // Forward sends to the same sink.
             let cmd_tx = cmd_tx.clone();
             let t2_srv_tx = t2_srv_tx.clone();
             t.expect_send().returning(move |msg| {
-                // Mirror the sent command into the test channel
+                // Mirror the sent command into the test channel.
                 cmd_tx.unbounded_send(msg.clone()).ok();
 
-                // If this is SynchronizeMe, emit StateSynchronized back from
-                // the server using the same state payload.
+                // If this is `SynchronizeMe`, emit `StateSynchronized` back
+                // from the server using the same state payload.
                 if let ClientMsg::Command { room_id, command } = msg.clone() {
                     if let Command::SynchronizeMe { state } = command {
                         if let Some(tx) =
@@ -161,7 +163,7 @@ async fn jason_network_changed() {
 
                 Ok(())
             });
-            // Accept close reason calls (not important for second)
+            // Accept close reason calls (not important for second).
             t.expect_set_close_reason().return_const(());
             Rc::new(t) as Rc<dyn RpcTransport>
         }
@@ -180,7 +182,7 @@ async fn jason_network_changed() {
 
     let jason = api::Jason::from(JasonImpl::new(Some(ws.clone())));
 
-    // Init room and join
+    // Init room and join.
     let room = jason.init_room();
     room.on_failed_local_media(Closure::once_into_js(|| {}).into()).unwrap();
     let (loss_tx, loss_rx) = oneshot::channel::<()>();
@@ -190,22 +192,22 @@ async fn jason_network_changed() {
     room.on_connection_loss(on_loss.into()).unwrap();
     JsFuture::from(room.join(TEST_ROOM_URL.to_string())).await.unwrap();
 
-    // Verify first transport created
+    // Verify first transport created.
     assert_eq!(*created_count.borrow(), 1);
 
-    // Trigger network change
+    // Trigger network change.
     JsFuture::from(jason.network_changed()).await.unwrap();
 
-    // Give reconnection some time
+    // Give reconnection some time.
     delay_for(50).await;
 
     // Second transport must be created, first must have been dropped with
-    // reason
+    // reason.
     assert_eq!(*created_count.borrow(), 2);
     assert!(*t1_dropped.borrow());
 
-    // We expect two `Command::JoinRoom`s - one for each transport
-    // And a single PeerConnectionState::Failed so server restarts ICE.
+    // We expect two `Command::JoinRoom`s - one for each transport,
+    // and a single `PeerConnectionState::Failed` so server restarts ICE.
     let mut join_room_sent = 0;
     let mut peer_conn_failed_sent = false;
     let mut sync_request_sent = false;
@@ -237,24 +239,25 @@ async fn jason_network_changed() {
 
     assert!(
         peer_conn_failed_sent,
-        "PeerConnectionState::Failed must be sent after \
-            `Jason::network_changed` call"
+        "`PeerConnectionState::Failed` must be sent after \
+         `Jason::network_changed()` call",
     );
     assert!(
         sync_request_sent,
-        "Command::SynchronizeMe must be sent after RPC reconnect"
+        "`Command::SynchronizeMe` must be sent after RPC reconnection",
     );
-    assert_eq!(join_room_sent, 2, "JoinRoom not sent after reconnect");
+    assert_eq!(join_room_sent, 2, "`JoinRoom` not sent after reconnection");
 
-    // Ensure on_connection_loss callback wasn't called during controlled
-    // reconnect flow.
+    // Ensure `on_connection_loss` callback wasn't called during controlled
+    // reconnection flow.
     assert!(
         timeout(300, loss_rx).await.is_err(),
-        "on_connection_loss callback must not be called during network_changed"
+        "`on_connection_loss` callback must not be called during \
+         `network_changed()`",
     );
 }
 
-/// Checks that [`JasonImpl::network_changed`] errors if the new transport
+/// Checks that [`JasonImpl::network_changed()`] errors if the new transport
 /// fails to open.
 #[wasm_bindgen_test]
 async fn jason_network_changed_errors_on_failed_reconnect() {
@@ -297,7 +300,7 @@ async fn jason_network_changed_errors_on_failed_reconnect() {
     };
 
     // Second transport: connects but sends wrong first message
-    // (not RpcSettings), which should make the reconnect fail.
+    // (not `RpcSettings`), which should make the reconnect fail.
     let t2 = move || {
         let mut t = MockRpcTransport::new();
         t.expect_connect().return_once(|_| {
@@ -330,6 +333,9 @@ async fn jason_network_changed_errors_on_failed_reconnect() {
     room.on_connection_loss(Closure::once_into_js(|| {}).into()).unwrap();
 
     JsFuture::from(room.join(TEST_ROOM_URL.to_string())).await.unwrap();
-    // This should error due to failed reconnect
-    assert!(JsFuture::from(jason.network_changed()).await.is_err());
+    // This should error due to failed reconnection.
+    assert!(
+        JsFuture::from(jason.network_changed()).await.is_err(),
+        "reconnection should have failed, but it hasn't",
+    );
 }

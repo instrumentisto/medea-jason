@@ -25,10 +25,13 @@ abstract class Jason implements RustOpaqueInterface {
   /// Returns a [`MediaManagerHandle`].
   MediaManagerHandle jasonMediaManager();
 
-  /// Notifies Jason about a network change event (e.g., interface switch).
+  /// Notifies [`Jason`] about a network change event (interface switch or
+  /// similar).
   ///
-  /// Drops and recreates active WebSocket connections and schedules ICE
-  /// restart after reconnection.
+  /// Drops and recreates active connections and schedules [ICE] restart after
+  /// reconnection.
+  ///
+  /// [ICE]: https://webrtcglossary.com/ice
   Object jasonNetworkChanged();
 
   /// Instantiates a new [`Jason`] interface to interact with this library.

@@ -197,7 +197,7 @@ impl State {
         self.0.borrow().get(&peer_id).cloned()
     }
 
-    /// Returns a snapshot of all peer states currently stored.
+    /// Returns a snapshot of all the [`peer::State`]s currently stored.
     #[must_use]
     pub fn all(&self) -> Vec<Rc<peer::State>> {
         self.0.borrow().values().map(Rc::clone).collect()
