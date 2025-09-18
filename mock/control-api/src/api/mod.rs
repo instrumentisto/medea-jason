@@ -476,8 +476,8 @@ pub struct SingleGetResponse {
 
 impl From<proto::GetResponse> for SingleGetResponse {
     fn from(proto: proto::GetResponse) -> Self {
-        proto.error.map_or(
-            Self {
+        proto.error.map_or_else(
+            || Self {
                 error: None,
                 element: proto.elements.into_values().map(Element::from).next(),
             },
