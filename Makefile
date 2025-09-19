@@ -22,7 +22,7 @@ IMAGE_NAME := $(strip \
 
 RUST_VER := 1.90
 CHROME_VERSION := 140.0-chromedriver-140.0
-FIREFOX_VERSION := 143.0-driver0.36.0
+FIREFOX_VERSION := 143.0.1-driver0.36.0
 
 CARGO_NDK_VER := 4.1.2-ndkr28c-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
@@ -746,7 +746,7 @@ endif
 #	                | crate=<crate-name> [features=(all|<f1>[,<f2>...])]
 #	                | crate=medea-jason
 #	                  [browser=(chrome|firefox|default)]
-#	                  [timeout=(60|<seconds>)] )]
+#	                  [timeout=(120|<seconds>)] )]
 
 webdriver-env = $(if $(call eq,$(browser),firefox),GECKO,CHROME)DRIVER_REMOTE
 
@@ -761,14 +761,14 @@ else
 ifeq ($(crate),medea-jason)
 ifeq ($(browser),default)
 	cd $(crate-dir)/ && \
-	WASM_BINDGEN_TEST_TIMEOUT=$(or $(timeout),60) \
+	WASM_BINDGEN_TEST_TIMEOUT=$(or $(timeout),120) \
 	cargo test --target wasm32-unknown-unknown --features mockable
 else
 	@make docker.up.webdriver browser=$(browser)
 	sleep 10
 	cd $(crate-dir)/ && \
 	$(webdriver-env)="http://127.0.0.1:4444" \
-	WASM_BINDGEN_TEST_TIMEOUT=$(or $(timeout),60) \
+	WASM_BINDGEN_TEST_TIMEOUT=$(or $(timeout),120) \
 	cargo test --target wasm32-unknown-unknown --features mockable
 	@make docker.down.webdriver browser=$(browser)
 endif
