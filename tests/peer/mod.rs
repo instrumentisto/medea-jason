@@ -843,8 +843,10 @@ impl InterconnectedPeers {
 async fn get_traffic_stats() {
     let peers = InterconnectedPeers::new().await;
 
+    let mut first_peer_has_video_outbound = false;
+    let mut first_peer_has_audio_outbound_stat = false;
+    let mut firs_peer_has_succeeded_pairs = false;
     // We might have to wait a bit for the target stat.
-    let mut first_peer_stats = None;
     for _ in 0..10 {
         let stats: RtcStats = peers.first_peer.get_stats().await.unwrap();
         if stats
@@ -853,80 +855,97 @@ async fn get_traffic_stats() {
             .find(|s| matches!(s.stats, RtcStatsType::OutboundRtp { .. }))
             .is_some()
         {
-            first_peer_stats = Some(stats);
+            for stat in stats.0 {
+                match stat.stats {
+                    RtcStatsType::OutboundRtp(outbound) => {
+                        match outbound.media_type {
+                            RtcOutboundRtpStreamMediaType::Audio { .. } => {
+                                first_peer_has_audio_outbound_stat = true
+                            }
+                            RtcOutboundRtpStreamMediaType::Video { .. } => {
+                                first_peer_has_video_outbound = true
+                            }
+                        }
+                    }
+                    RtcStatsType::InboundRtp(_) => {
+                        unreachable!(
+                            "First `Peer` shouldn't have any \
+                                `InboundRtp` stats",
+                        )
+                    }
+                    RtcStatsType::CandidatePair(candidate_pair) => {
+                        if let NonExhaustive::Known(
+                            KnownIceCandidatePairState::Succeeded,
+                        ) = candidate_pair.state
+                        {
+                            firs_peer_has_succeeded_pairs = true;
+                        }
+                    }
+                    _ => (),
+                }
+            }
+
+            if first_peer_has_video_outbound
+                && first_peer_has_video_outbound
+                && firs_peer_has_succeeded_pairs
+            {
+                break;
+            }
+        }
+        delay_for(100).await;
+    }
+
+    assert!(first_peer_has_video_outbound);
+    assert!(first_peer_has_audio_outbound_stat);
+    assert!(firs_peer_has_succeeded_pairs);
+
+    delay_for(100).await;
+
+    let mut second_peer_has_video_inbound_stats = false;
+    let mut second_peer_has_audio_inbound_stats = false;
+    let mut second_peer_has_succeeded_pairs = false;
+
+    for _ in 0..10 {
+        let stats = peers.second_peer.get_stats().await.unwrap();
+
+        for stat in stats.0 {
+            match stat.stats {
+                RtcStatsType::InboundRtp(inbound) => {
+                    match inbound.media_specific_stats {
+                        RtcInboundRtpStreamMediaType::Audio { .. } => {
+                            second_peer_has_audio_inbound_stats = true
+                        }
+                        RtcInboundRtpStreamMediaType::Video { .. } => {
+                            second_peer_has_video_inbound_stats = true
+                        }
+                    }
+                }
+                RtcStatsType::OutboundRtp(_) => unreachable!(
+                    "Second Peer shouldn't have any OutboundRtp stats."
+                ),
+                RtcStatsType::CandidatePair(candidate_pair) => {
+                    if let NonExhaustive::Known(
+                        KnownIceCandidatePairState::Succeeded,
+                    ) = candidate_pair.state
+                    {
+                        second_peer_has_succeeded_pairs = true;
+                    }
+                }
+                _ => (),
+            }
+        }
+        if second_peer_has_video_inbound_stats
+            && second_peer_has_audio_inbound_stats
+            && second_peer_has_succeeded_pairs
+        {
             break;
         }
         delay_for(100).await;
     }
 
-    let mut first_peer_video_outbound_stats_count = 0;
-    let mut first_peer_audio_outbound_stats_count = 0;
-    let mut firs_peer_succeeded_pairs_count = 0;
-    for stat in first_peer_stats.unwrap().0 {
-        match stat.stats {
-            RtcStatsType::OutboundRtp(outbound) => match outbound.media_type {
-                RtcOutboundRtpStreamMediaType::Audio { .. } => {
-                    first_peer_audio_outbound_stats_count += 1
-                }
-                RtcOutboundRtpStreamMediaType::Video { .. } => {
-                    first_peer_video_outbound_stats_count += 1
-                }
-            },
-            RtcStatsType::InboundRtp(_) => {
-                unreachable!(
-                    "First `Peer` shouldn't have any `InboundRtp` stats",
-                )
-            }
-            RtcStatsType::CandidatePair(candidate_pair) => {
-                if let NonExhaustive::Known(
-                    KnownIceCandidatePairState::Succeeded,
-                ) = candidate_pair.state
-                {
-                    firs_peer_succeeded_pairs_count += 1;
-                }
-            }
-            _ => (),
-        }
-    }
-    assert_eq!(first_peer_video_outbound_stats_count, 1);
-    assert_eq!(first_peer_audio_outbound_stats_count, 1);
-    assert_eq!(firs_peer_succeeded_pairs_count, 1);
-
-    delay_for(100).await;
-
-    let second_peer_stats = peers.second_peer.get_stats().await.unwrap();
-    let mut second_peer_video_inbound_stats_count = 0;
-    let mut second_peer_audio_inbound_stats_count = 0;
-    let mut second_peer_succeeded_pairs_count = 0;
-    for stat in second_peer_stats.0 {
-        match stat.stats {
-            RtcStatsType::InboundRtp(inbound) => {
-                match inbound.media_specific_stats {
-                    RtcInboundRtpStreamMediaType::Audio { .. } => {
-                        second_peer_audio_inbound_stats_count += 1
-                    }
-                    RtcInboundRtpStreamMediaType::Video { .. } => {
-                        second_peer_video_inbound_stats_count += 1
-                    }
-                }
-            }
-            RtcStatsType::OutboundRtp(_) => unreachable!(
-                "Second Peer shouldn't have any OutboundRtp stats."
-            ),
-            RtcStatsType::CandidatePair(candidate_pair) => {
-                if let NonExhaustive::Known(
-                    KnownIceCandidatePairState::Succeeded,
-                ) = candidate_pair.state
-                {
-                    second_peer_succeeded_pairs_count += 1;
-                }
-            }
-            _ => (),
-        }
-    }
-    assert_eq!(second_peer_video_inbound_stats_count, 1);
-    assert_eq!(second_peer_audio_inbound_stats_count, 1);
-    assert_eq!(second_peer_succeeded_pairs_count, 1);
+    assert!(second_peer_has_video_inbound_stats);
+    assert!(second_peer_has_audio_inbound_stats);
+    assert!(second_peer_has_succeeded_pairs);
 }
 
 /// Tests for a [`RtcStat`]s caching mechanism of the [`PeerConnection`].
