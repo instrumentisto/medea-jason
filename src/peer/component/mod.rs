@@ -134,6 +134,12 @@ pub struct State {
     /// All [`IceCandidate`]s of this [`Component`].
     ice_candidates: IceCandidates,
 
+    /// Network connectivity was changed so old [ICE] transports are considered
+    /// dead.
+    ///
+    /// [ICE]: https://webrtcglossary.com/ice
+    network_changed: Cell<bool>,
+
     /// Indicator whether [`State::update_local_stream`] method should be
     /// called if some [`sender`] wants to update a local stream.
     maybe_update_local_stream: ObservableCell<bool>,
@@ -172,6 +178,7 @@ impl State {
             negotiation_phase: ObservableCell::new(NegotiationPhase::Stable),
             restart_ice: Cell::new(false),
             ice_candidates: IceCandidates::new(),
+            network_changed: Cell::new(false),
             maybe_update_local_stream: ObservableCell::new(false),
             maybe_update_connections: ObservableCell::new(None),
             sync_phase: ObservableCell::new(SyncPhase::Synced),
@@ -443,6 +450,15 @@ impl State {
     #[must_use]
     pub fn current_sdp_offer(&self) -> Option<String> {
         self.local_sdp.current()
+    }
+
+    /// Marks this [`State`] as affected by a network change.
+    ///
+    /// This schedules [ICE] restarts after this [`State`]'s resynchronization.
+    ///
+    /// [ICE]: https://webrtcglossary.com/ice
+    pub fn set_network_changed(&self) {
+        self.network_changed.set(true);
     }
 }
 

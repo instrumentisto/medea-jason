@@ -2,14 +2,16 @@
 
 use std::{cell::RefCell, rc::Rc, thread};
 
-use futures::FutureExt as _;
+use futures::{FutureExt as _, future::LocalBoxFuture};
+use tracerr::Traced;
 
 use crate::{
     media::{MediaManager, MediaManagerHandleImpl},
     platform,
     room::{Room, RoomHandleImpl},
     rpc::{
-        ClientDisconnect, RpcSession, WebSocketRpcClient, WebSocketRpcSession,
+        ClientDisconnect, ReconnectError, RpcSession, WebSocketRpcClient,
+        WebSocketRpcSession,
     },
 };
 
@@ -17,7 +19,7 @@ use crate::{
 ///
 /// Responsible for managing shared transports, local media and room
 /// initialization.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct JasonImpl(Rc<RefCell<Inner>>);
 
 /// Inner representation if a [`JasonImpl`].
@@ -101,6 +103,37 @@ impl JasonImpl {
             room.set_close_reason(ClientDisconnect::RoomClosed.into());
             drop(room);
         }
+    }
+
+    /// Notifies this [`JasonImpl`] about a network change event (interface
+    /// switch or similar).
+    ///
+    /// Drops and recreates active connections and schedules [ICE] restart after
+    /// reconnection.
+    ///
+    /// # Errors
+    ///
+    /// With a [`ReconnectError`] if new signalling could not be connected.
+    ///
+    /// [ICE]: https://webrtcglossary.com/ice
+    #[must_use]
+    pub fn network_changed(
+        &self,
+    ) -> LocalBoxFuture<'static, Result<(), Traced<ReconnectError>>> {
+        let inner = self.0.borrow();
+        let weak_rooms: Vec<_> =
+            inner.rooms.iter().map(Room::downgrade).collect();
+
+        async move {
+            for room in weak_rooms.into_iter().filter_map(|r| r.upgrade()) {
+                room.network_changed()
+                    .await
+                    .map_err(tracerr::map_from_and_wrap!())?;
+            }
+
+            Ok(())
+        }
+        .boxed_local()
     }
 
     /// Drops this [`JasonImpl`] API object, so all the related objects (rooms,

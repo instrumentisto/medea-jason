@@ -5,7 +5,7 @@ use std::{collections::HashSet, rc::Rc};
 use derive_more::with_trait::{Display, From};
 use futures::{StreamExt as _, future};
 use medea_client_api_proto::{
-    IceCandidate, MemberId, NegotiationRole, TrackId,
+    IceCandidate, MemberId, NegotiationRole, PeerConnectionState, TrackId,
 };
 use medea_macro::watchers;
 use medea_reactive::Guarded;
@@ -474,11 +474,35 @@ impl Component {
     #[watch(self.sync_phase.subscribe().skip(1))]
     fn sync_phase_changed(
         peer: &PeerConnection,
-        _: &State,
+        state: &State,
         sync_phase: SyncPhase,
     ) {
+        // Triggers after successful RPC reconnection.
         if sync_phase == SyncPhase::Synced {
-            peer.send_current_connection_states();
+            PeerConnection::on_ice_connection_state_changed(
+                peer.id(),
+                &peer.peer_events_sender,
+                peer.peer.ice_connection_state(),
+            );
+
+            if state.network_changed.get() {
+                // Network configuration was changed and the current ICE
+                // transports won't survive that, so the
+                // `PeerConnectionState::Failed` is sent right away, since
+                // the actual connection state might be lagging behind.
+                state.network_changed.set(false);
+                PeerConnection::on_connection_state_changed(
+                    peer.id(),
+                    &peer.peer_events_sender,
+                    PeerConnectionState::Failed,
+                );
+            } else {
+                PeerConnection::on_connection_state_changed(
+                    peer.id(),
+                    &peer.peer_events_sender,
+                    peer.peer.connection_state(),
+                );
+            }
         }
     }
 

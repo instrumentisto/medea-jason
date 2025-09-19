@@ -244,13 +244,16 @@ impl RpcTransport for WebSocketRpcTransport {
 
 impl Drop for WebSocketRpcTransport {
     fn drop(&mut self) {
+        let code = self.close_reason.get().code();
         let rsn = serde_json::to_string(&self.close_reason.get())
-            .unwrap_or_else(|e| {
-                panic!("Could not serialize close message: {e}")
-            });
+            .unwrap_or_else(|e| panic!("cannot serialize close message: {e}"));
         if let Some(handle) = self.handle.borrow().as_ref() {
             unsafe {
-                transport::close(handle.get(), 1000, string_into_c_str(rsn))
+                transport::close(
+                    handle.get(),
+                    code.into(),
+                    string_into_c_str(rsn),
+                )
             }
             .unwrap();
         }

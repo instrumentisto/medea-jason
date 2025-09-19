@@ -40,8 +40,8 @@ use crate::{
     platform,
     rpc::{
         ClientDisconnect, CloseReason, ConnectionInfo,
-        ConnectionInfoParseError, ReconnectHandleImpl, RpcSession,
-        SessionError,
+        ConnectionInfoParseError, ReconnectError, ReconnectHandleImpl,
+        RpcSession, SessionError,
     },
     utils::{AsProtoState as _, Caused},
 };
@@ -932,6 +932,28 @@ impl Room {
     #[must_use]
     pub fn new_handle(&self) -> RoomHandleImpl {
         RoomHandleImpl(Rc::downgrade(&self.0))
+    }
+
+    /// Notifies this [`Room`] about a network change and re-establishes RPC.
+    ///
+    /// Sets the network-changed flag for all peers to trigger [ICE] restart on
+    /// reconnection and then asks the underlying RPC session to drop the
+    /// current transport and re-create a new one.
+    ///
+    /// # Errors
+    ///
+    /// With a [`ReconnectError`] if could not establish new signalling
+    /// transport.
+    ///
+    /// [ICE]: https://webrtcglossary.com/ice
+    pub async fn network_changed(&self) -> Result<(), Traced<ReconnectError>> {
+        for p in self.0.peers.state().all() {
+            p.set_network_changed();
+        }
+        Rc::clone(&self.0.rpc)
+            .network_changed()
+            .await
+            .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Indicates whether this [`Room`] reference is the same as the given

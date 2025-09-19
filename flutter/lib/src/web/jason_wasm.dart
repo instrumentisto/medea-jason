@@ -145,6 +145,7 @@ extension type Jason._(JSObject _) implements JSObject {
   external RoomHandle init_room();
   external MediaManagerHandle media_manager();
   external void close_room(RoomHandle room_to_delete);
+  external JSPromise<JSAny?> network_changed();
   external void dispose();
 }
 

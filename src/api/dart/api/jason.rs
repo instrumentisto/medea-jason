@@ -1,7 +1,10 @@
-use flutter_rust_bridge::frb;
+use flutter_rust_bridge::{DartOpaque, frb};
 use send_wrapper::SendWrapper;
 
-use crate::{api, jason};
+use crate::{
+    api, api::Error as DartError, jason,
+    platform::utils::dart_future::IntoDartFuture as _,
+};
 #[cfg(doc)]
 use crate::{
     api::{MediaManagerHandle, RoomHandle},
@@ -49,6 +52,26 @@ impl Jason {
     #[must_use]
     pub fn jason_close_room(&self, room_to_delete: api::RoomHandle) {
         self.0.close_room(&room_to_delete.0);
+    }
+
+    /// Notifies [`Jason`] about a network change event (interface switch or
+    /// similar).
+    ///
+    /// Drops and recreates active connections and schedules [ICE] restart after
+    /// reconnection.
+    ///
+    /// [ICE]: https://webrtcglossary.com/ice
+    #[frb(sync)]
+    #[must_use]
+    pub fn jason_network_changed(&self) -> DartOpaque {
+        let jason = self.0.clone();
+
+        async move {
+            jason.network_changed().await?;
+            Ok::<_, DartError>(())
+        }
+        .into_dart_future()
+        .into_dart_opaque()
     }
 
     /// Closes this [`Jason`].

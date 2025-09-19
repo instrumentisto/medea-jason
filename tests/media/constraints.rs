@@ -5,7 +5,6 @@ use medea_jason::media::{
     DeviceAudioTrackConstraints, DeviceVideoTrackConstraints,
     DisplayAudioTrackConstraints, DisplayVideoTrackConstraints, MediaKind,
     MediaManager, MediaStreamSettings, MultiSourceTracksConstraints,
-    VideoSource,
 };
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;

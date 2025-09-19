@@ -107,12 +107,13 @@ impl InnerSocket {
 impl Drop for InnerSocket {
     fn drop(&mut self) {
         if self.socket_state.borrow().can_close() {
+            let code = self.close_reason.code();
             let rsn =
                 serde_json::to_string(&self.close_reason).unwrap_or_else(|e| {
-                    panic!("Could not serialize close message: {e}")
+                    panic!("cannot serialize close message: {e}")
                 });
             if let Some(socket) = self.socket.borrow().as_ref() {
-                if let Err(e) = socket.close_with_code_and_reason(1000, &rsn) {
+                if let Err(e) = socket.close_with_code_and_reason(code, &rsn) {
                     log::error!("Failed to normally close socket: {e:?}");
                 }
             }
