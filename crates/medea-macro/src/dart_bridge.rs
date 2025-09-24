@@ -494,19 +494,14 @@ impl FnExpander {
     /// # Example of the generated code
     ///
     /// ```ignore
-    /// *SyncUnsafeCell::get(&PEER_CONNECTION__CREATE_OFFER__FUNCTION)
-    ///     = Some(create_offer)
+    /// PEER_CONNECTION__CREATE_OFFER__FUNCTION.replace(Some(create_offer))
     /// ```
     fn gen_register_fn_expr(&self) -> syn::Expr {
         let fn_storage_ident = &self.fn_storage_ident;
         let ident = &self.ident;
 
-        // TODO: Replace `sync_unsafe_cell` with `std` once the
-        //       following API is stabilized:
-        //       https://doc.rust-lang.org/std/cell/struct.SyncUnsafeCell.html
         parse_quote! {
-            *::sync_unsafe_cell::SyncUnsafeCell::get(&#fn_storage_ident)
-                = Some(#ident)
+            #fn_storage_ident.replace(Some(#ident))
         }
     }
 
@@ -534,21 +529,24 @@ impl FnExpander {
     ///
     /// ```ignore
     /// static PEER_CONNECTION__CREATE_OFFER__FUNCTION:
-    ///     ::sync_unsafe_cell::SyncUnsafeCell<
-    ///         Option<PeerConnectionCreateOfferFunction>
-    ///     > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
+    ///     LazyLock<SendWrapper<
+    ///         RefCell<Option<PeerConnectionCreateOfferFunction>>>> =
+    ///             LazyLock::new(|| {
+    ///                 SendWrapper::new(RefCell::new(None))
+    ///             });
     /// ```
     fn gen_fn_storages(&self) -> TokenStream {
         let name = &self.fn_storage_ident;
         let type_alias = &self.type_alias_ident;
 
-        // TODO: Replace `sync_unsafe_cell` with `std` once the
-        //       following API is stabilized:
-        //       https://doc.rust-lang.org/std/cell/struct.SyncUnsafeCell.html
         quote! {
-            static #name: ::sync_unsafe_cell::SyncUnsafeCell<
-                    Option<#type_alias>
-                > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
+            static #name: ::std::sync::LazyLock<::send_wrapper::SendWrapper<
+                ::std::cell::RefCell<Option<#type_alias>>>> =
+                    ::std::sync::LazyLock::new(|| {
+                        ::send_wrapper::SendWrapper::new(
+                            ::std::cell::RefCell::new(None)
+                        )
+                    });
         }
     }
 
@@ -561,11 +559,12 @@ impl FnExpander {
     ///     peer: Dart_Handle,
     /// ) -> Result<Dart_Handle, Error> {
     ///     let res = (
-    ///         *(*PEER_CONNECTION__CREATE_OFFER__FUNCTION.get())
-    ///             .as_ref()
+    ///         (**PEER_CONNECTION__CREATE_OFFER__FUNCTION)
+    ///             .borrow()
     ///             .unwrap()
     ///     )(peer);
-    ///     if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take() {
+    ///     if let Some(e) =
+    ///             PEER_CONNECTION__CREATE_OFFER__ERROR.borrow_mut().take() {
     ///         Err(e)
     ///     } else {
     ///         Ok(res)
@@ -595,11 +594,11 @@ impl FnExpander {
             #( #doc_attrs )*
             pub unsafe fn #name(#args) #ret_ty {
                 let res = (
-                        *(*#fn_storage_ident.get())
-                            .as_ref()
+                        (**#fn_storage_ident)
+                            .borrow()
                             .unwrap()
                     )(#( #args_idents ),*);
-                if let Some(e) = #error_slot.take() {
+                if let Some(e) = #error_slot.borrow_mut().take() {
                   Err(e)
                 } else {
                   Ok(res)
@@ -613,20 +612,23 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// ::std::thread_local! {
-    ///     static PEER_CONNECTION__CREATE_OFFER__ERROR: ::std::cell::RefCell<
-    ///         Option<Error>,
-    ///     > = ::std::cell::RefCell::default();
-    /// }
+    /// static PEER_CONNECTION__CREATE_OFFER__ERROR:
+    ///     LazyLock<SendWrapper<RefCell<Option<Error>>>> =
+    ///         LazyLock::new(|| {
+    ///             SendWrapper::new(RefCell::new(None))
+    ///         });
     /// ```
     fn get_errors_slot(&self) -> TokenStream {
         let name = &self.error_slot_ident;
 
         quote! {
-            ::std::thread_local! {
-                static #name: ::std::cell::RefCell<Option<Error>> =
-                    ::std::cell::RefCell::new(None);
-            }
+            static #name: ::std::sync::LazyLock<::send_wrapper::SendWrapper<
+                ::std::cell::RefCell<Option<Error>>>> =
+                    ::std::sync::LazyLock::new(|| {
+                        ::send_wrapper::SendWrapper::new(
+                            ::std::cell::RefCell::new(None)
+                        )
+                    });
         }
     }
 
@@ -640,7 +642,7 @@ impl FnExpander {
     ///     err: Dart_Handle,
     /// ) {
     ///     PEER_CONNECTION__CONNECTION_STATE__ERROR
-    ///         .set(Some(Error::from_handle(err)));
+    ///         .replace(Some(Error::from_handle(err)));
     /// }
     /// ```
     fn gen_error_setter(&self) -> TokenStream {
@@ -652,7 +654,7 @@ impl FnExpander {
             #[doc = #doc]
             #[unsafe(no_mangle)]
             pub unsafe extern "C" fn #fn_name(err: Dart_Handle) {
-                #error_slot.set(Some(Error::from_handle(err)));
+                _ = #error_slot.replace(Some(Error::from_handle(err)));
             }
         }
     }

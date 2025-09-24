@@ -620,10 +620,11 @@ pub fn derive_caused(input: TokenStream) -> TokenStream {
 /// ## Example of the generated code
 ///
 /// ```ignore
+/// #[automatically_derived]
 /// mod peer_connection {
 ///     use dart_sys::Dart_Handle;
 ///
-///     use crate::platform::Error;
+///    use crate::platform::Error;
 ///
 ///     type PeerConnectionCreateOfferFunction =
 ///         extern "C" fn(peer: Dart_Handle) -> Dart_Handle;
@@ -631,86 +632,93 @@ pub fn derive_caused(input: TokenStream) -> TokenStream {
 ///         extern "C" fn(peer: Dart_Handle) -> Dart_Handle;
 ///
 ///     static PEER_CONNECTION__CREATE_OFFER__FUNCTION:
-///         ::sync_unsafe_cell::SyncUnsafeCell<
-///             Option<PeerConnectionCreateOfferFunction>,
-///         > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
+///         ::std::sync::LazyLock<::send_wrapper::SendWrapper<
+///             ::std::cell::RefCell<
+///                 Option<PeerConnectionCreateOfferFunction>>>,
+///     > = ::std::sync::LazyLock::new(|| {
+///         ::send_wrapper::SendWrapper::new(::std::cell::RefCell::new(None))
+///     });
 ///
 ///     static PEER_CONNECTION__CREATE_ANSWER__FUNCTION:
-///         ::sync_unsafe_cell::SyncUnsafeCell<
-///             Option<PeerConnectionCreateAnswerFunction>,
-///         > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
+///         ::std::sync::LazyLock<::send_wrapper::SendWrapper<
+///             ::std::cell::RefCell<
+///                 Option<PeerConnectionCreateAnswerFunction>>>,
+///     > = ::std::sync::LazyLock::new(|| {
+///         ::send_wrapper::SendWrapper::new(::std::cell::RefCell::new(None))
+///     });
 ///
-///     ::std::thread_local! {
-///         static PEER_CONNECTION__CREATE_OFFER__ERROR: ::std::cell::RefCell<
-///             Option<Error>
-///         > = ::std::cell::RefCell::new(None);
-///     }
+///     static PEER_CONNECTION__CREATE_OFFER__ERROR: ::std::sync::LazyLock<
+///         ::send_wrapper::SendWrapper<::std::cell::RefCell<Option<Error>>>,
+///     > = ::std::sync::LazyLock::new(|| {
+///         ::send_wrapper::SendWrapper::new(::std::cell::RefCell::new(None))
+///     });
 ///
-///     ::std::thread_local! {
-///         static PEER_CONNECTION__CREATE_ANSWER__ERROR: ::std::cell::RefCell<
-///             Option<Error>
-///         > = ::std::cell::RefCell::new(None);
-///     }
+///     static PEER_CONNECTION__CREATE_ANSWER__ERROR: ::std::sync::LazyLock<
+///         ::send_wrapper::SendWrapper<::std::cell::RefCell<Option<Error>>>,
+///     > = ::std::sync::LazyLock::new(|| {
+///         ::send_wrapper::SendWrapper::new(::std::cell::RefCell::new(None))
+///     });
 ///
 ///     #[unsafe(no_mangle)]
 ///     pub unsafe extern "C" fn register_peer_connection(
 ///         create_offer: PeerConnectionCreateOfferFunction,
 ///         create_answer: PeerConnectionCreateAnswerFunction,
 ///     ) {
-///         *::sync_unsafe_cell::SyncUnsafeCell::get(
-///             &PEER_CONNECTION__CREATE_OFFER__FUNCTION,
-///         ) = Some(create_offer);
-///         *::sync_unsafe_cell::SyncUnsafeCell::get(
-///             &PEER_CONNECTION__CREATE_ANSWER__FUNCTION,
-///         ) = Some(create_answer);
+///         PEER_CONNECTION__CREATE_OFFER__FUNCTION
+///             .replace(Some(create_offer));
+///         PEER_CONNECTION__CREATE_ANSWER__FUNCTION
+///             .replace(Some(create_answer));
 ///     }
 ///
 ///     /// Error setter for the `create_offer` function.
 ///     #[unsafe(no_mangle)]
-///     unsafe extern "C" fn peer_connection__create_offer__set_error(
+///     pub unsafe extern "C" fn peer_connection__create_offer__set_error(
 ///         err: Dart_Handle,
 ///     ) {
-///         PEER_CONNECTION__CREATE_OFFER__ERROR.set(
+///         _ = PEER_CONNECTION__CREATE_OFFER__ERROR.replace(
 ///             Some(Error::from_handle(err))
 ///         );
 ///     }
 ///
 ///     /// Error setter for the `create_answer` function.
 ///     #[unsafe(no_mangle)]
-///     unsafe extern "C" fn peer_connection__create_answer__set_error(
+///     pub unsafe extern "C" fn peer_connection__create_answer__set_error(
 ///         err: Dart_Handle,
 ///     ) {
-///         PEER_CONNECTION__CREATE_ANSWER__ERROR.set(
+///         _ = PEER_CONNECTION__CREATE_ANSWER__ERROR.replace(
 ///             Some(Error::from_handle(err))
 ///         );
 ///     }
 ///
 ///     /// Returns newly created SDP offer of the provided `PeerConnection`.
-///     unsafe fn create_offer(
+///     pub unsafe fn create_offer(
 ///         peer: Dart_Handle,
 ///     ) -> Result<Dart_Handle, Error> {
-///         let res = (
-///             *(*PEER_CONNECTION__CREATE_OFFER__FUNCTION.get())
-///                 .as_ref()
-///                 .unwrap()
-///         )(peer);
-///         if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take() {
+///         let res = ((**PEER_CONNECTION__CREATE_OFFER__FUNCTION)
+///             .borrow()
+///             .unwrap())(peer);
+///         if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR
+///             .borrow_mut()
+///             .take()
+///         {
 ///             Err(e)
 ///         } else {
 ///             Ok(res)
 ///         }
 ///     }
 ///
-///     /// Returns a newly created SDP answer of the provided `PeerConnection`.
-///     unsafe fn create_answer(
+///     /// Returns a newly created SDP answer of the provided
+///     /// `PeerConnection`.
+///     pub unsafe fn create_answer(
 ///         peer: Dart_Handle,
 ///     ) -> Result<Dart_Handle, Error> {
-///         let res = (
-///             *(*PEER_CONNECTION__CREATE_ANSWER__FUNCTION.get())
-///                 .as_ref()
-///                 .unwrap()
-///         )(peer);
-///         if let Some(e) = PEER_CONNECTION__CREATE_ANSWER__ERROR.take() {
+///         let res = ((**PEER_CONNECTION__CREATE_ANSWER__FUNCTION)
+///             .borrow()
+///             .unwrap())(peer);
+///         if let Some(e) = PEER_CONNECTION__CREATE_ANSWER__ERROR
+///             .borrow_mut()
+///             .take()
+///         {
 ///             Err(e)
 ///         } else {
 ///             Ok(res)

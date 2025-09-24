@@ -68,10 +68,6 @@ simple_logger = "5.0"
 dart-sys = "4.1"
 libc = "0.2"
 send_wrapper = "0.6"
-# TODO: Replace `sync_unsafe_cell` with `std` once the following API is
-#       stabilized:
-#       https://doc.rust-lang.org/std/cell/struct.SyncUnsafeCell.html
-sync-unsafe-cell = "0.1"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 backoff = { version = "0.4", features = ["wasm-bindgen"] }
