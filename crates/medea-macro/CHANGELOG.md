@@ -6,6 +6,19 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.3.3] · 2025-??-??
+[0.3.3]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.3.3/crates/medea-macro
+
+### Changed
+
+- `#[dart_bridge]` macro:
+    - Remove `thread_local!` usage to avoid running out of TSD keys. ([#238])
+
+[#238]: https://github.com/instrumentisto/medea-jason/pull/238
+
+
+
+
 ## [0.3.2] · 2025-03-28
 [0.3.2]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.3.2/crates/medea-macro
 

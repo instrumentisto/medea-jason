@@ -361,8 +361,7 @@ struct FnExpander {
     /// [`syn::Ident`] of the storage storing extern Dart function pointer.
     fn_storage_ident: syn::Ident,
 
-    /// [`syn::Ident`] of the function error slot
-    /// (`thread_local! { RefCell<Option<Error>> }`).
+    /// [`syn::Ident`] of the function error slot.
     error_slot_ident: syn::Ident,
 
     /// [`syn::Ident`] of the extern function that saves error in its slot.

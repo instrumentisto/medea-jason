@@ -49,7 +49,7 @@ flutter_rust_bridge = { version = "=2.11.1", features = ["anyhow", "dart-opaque"
 futures = "0.3"
 log = "0.4"
 medea-client-api-proto = { version = "0.10.0-dev", path = "proto/client-api" }
-medea-macro = { version = "0.3", path = "crates/medea-macro" }
+medea-macro = { path = "crates/medea-macro" }
 medea-reactive = { version = "0.1", path = "crates/medea-reactive" }
 mockall = { version = "0.13", optional = true }
 sealed = "0.6"
