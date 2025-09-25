@@ -432,7 +432,7 @@ ifeq ($(crate),medea-jason)
 	make cargo.build.jason platform=android args="--features dart-codegen" \
 	     dockerized=$(dockerized)
 	make cargo.gen.bridge
-	make fmt
+	make flutter.fmt
 endif
 
 
