@@ -123,7 +123,6 @@ jobs:
         with:
           toolchain: nightly
           components: rustfmt
-        if: ${{ matrix.crate == 'medea-control-api-proto' }}
       - run: make rustup.targets only=android
         if: ${{ matrix.crate == 'medea-jason' }}
       - uses: actions-rs/install@v0.1
