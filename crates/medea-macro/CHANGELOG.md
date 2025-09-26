@@ -12,7 +12,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Changed
 
 - `#[dart_bridge]` macro:
-    - Remove `thread_local!` usage to avoid running out of TSD keys. ([#238])
+    - Removed `thread_local!` usage to avoid running out of TSD keys. ([#238])
 
 [#238]: https://github.com/instrumentisto/medea-jason/pull/238
 

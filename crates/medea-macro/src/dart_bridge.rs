@@ -528,6 +528,7 @@ impl FnExpander {
     ///
     /// ```ignore
     /// static PEER_CONNECTION__CREATE_OFFER__FUNCTION:
+    ///     OnceLock<SendWrapper<PeerConnectionCreateOfferFunction>>
     ///     LazyLock<SendWrapper<
     ///         RefCell<Option<PeerConnectionCreateOfferFunction>>>> =
     ///             LazyLock::new(|| {
