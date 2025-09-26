@@ -468,7 +468,6 @@ endif
 		--no-add-mod-to-lib \
 		--no-auto-upgrade-dependency \
 		--no-web \
-		--no-rust-format \
 		--local
 	cd flutter && \
 	dart run build_runner build --delete-conflicting-outputs
