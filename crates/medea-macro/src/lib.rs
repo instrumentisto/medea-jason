@@ -624,28 +624,20 @@ pub fn derive_caused(input: TokenStream) -> TokenStream {
 /// mod peer_connection {
 ///     use dart_sys::Dart_Handle;
 ///
-///    use crate::platform::Error;
+///     use crate::platform::Error;
 ///
 ///     type PeerConnectionCreateOfferFunction =
 ///         extern "C" fn(peer: Dart_Handle) -> Dart_Handle;
 ///     type PeerConnectionCreateAnswerFunction =
 ///         extern "C" fn(peer: Dart_Handle) -> Dart_Handle;
 ///
-///     static PEER_CONNECTION__CREATE_OFFER__FUNCTION:
-///         ::std::sync::LazyLock<::send_wrapper::SendWrapper<
-///             ::std::cell::RefCell<
-///                 Option<PeerConnectionCreateOfferFunction>>>,
-///     > = ::std::sync::LazyLock::new(|| {
-///         ::send_wrapper::SendWrapper::new(::std::cell::RefCell::new(None))
-///     });
+///     static PEER_CONNECTION__CREATE_OFFER__FUNCTION: ::std::sync::OnceLock<
+///         ::send_wrapper::SendWrapper<PeerConnectionCreateOfferFunction>,
+///     > = ::std::sync::OnceLock::new();
 ///
-///     static PEER_CONNECTION__CREATE_ANSWER__FUNCTION:
-///         ::std::sync::LazyLock<::send_wrapper::SendWrapper<
-///             ::std::cell::RefCell<
-///                 Option<PeerConnectionCreateAnswerFunction>>>,
-///     > = ::std::sync::LazyLock::new(|| {
-///         ::send_wrapper::SendWrapper::new(::std::cell::RefCell::new(None))
-///     });
+///     static PEER_CONNECTION__CREATE_ANSWER__FUNCTION: ::std::sync::OnceLock<
+///         ::send_wrapper::SendWrapper<PeerConnectionCreateAnswerFunction>,
+///     > = ::std::sync::OnceLock::new();
 ///
 ///     static PEER_CONNECTION__CREATE_OFFER__ERROR: ::std::sync::LazyLock<
 ///         ::send_wrapper::SendWrapper<::std::cell::RefCell<Option<Error>>>,
@@ -665,12 +657,20 @@ pub fn derive_caused(input: TokenStream) -> TokenStream {
 ///         create_answer: PeerConnectionCreateAnswerFunction,
 ///     ) {
 ///         PEER_CONNECTION__CREATE_OFFER__FUNCTION
-///             .replace(Some(create_offer));
+///             .set(::send_wrapper::SendWrapper::new(create_offer))
+///             .expect(
+///                 "PEER_CONNECTION__CREATE_OFFER__FUNCTION \
+///                 can only be set once",
+///             );
 ///         PEER_CONNECTION__CREATE_ANSWER__FUNCTION
-///             .replace(Some(create_answer));
+///             .set(::send_wrapper::SendWrapper::new(create_answer))
+///             .expect(
+///                 "PEER_CONNECTION__CREATE_ANSWER__FUNCTION \
+///                 can only be set once",
+///             );
 ///     }
 ///
-///     /// Error setter for the `create_offer` function.
+///     /// Error setter for the `create_offer` function
 ///     #[unsafe(no_mangle)]
 ///     pub unsafe extern "C" fn peer_connection__create_offer__set_error(
 ///         err: Dart_Handle,
@@ -694,9 +694,11 @@ pub fn derive_caused(input: TokenStream) -> TokenStream {
 ///     pub unsafe fn create_offer(
 ///         peer: Dart_Handle,
 ///     ) -> Result<Dart_Handle, Error> {
-///         let res = ((**PEER_CONNECTION__CREATE_OFFER__FUNCTION)
-///             .borrow()
-///             .unwrap())(peer);
+///         let res = (PEER_CONNECTION__CREATE_OFFER__FUNCTION
+///             .get()
+///             .as_ref()
+///             .expect("PEER_CONNECTION__CREATE_OFFER__FUNCTION is not set"))
+///             (peer);
 ///         if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR
 ///             .borrow_mut()
 ///             .take()
@@ -712,9 +714,11 @@ pub fn derive_caused(input: TokenStream) -> TokenStream {
 ///     pub unsafe fn create_answer(
 ///         peer: Dart_Handle,
 ///     ) -> Result<Dart_Handle, Error> {
-///         let res = ((**PEER_CONNECTION__CREATE_ANSWER__FUNCTION)
-///             .borrow()
-///             .unwrap())(peer);
+///         let res = (PEER_CONNECTION__CREATE_ANSWER__FUNCTION
+///             .get()
+///             .as_ref()
+///             .expect("PEER_CONNECTION__CREATE_ANSWER__FUNCTION is not set"))
+///             (peer);
 ///         if let Some(e) = PEER_CONNECTION__CREATE_ANSWER__ERROR
 ///             .borrow_mut()
 ///             .take()
@@ -761,11 +765,9 @@ pub fn derive_caused(input: TokenStream) -> TokenStream {
 ///
 /// pub type RtcPeerConnectionResult<T> = Result<T, RtcPeerConnectionError>;
 /// ```
-///
 /// ## Dart side code
 ///
 /// Also, you need to call registration functions on Dart side:
-///
 /// ```dart
 /// dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
 ///         'register_peer_connection')(
