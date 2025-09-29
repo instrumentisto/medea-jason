@@ -361,8 +361,7 @@ struct FnExpander {
     /// [`syn::Ident`] of the storage storing extern Dart function pointer.
     fn_storage_ident: syn::Ident,
 
-    /// [`syn::Ident`] of the function error slot
-    /// (`thread_local! { RefCell<Option<Error>> }`).
+    /// [`syn::Ident`] of the function error slot.
     error_slot_ident: syn::Ident,
 
     /// [`syn::Ident`] of the extern function that saves error in its slot.
@@ -494,19 +493,21 @@ impl FnExpander {
     /// # Example of the generated code
     ///
     /// ```ignore
-    /// *SyncUnsafeCell::get(&PEER_CONNECTION__CREATE_OFFER__FUNCTION)
-    ///     = Some(create_offer)
+    /// PEER_CONNECTION__CREATE_OFFER__FUNCTION
+    ///     .set(SendWrapper::new(create_offer))
+    ///     .expect(
+    ///         "PEER_CONNECTION__CREATE_OFFER__FUNCTION \
+    ///         can only be set once",
+    ///     );
     /// ```
     fn gen_register_fn_expr(&self) -> syn::Expr {
         let fn_storage_ident = &self.fn_storage_ident;
         let ident = &self.ident;
+        let expect_message = format!("{fn_storage_ident} can only be set once");
 
-        // TODO: Replace `sync_unsafe_cell` with `std` once the
-        //       following API is stabilized:
-        //       https://doc.rust-lang.org/std/cell/struct.SyncUnsafeCell.html
         parse_quote! {
-            *::sync_unsafe_cell::SyncUnsafeCell::get(&#fn_storage_ident)
-                = Some(#ident)
+            #fn_storage_ident.set(::send_wrapper::SendWrapper::new(#ident))
+                .expect(#expect_message)
         }
     }
 
@@ -533,22 +534,18 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// static PEER_CONNECTION__CREATE_OFFER__FUNCTION:
-    ///     ::sync_unsafe_cell::SyncUnsafeCell<
-    ///         Option<PeerConnectionCreateOfferFunction>
-    ///     > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
+    /// static PEER_CONNECTION__CREATE_OFFER__FUNCTION: OnceLock<
+    ///     SendWrapper<PeerConnectionCreateOfferFunction>,
+    /// > = OnceLock::new();
     /// ```
     fn gen_fn_storages(&self) -> TokenStream {
         let name = &self.fn_storage_ident;
         let type_alias = &self.type_alias_ident;
 
-        // TODO: Replace `sync_unsafe_cell` with `std` once the
-        //       following API is stabilized:
-        //       https://doc.rust-lang.org/std/cell/struct.SyncUnsafeCell.html
         quote! {
-            static #name: ::sync_unsafe_cell::SyncUnsafeCell<
-                    Option<#type_alias>
-                > = ::sync_unsafe_cell::SyncUnsafeCell::new(None);
+            static #name: ::std::sync::OnceLock<
+                ::send_wrapper::SendWrapper<#type_alias>> =
+                    ::std::sync::OnceLock::new();
         }
     }
 
@@ -560,12 +557,15 @@ impl FnExpander {
     /// pub unsafe fn create_offer(
     ///     peer: Dart_Handle,
     /// ) -> Result<Dart_Handle, Error> {
-    ///     let res = (
-    ///         *(*PEER_CONNECTION__CREATE_OFFER__FUNCTION.get())
-    ///             .as_ref()
-    ///             .unwrap()
-    ///     )(peer);
-    ///     if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR.take() {
+    ///     let res = (PEER_CONNECTION__CREATE_OFFER__FUNCTION
+    ///         .get()
+    ///         .as_ref()
+    ///         .expect("PEER_CONNECTION__CREATE_OFFER__FUNCTION is not set"))
+    ///         (peer);
+    ///     if let Some(e) = PEER_CONNECTION__CREATE_OFFER__ERROR
+    ///         .borrow_mut()
+    ///         .take()
+    ///     {
     ///         Err(e)
     ///     } else {
     ///         Ok(res)
@@ -588,18 +588,18 @@ impl FnExpander {
         });
 
         let ret_ty = &self.ret_ty;
-
         let fn_storage_ident = &self.fn_storage_ident;
+        let expect_message = format!("`{fn_storage_ident}` is not set");
 
         quote! {
             #( #doc_attrs )*
             pub unsafe fn #name(#args) #ret_ty {
                 let res = (
-                        *(*#fn_storage_ident.get())
+                        #fn_storage_ident.get()
                             .as_ref()
-                            .unwrap()
+                            .expect(#expect_message)
                     )(#( #args_idents ),*);
-                if let Some(e) = #error_slot.take() {
+                if let Some(e) = #error_slot.borrow_mut().take() {
                   Err(e)
                 } else {
                   Ok(res)
@@ -613,20 +613,23 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// ::std::thread_local! {
-    ///     static PEER_CONNECTION__CREATE_OFFER__ERROR: ::std::cell::RefCell<
-    ///         Option<Error>,
-    ///     > = ::std::cell::RefCell::default();
-    /// }
+    /// static PEER_CONNECTION__CREATE_OFFER__ERROR: LazyLock<
+    ///     SendWrapper<RefCell<Option<Error>>>,
+    /// > = LazyLock::new(|| {
+    ///         SendWrapper::new(RefCell::new(None))
+    ///     });
     /// ```
     fn get_errors_slot(&self) -> TokenStream {
         let name = &self.error_slot_ident;
 
         quote! {
-            ::std::thread_local! {
-                static #name: ::std::cell::RefCell<Option<Error>> =
-                    ::std::cell::RefCell::new(None);
-            }
+            static #name: ::std::sync::LazyLock<::send_wrapper::SendWrapper<
+                ::std::cell::RefCell<Option<Error>>>> =
+                    ::std::sync::LazyLock::new(|| {
+                        ::send_wrapper::SendWrapper::new(
+                            ::std::cell::RefCell::new(None)
+                        )
+                    });
         }
     }
 
@@ -636,11 +639,11 @@ impl FnExpander {
     ///
     /// ```ignore
     /// #[unsafe(no_mangle)]
-    /// pub unsafe extern "C" fn peer_connection__connection_state__set_error(
+    /// pub unsafe extern "C" fn peer_connection__create_offer__set_error(
     ///     err: Dart_Handle,
     /// ) {
-    ///     PEER_CONNECTION__CONNECTION_STATE__ERROR
-    ///         .set(Some(Error::from_handle(err)));
+    ///     _ = PEER_CONNECTION__CREATE_OFFER__ERROR
+    ///         .replace(Some(Error::from_handle(err)));
     /// }
     /// ```
     fn gen_error_setter(&self) -> TokenStream {
@@ -652,7 +655,7 @@ impl FnExpander {
             #[doc = #doc]
             #[unsafe(no_mangle)]
             pub unsafe extern "C" fn #fn_name(err: Dart_Handle) {
-                #error_slot.set(Some(Error::from_handle(err)));
+                _ = #error_slot.replace(Some(Error::from_handle(err)));
             }
         }
     }

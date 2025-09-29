@@ -25,6 +25,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Fixed
 
 - `ConnectionHandle.on_quality_score_update()` callback being called when `Connection` is in [SFU] mode. ([#228])
+- `SIGABRT` in FFI glue caused by running out of TSD keys. ([#238])
 
 ### Changed
 
@@ -35,6 +36,7 @@ All user visible changes to this project will be documented in this file. This p
 [#228]: https://github.com/instrumentisto/medea-jason/pull/228
 [#229]: https://github.com/instrumentisto/medea-jason/pull/229
 [#236]: https://github.com/instrumentisto/medea-jason/pull/236
+[#238]: https://github.com/instrumentisto/medea-jason/pull/238
 [095368cb]: https://github.com/instrumentisto/medea-jason/commit/095368cb2e5dd6faca44882955b7cab6b19d8ad2
 [`cargo-ndk` 4.0 version]: https://github.com/bbqsrc/cargo-ndk/blob/v4.0.0/CHANGELOG.md#v400---2025-07-30
 
