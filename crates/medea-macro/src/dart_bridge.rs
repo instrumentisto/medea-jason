@@ -589,7 +589,7 @@ impl FnExpander {
 
         let ret_ty = &self.ret_ty;
         let fn_storage_ident = &self.fn_storage_ident;
-        let expect_message = format!("{fn_storage_ident} is not set");
+        let expect_message = format!("`{fn_storage_ident}` is not set");
 
         quote! {
             #( #doc_attrs )*

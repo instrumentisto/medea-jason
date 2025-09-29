@@ -27,6 +27,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Fixed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
+- `SIGABRT` in FFI glue caused by running out of TSD keys. ([#238])
 
 ### Upgraded
 
@@ -39,6 +40,7 @@ All user visible changes to this project will be documented in this file. This p
 [#229]: https://github.com/instrumentisto/medea-jason/pull/229
 [#231]: https://github.com/instrumentisto/medea-jason/pull/231
 [#236]: https://github.com/instrumentisto/medea-jason/pull/236
+[#238]: https://github.com/instrumentisto/medea-jason/pull/238
 
 
 
