@@ -319,7 +319,7 @@ jobs:
           use-tool-cache: true
 
       - name: Download `medea-control-api-mock` Docker image
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
           path: .cache/
@@ -432,7 +432,7 @@ jobs:
         if: ${{ matrix.platform == 'ios' }}
 
       - name: Download `medea-jason` lib
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: build-jason-${{ matrix.platform }}
           path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
@@ -443,7 +443,7 @@ jobs:
                  ||                                  './flutter/assets/pkg/' }}
 
       - name: Download `medea-control-api-mock` Docker image
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
           path: .cache/
@@ -909,32 +909,32 @@ jobs:
       - uses: subosito/flutter-action@v2
         if: ${{ steps.skip.outputs.no == 'true' }}
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-android
           path: ./flutter/android/src/main/jniLibs/
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-ios
           path: ./flutter/ios/lib/
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-linux
           path: ./flutter/linux/lib/
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-macos
           path: ./flutter/macos/lib/
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-web
           path: ./flutter/assets/pkg/
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-windows
           path: ./flutter/windows/lib/
@@ -1012,7 +1012,7 @@ jobs:
       - uses: actions/checkout@v5
         if: ${{ steps.skip.outputs.no == 'true' }}
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: docker-${{ matrix.image }}-${{ github.run_number }}
           path: .cache/
