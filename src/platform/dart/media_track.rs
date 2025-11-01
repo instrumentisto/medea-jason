@@ -285,7 +285,6 @@ impl MediaStreamTrack {
     /// Returns [device ID][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-deviceid
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[inline]
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
@@ -309,7 +308,6 @@ impl MediaStreamTrack {
     /// Returns [facing mode][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-facingmode
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
         let facing_mode =
@@ -325,7 +323,6 @@ impl MediaStreamTrack {
     /// Returns [height][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-height
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn height(&self) -> Option<u32> {
         let height =
@@ -336,7 +333,6 @@ impl MediaStreamTrack {
     /// Returns [width][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-width
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn width(&self) -> Option<u32> {
         let width =

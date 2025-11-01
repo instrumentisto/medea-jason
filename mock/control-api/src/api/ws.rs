@@ -16,11 +16,11 @@ use actix_web::{
 use actix_web_actors::ws;
 use serde::Serialize;
 use serde_json::Value;
+use tracing as log;
 
 use crate::{
     api::{AppContext, Element, Subscribers},
     client::Fid,
-    prelude::*,
 };
 
 /// Handles HTTP upgrade request trying to perform handshake and establish
@@ -205,7 +205,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
                                     });
                             }
                         }
-                        Err(err) => error!(
+                        Err(err) => log::error!(
                             "Received broadcast message but it is not a valid \
                              JSON: {err:?}",
                         ),
@@ -214,11 +214,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
                 ws::Message::Binary(_)
                 | ws::Message::Continuation(_)
                 | ws::Message::Nop => {
-                    error!("Unsupported client message: {msg:?}");
+                    log::error!("Unsupported client message: {msg:?}");
                 }
             },
             Err(e) => {
-                error!("WS StreamHandler error: {e}");
+                log::error!("WS StreamHandler error: {e}");
             }
         }
     }

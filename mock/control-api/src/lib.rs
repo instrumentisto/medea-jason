@@ -95,7 +95,6 @@
     clippy::string_lit_as_bytes,
     clippy::string_lit_chars_any,
     clippy::string_slice,
-    clippy::string_to_string,
     clippy::suboptimal_flops,
     clippy::suspicious_operation_groupings,
     clippy::suspicious_xor_used_as_pow,
@@ -155,13 +154,9 @@
 pub mod api;
 pub mod callback;
 pub mod client;
-pub mod prelude;
 
 use actix_web::rt;
 use clap::Parser as _;
-use slog::{Drain as _, o};
-pub(crate) use slog_scope as log;
-use slog_scope::GlobalLoggerGuard;
 
 /// Control API protocol re-exported definitions.
 pub mod proto {
@@ -203,7 +198,7 @@ pub fn run() {
 
     let opts = Cli::parse();
 
-    let _log_guard = init_logger();
+    init_tracing();
 
     rt::System::new().block_on(async move {
         let callback_server = callback::server::run(&opts);
@@ -211,21 +206,41 @@ pub fn run() {
     });
 }
 
-/// Initializes [`slog`] logger outputting logs with a [`slog_term`]'s
-/// decorator.
-///
-/// # Panics
-///
-/// If [`slog_stdlog`] fails to [initialize](slog_stdlog::init).
-pub fn init_logger() -> GlobalLoggerGuard {
-    let decorator = slog_term::TermDecorator::new().build();
-    let drain = slog_term::FullFormat::new(decorator).build().fuse();
-    let drain = slog_envlogger::new(drain).fuse();
-    let drain = slog_async::Async::new(drain).build().fuse();
-    let logger = slog::Logger::root(drain, o!());
-    let scope_guard = slog_scope::set_global_logger(logger);
-    slog_stdlog::init()
-        .unwrap_or_else(|e| panic!("Failed to initialize `slog_stdlog`: {e}"));
+/// Initializes [`tracing`] backend and all the tools relying on it:
+/// - Global structured logger with the required [`tracing::Level`].
+pub fn init_tracing() {
+    use std::io;
 
-    scope_guard
+    use tracing_subscriber::{
+        EnvFilter, Layer as _, filter::filter_fn, fmt,
+        layer::SubscriberExt as _, util::SubscriberInitExt as _,
+    };
+
+    /// [`tracing::Level`]s outputted to [`io::stderr`].
+    const STDERR_LEVELS: &[tracing::Level] =
+        &[tracing::Level::WARN, tracing::Level::ERROR];
+
+    tracing_subscriber::registry()
+        .with(
+            fmt::layer()
+                .with_thread_names(true)
+                .compact()
+                .with_ansi(true)
+                .with_writer(io::stderr)
+                .with_filter(EnvFilter::from_default_env())
+                .with_filter(filter_fn(|meta| {
+                    meta.is_span() || STDERR_LEVELS.contains(meta.level())
+                })),
+        )
+        .with(
+            fmt::layer()
+                .with_thread_names(true)
+                .compact()
+                .with_ansi(true)
+                .with_filter(EnvFilter::from_default_env())
+                .with_filter(filter_fn(|meta| {
+                    meta.is_span() || !STDERR_LEVELS.contains(meta.level())
+                })),
+        )
+        .init();
 }

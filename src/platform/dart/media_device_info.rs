@@ -94,7 +94,6 @@ impl MediaDeviceInfo {
     /// same [groupId][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
         let group_id =

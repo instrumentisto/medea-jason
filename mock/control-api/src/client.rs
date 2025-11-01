@@ -14,11 +14,9 @@ use derive_more::with_trait::{AsRef, From, Into};
 use medea_control_api_proto::grpc::api as proto;
 use proto::control_api_client::ControlApiClient;
 use tonic::{Status, transport::Channel};
+use tracing as log;
 
-use crate::{
-    api::{Element, Subscribers, ws::Notification},
-    log,
-};
+use crate::api::{Element, Subscribers, ws::Notification};
 
 /// Fid to `Room` element.
 #[derive(AsRef, Clone, Debug, From, Into)]
