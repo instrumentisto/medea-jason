@@ -703,6 +703,13 @@ pub enum Event {
     RoomJoined {
         /// ID of the `Member` who joined the `Room`.
         member_id: MemberId,
+
+        /// Indicator whether server considers this `Room` connection a
+        /// reconnect. Meaning that there is already some runtime state
+        /// server has for the specified [`MemberId`]-[`Credential`] pair.
+        ///
+        /// Server expects [`Command::SynchronizeMe`] if this is `true`.
+        is_reconnect: bool,
     },
 
     /// Media Server notifies Web Client that a `Member` left a `Room`.

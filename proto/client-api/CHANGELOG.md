@@ -11,9 +11,11 @@ All user visible changes to this project will be documented in this file. This p
 ### BC Breaks
 
 - Added `source_kind` to `AudioSettings`. ([#225], [#224])
+- Added `is_reconnect` field to `Event::RoomJoined`. ([#242])
 
 [#224]: https://github.com/instrumentisto/medea-jason/issues/224
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
+[#242]: https://github.com/instrumentisto/medea-jason/pull/242
 
 
 
