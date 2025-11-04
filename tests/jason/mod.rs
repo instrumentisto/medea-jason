@@ -71,6 +71,7 @@ async fn jason_network_changed() {
                             room_id: "room_id".into(),
                             event: Event::RoomJoined {
                                 member_id: "member_id".into(),
+                                is_reconnect: false,
                             },
                         },
                         ServerMsg::Event {
@@ -131,6 +132,7 @@ async fn jason_network_changed() {
                         room_id: "room_id".into(),
                         event: Event::RoomJoined {
                             member_id: "member_id".into(),
+                            is_reconnect: true,
                         },
                     })
                     .unwrap();
@@ -283,6 +285,7 @@ async fn jason_network_changed_errors_on_failed_reconnect() {
                             room_id: "room_id".into(),
                             event: Event::RoomJoined {
                                 member_id: "member_id".into(),
+                                is_reconnect: false,
                             },
                         },
                     ])

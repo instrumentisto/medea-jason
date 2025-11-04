@@ -42,6 +42,7 @@ async fn only_one_strong_rpc_rc_exists() {
                         room_id: "room_id".into(),
                         event: Event::RoomJoined {
                             member_id: "member_id".into(),
+                            is_reconnect: false,
                         },
                     },
                 ]))
@@ -86,6 +87,7 @@ async fn rpc_dropped_on_jason_dispose() {
                         room_id: "room_id".into(),
                         event: Event::RoomJoined {
                             member_id: "member_id".into(),
+                            is_reconnect: false,
                         },
                     },
                 ]))
@@ -163,7 +165,10 @@ async fn room_dispose_works() {
             client_msg_txs.borrow().iter().for_each(|tx| {
                 tx.unbounded_send(ServerMsg::Event {
                     room_id: "room_id".into(),
-                    event: Event::RoomJoined { member_id: "member_id".into() },
+                    event: Event::RoomJoined {
+                        member_id: "member_id".into(),
+                        is_reconnect: false,
+                    },
                 })
                 .ok();
             });
@@ -185,7 +190,10 @@ async fn room_dispose_works() {
             client_msg_txs.borrow().iter().for_each(|tx| {
                 tx.unbounded_send(ServerMsg::Event {
                     room_id: "another_room_id".into(),
-                    event: Event::RoomJoined { member_id: "member_id".into() },
+                    event: Event::RoomJoined {
+                        member_id: "member_id".into(),
+                        is_reconnect: false,
+                    },
                 })
                 .ok();
             });
@@ -265,6 +273,7 @@ async fn room_closes_on_rpc_transport_close() {
                             room_id: "room_id".into(),
                             event: Event::RoomJoined {
                                 member_id: "member_id".into(),
+                                is_reconnect: false,
                             },
                         },
                     ]))

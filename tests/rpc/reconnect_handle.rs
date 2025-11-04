@@ -42,6 +42,7 @@ async fn reconnect_with_backoff() {
                         room_id: "room_id".into(),
                         event: Event::RoomJoined {
                             member_id: "member_id".into(),
+                            is_reconnect: false,
                         },
                     },
                 ]))
