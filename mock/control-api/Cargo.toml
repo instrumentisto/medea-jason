@@ -23,10 +23,6 @@ humantime-serde = "1.0"
 medea-control-api-proto = { version = "0.16", path = "../../proto/control-api", features = ["grpc", "client"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-slog = "2.5"
-slog-async = "2.5"
-slog-envlogger = "2.2"
-slog-scope = "4.3"
-slog-stdlog = "4.0"
-slog-term = "2.5"
 tonic = "0.14"
+tracing = "0.1.35"
+tracing-subscriber = { version = "0.3.11", features = ["env-filter"] }
