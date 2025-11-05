@@ -375,7 +375,7 @@ jobs:
           - linux
           - macos
           #- windows # TODO: Fix "windows cannot load linux image on windows".
-    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-13')
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
