@@ -175,7 +175,7 @@ pub struct WebSocketRpcSession {
     /// Current [`SessionState`] of this [`WebSocketRpcSession`].
     state: ObservableCell<SessionState>,
 
-    /// Flag indicating that this session has previously reached
+    /// Indicator whether this [`WebSocketRpcSession`] has previously reached
     /// [`SessionState::Opened`].
     was_connected: Rc<Cell<bool>>,
 
@@ -689,7 +689,8 @@ pub enum SessionState {
         /// [`RpcSession`] associated information.
         info: Rc<ConnectionInfo>,
 
-        /// Indicator whether current [`RpcSession`] is considered a reconnect.
+        /// Indicator whether the current [`RpcSession`] is considered as a
+        /// reconnect.
         is_reconnect: bool,
     },
 

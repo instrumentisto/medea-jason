@@ -703,9 +703,9 @@ pub enum Event {
         /// ID of the `Member` who joined the `Room`.
         member_id: MemberId,
 
-        /// Indicator whether server considers this `Room` connection a
-        /// reconnect. Meaning that there is already some runtime state
-        /// server has for the specified [`MemberId`]-[`Credential`] pair.
+        /// Indicator whether Media Server considers this `Room` connection as a
+        /// reconnect, meaning that there is already some runtime state on the
+        /// Media Server for the specified [`MemberId`]-[`Credential`] pair.
         ///
         /// Server expects [`Command::SynchronizeMe`] if this is `true`.
         is_reconnect: bool,

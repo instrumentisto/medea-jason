@@ -234,7 +234,7 @@ async fn reconnect_after_transport_abnormal_close() {
         .connect(ConnectionInfo::from_str(TEST_ROOM_URL).unwrap());
     timeout(100, connect_fut).await.unwrap().unwrap();
 
-    // on_connection_loss fires
+    // `on_connection_loss` fires.
     futures::select! {
         _ = delay_for(100).fuse() => panic!("on_connection_loss should fire"),
         _ = on_normal_close => panic!("on_normal_close fired"),
@@ -242,7 +242,7 @@ async fn reconnect_after_transport_abnormal_close() {
         _ = on_reconnected.next() => panic!("on_reconnected fired")
     };
 
-    // successful reconnect after connection loss
+    // Successful reconnect after connection loss.
     is_reconnect.store(true, Ordering::Relaxed);
     Rc::clone(&session).reconnect().await.unwrap();
     on_reconnected.select_next_some().await;
@@ -280,7 +280,7 @@ async fn reconnect_after_transport_abnormal_close() {
 /// initial join with `is_reconnect: false`).
 #[wasm_bindgen_test]
 async fn on_reconnected_emits_only_on_true() {
-    // 3 joins total: with is_reconnect [false, false, true]
+    // 3 joins total: with `is_reconnect` (`false`, `false`, `true`).
     let is_reconnect = Rc::new(AtomicBool::new(false));
     let commands_sent = Rc::new(RefCell::new(Vec::new()));
     let commands_sent_clone = Rc::clone(&commands_sent);
@@ -332,7 +332,7 @@ async fn on_reconnected_emits_only_on_true() {
     let mut on_reconnected = session.on_reconnected().fuse();
     let mut on_connection_loss = session.on_connection_loss().fuse();
 
-    // Simulate client behavior: on reconnected, send SynchronizeMe
+    // Simulate client behavior: on reconnected, send `SynchronizeMe`.
     {
         let session_for_sync = Rc::clone(&session);
         platform::spawn(async move {
@@ -347,19 +347,19 @@ async fn on_reconnected_emits_only_on_true() {
         });
     }
 
-    // Initial connect with is_reconnect = false
+    // Initial connect with `is_reconnect = false`.
     let connect_fut = Rc::clone(&session)
         .connect(ConnectionInfo::from_str(TEST_ROOM_URL).unwrap());
     timeout(100, connect_fut).await.unwrap().unwrap();
 
-    // on_reconnected must NOT fire on the initial join
+    // `on_reconnected` must NOT fire on the initial join.
     futures::select! {
         _ = delay_for(100).fuse() => (),
         _ = on_reconnected.next() =>
-            panic!("on_reconnected fired on initial join"),
+            panic!("`on_reconnected` fired on initial join"),
     };
 
-    // Ensure no SynchronizeMe sent yet
+    // Ensure no `SynchronizeMe` sent yet.
     assert_eq!(
         commands_sent
             .borrow()
@@ -375,17 +375,20 @@ async fn on_reconnected_emits_only_on_true() {
         0
     );
 
-    // Wait for connection loss #1
+    // Wait for connection loss #1.
     on_connection_loss.select_next_some().await;
-    // First reconnect (is_reconnect = false) -> on_reconnected must NOT fire
+    // First reconnect (`is_reconnect = false`) -> `on_reconnected` must NOT
+    // fire.
     Rc::clone(&session).reconnect().await.unwrap();
     futures::select! {
         _ = delay_for(100).fuse() => (),
-        _ = on_reconnected.next() => panic!("on_reconnected fired on first \
-            reconnect with is_reconnect = false"),
+        _ = on_reconnected.next() => panic!(
+            "`on_reconnected` fired on first \
+             reconnect with `is_reconnect = false`",
+        ),
     };
 
-    // Still no SynchronizeMe on first reconnect
+    // Still no `SynchronizeMe` on first reconnect.
     assert_eq!(
         commands_sent
             .borrow()
@@ -400,15 +403,15 @@ async fn on_reconnected_emits_only_on_true() {
             .count(),
         0
     );
-    // Wait for connection loss #2
+    // Wait for connection loss #2.
     on_connection_loss.select_next_some().await;
 
     is_reconnect.store(true, Ordering::Relaxed);
-    // Second reconnect (is_reconnect = true) -> on_reconnected MUST fire
+    // Second reconnect (`is_reconnect = true`) -> `on_reconnected` MUST fire.
     Rc::clone(&session).reconnect().await.unwrap();
     on_reconnected.select_next_some().await;
 
-    // Exactly one SynchronizeMe sent after `is_reconnect = true` reconnect
+    // Exactly one `SynchronizeMe` sent after `is_reconnect = true` reconnect.
     assert_eq!(
         commands_sent
             .borrow()
