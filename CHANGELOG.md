@@ -15,6 +15,7 @@ All user visible changes to this project will be documented in this file. This p
 - Bumped up minimum supported iOS deployment target to 15. ([#236])
 - Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.device_audio()`. ([#225], [#224])
 - Made `RoomHandle`'s `mute_audio()`, `unmute_audio()`, `disable_audio()`, `enable_audio()`, `disable_remote_audio()`, `enable_remote_audio()` to accept optional `MediaSourceKind`. ([#225], [#224])
+- Drop support for `i686-linux-android` target. ([#243])
 
 ### Added
 
@@ -39,6 +40,7 @@ All user visible changes to this project will be documented in this file. This p
 [#236]: https://github.com/instrumentisto/medea-jason/pull/236
 [#238]: https://github.com/instrumentisto/medea-jason/pull/238
 [#242]: https://github.com/instrumentisto/medea-jason/pull/242
+[#243]: https://github.com/instrumentisto/medea-jason/pull/243
 [095368cb]: https://github.com/instrumentisto/medea-jason/commit/095368cb2e5dd6faca44882955b7cab6b19d8ad2
 [`cargo-ndk` 4.0 version]: https://github.com/bbqsrc/cargo-ndk/blob/v4.0.0/CHANGELOG.md#v400---2025-07-30
 
