@@ -188,6 +188,9 @@ pub enum RpcEvent {
 
         /// ID of the joined `Member`.
         member_id: MemberId,
+
+        /// Indicator whether this join is a reconnect.
+        is_reconnect: bool,
     },
 
     /// Notification of the subscribers that [`WebSocketRpcClient`] left
@@ -318,8 +321,12 @@ impl WebSocketRpcClient {
     fn on_transport_message(&self, msg: ServerMsg) {
         let msg = match msg {
             ServerMsg::Event { room_id, event } => match event {
-                Event::RoomJoined { member_id } => {
-                    Some(RpcEvent::JoinedRoom { room_id, member_id })
+                Event::RoomJoined { member_id, is_reconnect } => {
+                    Some(RpcEvent::JoinedRoom {
+                        room_id,
+                        member_id,
+                        is_reconnect,
+                    })
                 }
                 Event::RoomLeft { close_reason } => Some(RpcEvent::LeftRoom {
                     room_id,

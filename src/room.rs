@@ -1711,7 +1711,7 @@ impl EventHandler for InnerRoom {
         Ok(())
     }
 
-    async fn on_room_joined(&self, _: MemberId) -> Self::Output {
+    async fn on_room_joined(&self, _: MemberId, _: bool) -> Self::Output {
         unreachable!("Room can't receive Event::RoomJoined")
     }
 
