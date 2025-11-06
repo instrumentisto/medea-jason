@@ -363,15 +363,14 @@ jobs:
       matrix:
         platform:
           - android
-          #- ios # TODO: Very flaky and runs for few hours. Try re-enabling once
-          #              GitHub Actions support nested virtualization on Apple
-          #              Silicon (M3 and macos-15+).
+          - ios
           - linux
           - macos
           #- windows # TODO: Fix "windows cannot load linux image on windows".
-    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-15-intel')
-              || (matrix.platform == 'windows' &&           'windows-latest')
-              ||                                            'ubuntu-latest' }}
+    runs-on: ${{ (contains('macos', matrix.platform) && 'macos-15-intel')
+              || (matrix.platform == 'ios' &&           'macos-latest')
+              || (matrix.platform == 'windows' &&       'windows-latest')
+              ||                                        'ubuntu-latest' }}
     steps:
       - name: Enable KVM for Android HW acceleration
         run: |
