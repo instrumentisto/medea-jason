@@ -27,7 +27,6 @@ FIREFOX_VERSION := 144.0.2-driver0.36.0
 CARGO_NDK_VER := 4.1.2-ndkr29-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
-                   i686-linux-android \
                    x86_64-linux-android
 ANDROID_SDK_COMPILE_VERSION = $(strip \
 	$(shell grep compileSdk flutter/android/build.gradle \
