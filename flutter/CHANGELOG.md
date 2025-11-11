@@ -17,6 +17,7 @@ All user visible changes to this project will be documented in this file. This p
 - Bumped up minimum supported iOS deployment target to 15. ([#236])
 - Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.deviceAudio()`. ([#225], [#224])
 - Made `RoomHandle`'s `muteAudio()`, `unmuteAudio()`, `disableAudio()`, `enableAudio()`, `disableRemoteAudio()`, `enableRemoteAudio()` to accept optional `MediaSourceKind`. ([#225], [#224])
+- Dropped support for `i686-linux-android` target. ([#243])
 
 ### Added
 
@@ -43,6 +44,7 @@ All user visible changes to this project will be documented in this file. This p
 [#236]: https://github.com/instrumentisto/medea-jason/pull/236
 [#238]: https://github.com/instrumentisto/medea-jason/pull/238
 [#242]: https://github.com/instrumentisto/medea-jason/pull/242
+[#243]: https://github.com/instrumentisto/medea-jason/pull/243
 
 
 
