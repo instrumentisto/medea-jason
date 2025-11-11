@@ -12,7 +12,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  MEDEA_TAG: fix-reconnect
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 
@@ -363,14 +362,15 @@ jobs:
       matrix:
         platform:
           - android
-          - ios
+          #- ios # TODO: Very flaky and runs for few hours. Try re-enabling once
+          #              GitHub Actions support nested virtualization on Apple
+          #              Silicon (M3 and macos-15+).
           - linux
           - macos
           #- windows # TODO: Fix "windows cannot load linux image on windows".
-    runs-on: ${{ (contains('macos', matrix.platform) && 'macos-15-intel')
-              || (matrix.platform == 'ios' &&           'macos-latest')
-              || (matrix.platform == 'windows' &&       'windows-latest')
-              ||                                        'ubuntu-latest' }}
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-15-intel')
+              || (matrix.platform == 'windows' &&           'windows-latest')
+              ||                                            'ubuntu-latest' }}
     steps:
       - name: Enable KVM for Android HW acceleration
         run: |
@@ -389,17 +389,6 @@ jobs:
           brew install colima docker docker-compose
           colima start
         if: ${{ contains('ios macos', matrix.platform) }}
-
-      - name: Show Colima VM error log on failure
-        if: always()
-        run: |
-          LOG="/Users/runner/.colima/_lima/colima/ha.stderr.log"
-          if [ -f "$LOG" ]; then
-            cat "$LOG"
-          else
-            echo "Colima error log not found at $LOG"
-            ls -la "/Users/runner/.colima/_lima/colima"
-          fi
 
       - uses: subosito/flutter-action@v2
       - name: Install Flutter Linux dependencies
