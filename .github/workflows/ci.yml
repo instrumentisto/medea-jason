@@ -344,12 +344,12 @@ jobs:
         run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_TAG }}
         if: ${{ env.MEDEA_TAG != 'edge' }}
 
-      - name: ${{ matrix.browser }} (P2P mesh)
+      - name: P2P mesh (${{ matrix.browser }})
         run: make test.e2e browser=${{ matrix.browser }} sfu=no
                            up=yes debug=no dockerized=yes
                            medea-tag=${{ env.MEDEA_TAG }}
                            control-tag=build-${{ github.run_number }}
-      - name: ${{ matrix.browser }} (SFU)
+      - name: SFU (${{ matrix.browser }})
         run: make test.e2e browser=${{ matrix.browser }} sfu=yes
                            up=yes debug=no dockerized=yes
                            medea-tag=${{ env.MEDEA_TAG }}
