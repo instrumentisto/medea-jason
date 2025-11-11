@@ -390,6 +390,17 @@ jobs:
           colima start
         if: ${{ contains('ios macos', matrix.platform) }}
 
+      - name: Show Colima VM error log on failure
+        if: always()
+        run: |
+          LOG="/Users/runner/.colima/_lima/colima/ha.stderr.log"
+          if [ -f "$LOG" ]; then
+            cat "$LOG"
+          else
+            echo "Colima error log not found at $LOG"
+            ls -la "/Users/runner/.colima/_lima/colima"
+          fi
+
       - uses: subosito/flutter-action@v2
       - name: Install Flutter Linux dependencies
         run: |
