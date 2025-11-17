@@ -16,12 +16,16 @@ All user visible changes to this project will be documented in this file. This p
 - Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.device_audio()`. ([#225], [#224])
 - Made `RoomHandle`'s `mute_audio()`, `unmute_audio()`, `disable_audio()`, `enable_audio()`, `disable_remote_audio()`, `enable_remote_audio()` to accept optional `MediaSourceKind`. ([#225], [#224])
 - Dropped support for `i686-linux-android` target. ([#243])
+- Rework `RoomCloseReason`: ([#244])
+    - Change `RoomCloseReason.reason()` to return `RoomCloseKind`;
+    - Remove `RoomCloseReason.isErr()`.
 
 ### Added
 
 - `DisplayAudioTrackConstraints` and `MediaStreamSettings.display_audio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
 - `ConnectionHandle.get_state()` and `ConnectionHandle.on_state_change()` for tracking connection with remote member in P2P mode. ([#229])
 - `Jason.network_changed()` for instant reconnection of all signalling and ICE transports. ([#236])
+- `RoomCloseKind` enumeration to reflect why `Room` was closed. ([#244])
 
 ### Fixed
 

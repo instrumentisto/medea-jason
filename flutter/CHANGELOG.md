@@ -18,18 +18,23 @@ All user visible changes to this project will be documented in this file. This p
 - Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.deviceAudio()`. ([#225], [#224])
 - Made `RoomHandle`'s `muteAudio()`, `unmuteAudio()`, `disableAudio()`, `enableAudio()`, `disableRemoteAudio()`, `enableRemoteAudio()` to accept optional `MediaSourceKind`. ([#225], [#224])
 - Dropped support for `i686-linux-android` target. ([#243])
+- Rework `RoomCloseReason`: ([#244])
+    - Change `RoomCloseReason.reason()` to return `RoomCloseKind`;
+    - Remove `RoomCloseReason.isErr()`.
 
 ### Added
 
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
 - `DisplayAudioTrackConstraints` and `MediaStreamSettings.displayAudio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
 - `Jason.networkChanged()` for instant reconnection of all signalling and ICE transports. ([#236])
+- `RoomCloseKind` enumeration to reflect why `Room` was closed. ([#244])
 
 ### Fixed
 
 - `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 - `SIGABRT` in FFI glue caused by running out of TSD keys. ([#238])
 - RPC reconnect with a fresh `Jason` instance. ([#242])
+- Error while trying construct some exceptions on Web. ([#244])
 
 ### Upgraded
 

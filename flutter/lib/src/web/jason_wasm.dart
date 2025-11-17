@@ -247,7 +247,6 @@ extension type RoomCloseReason._(JSObject _) implements JSObject {
   external void free();
   external num reason();
   external bool is_closed_by_server();
-  external bool is_err();
 }
 
 @JS()

@@ -1,6 +1,8 @@
 //! API objects that can be shared between `dart` and `wasm`.
 
 use medea_client_api_proto as proto;
+#[cfg(doc)]
+use medea_client_api_proto::IceConnectionState;
 #[cfg(target_family = "wasm")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
