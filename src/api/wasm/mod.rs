@@ -32,7 +32,7 @@ pub use self::{
         MediaStreamSettings,
     },
     member_connection_state::{
-        MemberConnectionState, MemberConnectionStateKind, PeerConnectionState,
+        MemberConnectionState, MemberConnectionStateKind,
     },
     reconnect_handle::ReconnectHandle,
     remote_media_track::RemoteMediaTrack,

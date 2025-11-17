@@ -52,20 +52,15 @@ type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 /// Reason of why [`Room`] has been closed.
 ///
 /// This struct is passed into [`RoomHandleImpl::on_close`] callback.
-#[derive(Debug, Into)]
+#[derive(Clone, Copy, Debug)]
 pub struct RoomCloseReasonImpl {
     /// Reason of closing.
-    pub(crate) reason: String,
+    pub(crate) reason: api::RoomCloseKind,
 
     /// Indicator if [`Room`] is closed by server.
     ///
     /// `true` if [`CloseReason::ByServer`].
     pub(crate) is_closed_by_server: bool,
-
-    /// Indicator if closing is considered as error.
-    ///
-    /// This field may be `true` only on closing by client.
-    pub(crate) is_err: bool,
 }
 
 impl RoomCloseReasonImpl {
@@ -77,35 +72,25 @@ impl RoomCloseReasonImpl {
     #[must_use]
     pub fn new(reason: CloseReason) -> Self {
         match reason {
-            CloseReason::ByServer(rsn) => Self {
-                reason: rsn.to_string(),
-                is_closed_by_server: true,
-                is_err: false,
-            },
-            CloseReason::ByClient { reason: rsn, is_err } => Self {
-                reason: rsn.to_string(),
-                is_closed_by_server: false,
-                is_err,
-            },
+            CloseReason::ByServer(rsn) => {
+                Self { reason: rsn.into(), is_closed_by_server: true }
+            }
+            CloseReason::ByClient { reason: rsn } => {
+                Self { reason: rsn.into(), is_closed_by_server: false }
+            }
         }
     }
 
     /// Returns a close reason of the [`Room`].
     #[must_use]
-    pub fn reason(&self) -> String {
-        self.reason.clone()
+    pub const fn reason(&self) -> api::RoomCloseKind {
+        self.reason
     }
 
     /// Indicates whether the [`Room`] was closed by server.
     #[must_use]
     pub const fn is_closed_by_server(&self) -> bool {
         self.is_closed_by_server
-    }
-
-    /// Indicates whether the [`Room`]'s close reason is considered as an error.
-    #[must_use]
-    pub const fn is_err(&self) -> bool {
-        self.is_err
     }
 }
 
@@ -1163,7 +1148,6 @@ impl InnerRoom {
             on_close: Rc::new(platform::Callback::default()),
             close_reason: RefCell::new(CloseReason::ByClient {
                 reason: ClientDisconnect::RoomUnexpectedlyDropped,
-                is_err: true,
             }),
         }
     }

@@ -9,18 +9,13 @@ class WebRoomCloseReason implements RoomCloseReason {
   WebRoomCloseReason(this.obj);
 
   @override
-  String reason() {
-    return fallibleFunction(() => obj.reason());
+  RoomCloseKind reason() {
+    return fallibleFunction(() => RoomCloseKind.values[obj.reason().toInt()]);
   }
 
   @override
   bool isClosedByServer() {
     return fallibleFunction(() => obj.is_closed_by_server());
-  }
-
-  @override
-  bool isErr() {
-    return fallibleFunction(() => obj.is_err());
   }
 
   @moveSemantics

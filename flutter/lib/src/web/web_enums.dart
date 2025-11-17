@@ -142,3 +142,30 @@ enum PeerConnectionState {
   /// It's a terminal state.
   closed,
 }
+
+/// The reason of why `Room` was closed.
+enum RoomCloseKind {
+  /// Unexpected client error.
+  internalClientError,
+
+  /// Unexpected server error.
+  internalServerError,
+
+  /// Room was normally closed by client via `Jason::close_room()`.
+  finished,
+
+  /// Connection has been inactive for a while and thus considered idle
+  /// by a server.
+  idle,
+
+  /// Establishing of connection with a server was rejected on server side.
+  ///
+  /// Most likely because of incorrect `Member` credentials.
+  rejected,
+
+  /// Client was evicted on the server side.
+  ///
+  /// Usually this means that either `Member` or `Room` was deleted from the
+  /// server.
+  evicted,
+}

@@ -19,6 +19,7 @@ import 'api/dart/api/reconnect_handle.dart';
 import 'api/dart/api/remote_media_track.dart';
 import 'api/dart/api/room.dart';
 import 'api/dart/api/room_close_reason.dart';
+import 'api/shared.dart';
 import 'frb_generated.dart';
 import 'media.dart';
 import 'media/constraints.dart';
@@ -385,6 +386,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PeerConnectionState dco_decode_peer_connection_state(dynamic raw);
+
+  @protected
+  RoomCloseKind dco_decode_room_close_kind(dynamic raw);
 
   @protected
   RoomCloseReason dco_decode_room_close_reason(dynamic raw);
@@ -765,6 +769,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PeerConnectionState sse_decode_peer_connection_state(
     SseDeserializer deserializer,
   );
+
+  @protected
+  RoomCloseKind sse_decode_room_close_kind(SseDeserializer deserializer);
 
   @protected
   RoomCloseReason sse_decode_room_close_reason(SseDeserializer deserializer);
@@ -1210,6 +1217,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     PeerConnectionState self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_room_close_kind(RoomCloseKind self, SseSerializer serializer);
 
   @protected
   void sse_encode_room_close_reason(

@@ -2532,7 +2532,10 @@ impl SseDecode
         let mut tag_ = <i32>::sse_decode(deserializer);
         match tag_ {
             0 => {
-                let mut var_field0 = <crate::api::dart::api::member_connection_state::PeerConnectionState>::sse_decode(deserializer);
+                let mut var_field0 =
+                    <crate::api::shared::PeerConnectionState>::sse_decode(
+                        deserializer,
+                    );
                 return crate::api::dart::api::member_connection_state::MemberConnectionState::P2P(var_field0);
             }
             _ => {
@@ -2747,22 +2750,41 @@ impl SseDecode for Option<u32> {
     }
 }
 
-impl SseDecode
-    for crate::api::dart::api::member_connection_state::PeerConnectionState
-{
+impl SseDecode for crate::api::shared::PeerConnectionState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(
         deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
     ) -> Self {
         let mut inner = <i32>::sse_decode(deserializer);
         return match inner {
-            0 => crate::api::dart::api::member_connection_state::PeerConnectionState::New,
-1 => crate::api::dart::api::member_connection_state::PeerConnectionState::Connecting,
-2 => crate::api::dart::api::member_connection_state::PeerConnectionState::Connected,
-3 => crate::api::dart::api::member_connection_state::PeerConnectionState::Disconnected,
-4 => crate::api::dart::api::member_connection_state::PeerConnectionState::Failed,
-5 => crate::api::dart::api::member_connection_state::PeerConnectionState::Closed,
-            _ => unreachable!("Invalid variant for PeerConnectionState: {}", inner),
+            0 => crate::api::shared::PeerConnectionState::New,
+            1 => crate::api::shared::PeerConnectionState::Connecting,
+            2 => crate::api::shared::PeerConnectionState::Connected,
+            3 => crate::api::shared::PeerConnectionState::Disconnected,
+            4 => crate::api::shared::PeerConnectionState::Failed,
+            5 => crate::api::shared::PeerConnectionState::Closed,
+            _ => unreachable!(
+                "Invalid variant for PeerConnectionState: {}",
+                inner
+            ),
+        };
+    }
+}
+
+impl SseDecode for crate::api::shared::RoomCloseKind {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::shared::RoomCloseKind::InternalClientError,
+            1 => crate::api::shared::RoomCloseKind::InternalServerError,
+            2 => crate::api::shared::RoomCloseKind::Finished,
+            3 => crate::api::shared::RoomCloseKind::Idle,
+            4 => crate::api::shared::RoomCloseKind::Rejected,
+            5 => crate::api::shared::RoomCloseKind::Evicted,
+            _ => unreachable!("Invalid variant for RoomCloseKind: {}", inner),
         };
     }
 }
@@ -2772,13 +2794,12 @@ impl SseDecode for crate::api::dart::api::room_close_reason::RoomCloseReason {
     fn sse_decode(
         deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
     ) -> Self {
-        let mut var_reason = <String>::sse_decode(deserializer);
+        let mut var_reason =
+            <crate::api::shared::RoomCloseKind>::sse_decode(deserializer);
         let mut var_isClosedByServer = <bool>::sse_decode(deserializer);
-        let mut var_isErr = <bool>::sse_decode(deserializer);
         return crate::api::dart::api::room_close_reason::RoomCloseReason {
             reason: var_reason,
             is_closed_by_server: var_isClosedByServer,
-            is_err: var_isErr,
         };
     }
 }
@@ -3545,9 +3566,7 @@ impl
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart
-    for crate::api::dart::api::member_connection_state::PeerConnectionState
-{
+impl flutter_rust_bridge::IntoDart for crate::api::shared::PeerConnectionState {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
             Self::New => 0.into_dart(),
@@ -3561,18 +3580,38 @@ impl flutter_rust_bridge::IntoDart
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::dart::api::member_connection_state::PeerConnectionState
+    for crate::api::shared::PeerConnectionState
 {
 }
-impl
-    flutter_rust_bridge::IntoIntoDart<
-        crate::api::dart::api::member_connection_state::PeerConnectionState,
-    > for crate::api::dart::api::member_connection_state::PeerConnectionState
+impl flutter_rust_bridge::IntoIntoDart<crate::api::shared::PeerConnectionState>
+    for crate::api::shared::PeerConnectionState
 {
-    fn into_into_dart(
-        self,
-    ) -> crate::api::dart::api::member_connection_state::PeerConnectionState
-    {
+    fn into_into_dart(self) -> crate::api::shared::PeerConnectionState {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::shared::RoomCloseKind {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::InternalClientError => 0.into_dart(),
+            Self::InternalServerError => 1.into_dart(),
+            Self::Finished => 2.into_dart(),
+            Self::Idle => 3.into_dart(),
+            Self::Rejected => 4.into_dart(),
+            Self::Evicted => 5.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::shared::RoomCloseKind
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::shared::RoomCloseKind>
+    for crate::api::shared::RoomCloseKind
+{
+    fn into_into_dart(self) -> crate::api::shared::RoomCloseKind {
         self
     }
 }
@@ -3584,7 +3623,6 @@ impl flutter_rust_bridge::IntoDart
         [
             self.reason.into_into_dart().into_dart(),
             self.is_closed_by_server.into_into_dart().into_dart(),
-            self.is_err.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4291,7 +4329,7 @@ impl SseEncode
         self,
         serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
     ) {
-        match self {crate::api::dart::api::member_connection_state::MemberConnectionState::P2P(field0) => { <i32>::sse_encode(0, serializer); <crate::api::dart::api::member_connection_state::PeerConnectionState>::sse_encode(field0, serializer);
+        match self {crate::api::dart::api::member_connection_state::MemberConnectionState::P2P(field0) => { <i32>::sse_encode(0, serializer); <crate::api::shared::PeerConnectionState>::sse_encode(field0, serializer);
  }
  _ => { unimplemented!(""); }}
     }
@@ -4500,21 +4538,49 @@ impl SseEncode for Option<u32> {
     }
 }
 
-impl SseEncode
-    for crate::api::dart::api::member_connection_state::PeerConnectionState
-{
+impl SseEncode for crate::api::shared::PeerConnectionState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(
         self,
         serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
     ) {
-        <i32>::sse_encode(match self {crate::api::dart::api::member_connection_state::PeerConnectionState::New => { 0 }
-crate::api::dart::api::member_connection_state::PeerConnectionState::Connecting => { 1 }
-crate::api::dart::api::member_connection_state::PeerConnectionState::Connected => { 2 }
-crate::api::dart::api::member_connection_state::PeerConnectionState::Disconnected => { 3 }
-crate::api::dart::api::member_connection_state::PeerConnectionState::Failed => { 4 }
-crate::api::dart::api::member_connection_state::PeerConnectionState::Closed => { 5 }
- _ => { unimplemented!(""); }}, serializer);
+        <i32>::sse_encode(
+            match self {
+                crate::api::shared::PeerConnectionState::New => 0,
+                crate::api::shared::PeerConnectionState::Connecting => 1,
+                crate::api::shared::PeerConnectionState::Connected => 2,
+                crate::api::shared::PeerConnectionState::Disconnected => 3,
+                crate::api::shared::PeerConnectionState::Failed => 4,
+                crate::api::shared::PeerConnectionState::Closed => 5,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::api::shared::RoomCloseKind {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::shared::RoomCloseKind::InternalClientError => 0,
+                crate::api::shared::RoomCloseKind::InternalServerError => 1,
+                crate::api::shared::RoomCloseKind::Finished => 2,
+                crate::api::shared::RoomCloseKind::Idle => 3,
+                crate::api::shared::RoomCloseKind::Rejected => 4,
+                crate::api::shared::RoomCloseKind::Evicted => 5,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -4524,9 +4590,11 @@ impl SseEncode for crate::api::dart::api::room_close_reason::RoomCloseReason {
         self,
         serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
     ) {
-        <String>::sse_encode(self.reason, serializer);
+        <crate::api::shared::RoomCloseKind>::sse_encode(
+            self.reason,
+            serializer,
+        );
         <bool>::sse_encode(self.is_closed_by_server, serializer);
-        <bool>::sse_encode(self.is_err, serializer);
     }
 }
 

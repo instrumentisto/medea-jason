@@ -7,10 +7,11 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 
 import '../../../frb_generated.dart';
+import '../../shared.dart';
 
 part 'member_connection_state.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `from`
 
 @freezed
 sealed class MemberConnectionState with _$MemberConnectionState {
@@ -34,62 +35,4 @@ sealed class MemberConnectionState with _$MemberConnectionState {
       .crateApiDartApiMemberConnectionStateMemberConnectionStateFromPtr(
         ptr: ptr,
       );
-}
-
-/// Possible connection states of a [`PeerConnection`].
-enum PeerConnectionState {
-  /// At least one of the connection's [ICE] transports are in the
-  /// [`IceConnectionState::New`] state, and none of them are in one
-  /// of the following states: [`IceConnectionState::Checking`],
-  /// [`IceConnectionState::Failed`], or
-  /// [`IceConnectionState::Disconnected`], or all of the connection's
-  /// transports are in the [`IceConnectionState::Closed`] state.
-  ///
-  /// [ICE]: https://webrtcglossary.com/ice
-  new_,
-
-  /// One or more of the [ICE] transports are currently in the process of
-  /// establishing a connection; that is, their [`IceConnectionState`] is
-  /// either [`IceConnectionState::Checking`] or
-  /// [`IceConnectionState::Connected`], and no transports are in the
-  /// [`IceConnectionState::Failed`] state.
-  ///
-  /// [ICE]: https://webrtcglossary.com/ice
-  connecting,
-
-  /// Every [ICE] transport used by the connection is either in use (state
-  /// [`IceConnectionState::Connected`] or [`IceConnectionState::Completed`])
-  /// or is closed ([`IceConnectionState::Closed`]).
-  ///
-  /// In addition, at least one transport is either
-  /// [`IceConnectionState::Connected`] or [`IceConnectionState::Completed`].
-  ///
-  /// [ICE]: https://webrtcglossary.com/ice
-  connected,
-
-  /// At least one of the [ICE] transports for the connection is in the
-  /// [`IceConnectionState::Disconnected`] state and none of the other
-  /// transports are in the state [`IceConnectionState::Failed`] or
-  /// [`IceConnectionState::Checking`].
-  ///
-  /// It's not a terminal state, and it can go back to
-  /// [`PeerConnectionState::Connecting`] and then
-  /// [`PeerConnectionState::Connected`] on its own.
-  ///
-  /// [ICE]: https://webrtcglossary.com/ice
-  disconnected,
-
-  /// One or more of the [ICE] transports on the connection is in the
-  /// [`IceConnectionState::Failed`] state.
-  ///
-  /// It's not a terminal state, and it can be fixed with [ICE] restart if
-  /// signalling connection is alive.
-  ///
-  /// [ICE]: https://webrtcglossary.com/ice
-  failed,
-
-  /// [`PeerConnection`] is closed.
-  ///
-  /// It's a terminal state.
-  closed,
 }
