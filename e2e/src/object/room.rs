@@ -494,7 +494,7 @@ impl Object<Room> {
                     });
 
                     let closeReason = await waiter;
-                    return closeReason.reason();
+                    return window.rust.RoomCloseKind[closeReason.reason()];
                 }
             }
             ",

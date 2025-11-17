@@ -21,7 +21,12 @@ StepDefinitionGeneric thenOnCloseFires = then2<String, String, CustomWorld>(
   RegExp(r"(\S+)'s `on_close` room's callback fires with `(\S+)` reason$"),
   (id, expectReason, context) async {
     var reason = await context.world.waitForOnClose(id);
-    expect(reason.reason(), expectReason);
+
+    var kind = RoomCloseKind.values.firstWhere(
+      (e) => e.name.toLowerCase() == expectReason.toLowerCase(),
+    );
+
+    expect(reason.reason(), kind);
   },
 );
 
