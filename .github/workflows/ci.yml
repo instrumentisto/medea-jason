@@ -149,7 +149,7 @@ jobs:
 
       - run: make cargo.gen crate=${{ matrix.crate }}
 
-      - run: git status --short
+      - run: git status --short | (! read -t 1 -N 1)
 
   dartanalyze:
     runs-on: ubuntu-latest
