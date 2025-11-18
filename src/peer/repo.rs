@@ -156,10 +156,6 @@ impl Repository {
         peers: Rc<RefCell<HashMap<PeerId, peer::Component>>>,
     ) -> TaskHandle {
         let (fut, abort) = future::abortable(async move {
-            #[expect( // intentional
-                clippy::infinite_loop,
-                reason = "cannot annotate `async` block with `-> !`"
-            )]
             loop {
                 platform::delay_for(Duration::from_secs(1)).await;
 

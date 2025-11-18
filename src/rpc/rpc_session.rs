@@ -175,9 +175,9 @@ pub struct WebSocketRpcSession {
     /// Current [`SessionState`] of this [`WebSocketRpcSession`].
     state: ObservableCell<SessionState>,
 
-    /// Flag which indicates that [`WebSocketRpcSession`] goes to the
-    /// [`SessionState::Lost`] from the [`SessionState::Opened`].
-    can_reconnect: Rc<Cell<bool>>,
+    /// Indicator whether this [`WebSocketRpcSession`] has previously reached
+    /// [`SessionState::Opened`].
+    was_connected: Rc<Cell<bool>>,
 
     /// Subscribers of the [`RpcSession::subscribe`].
     event_txs: RefCell<Vec<mpsc::UnboundedSender<Event>>>,
@@ -192,7 +192,7 @@ impl WebSocketRpcSession {
         let this = Rc::new(Self {
             client,
             state: ObservableCell::new(SessionState::Uninitialized),
-            can_reconnect: Rc::new(Cell::new(false)),
+            was_connected: Rc::new(Cell::new(false)),
             event_txs: RefCell::default(),
         });
 
@@ -234,7 +234,7 @@ impl WebSocketRpcSession {
         use SessionState as S;
 
         match self.state.get() {
-            S::Connecting(_) | S::Authorizing(_) | S::Opened(_) => {}
+            S::Connecting(_) | S::Authorizing(_) | S::Opened { .. } => {}
             S::Initialized(info) | S::Lost(_, info) => {
                 self.state.set(S::Connecting(info));
             }
@@ -249,7 +249,7 @@ impl WebSocketRpcSession {
         let mut state_updates_stream = self.state.subscribe();
         while let Some(state) = state_updates_stream.next().await {
             match state {
-                S::Opened(_) => return Ok(()),
+                S::Opened { .. } => return Ok(()),
                 S::Initialized(_) => {
                     return Err(tracerr::new!(E::NewConnectionInfo));
                 }
@@ -307,7 +307,7 @@ impl WebSocketRpcSession {
                     S::Uninitialized
                     | S::Initialized(_)
                     | S::Lost(..)
-                    | S::Opened(_)
+                    | S::Opened { .. }
                     | S::Finished(_) => {}
                 }
             }
@@ -329,13 +329,13 @@ impl WebSocketRpcSession {
                 let this = upgrade_or_break!(weak_this);
 
                 let state = this.state.get();
-                if matches!(state, S::Opened(_)) {
-                    this.can_reconnect.set(true);
+                if matches!(state, S::Opened { .. }) {
+                    this.was_connected.set(true);
                 }
                 match state {
                     S::Connecting(info)
                     | S::Authorizing(info)
-                    | S::Opened(info) => {
+                    | S::Opened { info, .. } => {
                         this.state.set(S::Lost(
                             ConnectionLostReason::Lost(reason),
                             info,
@@ -407,7 +407,7 @@ impl RpcSession for WebSocketRpcSession {
                     self.state.set(S::Initialized(Rc::new(connection_info)));
                 }
             }
-            S::Authorizing(info) | S::Opened(info) => {
+            S::Authorizing(info) | S::Opened { info, .. } => {
                 if info.as_ref() != &connection_info {
                     unimplemented!(
                         "Changing `ConnectionInfo` with active or pending \
@@ -438,7 +438,7 @@ impl RpcSession for WebSocketRpcSession {
     /// Sends [`Command`] to the server if current [`SessionState`] is
     /// [`SessionState::Opened`].
     fn send_command(&self, command: Command) {
-        if let SessionState::Opened(info) = self.state.get() {
+        if let SessionState::Opened { info, .. } = self.state.get() {
             self.client.send_command(info.room_id.clone(), command);
         }
     }
@@ -473,7 +473,7 @@ impl RpcSession for WebSocketRpcSession {
     /// Provided [`ClientDisconnect`] will be provided to the underlying
     /// [`WebSocketRpcClient`] with [`WebSocketRpcClient::set_close_reason`].
     fn close_with_reason(&self, close_reason: ClientDisconnect) {
-        if let SessionState::Opened(info) = self.state.get() {
+        if let SessionState::Opened { info, .. } = self.state.get() {
             self.client
                 .leave_room(info.room_id.clone(), info.member_id.clone());
         }
@@ -487,12 +487,12 @@ impl RpcSession for WebSocketRpcSession {
     ///
     /// [`Stream`]: futures::Stream
     fn on_connection_loss(&self) -> LocalBoxStream<'static, ()> {
-        let can_reconnect = Rc::clone(&self.can_reconnect);
+        let was_connected = Rc::clone(&self.was_connected);
         self.state
             .subscribe()
             .filter_map(move |state| {
                 if matches!(state, SessionState::Lost(_, _))
-                    && can_reconnect.get()
+                    && was_connected.get()
                 {
                     future::ready(Some(()))
                 } else {
@@ -510,16 +510,14 @@ impl RpcSession for WebSocketRpcSession {
     ///
     /// [`Stream`]: futures::Stream
     fn on_reconnected(&self) -> LocalBoxStream<'static, ()> {
-        let can_reconnect = Rc::clone(&self.can_reconnect);
         self.state
             .subscribe()
-            .filter_map(move |current_state| {
-                let can_reconnect = Rc::clone(&can_reconnect);
-                async move {
-                    (matches!(current_state, SessionState::Opened(_))
-                        && can_reconnect.get())
-                    .then_some(())
-                }
+            .filter_map(async move |current_state| {
+                matches!(
+                    current_state,
+                    SessionState::Opened { is_reconnect: true, .. }
+                )
+                .then_some(())
             })
             .boxed_local()
     }
@@ -536,8 +534,8 @@ impl RpcSession for WebSocketRpcSession {
             | S::Authorizing(_)
             | S::Lost(..)
             | S::Initialized(_) => {}
-            S::Opened(info) => {
-                self.can_reconnect.set(true);
+            S::Opened { info, .. } => {
+                self.was_connected.set(true);
                 self.client.close_for_reconnection();
                 self.state.set(S::Connecting(info));
             }
@@ -559,11 +557,16 @@ impl RpcEventHandler for WebSocketRpcSession {
     /// [`RoomId`] from [`ConnectionInfo`] is equal to the provided
     /// [`RoomId`], then [`SessionState`] will be transited to the
     /// [`SessionState::Opened`].
-    fn on_joined_room(&self, room_id: RoomId, member_id: MemberId) {
+    fn on_joined_room(
+        &self,
+        room_id: RoomId,
+        member_id: MemberId,
+        is_reconnect: bool,
+    ) {
         let state = self.state.get();
         if let SessionState::Authorizing(info) = state {
             if info.room_id == room_id && info.member_id == member_id {
-                self.state.set(SessionState::Opened(info));
+                self.state.set(SessionState::Opened { info, is_reconnect });
             }
         }
     }
@@ -579,7 +582,8 @@ impl RpcEventHandler for WebSocketRpcSession {
         let state = self.state.get();
 
         match &state {
-            SessionState::Opened(info) | SessionState::Authorizing(info) => {
+            SessionState::Opened { info, .. }
+            | SessionState::Authorizing(info) => {
                 if info.room_id != room_id {
                     return;
                 }
@@ -592,7 +596,7 @@ impl RpcEventHandler for WebSocketRpcSession {
         }
 
         match state {
-            SessionState::Opened(_) => {
+            SessionState::Opened { .. } => {
                 self.state.set(SessionState::Finished(close_reason));
             }
             SessionState::Authorizing(_) => {
@@ -611,7 +615,7 @@ impl RpcEventHandler for WebSocketRpcSession {
     /// and provided [`RoomId`] is equal to the [`RoomId`] from the
     /// [`ConnectionInfo`].
     fn on_event(&self, room_id: RoomId, event: Event) {
-        if let SessionState::Opened(info) = self.state.get() {
+        if let SessionState::Opened { info, .. } = self.state.get() {
             if info.room_id == room_id {
                 self.event_txs
                     .borrow_mut()
@@ -681,7 +685,14 @@ pub enum SessionState {
 
     /// Connection with a server is established and [`WebSocketRpcSession`] is
     /// authorized.
-    Opened(Rc<ConnectionInfo>),
+    Opened {
+        /// [`RpcSession`] associated information.
+        info: Rc<ConnectionInfo>,
+
+        /// Indicator whether the current [`RpcSession`] is considered as a
+        /// reconnect.
+        is_reconnect: bool,
+    },
 
     /// Terminal state: transport is closed and can not be reopened.
     Finished(CloseReason),

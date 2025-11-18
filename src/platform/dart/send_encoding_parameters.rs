@@ -148,7 +148,6 @@ impl SendEncodingParameters {
     /// Returns [RID] of these [`SendEncodingParameters`].
     ///
     /// [RID]: https://w3.org/TR/webrtc#dom-rtcrtpcodingparameters-rid
-    #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
     #[must_use]
     pub fn rid(&self) -> Option<String> {
         let rid =
@@ -188,7 +187,6 @@ impl SendEncodingParameters {
     /// Returns [maxBitrate][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters-maxbitrate
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn max_bitrate(&self) -> Option<u32> {
         let max_bitrate =
@@ -238,7 +236,6 @@ impl SendEncodingParameters {
     /// Returns [scalabilityMode][1] of these [`SendEncodingParameters`].
     ///
     /// [1]: https://tinyurl.com/3zuaee45
-    #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
     #[must_use]
     pub fn scalability_mode(&self) -> Option<String> {
         let mode = unsafe {

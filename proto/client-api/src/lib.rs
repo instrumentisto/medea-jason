@@ -96,7 +96,6 @@
     clippy::string_lit_as_bytes,
     clippy::string_lit_chars_any,
     clippy::string_slice,
-    clippy::string_to_string,
     clippy::suboptimal_flops,
     clippy::suspicious_operation_groupings,
     clippy::suspicious_xor_used_as_pow,
@@ -705,6 +704,13 @@ pub enum Event {
     RoomJoined {
         /// ID of the `Member` who joined the `Room`.
         member_id: MemberId,
+
+        /// Indicator whether Media Server considers this `Room` connection as a
+        /// reconnect, meaning that there is already some runtime state on the
+        /// Media Server for the specified [`MemberId`]-[`Credential`] pair.
+        ///
+        /// Server expects [`Command::SynchronizeMe`] if this is `true`.
+        is_reconnect: bool,
     },
 
     /// Media Server notifies Web Client that a `Member` left a `Room`.

@@ -161,7 +161,6 @@ impl CodecCapability {
     /// Returns [channels][2] of this [`CodecCapability`].
     ///
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpcodec-channels
-    #[expect(clippy::unwrap_in_result, reason = "unrelated and intended")]
     #[must_use]
     pub fn channels(&self) -> Option<u16> {
         let channels =

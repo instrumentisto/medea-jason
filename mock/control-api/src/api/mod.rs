@@ -23,6 +23,7 @@ use actix_web::{
 use derive_more::with_trait::From;
 use medea_control_api_proto::grpc::api as proto;
 use serde::{Deserialize, Serialize};
+use tracing as log;
 
 use self::{
     endpoint::{WebRtcPlayEndpoint, WebRtcPublishEndpoint},
@@ -34,7 +35,6 @@ use crate::{
     api::ws::Notification,
     callback::server::{GetCallbackItems, GrpcCallbackServer},
     client::{ControlClient, Fid},
-    prelude::*,
 };
 
 /// Map of subscribers to [`Notification`]s.
@@ -78,7 +78,7 @@ pub async fn run(opts: &Cli, callback_server: Addr<GrpcCallbackServer>) {
     });
 
     HttpServer::new(move || {
-        debug!("Running HTTP server...");
+        log::debug!("Running HTTP server...");
         App::new()
             .wrap(Cors::permissive())
             .app_data(app_data.clone())

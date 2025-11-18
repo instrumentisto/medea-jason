@@ -299,8 +299,12 @@ jobs:
              && matrix.crate != 'medea-jason' }}
 
   test-e2e-browser:
-    name: test (E2E, chrome, firefox)
+    name: test (E2E, ${{ matrix.browser }})
     needs: ["docker"]
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: ["chrome", "firefox"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -319,7 +323,7 @@ jobs:
           use-tool-cache: true
 
       - name: Download `medea-control-api-mock` Docker image
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
           path: .cache/
@@ -340,23 +344,13 @@ jobs:
         run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_TAG }}
         if: ${{ env.MEDEA_TAG != 'edge' }}
 
-      - name: Chrome (P2P mesh)
-        run: make test.e2e browser=chrome sfu=no
+      - name: P2P mesh (${{ matrix.browser }})
+        run: make test.e2e browser=${{ matrix.browser }} sfu=no
                            up=yes debug=no dockerized=yes
                            medea-tag=${{ env.MEDEA_TAG }}
                            control-tag=build-${{ github.run_number }}
-      - name: Chrome (SFU)
-        run: make test.e2e browser=chrome sfu=yes
-                           up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_TAG }}
-                           control-tag=build-${{ github.run_number }}
-      - name: Firefox (P2P mesh)
-        run: make test.e2e browser=firefox sfu=no
-                           up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_TAG }}
-                           control-tag=build-${{ github.run_number }}
-      - name: Firefox (SFU)
-        run: make test.e2e browser=firefox sfu=yes
+      - name: SFU (${{ matrix.browser }})
+        run: make test.e2e browser=${{ matrix.browser }} sfu=yes
                            up=yes debug=no dockerized=yes
                            medea-tag=${{ env.MEDEA_TAG }}
                            control-tag=build-${{ github.run_number }}
@@ -375,7 +369,7 @@ jobs:
           - linux
           - macos
           #- windows # TODO: Fix "windows cannot load linux image on windows".
-    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-13')
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-15-intel')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
@@ -432,7 +426,7 @@ jobs:
         if: ${{ matrix.platform == 'ios' }}
 
       - name: Download `medea-jason` lib
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: build-jason-${{ matrix.platform }}
           path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
@@ -443,7 +437,7 @@ jobs:
                  ||                                  './flutter/assets/pkg/' }}
 
       - name: Download `medea-control-api-mock` Docker image
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
           path: .cache/
@@ -668,7 +662,7 @@ jobs:
       - run: make flutter.web.assets
         if: ${{ matrix.platform == 'web' }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: build-jason-${{ matrix.platform }}
           path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
@@ -696,7 +690,7 @@ jobs:
       - run: make cargo.build.jason platform=linux
                                     dockerized=no debug=no
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: build-jason-linux
           path: ./flutter/linux/lib/
@@ -740,7 +734,7 @@ jobs:
                   image=${{ matrix.image }} tags=build-${{ github.run_number }}
         if: ${{ steps.skip.outputs.no == 'true'
              && steps.export.outputs.yes == 'true' }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: docker-${{ matrix.image }}-${{ github.run_number }}
           path: .cache/image.tar
@@ -909,32 +903,32 @@ jobs:
       - uses: subosito/flutter-action@v2
         if: ${{ steps.skip.outputs.no == 'true' }}
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-android
           path: ./flutter/android/src/main/jniLibs/
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-ios
           path: ./flutter/ios/lib/
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-linux
           path: ./flutter/linux/lib/
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-macos
           path: ./flutter/macos/lib/
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-web
           path: ./flutter/assets/pkg/
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: build-jason-windows
           path: ./flutter/windows/lib/
@@ -1012,7 +1006,7 @@ jobs:
       - uses: actions/checkout@v5
         if: ${{ steps.skip.outputs.no == 'true' }}
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: docker-${{ matrix.image }}-${{ github.run_number }}
           path: .cache/

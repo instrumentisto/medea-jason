@@ -72,7 +72,6 @@ impl DartList {
     }
 
     /// Returns an element by the provided `index` from this [`DartList`].
-    #[expect(clippy::unwrap_in_result, reason = "unrelated")]
     #[must_use]
     pub fn get(&self, index: usize) -> Option<DartHandle> {
         #[expect( // intended
