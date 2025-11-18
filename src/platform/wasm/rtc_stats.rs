@@ -22,6 +22,7 @@ impl TryFrom<RtcStatsReport> for RtcStats {
     fn try_from(stats: RtcStatsReport) -> Result<Self, Self::Error> {
         use RtcStatsError::Platform;
 
+        // asdasdasdasdasdasd
         let mut out = Vec::new();
 
         for stat in stats.entries() {
@@ -34,9 +35,16 @@ impl TryFrom<RtcStatsReport> for RtcStats {
             let stat_json = JSON::stringify(&JsValue::from(&stat.0))
                 .map(String::from)
                 .unwrap_throw();
-            let rtc_stat: RtcStat = serde_json::from_str(&stat_json)
+            let rtc_stat: Result<RtcStat, _> = serde_json::from_str(&stat_json)
                 .map_err(Rc::new)
-                .map_err(tracerr::from_and_wrap!())?;
+                .map_err(tracerr::from_and_wrap!());
+
+            if rtc_stat.is_err() {
+                web_sys::console::error_1(&JsValue::from(stat_json));
+                // stat_json
+            }
+
+            let rtc_stat = rtc_stat?;
 
             if matches!(rtc_stat.stats, RtcStatsType::Other) {
                 continue;

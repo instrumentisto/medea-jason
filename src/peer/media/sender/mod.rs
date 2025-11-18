@@ -31,8 +31,8 @@ use crate::{
 pub enum CreateError {
     /// [`Sender`] cannot be disabled because it's marked as `required`.
     #[display(
-        "`MediaExchangeState` of `Sender` cannot transit to \
-         disabled state, because this `Sender` is required"
+        "`MediaExchangeState` of `Sender` cannot transit to disabled state, \
+         because this `Sender` is required"
     )]
     CannotDisableRequiredSender,
 

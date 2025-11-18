@@ -210,8 +210,8 @@ pub enum TrackDirection {
 pub enum ProhibitedStateError {
     /// [`Sender`] cannot be disabled because it's required.
     #[display(
-        "`MediaExchangeState` of `Sender` can't transit to \
-         disabled state, because this `Sender` is required"
+        "`MediaExchangeState` of `Sender` can't transit to disabled state, \
+         because this `Sender` is required"
     )]
     CannotDisableRequiredSender,
 }

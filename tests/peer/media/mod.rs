@@ -714,8 +714,8 @@ mod codec_probing {
                     "video/ulpfec",
                 ]
             },
-            "Browser available codecs are changed, check new codecs \
-             and update this test",
+            "Browser available codecs are changed, check new codecs and \
+             update this test",
         );
     }
 }

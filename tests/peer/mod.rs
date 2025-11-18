@@ -14,9 +14,9 @@ use medea_client_api_proto::{
     MediaDirection, MediaSourceKind, MediaType, MemberId, NegotiationRole,
     PeerId, Track, TrackId, TrackPatchEvent, VideoSettings,
     stats::{
-        HighResTimeStamp, KnownIceCandidatePairState, NonExhaustive,
-        RtcInboundRtpStreamMediaType, RtcOutboundRtpStreamMediaType, RtcStat,
-        RtcStatsType, StatId, TrackStats, TrackStatsKind,
+        HighResTimeStamp, InboundRtpKind, KnownIceCandidatePairState,
+        NonExhaustive, RtcOutboundRtpStreamMediaType, RtcStat, RtcStatsType,
+        StatId, TrackStats, TrackStatsKind,
     },
 };
 use medea_jason::{
@@ -869,8 +869,8 @@ async fn get_traffic_stats() {
                     }
                     RtcStatsType::InboundRtp(_) => {
                         unreachable!(
-                            "First `Peer` shouldn't have any \
-                                `InboundRtp` stats",
+                            "First `Peer` shouldn't have any `InboundRtp` \
+                             stats",
                         )
                     }
                     RtcStatsType::CandidatePair(candidate_pair) => {
@@ -912,10 +912,10 @@ async fn get_traffic_stats() {
             match stat.stats {
                 RtcStatsType::InboundRtp(inbound) => {
                     match inbound.media_specific_stats {
-                        RtcInboundRtpStreamMediaType::Audio { .. } => {
+                        InboundRtpKind::Audio { .. } => {
                             second_peer_has_audio_inbound_stats = true
                         }
-                        RtcInboundRtpStreamMediaType::Video { .. } => {
+                        InboundRtpKind::Video { .. } => {
                             second_peer_has_video_inbound_stats = true
                         }
                     }
@@ -1397,8 +1397,8 @@ async fn new_remote_track() {
                 has_audio: audio_tx_enabled && audio_rx_enabled,
                 has_video: video_tx_enabled && video_rx_enabled,
             },
-            "{audio_tx_enabled} {video_tx_enabled} \
-             {audio_rx_enabled} {video_rx_enabled}",
+            "{audio_tx_enabled} {video_tx_enabled} {audio_rx_enabled} \
+             {video_rx_enabled}",
         );
     }
 }

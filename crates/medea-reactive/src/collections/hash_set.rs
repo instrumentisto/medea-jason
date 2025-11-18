@@ -201,7 +201,7 @@ where
     ///
     /// If it did have such `value` present, `false` is returned.
     ///
-    /// This will produce [`HashSet::on_inser()t`] event.
+    /// This will produce [`HashSet::on_insert()`] event.
     pub fn insert(&mut self, value: T) -> bool {
         if self.store.insert(value.clone()) {
             self.on_insert_subs.send_update(value);

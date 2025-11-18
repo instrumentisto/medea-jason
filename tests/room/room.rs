@@ -1298,23 +1298,19 @@ mod on_close_callback {
 
     use super::*;
 
-    #[wasm_bindgen(inline_js = "export function get_reason(closed) { \
-                                  return closed.reason(); \
-                                }")]
+    #[wasm_bindgen(inline_js = "export function get_reason(closed) { return \
+                                closed.reason(); }")]
     extern "C" {
         fn get_reason(closed: &JsValue) -> String;
     }
-    #[wasm_bindgen(inline_js = "export function get_is_closed_by_server(\
-                                  reason\
-                                ) { \
-                                  return reason.is_closed_by_server(); \
-                                }")]
+    #[wasm_bindgen(inline_js = "export function \
+                                get_is_closed_by_server(reason) { return \
+                                reason.is_closed_by_server(); }")]
     extern "C" {
         fn get_is_closed_by_server(reason: &JsValue) -> bool;
     }
-    #[wasm_bindgen(inline_js = "export function get_is_err(reason) { \
-                                  return reason.is_err(); \
-                                }")]
+    #[wasm_bindgen(inline_js = "export function get_is_err(reason) { return \
+                                reason.is_err(); }")]
     extern "C" {
         fn get_is_err(reason: &JsValue) -> bool;
     }
@@ -2329,7 +2325,7 @@ async fn set_media_state_return_media_error_display_video() {
         err.message(),
         format!(
             "Failed to get local tracks: `MediaDevices.getDisplayMedia()` \
-            failed: Error: {ERROR_MSG}",
+             failed: Error: {ERROR_MSG}",
         )
     );
 
@@ -2772,10 +2768,8 @@ mod set_local_media_settings {
                 .await
                 .is_ok(),
                 is_should_be_ok,
-                "audio_required: {audio_required}; \
-                 add_audio: {add_audio}; \
-                 video_required: {video_required}; \
-                 add_video: {add_video}",
+                "audio_required: {audio_required}; add_audio: {add_audio}; \
+                 video_required: {video_required}; add_video: {add_video}",
             );
 
             timeout(1000, test_rx).await.map(|rx| rx.unwrap()).map_err(drop)
