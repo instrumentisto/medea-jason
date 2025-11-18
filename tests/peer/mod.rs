@@ -869,8 +869,8 @@ async fn get_traffic_stats() {
                     }
                     RtcStatsType::InboundRtp(_) => {
                         unreachable!(
-                            "First `Peer` shouldn't have any `InboundRtp` \
-                             stats",
+                            "First `Peer` shouldn't have any \
+                                `InboundRtp` stats",
                         )
                     }
                     RtcStatsType::CandidatePair(candidate_pair) => {
@@ -1397,8 +1397,8 @@ async fn new_remote_track() {
                 has_audio: audio_tx_enabled && audio_rx_enabled,
                 has_video: video_tx_enabled && video_rx_enabled,
             },
-            "{audio_tx_enabled} {video_tx_enabled} {audio_rx_enabled} \
-             {video_rx_enabled}",
+            "{audio_tx_enabled} {video_tx_enabled} \
+             {audio_rx_enabled} {video_rx_enabled}",
         );
     }
 }
