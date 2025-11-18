@@ -487,7 +487,8 @@ impl Object<Room> {
             "
             async (room) => {
                 if (room.closeListener.isClosed) {
-                    return room.closeListener.closeReason.reason();
+                    let reason = room.closeListener.closeReason.reason();
+                    return window.rust.RoomCloseKind[reason];
                 } else {
                     let waiter = new Promise((resolve) => {
                         room.closeListener.subs.push(resolve);
