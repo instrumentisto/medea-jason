@@ -1,4 +1,4 @@
-//! API objects that can be shared between `dart` and `wasm`.
+//! API objects that can be shared between any target platform.
 
 use medea_client_api_proto as proto;
 #[cfg(doc)]
@@ -10,7 +10,7 @@ use crate::rpc::ClientDisconnect;
 #[cfg(doc)]
 use crate::{api::RoomCloseReason, peer::PeerConnection};
 
-/// The reason of why `Room` was closed.
+/// The reason of why a `Room` was closed.
 ///
 /// Provided in a [`RoomCloseReason`]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]

@@ -76,8 +76,8 @@ impl ClientDisconnect {
 }
 
 impl From<ClientDisconnect> for CloseReason {
-    fn from(v: ClientDisconnect) -> Self {
-        Self::ByClient { reason: v }
+    fn from(value: ClientDisconnect) -> Self {
+        Self::ByClient { reason: value }
     }
 }
 

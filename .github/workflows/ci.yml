@@ -380,8 +380,8 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
         if: ${{ matrix.platform == 'android' }}
-
-      - uses: jlumbroso/free-disk-space@v1.3.1
+      - name: Free disk space for Android
+        uses: jlumbroso/free-disk-space@v1.3.1
         with:
           android: false
           swap-storage: false

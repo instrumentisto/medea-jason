@@ -19,7 +19,7 @@ All user visible changes to this project will be documented in this file. This p
 - Made `RoomHandle`'s `muteAudio()`, `unmuteAudio()`, `disableAudio()`, `enableAudio()`, `disableRemoteAudio()`, `enableRemoteAudio()` to accept optional `MediaSourceKind`. ([#225], [#224])
 - Dropped support for `i686-linux-android` target. ([#243])
 - Rework `RoomCloseReason`: ([#244])
-    - Change `RoomCloseReason.reason()` to return `RoomCloseKind`;
+    - Change `RoomCloseReason.reason()` to return `RoomCloseKind` instead of `String`.
     - Remove `RoomCloseReason.isErr()`.
 
 ### Added
@@ -50,6 +50,7 @@ All user visible changes to this project will be documented in this file. This p
 [#238]: https://github.com/instrumentisto/medea-jason/pull/238
 [#242]: https://github.com/instrumentisto/medea-jason/pull/242
 [#243]: https://github.com/instrumentisto/medea-jason/pull/243
+[#244]: https://github.com/instrumentisto/medea-jason/pull/244
 
 
 

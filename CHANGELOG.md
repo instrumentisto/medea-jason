@@ -16,9 +16,9 @@ All user visible changes to this project will be documented in this file. This p
 - Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.device_audio()`. ([#225], [#224])
 - Made `RoomHandle`'s `mute_audio()`, `unmute_audio()`, `disable_audio()`, `enable_audio()`, `disable_remote_audio()`, `enable_remote_audio()` to accept optional `MediaSourceKind`. ([#225], [#224])
 - Dropped support for `i686-linux-android` target. ([#243])
-- Rework `RoomCloseReason`: ([#244])
-    - Change `RoomCloseReason.reason()` to return `RoomCloseKind`;
-    - Remove `RoomCloseReason.isErr()`.
+- Reworked `RoomCloseReason`: ([#244])
+    - Changed `RoomCloseReason.reason()` to return `RoomCloseKind` instead of `String`.
+    - Removed `RoomCloseReason.is_err()`.
 
 ### Added
 
@@ -45,6 +45,7 @@ All user visible changes to this project will be documented in this file. This p
 [#238]: https://github.com/instrumentisto/medea-jason/pull/238
 [#242]: https://github.com/instrumentisto/medea-jason/pull/242
 [#243]: https://github.com/instrumentisto/medea-jason/pull/243
+[#244]: https://github.com/instrumentisto/medea-jason/pull/244
 [095368cb]: https://github.com/instrumentisto/medea-jason/commit/095368cb2e5dd6faca44882955b7cab6b19d8ad2
 [`cargo-ndk` 4.0 version]: https://github.com/bbqsrc/cargo-ndk/blob/v4.0.0/CHANGELOG.md#v400---2025-07-30
 

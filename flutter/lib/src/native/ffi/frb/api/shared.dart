@@ -65,7 +65,7 @@ enum PeerConnectionState {
   closed,
 }
 
-/// The reason of why `Room` was closed.
+/// The reason of why a `Room` was closed.
 ///
 /// Provided in a [`RoomCloseReason`]
 enum RoomCloseKind {
