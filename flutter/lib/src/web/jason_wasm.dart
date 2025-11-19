@@ -134,7 +134,7 @@ extension type MediaDeviceDetails._(JSObject _) implements JSObject {
 extension type InternalException._(JSObject _) implements JSObject {
   external void free();
   external String message();
-  external JSObject cause();
+  external JSObject? cause();
   external String trace();
 }
 
@@ -154,7 +154,7 @@ extension type LocalMediaInitException._(JSObject _) implements JSObject {
   external void free();
   external num kind();
   external String message();
-  external JSObject cause();
+  external JSObject? cause();
   external String trace();
 }
 
@@ -245,9 +245,8 @@ extension type RemoteMediaTrack._(JSObject _) implements JSObject {
 @JS()
 extension type RoomCloseReason._(JSObject _) implements JSObject {
   external void free();
-  external String reason();
+  external num reason();
   external bool is_closed_by_server();
-  external bool is_err();
 }
 
 @JS()
@@ -283,7 +282,7 @@ extension type RpcClientException._(JSObject _) implements JSObject {
   external void free();
   external num kind();
   external String message();
-  external JSObject cause();
+  external JSObject? cause();
   external String trace();
 }
 

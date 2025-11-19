@@ -10,18 +10,13 @@ class NativeRoomCloseReason implements RoomCloseReason {
   NativeRoomCloseReason(this._closeReason);
 
   @override
-  String reason() {
+  RoomCloseKind reason() {
     return _closeReason.reason;
   }
 
   @override
   bool isClosedByServer() {
     return _closeReason.isClosedByServer;
-  }
-
-  @override
-  bool isErr() {
-    return _closeReason.isErr;
   }
 
   @override

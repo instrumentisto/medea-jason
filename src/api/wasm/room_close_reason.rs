@@ -5,7 +5,7 @@
 use derive_more::with_trait::From;
 use wasm_bindgen::prelude::*;
 
-use crate::room;
+use crate::{api::RoomCloseKind, room};
 
 /// Reason of why a [`Room`] is closed.
 ///
@@ -14,7 +14,7 @@ use crate::room;
 /// [`Room`]: room::Room
 /// [`RoomHandle::on_close`]: crate::api::RoomHandle::on_close
 #[wasm_bindgen]
-#[derive(Debug, From)]
+#[derive(Clone, Copy, Debug, From)]
 pub struct RoomCloseReason(room::RoomCloseReasonImpl);
 
 #[expect( // `wasm_bindgen` doesn't support `const fn`
@@ -27,7 +27,7 @@ impl RoomCloseReason {
     ///
     /// [`Room`]: room::Room
     #[must_use]
-    pub fn reason(&self) -> String {
+    pub fn reason(&self) -> RoomCloseKind {
         self.0.reason()
     }
 
@@ -37,13 +37,5 @@ impl RoomCloseReason {
     #[must_use]
     pub fn is_closed_by_server(&self) -> bool {
         self.0.is_closed_by_server()
-    }
-
-    /// Indicates whether the [`Room`] close reason is considered as an error.
-    ///
-    /// [`Room`]: room::Room
-    #[must_use]
-    pub fn is_err(&self) -> bool {
-        self.0.is_err()
     }
 }

@@ -18,6 +18,7 @@ import 'api/dart/api/reconnect_handle.dart';
 import 'api/dart/api/remote_media_track.dart';
 import 'api/dart/api/room.dart';
 import 'api/dart/api/room_close_reason.dart';
+import 'api/shared.dart';
 import 'frb_generated.dart';
 import 'media.dart';
 import 'media/constraints.dart';
@@ -4094,15 +4095,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RoomCloseKind dco_decode_room_close_kind(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return RoomCloseKind.values[raw as int];
+  }
+
+  @protected
   RoomCloseReason dco_decode_room_close_reason(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return RoomCloseReason(
-      reason: dco_decode_String(arr[0]),
+      reason: dco_decode_room_close_kind(arr[0]),
       isClosedByServer: dco_decode_bool(arr[1]),
-      isErr: dco_decode_bool(arr[2]),
     );
   }
 
@@ -5006,15 +5012,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RoomCloseKind sse_decode_room_close_kind(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return RoomCloseKind.values[inner];
+  }
+
+  @protected
   RoomCloseReason sse_decode_room_close_reason(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_reason = sse_decode_String(deserializer);
+    var var_reason = sse_decode_room_close_kind(deserializer);
     var var_isClosedByServer = sse_decode_bool(deserializer);
-    var var_isErr = sse_decode_bool(deserializer);
     return RoomCloseReason(
       reason: var_reason,
       isClosedByServer: var_isClosedByServer,
-      isErr: var_isErr,
     );
   }
 
@@ -5919,14 +5930,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_room_close_kind(
+    RoomCloseKind self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
   void sse_encode_room_close_reason(
     RoomCloseReason self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.reason, serializer);
+    sse_encode_room_close_kind(self.reason, serializer);
     sse_encode_bool(self.isClosedByServer, serializer);
-    sse_encode_bool(self.isErr, serializer);
   }
 
   @protected

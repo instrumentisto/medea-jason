@@ -35,7 +35,7 @@ pub enum ClientDisconnect {
     /// [`Room`]: crate::room::Room
     RoomUnexpectedlyDropped,
 
-    /// [`Room`] was normally closed bu client.
+    /// [`Room`] was normally closed by client.
     ///
     /// [`Room`]: crate::room::Room
     RoomClosed,
@@ -56,18 +56,6 @@ pub enum ClientDisconnect {
 }
 
 impl ClientDisconnect {
-    /// Indicates whether this [`ClientDisconnect`] is considered as error.
-    #[must_use]
-    pub const fn is_err(self) -> bool {
-        match self {
-            Self::RoomUnexpectedlyDropped
-            | Self::RpcClientUnexpectedlyDropped
-            | Self::RpcTransportUnexpectedlyDropped
-            | Self::SessionUnexpectedlyDropped => true,
-            Self::CloseForReconnection | Self::RoomClosed => false,
-        }
-    }
-
     /// Returns a close code for this [`ClientDisconnect`] reason.
     #[must_use]
     pub const fn code(self) -> u16 {
@@ -88,8 +76,8 @@ impl ClientDisconnect {
 }
 
 impl From<ClientDisconnect> for CloseReason {
-    fn from(v: ClientDisconnect) -> Self {
-        Self::ByClient { is_err: v.is_err(), reason: v }
+    fn from(value: ClientDisconnect) -> Self {
+        Self::ByClient { reason: value }
     }
 }
 

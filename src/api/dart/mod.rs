@@ -37,8 +37,8 @@ use libc::c_char;
 pub use self::{
     api::{
         ConnectionHandle, Jason, LocalMediaTrack, MediaManagerHandle,
-        MemberConnectionState, PeerConnectionState, ReconnectHandle,
-        RemoteMediaTrack, RoomCloseReason, RoomHandle,
+        MemberConnectionState, ReconnectHandle, RemoteMediaTrack,
+        RoomCloseReason, RoomHandle,
     },
     err::DartError as Error,
 };
