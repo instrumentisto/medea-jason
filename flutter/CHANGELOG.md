@@ -34,7 +34,7 @@ All user visible changes to this project will be documented in this file. This p
 - `ConnectionHandle.onQualityScoreUpdate()` callback being called when `Connection` is in [SFU] mode. ([#228])
 - `SIGABRT` in FFI glue caused by running out of TSD keys. ([#238])
 - RPC reconnect with a fresh `Jason` instance. ([#242])
-- Error while trying construct some exceptions on Web. ([#244])
+- Error while trying to construct some exceptions on Web. ([#244])
 
 ### Upgraded
 

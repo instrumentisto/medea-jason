@@ -66,8 +66,6 @@ pub struct RoomCloseReasonImpl {
 impl RoomCloseReasonImpl {
     /// Creates a new [`RoomCloseReasonImpl`] with the provided [`CloseReason`].
     ///
-    /// `is_err` may be `true` only on closing by client.
-    ///
     /// `is_closed_by_server` is `true` on [`CloseReason::ByServer`].
     #[must_use]
     pub fn new(reason: CloseReason) -> Self {
@@ -1010,9 +1008,6 @@ struct InnerRoom {
     ///
     /// This [`CloseReason`] will be provided into [`RoomHandleImpl::on_close`]
     /// callback.
-    ///
-    /// Note that `None` will be considered as error and `is_err` will be
-    /// `true` in [`CloseReason`] provided to callback.
     close_reason: RefCell<CloseReason>,
 }
 
