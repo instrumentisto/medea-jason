@@ -305,7 +305,7 @@ pub struct RtcReceivedRtpStreamStats {
     /// [RFC3550]: https://rfc-editor.org/rfc/rfc3550
     /// [0]: https://w3.org/TR/webrtc-stats/#dfn-receiver-report
     /// [RTCP Sender Report]: https://w3.org/TR/webrtc-stats/#dfn-sender-report
-    pub packets_received: Option<u64>,
+    pub packets_received: u64,
 
     /// Total number of RTP packets received for this [SSRC] marked with the
     /// "ECT(1)" marking.
@@ -443,7 +443,7 @@ pub struct RtcInboundRtpStreamStats {
 
     /// Fields which should be in the [`RtcStat`] based on its `kind`.
     #[serde(flatten)]
-    pub kind: InboundRtpKind,
+    pub media_specific_stats: InboundRtpKind,
 
     /// The value of the [MediaStreamTrack][0]'s `id` attribute.
     ///
@@ -654,7 +654,7 @@ pub struct RtcOutboundRtpStreamStats {
     ///
     /// [RTP stream]: https://w3.org/TR/webrtc-stats/#dfn-rtp-stream
     #[serde(flatten)]
-    pub stream: RtcSentRtpStreamStats,
+    pub sent_stream: RtcSentRtpStreamStats,
 
     /// Fields which should be in the [`RtcStat`] based on its `kind`.
     #[serde(flatten)]
@@ -838,7 +838,7 @@ pub struct RtcRemoteOutboundRtpStreamStats {
     ///
     /// [RTP stream]: https://w3.org/TR/webrtc-stats/#dfn-rtp-stream
     #[serde(flatten)]
-    pub stream: RtcSentRtpStreamStats,
+    pub sent_stream: RtcSentRtpStreamStats,
 
     /// Used for looking up the local [`RtcInboundRtpStreamStats`] object
     /// for the same [SSRC].
@@ -1263,7 +1263,7 @@ pub struct RtcIceCandidatePairStats {
     pub remote_candidate_id: Option<String>,
 
     /// State of the checklist for the local and remote candidates in a pair.
-    pub state: RtcStatsIceCandidatePairState,
+    pub state: IceCandidatePairState,
 
     /// Related to updating the nominated flag described in
     /// [Section 7.1.3.2.4 of RFC 5245][1].
@@ -1318,7 +1318,7 @@ pub struct RtcIceCandidatePairStats {
     ///
     /// [STUN-PATH-CHAR]: https://w3.org/TR/webrtc-stats#bib-stun-path-char
     /// [RFC 7675]: https://tools.ietf.org/html/rfc7675
-    pub current_round_trip_time: Option<HighResTimeStamp>,
+    pub current_round_trip_time: Option<Double>,
 
     /// It is calculated by the underlying congestion control by combining the
     /// available bitrate for all the outgoing [RTP stream]s using this
@@ -1725,7 +1725,7 @@ pub enum KnownDtlsRole {
 /// Possible states of a candidate pair.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "kebab-case")]
-pub enum KnownRtcStatsIceCandidatePairState {
+pub enum KnownIceCandidatePairState {
     /// Check has not been performed for this pair, and can be performed as
     /// soon as it is the highest-priority Waiting pair on the check list.
     Waiting,
@@ -1743,7 +1743,7 @@ pub enum KnownRtcStatsIceCandidatePairState {
     /// Check for this pair hasn't been performed, and it can't yet be
     /// performed until some other check succeeds, allowing this pair to
     /// unfreeze and move into the
-    /// [`KnownRtcStatsIceCandidatePairState::Waiting`] state.
+    /// [`KnownIceCandidatePairState::Waiting`] state.
     Frozen,
 
     /// Other Candidate pair was nominated.
@@ -1753,9 +1753,8 @@ pub enum KnownRtcStatsIceCandidatePairState {
     Cancelled,
 }
 
-/// Non-exhaustive version of [`KnownRtcStatsIceCandidatePairState`].
-pub type RtcStatsIceCandidatePairState =
-    NonExhaustive<KnownRtcStatsIceCandidatePairState>;
+/// Non-exhaustive version of [`KnownIceCandidatePairState`].
+pub type IceCandidatePairState = NonExhaustive<KnownIceCandidatePairState>;
 
 /// Known protocols used in the WebRTC.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
@@ -1877,7 +1876,7 @@ pub enum InboundRtpKind {
         /// Represents the audio duration of the receiving track.
         /// For audio durations of tracks attached locally, see
         /// [`MediaSourceKind::Audio`] instead.
-        total_samples_duration: Option<HighResTimeStamp>,
+        total_samples_duration: Option<Double>,
 
         /// If audio playout is happening, this is used to look up the
         /// corresponding [`RtcAudioPlayoutStats`].
@@ -2128,19 +2127,19 @@ pub struct RtcOutboundRtpStreamVideo {
     ///
     /// [rid]: https://w3.org/TR/webrtc/#dom-rtcrtpcodingparameters-rid
     /// [RTP stream]: https://w3.org/TR/webrtc-stats/#dfn-rtp-stream
-    rid: Option<String>,
+    pub rid: Option<String>,
 
     /// This is the index of the encoding that represents this [RTP stream]
     /// in the RTP sender's list of [encodings][0].
     ///
     /// [0]: https://w3.org/TR/webrtc/#dom-rtcrtpsendparameters-encodings
-    encoding_index: Option<u32>,
+    pub encoding_index: Option<u32>,
 
     /// This value is increased by the target frame size in bytes every
     /// time a frame has been encoded. The actual frame size may be
     /// bigger or smaller than this number. This value goes up every time
     /// [`RtcOutboundRtpStreamMediaType::Video::frames_encoded`] goes up.
-    total_encoded_bytes_target: Option<u64>,
+    pub total_encoded_bytes_target: Option<u64>,
 
     /// Width of the last encoded frame.
     ///
@@ -2150,7 +2149,7 @@ pub struct RtcOutboundRtpStreamVideo {
     /// Before the first frame is encoded this attribute is missing.
     ///
     /// [1]: https://w3.org/TR/webrtc-stats#dom-rtcvideosourcestats-width
-    frame_width: Option<u64>,
+    pub frame_width: Option<u64>,
 
     /// Height of the last encoded frame.
     ///
@@ -2160,7 +2159,7 @@ pub struct RtcOutboundRtpStreamVideo {
     /// Before the first frame is encoded this attribute is missing.
     ///
     /// [1]: https://w3.org/TR/webrtc-stats#dom-rtcvideosourcestats-height
-    frame_height: Option<u64>,
+    pub frame_height: Option<u64>,
 
     /// Number of encoded frames during the last second.
     ///
@@ -2168,12 +2167,12 @@ pub struct RtcOutboundRtpStreamVideo {
     /// [RTCVideoSourceStats.framesPerSecond][1]).
     ///
     /// [1]: https://tinyurl.com/rrmkrfk
-    frames_per_second: Option<Double>,
+    pub frames_per_second: Option<Double>,
 
     /// Represents the total number of frames sent on this [RTP stream].
     ///
     /// [RTP stream]: https://w3.org/TR/webrtc-stats/#dfn-rtp-stream
-    frames_sent: Option<u32>,
+    pub frames_sent: Option<u32>,
 
     /// Represents the total number of huge frames sent by this
     /// [RTP stream]. Huge frames, by definition, are frames that
@@ -2192,11 +2191,11 @@ pub struct RtcOutboundRtpStreamVideo {
     /// detections which is deemed reasonable.
     ///
     /// [RTP stream]: https://w3.org/TR/webrtc-stats/#dfn-rtp-stream
-    huge_frames_sent: Option<u32>,
+    pub huge_frames_sent: Option<u32>,
 
     /// It represents the total number of frames successfully encoded
     /// for this RTP media stream.
-    frames_encoded: Option<u32>,
+    pub frames_encoded: Option<u32>,
 
     /// It represents the total number of key frames, such as key frames
     /// in VP8 [RFC6386] or IDR-frames in H.264 [RFC6184], successfully
@@ -2208,7 +2207,7 @@ pub struct RtcOutboundRtpStreamVideo {
     ///
     /// [RFC6386]: https://rfc-editor.org/rfc/rfc6386
     /// [RFC6184]: https://rfc-editor.org/rfc/rfc6184
-    key_frames_encoded: Option<u32>,
+    pub key_frames_encoded: Option<u32>,
 
     /// The sum of the QP values of frames encoded by this sender. The
     /// count of frames is in
@@ -2224,7 +2223,7 @@ pub struct RtcOutboundRtpStreamVideo {
     /// frame.
     ///
     /// [RFC6386]: https://rfc-editor.org/rfc/rfc6386
-    qp_sum: Option<u64>,
+    pub qp_sum: Option<u64>,
 
     /// Total number of seconds that has been spent encoding the
     /// [`RtcOutboundRtpStreamMediaType::Video::frames_encoded`] frames
@@ -2235,7 +2234,7 @@ pub struct RtcOutboundRtpStreamVideo {
     /// the encoder a frame and the encoder returning encoded data for
     /// that frame. This does not include any additional time it may
     /// take to packetize the resulting data.
-    total_encode_time: Option<Double>,
+    pub total_encode_time: Option<Double>,
 
     /// Count the total number of Full Intra Request (FIR) packets, as
     /// defined in [RFC5104] section 4.3.1, received by this sender.
@@ -2245,25 +2244,25 @@ pub struct RtcOutboundRtpStreamVideo {
     /// [RFC5104]: https://rfc-editor.org/rfc/rfc5104
     /// [RFC2032]: https://rfc-editor.org/rfc/rfc2032
     /// [RFC4587]: https://rfc-editor.org/rfc/rfc4587
-    fir_count: Option<u32>,
+    pub fir_count: Option<u32>,
 
     /// Count the total number of Picture Loss Indication (PLI) packets,
     /// as defined in [RFC4585] section 6.3.1, received by this sender.
     ///
     /// [RFC4585]: https://rfc-editor.org/rfc/rfc4585
-    pli_count: Option<u32>,
+    pub pli_count: Option<u32>,
 
     /// Identifies the encoder implementation used.
     ///
     /// This is useful for diagnosing interoperability issues.
-    encoder_implementation: Option<String>,
+    pub encoder_implementation: Option<String>,
 
     /// Whether the encoder currently used is considered power efficient
     /// by the user agent. This SHOULD reflect if the configuration results
     /// in hardware acceleration, but the user agent MAY take other
     /// information into account when deciding if the configuration
     /// is considered power efficient.
-    power_efficient_encoder: Option<bool>,
+    pub power_efficient_encoder: Option<bool>,
 
     /// The current reason for limiting the resolution and/or framerate.
     ///
@@ -2271,7 +2270,7 @@ pub struct RtcOutboundRtpStreamVideo {
     /// implementation is not able to determine the most limiting factor
     /// because multiple may exist, the reasons MUST be reported in the
     /// following order of priority: `bandwidth`, `cpu`, `other`.
-    quality_limitation_reason: Option<RtcQualityLimitationReason>,
+    pub quality_limitation_reason: Option<RtcQualityLimitationReason>,
 
     /// A record of the total time, in seconds, that this stream has spent
     /// in each quality limitation state. The record includes a mapping
@@ -2281,7 +2280,8 @@ pub struct RtcOutboundRtpStreamVideo {
     /// The sum of all entries minus
     /// [`KnownRtcQualityLimitationReason::None`] gives the total time
     /// that the stream has been limited.
-    quality_limitation_durations: BTreeMap<RtcQualityLimitationReason, Double>,
+    pub quality_limitation_durations:
+        BTreeMap<RtcQualityLimitationReason, Double>,
 
     /// The number of times that the resolution has changed because
     /// we are quality limited (`quality_limitation_reason` has a value
@@ -2289,14 +2289,14 @@ pub struct RtcOutboundRtpStreamVideo {
     /// is initially zero and increases when the resolution goes up or
     /// down. For example, if a `720p` track is sent as `480p` for
     /// some time and then recovers to `720p`, this will have the value `2`.
-    quality_limitation_resolution_changes: Option<u32>,
+    pub quality_limitation_resolution_changes: Option<u32>,
 
     /// Only exists when a [scalability mode][0] is currently configured
     /// for this [RTP stream].
     ///
     /// [0]: https://w3c.github.io/webrtc-svc/#scalabilitymodes*
     /// [RTP stream]: https://w3.org/TR/webrtc-stats/#dfn-rtp-stream
-    scalability_mode: Option<String>,
+    pub scalability_mode: Option<String>,
 }
 
 /// Non-exhaustive version of [`KnownRtcQualityLimitationReason`].
