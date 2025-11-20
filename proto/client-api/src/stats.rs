@@ -830,7 +830,7 @@ pub struct RtcRemoteInboundRtpStreamStats {
     /// [RTCP RR]: https://w3.org/TR/webrtc-stats/#dfn-receiver-report
     /// [SSRC]: https://w3.org/TR/webrtc-stats/#dfn-ssrc
     /// [0]: https://w3.org/TR/webrtc-stats/#dfn-receiver-report
-    pub round_trip_time_measurements: Option<Double>,
+    pub round_trip_time_measurements: Option<u64>,
 
     /// Number of packets that were sent with ECT(1) markings per [RFC3168]
     /// section 3, but where an [RFC8888] report gave information that the
@@ -838,7 +838,7 @@ pub struct RtcRemoteInboundRtpStreamStats {
     ///
     /// [RFC3168]: https://rfc-editor.org/rfc/rfc3168
     /// [RFC8888]: https://rfc-editor.org/rfc/rfc8888
-    pub packets_with_bleached_ect1marking: Option<u64>,
+    pub packets_with_bleached_ect1_marking: Option<u64>,
 }
 
 /// Represents the remote endpoint's measurement metrics for its outgoing
@@ -1009,14 +1009,14 @@ pub struct RtcAudioPlayoutStats {
 pub struct RtcPeerConnectionStats {
     /// Number of unique `DataChannel`s that have entered the `open` state
     /// during their lifetime.
-    pub data_channels_opened: Option<u64>,
+    pub data_channels_opened: Option<u32>,
 
     /// Number of unique `DataChannel`s that have left the `open` state during
     /// their lifetime (due to being closed by either end or the underlying
     /// transport being closed). `DataChannel`s that transition from
     /// `connecting` to `closing` or `closed` without ever being `open` are not
     /// counted in this number.
-    pub data_channels_closed: Option<u64>,
+    pub data_channels_closed: Option<u32>,
 }
 
 /// Non-exhaustive version of [`KnownRtcDataChannelState`].
@@ -1088,7 +1088,7 @@ pub struct RtcDataChannelStats {
     ///
     /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
     /// [1]: https://w3.org/TR/webrtc#dom-rtcdatachannel-id
-    pub data_channel_identifier: Option<u64>,
+    pub data_channel_identifier: Option<u16>,
 
     /// [`readyState`][1] value of the [RTCDataChannel] object.
     ///
@@ -1097,7 +1097,7 @@ pub struct RtcDataChannelStats {
     pub state: Option<RtcDataChannelState>,
 
     /// Total number of API `message` events sent.
-    pub messages_sent: Option<u64>,
+    pub messages_sent: Option<u32>,
 
     /// Total number of payload bytes sent on this [RTCDataChannel].
     ///
@@ -1105,7 +1105,7 @@ pub struct RtcDataChannelStats {
     pub bytes_sent: Option<u64>,
 
     /// Total number of API `message` events received.
-    pub messages_received: Option<u64>,
+    pub messages_received: Option<u32>,
 
     /// Total number of bytes received on this [RTCDataChannel].
     ///
@@ -1187,13 +1187,15 @@ pub struct RtcTransportStats {
     pub remote_certificate_id: Option<String>,
 
     /// For components where DTLS is negotiated, the TLS version agreed. Only
-    /// exists after DTLS negotiation is complete.
+    /// present after DTLS negotiation is complete. It is represented as four
+    /// upper case hexadecimal digits representing the two bytes of the version.
     pub tls_version: Option<String>,
 
-    /// Set to the current value of the state attribute of the underlying
-    /// [RTCDtlsTransport].
+    /// Descriptive name of the cipher suite used for the DTLS transport, as
+    /// defined in the "Description" column of the IANA cipher suite registry
+    /// [IANA-TLS-CIPHERS][0].
     ///
-    /// [RTCDtlsTransport]: https://w3.org/TR/webrtc#dom-rtcdtlstransport
+    /// [0]: https://w3.org/TR/webrtc-stats/#bib-iana-tls-ciphers
     pub dtls_cipher: Option<String>,
 
     /// [`KnownRtcDtlsRole::Client`] or [`KnownRtcDtlsRole::Server`] depending
@@ -1413,7 +1415,7 @@ pub struct RtcIceCandidateStats {
     pub address: Option<String>,
 
     /// Port number of the candidate.
-    pub port: Option<u16>,
+    pub port: Option<i32>,
 
     /// Valid values for transport is one of `udp` and `tcp`. Based on the
     /// "transport" defined in [RFC5245] section 15.1.
@@ -1427,7 +1429,7 @@ pub struct RtcIceCandidateStats {
     /// Calculated as defined in [RFC5245] section 15.1.
     ///
     /// [RFC5245]: https://rfc-editor.org/rfc/rfc5245
-    pub priority: Option<u32>,
+    pub priority: Option<i32>,
 
     /// For local candidates of type [`KnownRtcIceCandidateType::Srflx`] or type
     /// [`KnownRtcIceCandidateType::Relay`] this is the URL of the ICE server
@@ -1482,6 +1484,8 @@ pub struct RtcIceCandidateStats {
     pub tcp_type: Option<RtcIceTcpCandidateType>,
 
     /// Specifies the type of network used by a local ICE candidate.
+    ///
+    /// **Not spec compliant** but provided by most UA's.
     pub network_type: Option<String>,
 }
 
@@ -1560,6 +1564,11 @@ pub struct RtcCertificateStats {
 
     /// The DER-encoded Base64 representation of the certificate.
     pub base64_certificate: String,
+
+    /// Refers to the stats object that contains the next certificate in the
+    /// certificate chain. If the current certificate is at the end of the chain
+    /// (i.e. a self-signed certificate), this will not be set.
+    pub issuer_certificate_id: Option<String>,
 }
 
 /// Non-exhaustive version of [`KnownRtcIceRole`].
@@ -1962,12 +1971,12 @@ pub enum InboundRtpMediaType {
         /// Width of the last decoded frame.
         ///
         /// Before the first frame is decoded this attribute is missing.
-        frame_width: Option<u64>,
+        frame_width: Option<u32>,
 
         /// Height of the last decoded frame.
         ///
         /// Before the first frame is decoded this attribute is missing.
-        frame_height: Option<u64>,
+        frame_height: Option<u32>,
 
         /// The number of decoded frames in the last second.
         frames_per_second: Option<Double>,
@@ -2049,20 +2058,20 @@ pub enum InboundRtpMediaType {
         /// [RFC5104]: https://rfc-editor.org/rfc/rfc5104
         /// [RFC2032]: https://rfc-editor.org/rfc/rfc2032
         /// [RFC4587]: https://rfc-editor.org/rfc/rfc4587
-        fir_count: Option<u64>,
+        fir_count: Option<u32>,
 
         /// Count the total number of Picture Loss Indication (PLI) packets,
         /// as defined in [RFC4585] section 6.3.1, sent by this receiver.
         ///
         /// [RFC4585]: https://rfc-editor.org/rfc/rfc4585
-        pli_count: Option<u64>,
+        pli_count: Option<u32>,
 
         /// Represents the total number of complete frames received on this
         /// [RTP stream]. This metric is incremented when the complete frame is
         /// received.
         ///
         /// [RTP stream]: https://w3.org/TR/webrtc-stats/#dfn-rtp-stream
-        frames_received: Option<u64>,
+        frames_received: Option<u32>,
 
         /// Identifies the decoder implementation used. This is useful for
         /// diagnosing interoperability issues.
@@ -2190,7 +2199,7 @@ pub struct RtcOutboundRtpStreamVideo {
     /// Before the first frame is encoded this attribute is missing.
     ///
     /// [1]: https://w3.org/TR/webrtc-stats#dom-rtcvideosourcestats-width
-    pub frame_width: Option<u64>,
+    pub frame_width: Option<u32>,
 
     /// Height of the last encoded frame.
     ///
@@ -2200,7 +2209,7 @@ pub struct RtcOutboundRtpStreamVideo {
     /// Before the first frame is encoded this attribute is missing.
     ///
     /// [1]: https://w3.org/TR/webrtc-stats#dom-rtcvideosourcestats-height
-    pub frame_height: Option<u64>,
+    pub frame_height: Option<u32>,
 
     /// Number of encoded frames during the last second.
     ///
@@ -2265,6 +2274,15 @@ pub struct RtcOutboundRtpStreamVideo {
     ///
     /// [RFC6386]: https://rfc-editor.org/rfc/rfc6386
     pub qp_sum: Option<u64>,
+
+    /// The cumulative sum of the PSNR values of frames encoded by this
+    /// sender. The record includes values for the "y", "u" and "v"
+    /// components. The count of measurements is in [`Self::psnr_measurements`].
+    pub psnr_sum: Option<BTreeMap<String, Double>>,
+
+    /// The number of times PSNR was measured. The components of
+    /// [`Self::psnr_sum`] are aggregated with this measurement.
+    pub psnr_measurements: Option<u64>,
 
     /// Total number of seconds that has been spent encoding the
     /// [`OutboundRtpMediaType::Video::frames_encoded`] frames
@@ -2493,7 +2511,7 @@ pub struct HighResTimeStamp(pub f64);
 
 impl From<HighResTimeStamp> for SystemTime {
     fn from(timestamp: HighResTimeStamp) -> Self {
-        Self::UNIX_EPOCH + Duration::from_secs_f64(timestamp.0 / 100.0)
+        Self::UNIX_EPOCH + Duration::from_secs_f64(timestamp.0 / 1000.0)
     }
 }
 
@@ -2502,7 +2520,7 @@ impl TryFrom<SystemTime> for HighResTimeStamp {
 
     fn try_from(time: SystemTime) -> Result<Self, Self::Error> {
         Ok(Self(
-            time.duration_since(SystemTime::UNIX_EPOCH)?.as_secs_f64() * 100.0,
+            time.duration_since(SystemTime::UNIX_EPOCH)?.as_secs_f64() * 1000.0,
         ))
     }
 }
@@ -2530,8 +2548,8 @@ impl PartialEq for HighResTimeStamp {
     }
 }
 
-/// Doubleing point numeric type that corresponds to the set of *finite*
-/// double-precision 64-bit [IEEE 754] Doubleing point numbers. Web IDL
+/// Floating point numeric type that corresponds to the set of *finite*
+/// double-precision 64-bit [IEEE 754] floating point numbers. Web IDL
 /// [double] type.
 ///
 /// [double]: https://webidl.spec.whatwg.org/#idl-double
