@@ -2,7 +2,7 @@
 //! [Identifiers for WebRTC's Statistics API][0]
 //!
 //! [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-//! [0]: https://www.w3.org/TR/webrtc-stats
+//! [0]: https://w3.org/TR/webrtc-stats
 
 // TODO: Needs refactoring.
 #![expect(clippy::module_name_repetitions, reason = "needs refactoring")]
@@ -20,7 +20,16 @@ use serde::{Deserialize, Serialize};
 /// isn't known, then unknown data will be stored as [`String`] in the
 /// [`NonExhaustive::Unknown`] variant.
 #[derive(
-    Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
+    Clone,
+    Debug,
+    Deserialize,
+    Display,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd,
+    Serialize,
 )]
 #[serde(untagged)]
 pub enum NonExhaustive<T> {
@@ -28,6 +37,7 @@ pub enum NonExhaustive<T> {
     Known(T),
 
     /// Will store unknown enum variant with it's data as [`String`].
+    #[display("Unknown: {}", _0)]
     Unknown(String),
 }
 
@@ -305,7 +315,7 @@ pub struct RtcReceivedRtpStreamStats {
     /// [RFC3550]: https://rfc-editor.org/rfc/rfc3550
     /// [0]: https://w3.org/TR/webrtc-stats/#dfn-receiver-report
     /// [RTCP Sender Report]: https://w3.org/TR/webrtc-stats/#dfn-sender-report
-    pub packets_received: u64,
+    pub packets_received: Option<u64>,
 
     /// Total number of RTP packets received for this [SSRC] marked with the
     /// "ECT(1)" marking.
@@ -441,9 +451,9 @@ pub struct RtcInboundRtpStreamStats {
     #[serde(flatten)]
     pub received_stream: RtcReceivedRtpStreamStats,
 
-    /// Fields which should be in the [`RtcStat`] based on its `kind`.
+    /// Media kind specific part of [`RtcInboundRtpStreamStats`].
     #[serde(flatten)]
-    pub media_specific_stats: InboundRtpKind,
+    pub media_specific: InboundRtpMediaType,
 
     /// The value of the [MediaStreamTrack][0]'s `id` attribute.
     ///
@@ -560,8 +570,8 @@ pub struct RtcInboundRtpStreamStats {
     /// Total number of RTP FEC bytes received for this [SSRC], only including
     /// payload bytes.
     ///
-    /// This is a subset of `bytesReceived`. If FEC uses a different [SSRC],
-    /// packets are still accounted for here.
+    /// This is a subset of [`Self::bytes_received`]. If FEC uses a different
+    /// [SSRC], packets are still accounted for here.
     ///
     /// [SSRC]: https://w3.org/TR/webrtc-stats/#dfn-ssrc
     pub fec_bytes_received: Option<u64>,
@@ -578,7 +588,7 @@ pub struct RtcInboundRtpStreamStats {
     /// correction payload was discarded (for example, sources already recovered
     /// or FEC arrived late).
     ///
-    /// This is a subset of `fecPacketsReceived`.
+    /// This is a subset of [`Self::fec_bytes_received`].
     ///
     /// [SSRC]: https://w3.org/TR/webrtc-stats/#dfn-ssrc
     pub fec_packets_discarded: Option<u64>,
@@ -656,9 +666,9 @@ pub struct RtcOutboundRtpStreamStats {
     #[serde(flatten)]
     pub sent_stream: RtcSentRtpStreamStats,
 
-    /// Fields which should be in the [`RtcStat`] based on its `kind`.
+    /// Media kind specific part of [`RtcOutboundRtpStreamStats`].
     #[serde(flatten)]
-    pub media_type: RtcOutboundRtpStreamMediaType,
+    pub media_specific: OutboundRtpMediaType,
 
     /// If the [RTCRtpTransceiver][0] owning this stream has a [mid] value that
     /// is not null, this is that value, otherwise this member MUST NOT be
@@ -821,6 +831,14 @@ pub struct RtcRemoteInboundRtpStreamStats {
     /// [SSRC]: https://w3.org/TR/webrtc-stats/#dfn-ssrc
     /// [0]: https://w3.org/TR/webrtc-stats/#dfn-receiver-report
     pub round_trip_time_measurements: Option<Double>,
+
+    /// Number of packets that were sent with ECT(1) markings per [RFC3168]
+    /// section 3, but where an [RFC8888] report gave information that the
+    /// packet was received with a marking of "not-ECT".
+    ///
+    /// [RFC3168]: https://rfc-editor.org/rfc/rfc3168
+    /// [RFC8888]: https://rfc-editor.org/rfc/rfc8888
+    pub packets_with_bleached_ect1marking: Option<u64>,
 }
 
 /// Represents the remote endpoint's measurement metrics for its outgoing
@@ -955,7 +973,7 @@ pub struct RtcAudioPlayoutStats {
     /// Synthesization typically only happens if the pipeline is
     /// underperforming. Samples synthesized by the
     /// [`RtcInboundRtpStreamStats`] are not counted for here, but in
-    /// [`InboundRtpKind::Audio::concealed_samples`].
+    /// [`InboundRtpMediaType::Audio::concealed_samples`].
     pub synthesized_samples_duration: Option<Double>,
 
     /// The number of synthesized samples events. This counter increases
@@ -999,26 +1017,19 @@ pub struct RtcPeerConnectionStats {
     /// `connecting` to `closing` or `closed` without ever being `open` are not
     /// counted in this number.
     pub data_channels_closed: Option<u64>,
-
-    /// Number of unique `DataChannel`s returned from a successful
-    /// [createDataChannel][1] call on the [RTCPeerConnection].
-    /// If the underlying data transport is not established, these may be in
-    /// the `connecting` state.
-    ///
-    /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-    /// [1]: https://w3.org/TR/webrtc#dom-peerconnection-createdatachannel
-    pub data_channels_requested: Option<u64>,
 }
 
-/// Non-exhaustive version of [`KnownDataChannelState`].
-pub type DataChannelState = NonExhaustive<KnownDataChannelState>;
+/// Non-exhaustive version of [`KnownRtcDataChannelState`].
+pub type RtcDataChannelState = NonExhaustive<KnownRtcDataChannelState>;
 
 /// State of the [RTCDataChannel]'s underlying data connection.
 ///
 /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
+)]
 #[serde(rename_all = "kebab-case")]
-pub enum KnownDataChannelState {
+pub enum KnownRtcDataChannelState {
     /// User agent is attempting to establish the underlying data transport.
     /// This is the initial state of [RTCDataChannel] object, whether created
     /// with [createDataChannel][1], or dispatched as a part of an
@@ -1027,12 +1038,14 @@ pub enum KnownDataChannelState {
     /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
     /// [RTCDataChannelEvent]: https://w3.org/TR/webrtc#dom-rtcdatachannelevent
     /// [1]: https://w3.org/TR/webrtc#dom-peerconnection-createdatachannel
+    #[display("connecting")]
     Connecting,
 
     /// [Underlying data transport][1] is established and communication is
     /// possible.
     ///
     /// [1]: https://w3.org/TR/webrtc#dfn-data-transport
+    #[display("open")]
     Open,
 
     /// [`procedure`][2] to close down the [underlying data transport][1] has
@@ -1040,6 +1053,7 @@ pub enum KnownDataChannelState {
     ///
     /// [1]: https://w3.org/TR/webrtc#dfn-data-transport
     /// [2]: https://w3.org/TR/webrtc#data-transport-closing-procedure
+    #[display("closing")]
     Closing,
 
     /// [Underlying data transport][1] has been [`closed`][2] or could not be
@@ -1047,6 +1061,7 @@ pub enum KnownDataChannelState {
     ///
     /// [1]: https://w3.org/TR/webrtc#dfn-data-transport
     /// [2]: https://w3.org/TR/webrtc#dom-rtcdatachannelstate-closed
+    #[display("closed")]
     Closed,
 }
 
@@ -1057,17 +1072,17 @@ pub enum KnownDataChannelState {
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RtcDataChannelStats {
-    /// [`label`][1] value of the [RTCDataChannel] object.
+    /// [`label`] value of the [RTCDataChannel] object.
     ///
     /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
-    /// [1]: https://w3.org/TR/webrtc#dom-datachannel-label
+    /// [`label`]: https://w3.org/TR/webrtc#dom-datachannel-label
     pub label: Option<String>,
 
     /// [`protocol`][1] value of the [RTCDataChannel] object.
     ///
     /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
     /// [1]: https://w3.org/TR/webrtc#dom-datachannel-protocol
-    pub protocol: Option<Protocol>,
+    pub protocol: Option<String>,
 
     /// [`id`][1] attribute of the [RTCDataChannel] object.
     ///
@@ -1075,24 +1090,16 @@ pub struct RtcDataChannelStats {
     /// [1]: https://w3.org/TR/webrtc#dom-rtcdatachannel-id
     pub data_channel_identifier: Option<u64>,
 
-    /// [Stats object reference][1] for the transport used to carry
-    /// [RTCDataChannel].
-    ///
-    /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
-    /// [1]: https://w3.org/TR/webrtc-stats#dfn-stats-object-reference
-    pub transport_id: Option<String>,
-
     /// [`readyState`][1] value of the [RTCDataChannel] object.
     ///
     /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
     /// [1]: https://w3.org/TR/webrtc#dom-datachannel-readystate
-    pub state: Option<DataChannelState>,
+    pub state: Option<RtcDataChannelState>,
 
     /// Total number of API `message` events sent.
     pub messages_sent: Option<u64>,
 
-    /// Total number of payload bytes sent on this [RTCDataChannel], i.e. not
-    /// including headers or padding.
+    /// Total number of payload bytes sent on this [RTCDataChannel].
     ///
     /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
     pub bytes_sent: Option<u64>,
@@ -1100,8 +1107,7 @@ pub struct RtcDataChannelStats {
     /// Total number of API `message` events received.
     pub messages_received: Option<u64>,
 
-    /// Total number of bytes received on this [RTCDataChannel], i.e. not
-    /// including headers or padding.
+    /// Total number of bytes received on this [RTCDataChannel].
     ///
     /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
     pub bytes_received: Option<u64>,
@@ -1115,7 +1121,7 @@ pub struct RtcDataChannelStats {
 ///
 /// [RTCDtlsTransport]: https://w3.org/TR/webrtc#dom-rtcdtlstransport
 /// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
-/// [WEBRTC]: https://www.w3.org/TR/webrtc/
+/// [WEBRTC]: https://w3.org/TR/webrtc/
 /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
@@ -1146,7 +1152,7 @@ pub struct RtcTransportStats {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-icetransport-role
     /// [2]: https://w3.org/TR/webrtc#dom-rtcdtlstransport-icetransport
-    pub ice_role: Option<IceRole>,
+    pub ice_role: Option<RtcIceRole>,
 
     /// Set to the current value of the local username fragment used in
     /// message validation procedures [RFC5245] for this [RTCIceTransport].
@@ -1167,7 +1173,7 @@ pub struct RtcTransportStats {
     /// [RTCDtlsTransport].
     ///
     /// [RTCDtlsTransport]: https://w3.org/TR/webrtc#dom-rtcdtlstransport
-    pub dtls_state: Option<DtlsTransportState>,
+    pub dtls_state: Option<RtcDtlsTransportState>,
 
     /// It is a unique identifier that is associated to the object that was
     /// inspected to produce the [`RtcIceCandidatePairStats`] associated with
@@ -1190,31 +1196,31 @@ pub struct RtcTransportStats {
     /// [RTCDtlsTransport]: https://w3.org/TR/webrtc#dom-rtcdtlstransport
     pub dtls_cipher: Option<String>,
 
-    /// [`KnownDtlsRole::Client`] or [`KnownDtlsRole::Server`] depending on
-    /// the DTLS role. [`KnownDtlsRole::Unknown`] before the DTLS negotiation
-    /// starts.
-    pub dtls_role: Option<DtlsRole>,
+    /// [`KnownRtcDtlsRole::Client`] or [`KnownRtcDtlsRole::Server`] depending
+    /// on the DTLS role. [`KnownRtcDtlsRole::Unknown`] before the DTLS
+    /// negotiation starts.
+    pub dtls_role: Option<RtcDtlsRole>,
 
     /// Descriptive name of the protection profile used for the SRTP transport,
     /// as defined in the "Profile" column of the IANA DTLS-SRTP protection
     /// profile registry [IANA-DTLS-SRTP][0] and described further in [RFC5764].
     ///
     /// [0]: https://iana.org/assignments/srtp-protection/srtp-protection.xhtml
-    /// [RFC5764]: https://www.rfc-editor.org/rfc/rfc5764
+    /// [RFC5764]: https://rfc-editor.org/rfc/rfc5764
     pub srtp_cipher: Option<String>,
 
     /// The number of Transport-Layer Feedback Messages of type
     /// `CongestionControl Feedback Packet`, as described in [RFC8888]
     /// section 3.1, sent on this transport.
     ///
-    /// [RFC8888]: https://www.rfc-editor.org/rfc/rfc8888
+    /// [RFC8888]: https://rfc-editor.org/rfc/rfc8888
     pub ccfb_messages_sent: Option<u32>,
 
     /// The number of Transport-Layer Feedback Messages of type
     /// `CongestionControl Feedback Packet`, as described in
     /// [RFC8888] section 3.1, received on this transport
     ///
-    /// [RFC8888]: https://www.rfc-editor.org/rfc/rfc8888
+    /// [RFC8888]: https://rfc-editor.org/rfc/rfc8888
     pub ccfb_messages_received: Option<u32>,
 
     /// The number of times that the selected candidate pair of this transport
@@ -1263,7 +1269,7 @@ pub struct RtcIceCandidatePairStats {
     pub remote_candidate_id: Option<String>,
 
     /// State of the checklist for the local and remote candidates in a pair.
-    pub state: IceCandidatePairState,
+    pub state: RtcStatsIceCandidatePairState,
 
     /// Related to updating the nominated flag described in
     /// [Section 7.1.3.2.4 of RFC 5245][1].
@@ -1413,23 +1419,23 @@ pub struct RtcIceCandidateStats {
     /// "transport" defined in [RFC5245] section 15.1.
     ///
     /// [RFC5245]: https://rfc-editor.org/rfc/rfc5245
-    pub protocol: Option<Protocol>,
+    pub protocol: Option<String>,
 
     /// Type of the ICE candidate.
-    pub candidate_type: CandidateType,
+    pub candidate_type: RtcIceCandidateType,
 
     /// Calculated as defined in [RFC5245] section 15.1.
     ///
     /// [RFC5245]: https://rfc-editor.org/rfc/rfc5245
     pub priority: Option<u32>,
 
-    /// For local candidates of type [`KnownCandidateType::Srflx`] or type
-    /// [`KnownCandidateType::Relay`] this is the URL of the ICE server from
-    /// which the candidate was obtained and defined in [WEBRTC].
+    /// For local candidates of type [`KnownRtcIceCandidateType::Srflx`] or type
+    /// [`KnownRtcIceCandidateType::Relay`] this is the URL of the ICE server
+    /// from which the candidate was obtained and defined in [WEBRTC].
     ///
     /// For remote candidates, this property MUST NOT be present.
     ///
-    /// [WEBRTC]: https://www.w3.org/TR/webrtc/
+    /// [WEBRTC]: https://w3.org/TR/webrtc/
     pub url: Option<String>,
 
     /// The protocol used by the endpoint to communicate with the TURN server.
@@ -1438,7 +1444,7 @@ pub struct RtcIceCandidateStats {
     ///
     /// For remote candidates, this property MUST NOT be present.
     ///
-    /// [WEBRTC]: https://www.w3.org/TR/webrtc/
+    /// [WEBRTC]: https://w3.org/TR/webrtc/
     pub relay_protocol: Option<IceServerTransportProtocol>,
 
     /// The ICE foundation as defined in [RFC5245] section 15.1.
@@ -1447,22 +1453,24 @@ pub struct RtcIceCandidateStats {
     pub foundation: Option<String>,
 
     /// The ICE rel-addr defined in [RFC5245] section 15.1. Only set for
-    /// [`KnownCandidateType::Srflx`], [`KnownCandidateType::Prflx`] and
-    /// [`KnownCandidateType::Relay`] candidates.
+    /// [`KnownRtcIceCandidateType::Srflx`],
+    /// [`KnownRtcIceCandidateType::Prflx`] and
+    /// [`KnownRtcIceCandidateType::Relay`] candidates.
     ///
     /// [RFC5245]: https://rfc-editor.org/rfc/rfc5245
     pub related_address: Option<String>,
 
     /// The ICE rel-addr defined in [RFC5245] section 15.1. Only set for
-    /// [`KnownCandidateType::Srflx`], [`KnownCandidateType::Prflx`] and
-    /// [`KnownCandidateType::Relay`] candidates.
+    /// [`KnownRtcIceCandidateType::Srflx`],
+    /// [`KnownRtcIceCandidateType::Prflx`] and
+    /// [`KnownRtcIceCandidateType::Relay`] candidates.
     ///
     /// [RFC5245]: https://rfc-editor.org/rfc/rfc5245
     pub related_port: Option<i32>,
 
     /// The ICE username fragment as defined in [RFC5245] section 7.1.2.3. For
-    /// [`KnownCandidateType::Prflx`] remote candidates this is not set unless
-    /// the ICE username fragment has been previously signaled.
+    /// [`KnownRtcIceCandidateType::Prflx`] remote candidates this is not set
+    /// unless the ICE username fragment has been previously signaled.
     ///
     /// [RFC5245]: https://rfc-editor.org/rfc/rfc5245
     pub username_fragment: Option<String>,
@@ -1484,17 +1492,22 @@ pub type IceServerTransportProtocol =
 /// Represents the type of the transport protocol used between the client and
 /// the server, as defined in [RFC8656] section 3.1.
 ///
-/// [RFC8656]: https://www.rfc-editor.org/rfc/rfc8656
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
+/// [RFC8656]: https://rfc-editor.org/rfc/rfc8656
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Serialize, PartialEq, Eq, Hash,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum KnownIceServerTransportProtocol {
     /// The TURN client is using UDP as transport to the server.
+    #[display("udp")]
     Udp,
 
     /// The TURN client is using TCP as transport to the server.
+    #[display("tcp")]
     Tcp,
 
     /// The TURN client is using TLS as transport to the server.
+    #[display("tls")]
     Tls,
 }
 
@@ -1504,20 +1517,25 @@ pub type RtcIceTcpCandidateType = NonExhaustive<KnownRtcIceTcpCandidateType>;
 /// Represents the type of the ICE TCP candidate, as defined in [RFC6544].
 ///
 /// [RFC6544]: https://rfc-editor.org/rfc/rfc6544
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
+)]
 #[serde(rename_all = "kebab-case")]
 pub enum KnownRtcIceTcpCandidateType {
     /// An [`Self::Active`] TCP candidate is one for which the transport will
     /// attempt to open an outbound connection but will not receive incoming
     /// connection requests.
+    #[display("active")]
     Active,
 
     /// A [`Self::Passive`] TCP candidate is one for which the transport will
     /// receive incoming connection attempts but not attempt a connection.
+    #[display("passive")]
     Passive,
 
     /// An [`Self::So`] candidate is one for which the transport will attempt
     /// to open a connection simultaneously with its peer.
+    #[display("so")]
     So,
 }
 
@@ -1544,8 +1562,8 @@ pub struct RtcCertificateStats {
     pub base64_certificate: String,
 }
 
-/// Non-exhaustive version of [`KnownIceRole`].
-pub type IceRole = NonExhaustive<KnownIceRole>;
+/// Non-exhaustive version of [`KnownRtcIceRole`].
+pub type RtcIceRole = NonExhaustive<KnownRtcIceRole>;
 
 /// Variants of [ICE roles][1].
 ///
@@ -1553,52 +1571,64 @@ pub type IceRole = NonExhaustive<KnownIceRole>;
 ///
 /// [RFC 5245]: https://tools.ietf.org/html/rfc5245
 /// [1]: https://w3.org/TR/webrtc#dom-icetransport-role
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
+)]
 #[serde(rename_all = "camelCase")]
-pub enum KnownIceRole {
+pub enum KnownRtcIceRole {
     /// Agent whose role as defined by [Section 3 in RFC 5245][1], has not yet
     /// been determined.
     ///
     /// [1]: https://tools.ietf.org/html/rfc5245#section-3
+    #[display("unknown")]
     Unknown,
 
     /// Controlling agent as defined by [Section 3 in RFC 5245][1].
     ///
     /// [1]: https://tools.ietf.org/html/rfc5245#section-3
+    #[display("controlling")]
     Controlling,
 
     /// Controlled agent as defined by [Section 3 in RFC 5245][1].
     ///
     /// [1]: https://tools.ietf.org/html/rfc5245#section-3
+    #[display("controlled")]
     Controlled,
 }
 
-/// Non-exhaustive version of [`KnownDtlsTransportState`].
-pub type DtlsTransportState = NonExhaustive<KnownDtlsTransportState>;
+/// Non-exhaustive version of [`KnownRtcDtlsTransportState`].
+pub type RtcDtlsTransportState = NonExhaustive<KnownRtcDtlsTransportState>;
 
 /// Describes the state of the DTLS transport.
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
+)]
 #[serde(rename_all = "camelCase")]
-pub enum KnownDtlsTransportState {
+pub enum KnownRtcDtlsTransportState {
     /// DTLS has not started negotiating yet.
+    #[display("new")]
     New,
 
     /// DTLS is in the process of negotiating a secure connection and
     /// verifying the remote fingerprint.
+    #[display("connecting")]
     Connecting,
 
     /// DTLS has completed negotiation of a secure connection and verified
     /// the remote fingerprint.
+    #[display("connected")]
     Connected,
 
     /// The transport has been closed intentionally as the result of receipt of
     /// a `close_notify` alert, or calling [close()].
     ///
     /// [close()]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-close
+    #[display("closed")]
     Closed,
 
     /// The transport has failed as the result of an error (such as receipt of
     /// an error alert or failure to validate the remote fingerprint).
+    #[display("failed")]
     Failed,
 }
 
@@ -1610,13 +1640,16 @@ pub type RtcIceTransportState = NonExhaustive<KnownRtcIceTransportState>;
 ///
 /// [ICE]: https://datatracker.ietf.org/doc/html/rfc8445
 /// [RTCPeerConnection]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
+)]
 #[serde(rename_all = "camelCase")]
 pub enum KnownRtcIceTransportState {
     /// The [RTCIceTransport] has shut down and is no longer responding to
     /// STUN requests
     ///
     /// [RTCIceTransport]: https://w3.org/TR/webrtc/#dom-rtcicetransport
+    #[display("closed")]
     Closed,
 
     /// The [RTCIceTransport] has finished gathering, received an indication
@@ -1631,6 +1664,7 @@ pub enum KnownRtcIceTransportState {
     ///
     /// [RTCIceTransport]: https://w3.org/TR/webrtc/#dom-rtcicetransport
     /// [RFC8863]: https://rfc-editor.org/rfc/rfc8863
+    #[display("failed")]
     Failed,
 
     /// The [ICE Agent] has determined that connectivity is currently lost for
@@ -1649,12 +1683,14 @@ pub enum KnownRtcIceTransportState {
     /// [ICE Agent]: https://w3.org/TR/webrtc/#dfn-ice-agent
     /// [RTCIceTransport]: https://w3.org/TR/webrtc/#dom-rtcicetransport
     /// [RFC7675]: https://rfc-editor.org/rfc/rfc7675
+    #[display("disconnected")]
     Disconnected,
 
     /// The [RTCIceTransport] is gathering candidates and/or waiting for remote
     /// candidates to be supplied, and has not yet started checking.
     ///
     /// [RTCIceTransport]: https://w3.org/TR/webrtc/#dom-rtcicetransport
+    #[display("new")]
     New,
 
     /// The [RTCIceTransport] has received at least one remote candidate (by
@@ -1667,6 +1703,7 @@ pub enum KnownRtcIceTransportState {
     /// [RTCIceTransport]: https://w3.org/TR/webrtc/#dom-rtcicetransport
     /// [0]: https://w3.org/TR/webrtc/#dom-peerconnection-addicecandidate
     /// [RFC7675]: https://rfc-editor.org/rfc/rfc7675
+    #[display("checking")]
     Checking,
 
     /// The [RTCIceTransport] has finished gathering, received an indication
@@ -1677,6 +1714,7 @@ pub enum KnownRtcIceTransportState {
     ///
     /// [RTCIceTransport]: https://w3.org/TR/webrtc/#dom-rtcicetransport
     /// [RFC7675]: https://rfc-editor.org/rfc/rfc7675
+    #[display("completed")]
     Completed,
 
     /// The [RTCIceTransport] has found a usable connection, but is still
@@ -1692,21 +1730,25 @@ pub enum KnownRtcIceTransportState {
     ///
     /// [RTCIceTransport]: https://w3.org/TR/webrtc/#dom-rtcicetransport
     /// [RFC7675]: https://rfc-editor.org/rfc/rfc7675
+    #[display("connected")]
     Connected,
 }
 
-/// Non-exhaustive version of [`KnownDtlsRole`].
-pub type DtlsRole = NonExhaustive<KnownDtlsRole>;
+/// Non-exhaustive version of [`KnownRtcDtlsRole`].
+pub type RtcDtlsRole = NonExhaustive<KnownRtcDtlsRole>;
 
 /// Indicates the role in the DTLS handshake for a transport.
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
+)]
 #[serde(rename_all = "camelCase")]
-pub enum KnownDtlsRole {
+pub enum KnownRtcDtlsRole {
     /// The [RTCPeerConnection] is acting as a DTLS client as defined in
     /// [RFC6347].
     ///
     /// [RTCPeerConnection]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
     /// [RFC6347]: https://rfc-editor.org/rfc/rfc6347
+    #[display("client")]
     Client,
 
     /// The [RTCPeerConnection] is acting as a DTLS server as defined in
@@ -1714,110 +1756,109 @@ pub enum KnownDtlsRole {
     ///
     /// [RTCPeerConnection]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
     /// [RFC6347]: https://rfc-editor.org/rfc/rfc6347
+    #[display("server")]
     Server,
 
     /// The DTLS role of the [RTCPeerConnection] has not been determined yet.
     ///
     /// [RTCPeerConnection]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
+    #[display("unknown")]
     Unknown,
 }
 
+/// Non-exhaustive version of [`KnownRtcStatsIceCandidatePairState`].
+pub type RtcStatsIceCandidatePairState =
+    NonExhaustive<KnownRtcStatsIceCandidatePairState>;
+
 /// Possible states of a candidate pair.
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
+)]
 #[serde(rename_all = "kebab-case")]
-pub enum KnownIceCandidatePairState {
-    /// Check has not been performed for this pair, and can be performed as
-    /// soon as it is the highest-priority Waiting pair on the check list.
-    Waiting,
-
-    /// Check has been sent for this pair, but the transaction is in progress.
-    InProgress,
-
-    /// Check for this pair was already done and produced a successful result.
-    Succeeded,
-
-    /// Check for this pair was already done and failed, either never producing
-    /// any response or producing an unrecoverable failure response.
-    Failed,
-
+pub enum KnownRtcStatsIceCandidatePairState {
     /// Check for this pair hasn't been performed, and it can't yet be
     /// performed until some other check succeeds, allowing this pair to
     /// unfreeze and move into the
-    /// [`KnownIceCandidatePairState::Waiting`] state.
+    /// [`KnownRtcStatsIceCandidatePairState::Waiting`] state.
+    #[display("frozen")]
     Frozen,
+
+    /// Check has not been performed for this pair, and can be performed as
+    /// soon as it is the highest-priority Waiting pair on the check list.
+    #[display("waiting")]
+    Waiting,
+
+    /// Check has been sent for this pair, but the transaction is in progress.
+    #[display("in-progress")]
+    InProgress,
+
+    /// Check for this pair was already done and failed, either never producing
+    /// any response or producing an unrecoverable failure response.
+    #[display("failed")]
+    Failed,
+
+    /// Check for this pair was already done and produced a successful result.
+    #[display("succeeded")]
+    Succeeded,
 
     /// Other Candidate pair was nominated.
     ///
     /// This state is **obsolete and not spec compliant**, however, it still
     /// may be emitted by some implementations.
+    #[display("cancelled")]
     Cancelled,
 }
 
-/// Non-exhaustive version of [`KnownIceCandidatePairState`].
-pub type IceCandidatePairState = NonExhaustive<KnownIceCandidatePairState>;
-
-/// Known protocols used in the WebRTC.
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub enum KnownProtocol {
-    /// [User Datagram Protocol][1].
-    ///
-    /// [1]: https://en.wikipedia.org/wiki/User_Datagram_Protocol
-    Udp,
-
-    /// [Transmission Control Protocol][1].
-    ///
-    /// [1]: https://en.wikipedia.org/wiki/Transmission_Control_Protocol
-    Tcp,
-}
-
-/// Non-exhaustive version of [`KnownProtocol`].
-pub type Protocol = NonExhaustive<KnownProtocol>;
+/// Non-exhaustive version of [`KnownRtcIceCandidateType`].
+pub type RtcIceCandidateType = NonExhaustive<KnownRtcIceCandidateType>;
 
 /// [RTCIceCandidateType] represents the type of the ICE candidate, as
 /// defined in [Section 15.1 of RFC 5245][1].
 ///
 /// [RTCIceCandidateType]: https://w3.org/TR/webrtc#rtcicecandidatetype-enum
 /// [1]: https://tools.ietf.org/html/rfc5245#section-15.1
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
+)]
 #[serde(rename_all = "lowercase")]
-pub enum KnownCandidateType {
+pub enum KnownRtcIceCandidateType {
     /// Host candidate, as defined in [Section 4.1.1.1 of RFC 5245][1].
     ///
     /// [1]: https://tools.ietf.org/html/rfc5245#section-4.1.1.1
+    #[display("host")]
     Host,
 
     /// Server reflexive candidate, as defined in
     /// [Section 4.1.1.2 of RFC 5245][1].
     ///
     /// [1]: https://tools.ietf.org/html/rfc5245#section-4.1.1.2
+    #[display("srflx")]
     Srflx,
 
     /// Peer reflexive candidate, as defined in
     /// [Section 4.1.1.2 of RFC 5245][1].
     ///
     /// [1]: https://tools.ietf.org/html/rfc5245#section-4.1.1.2
+    #[display("prflx")]
     Prflx,
 
     /// Relay candidate, as defined in [Section 7.1.3.2.1 of RFC 5245][1].
     ///
     /// [1]: https://tools.ietf.org/html/rfc5245#section-7.1.3.2.1
+    #[display("relay")]
     Relay,
 }
-
-/// Non-exhaustive version of [`KnownCandidateType`].
-pub type CandidateType = NonExhaustive<KnownCandidateType>;
 
 /// Media kind specific [`RtcInboundRtpStreamStats`]'s part.
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Debug, Deserialize, Hash, PartialEq, Serialize)]
-#[serde(tag = "kind", rename_all = "camelCase")]
-pub enum InboundRtpKind {
+#[serde(tag = "mediaType", rename_all = "camelCase")]
+pub enum InboundRtpMediaType {
     /// Fields when the `kind` is `audio`.
     #[serde(rename_all = "camelCase")]
     Audio {
         /// Total number of samples that have been received on this RTP stream.
-        /// This includes [`InboundRtpKind::Audio::concealed_samples`].
+        /// This includes [`InboundRtpMediaType::Audio::concealed_samples`].
         total_samples_received: Option<u64>,
 
         /// The total number of samples that are concealed samples. A concealed
@@ -1832,14 +1873,14 @@ pub enum InboundRtpKind {
         /// The total number of concealed samples inserted that are "silent".
         /// Playing out silent samples results in silence or comfort noise.
         /// This is a subset of
-        /// [`InboundRtpKind::Audio::concealed_samples`].
+        /// [`InboundRtpMediaType::Audio::concealed_samples`].
         silent_concealed_samples: Option<u64>,
 
         /// The number of concealment events. This counter increases every
         /// time a concealed sample is synthesized after a non-concealed
         /// sample. That is, multiple consecutive concealed samples will
         /// increase the
-        /// [`InboundRtpKind::Audio::concealed_samples`] count
+        /// [`InboundRtpMediaType::Audio::concealed_samples`] count
         /// multiple times but is a single concealment event.
         concealment_events: Option<u64>,
 
@@ -1897,9 +1938,9 @@ pub enum InboundRtpKind {
         /// media stream.
         ///
         /// This is a subset of
-        /// [`InboundRtpKind::Video::frames_decoded`].
-        /// [`InboundRtpKind::Video::frames_decoded`] -
-        /// [`InboundRtpKind::Video::key_frames_decoded`] gives
+        /// [`InboundRtpMediaType::Video::frames_decoded`].
+        /// [`InboundRtpMediaType::Video::frames_decoded`] -
+        /// [`InboundRtpMediaType::Video::key_frames_decoded`] gives
         /// you the number of delta frames decoded.
         ///
         /// [RFC6386]: https://w3.org/TR/webrtc-stats#bib-rfc6386
@@ -1933,7 +1974,7 @@ pub enum InboundRtpKind {
 
         /// The sum of the QP values of frames decoded by this receiver.
         /// The count of frames is in
-        /// [`InboundRtpKind::Video::frames_decoded`].
+        /// [`InboundRtpMediaType::Video::frames_decoded`].
         ///
         /// The definition of QP value depends on the codec; for VP8, the QP
         /// value is the value carried in the frame header as the syntax
@@ -1948,10 +1989,10 @@ pub enum InboundRtpKind {
         qp_sum: Option<u64>,
 
         /// Total number of seconds that have been spent decoding the
-        /// [`InboundRtpKind::Video::frames_decoded`] frames of
+        /// [`InboundRtpMediaType::Video::frames_decoded`] frames of
         /// this stream. The average decode time can be calculated by dividing
         /// this value with
-        /// [`InboundRtpKind::Video::frames_decoded`]. The time
+        /// [`InboundRtpMediaType::Video::frames_decoded`]. The time
         /// it takes to decode one frame is the time passed between feeding the
         /// decoder a frame and the decoder returning decoded data for that
         /// frame.
@@ -1960,9 +2001,9 @@ pub enum InboundRtpKind {
         /// Sum of the interframe delays in seconds between consecutively
         /// rendered frames, recorded just after a frame has been rendered.
         /// The interframe delay variance be calculated from
-        /// [`InboundRtpKind::Video::total_inter_frame_delay`],
-        /// [`InboundRtpKind::Video::total_squared_inter_frame_delay`],
-        /// and [`InboundRtpKind::Video::frames_rendered`]
+        /// [`InboundRtpMediaType::Video::total_inter_frame_delay`],
+        /// [`InboundRtpMediaType::Video::total_squared_inter_frame_delay`],
+        /// and [`InboundRtpMediaType::Video::frames_rendered`]
         /// according to the formula:
         /// `(total_squared_inter_frame_delay - total_inter_frame_delay^2 /
         /// frames_rendered) / frames_rendered`.
@@ -1971,7 +2012,7 @@ pub enum InboundRtpKind {
         /// Sum of the squared interframe delays in seconds between
         /// consecutively rendered frames, recorded just after a frame has
         /// been rendered. See
-        /// [`InboundRtpKind::Video::total_inter_frame_delay`]
+        /// [`InboundRtpMediaType::Video::total_inter_frame_delay`]
         /// for details on how to calculate the interframe delay variance.
         total_squared_inter_frame_delay: Option<Double>,
 
@@ -1982,7 +2023,7 @@ pub enum InboundRtpKind {
         pause_count: Option<u32>,
 
         /// Total duration of pauses (for definition of pause see
-        /// [`InboundRtpKind::Video::pause_count`]), in seconds.
+        /// [`InboundRtpMediaType::Video::pause_count`]), in seconds.
         /// This value is updated when a frame is rendered.
         total_pauses_duration: Option<Double>,
 
@@ -1996,7 +2037,7 @@ pub enum InboundRtpKind {
 
         /// Total duration of rendered frames which are considered as frozen
         /// (for definition of freeze see
-        /// [`InboundRtpKind::Video::freeze_count`]), in seconds.
+        /// [`InboundRtpMediaType::Video::freeze_count`]), in seconds.
         /// This value is updated when a frame is rendered.
         total_freezes_duration: Option<Double>,
 
@@ -2038,7 +2079,7 @@ pub enum InboundRtpKind {
         /// [RTP stream] that consist of more than one RTP packet. For such
         /// frames the totalAssemblyTime is incremented. The average frame
         /// assembly time can be calculated by dividing the
-        /// [`InboundRtpKind::Video::total_assembly_time`] with
+        /// [`InboundRtpMediaType::Video::total_assembly_time`] with
         /// this value.
         frames_assembled_from_multiple_packets: Option<u32>,
 
@@ -2051,18 +2092,18 @@ pub enum InboundRtpKind {
         /// reception timestamp is measured as close to the network layer as
         /// possible. This metric is not incremented for frames that are not
         /// decoded, i.e.,
-        /// [`InboundRtpKind::Video::frames_dropped`] or frames
+        /// [`InboundRtpMediaType::Video::frames_dropped`] or frames
         /// that fail decoding for other reasons (if any). Only incremented
         /// for frames consisting of more than one RTP packet.
         total_assembly_time: Option<Double>,
 
         /// Represents the cumulative sum of all corruption probability
         /// measurements that have been made for this SSRC, see
-        /// [`InboundRtpKind::Video::corruption_measurements`]
+        /// [`InboundRtpMediaType::Video::corruption_measurements`]
         /// regarding when this attribute SHOULD be present.
         ///
         /// Each measurement added to
-        /// [`InboundRtpKind::Video::total_corruption_probability`]
+        /// [`InboundRtpMediaType::Video::total_corruption_probability`]
         /// MUST be in the range [0.0, 1.0], where a value of 0.0 indicates
         /// the system has estimated there is no or negligible corruption
         /// present in the processed frame. Similarly a value of 1.0 indicates
@@ -2074,16 +2115,16 @@ pub enum InboundRtpKind {
 
         /// Represents the cumulative sum of all corruption probability
         /// measurements squared that have been made for this SSRC, see
-        /// [`InboundRtpKind::Video::corruption_measurements`]
+        /// [`InboundRtpMediaType::Video::corruption_measurements`]
         /// regarding when this attribute SHOULD be present.
         total_squared_corruption_probability: Option<Double>,
 
         /// When the user agent is able to make a corruption probability
         /// measurement, this counter is incremented for each such
         /// measurement and
-        /// [`InboundRtpKind::Video::total_corruption_probability`]
+        /// [`InboundRtpMediaType::Video::total_corruption_probability`]
         /// and
-        /// [`InboundRtpKind::Video::total_squared_corruption_probability`]
+        /// [`InboundRtpMediaType::Video::total_squared_corruption_probability`]
         /// are aggregated with this measurement and measurement squared
         /// respectively. If the [corruption-detection][0] header extension
         /// is present in the RTP packets, corruption probability measurements
@@ -2098,8 +2139,8 @@ pub enum InboundRtpKind {
 /// `kind`.
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Debug, Deserialize, Hash, PartialEq, Serialize)]
-#[serde(tag = "kind", rename_all = "camelCase")]
-pub enum RtcOutboundRtpStreamMediaType {
+#[serde(tag = "mediaType", rename_all = "camelCase")]
+pub enum OutboundRtpMediaType {
     /// Fields when the `kind` is `audio`.
     #[serde(rename_all = "camelCase")]
     Audio {
@@ -2138,7 +2179,7 @@ pub struct RtcOutboundRtpStreamVideo {
     /// This value is increased by the target frame size in bytes every
     /// time a frame has been encoded. The actual frame size may be
     /// bigger or smaller than this number. This value goes up every time
-    /// [`RtcOutboundRtpStreamMediaType::Video::frames_encoded`] goes up.
+    /// [`OutboundRtpMediaType::Video::frames_encoded`] goes up.
     pub total_encoded_bytes_target: Option<u64>,
 
     /// Width of the last encoded frame.
@@ -2200,9 +2241,9 @@ pub struct RtcOutboundRtpStreamVideo {
     /// It represents the total number of key frames, such as key frames
     /// in VP8 [RFC6386] or IDR-frames in H.264 [RFC6184], successfully
     /// encoded for this RTP media stream. This is a subset of
-    /// [`RtcOutboundRtpStreamMediaType::Video::frames_encoded`].
-    /// [`RtcOutboundRtpStreamMediaType::Video::frames_encoded`] -
-    /// [`RtcOutboundRtpStreamMediaType::Video::key_frames_encoded`] gives
+    /// [`OutboundRtpMediaType::Video::frames_encoded`].
+    /// [`OutboundRtpMediaType::Video::frames_encoded`] -
+    /// [`OutboundRtpMediaType::Video::key_frames_encoded`] gives
     /// you the number of delta frames encoded.
     ///
     /// [RFC6386]: https://rfc-editor.org/rfc/rfc6386
@@ -2211,7 +2252,7 @@ pub struct RtcOutboundRtpStreamVideo {
 
     /// The sum of the QP values of frames encoded by this sender. The
     /// count of frames is in
-    /// [`RtcOutboundRtpStreamMediaType::Video::frames_encoded`].
+    /// [`OutboundRtpMediaType::Video::frames_encoded`].
     ///
     /// The definition of QP value depends on the codec; for VP8, the QP
     /// value is the value carried in the frame header as the syntax element
@@ -2226,10 +2267,10 @@ pub struct RtcOutboundRtpStreamVideo {
     pub qp_sum: Option<u64>,
 
     /// Total number of seconds that has been spent encoding the
-    /// [`RtcOutboundRtpStreamMediaType::Video::frames_encoded`] frames
+    /// [`OutboundRtpMediaType::Video::frames_encoded`] frames
     /// of this stream. The average encode time can be calculated by
     /// dividing this value with
-    /// [`RtcOutboundRtpStreamMediaType::Video::frames_encoded`]. The time
+    /// [`OutboundRtpMediaType::Video::frames_encoded`]. The time
     /// it takes to encode one frame is the time passed between feeding
     /// the encoder a frame and the encoder returning encoded data for
     /// that frame. This does not include any additional time it may
@@ -2310,6 +2351,7 @@ pub type RtcQualityLimitationReason =
     Copy,
     Debug,
     Deserialize,
+    Display,
     Eq,
     Hash,
     Ord,
@@ -2320,19 +2362,23 @@ pub type RtcQualityLimitationReason =
 #[serde(rename_all = "kebab-case")]
 pub enum KnownRtcQualityLimitationReason {
     /// The resolution and/or framerate is not limited.
+    #[display("none")]
     None,
 
     /// The resolution and/or framerate is primarily limited due to CPU load.
+    #[display("cpu")]
     Cpu,
 
     /// The resolution and/or framerate is primarily limited due to congestion
     /// cues during bandwidth estimation. Typical, congestion control
     /// algorithms use inter-arrival time, round-trip time, packet or other
     /// congestion cues to perform bandwidth estimation.
+    #[display("bandwidth")]
     Bandwidth,
 
     /// The resolution and/or framerate is primarily limited for a reason other
     /// than the above.
+    #[display("other")]
     Other,
 }
 

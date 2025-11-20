@@ -14,9 +14,10 @@ use medea_client_api_proto::{
     MediaDirection, MediaSourceKind, MediaType, MemberId, NegotiationRole,
     PeerId, Track, TrackId, TrackPatchEvent, VideoSettings,
     stats::{
-        HighResTimeStamp, InboundRtpKind, KnownIceCandidatePairState,
-        NonExhaustive, RtcOutboundRtpStreamMediaType, RtcStat, RtcStatsType,
-        StatId, TrackStats, TrackStatsKind,
+        HighResTimeStamp, InboundRtpMediaType,
+        KnownRtcStatsIceCandidatePairState, NonExhaustive,
+        OutboundRtpMediaType, RtcStat, RtcStatsType, StatId, TrackStats,
+        TrackStatsKind,
     },
 };
 use medea_jason::{
@@ -858,11 +859,11 @@ async fn get_traffic_stats() {
             for stat in stats.0 {
                 match stat.stats {
                     RtcStatsType::OutboundRtp(outbound) => {
-                        match outbound.media_type {
-                            RtcOutboundRtpStreamMediaType::Audio { .. } => {
+                        match outbound.media_specific {
+                            OutboundRtpMediaType::Audio { .. } => {
                                 first_peer_has_audio_outbound_stat = true
                             }
-                            RtcOutboundRtpStreamMediaType::Video { .. } => {
+                            OutboundRtpMediaType::Video { .. } => {
                                 first_peer_has_video_outbound = true
                             }
                         }
@@ -875,7 +876,7 @@ async fn get_traffic_stats() {
                     }
                     RtcStatsType::CandidatePair(candidate_pair) => {
                         if let NonExhaustive::Known(
-                            KnownIceCandidatePairState::Succeeded,
+                            KnownRtcStatsIceCandidatePairState::Succeeded,
                         ) = candidate_pair.state
                         {
                             firs_peer_has_succeeded_pairs = true;
@@ -911,11 +912,11 @@ async fn get_traffic_stats() {
         for stat in stats.0 {
             match stat.stats {
                 RtcStatsType::InboundRtp(inbound) => {
-                    match inbound.media_specific_stats {
-                        InboundRtpKind::Audio { .. } => {
+                    match inbound.media_specific {
+                        InboundRtpMediaType::Audio { .. } => {
                             second_peer_has_audio_inbound_stats = true
                         }
-                        InboundRtpKind::Video { .. } => {
+                        InboundRtpMediaType::Video { .. } => {
                             second_peer_has_video_inbound_stats = true
                         }
                     }
@@ -925,7 +926,7 @@ async fn get_traffic_stats() {
                 ),
                 RtcStatsType::CandidatePair(candidate_pair) => {
                     if let NonExhaustive::Known(
-                        KnownIceCandidatePairState::Succeeded,
+                        KnownRtcStatsIceCandidatePairState::Succeeded,
                     ) = candidate_pair.state
                     {
                         second_peer_has_succeeded_pairs = true;
