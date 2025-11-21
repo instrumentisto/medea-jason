@@ -261,7 +261,7 @@ pub struct RtcRtpStreamStats {
     /// remote endpoint.
     ///
     /// [RFC3550]: https://rfc-editor.org/rfc/rfc3550
-    pub ssrc: u32,
+    pub ssrc: Option<u32>,
 
     /// Either "audio" or "video". This MUST match the kind attribute of the
     /// related [MediaStreamTrack][0].
@@ -2188,7 +2188,7 @@ pub struct RtcOutboundRtpStreamVideo {
     /// This value is increased by the target frame size in bytes every
     /// time a frame has been encoded. The actual frame size may be
     /// bigger or smaller than this number. This value goes up every time
-    /// [`OutboundRtpMediaType::Video::frames_encoded`] goes up.
+    /// [`RtcOutboundRtpStreamVideo::frames_encoded`] goes up.
     pub total_encoded_bytes_target: Option<u64>,
 
     /// Width of the last encoded frame.
@@ -2250,10 +2250,10 @@ pub struct RtcOutboundRtpStreamVideo {
     /// It represents the total number of key frames, such as key frames
     /// in VP8 [RFC6386] or IDR-frames in H.264 [RFC6184], successfully
     /// encoded for this RTP media stream. This is a subset of
-    /// [`OutboundRtpMediaType::Video::frames_encoded`].
-    /// [`OutboundRtpMediaType::Video::frames_encoded`] -
-    /// [`OutboundRtpMediaType::Video::key_frames_encoded`] gives
-    /// you the number of delta frames encoded.
+    /// [`RtcOutboundRtpStreamVideo::frames_encoded`].
+    /// [`RtcOutboundRtpStreamVideo::frames_encoded`] -
+    /// [`RtcOutboundRtpStreamVideo::key_frames_encoded`] gives you the number
+    /// of delta frames encoded.
     ///
     /// [RFC6386]: https://rfc-editor.org/rfc/rfc6386
     /// [RFC6184]: https://rfc-editor.org/rfc/rfc6184
@@ -2261,7 +2261,7 @@ pub struct RtcOutboundRtpStreamVideo {
 
     /// The sum of the QP values of frames encoded by this sender. The
     /// count of frames is in
-    /// [`OutboundRtpMediaType::Video::frames_encoded`].
+    /// [`RtcOutboundRtpStreamVideo::frames_encoded`].
     ///
     /// The definition of QP value depends on the codec; for VP8, the QP
     /// value is the value carried in the frame header as the syntax element
@@ -2285,14 +2285,13 @@ pub struct RtcOutboundRtpStreamVideo {
     pub psnr_measurements: Option<u64>,
 
     /// Total number of seconds that has been spent encoding the
-    /// [`OutboundRtpMediaType::Video::frames_encoded`] frames
-    /// of this stream. The average encode time can be calculated by
-    /// dividing this value with
-    /// [`OutboundRtpMediaType::Video::frames_encoded`]. The time
-    /// it takes to encode one frame is the time passed between feeding
-    /// the encoder a frame and the encoder returning encoded data for
-    /// that frame. This does not include any additional time it may
-    /// take to packetize the resulting data.
+    /// [`RtcOutboundRtpStreamVideo::frames_encoded`] frames of this stream.
+    /// The average encode time can be calculated by dividing this value with
+    /// [`RtcOutboundRtpStreamVideo::frames_encoded`]. The time it takes to
+    /// encode one frame is the time passed between feeding the encoder a
+    /// frame and the encoder returning encoded data for that frame. This
+    /// does not include any additional time it may take to packetize the
+    /// resulting data.
     pub total_encode_time: Option<Double>,
 
     /// Count the total number of Full Intra Request (FIR) packets, as
