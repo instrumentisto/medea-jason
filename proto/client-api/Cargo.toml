@@ -22,7 +22,6 @@ rustdoc-args = ["--cfg", "docsrs"]
 default = ["client"]
 client = ["dep:async-trait"]
 server = []
-extended-stats = []
 
 [dependencies]
 async-trait = { version = "0.1.34", optional = true }
