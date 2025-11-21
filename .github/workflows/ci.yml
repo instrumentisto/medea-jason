@@ -79,7 +79,7 @@ jobs:
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -113,7 +113,7 @@ jobs:
           - medea-jason
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: dtolnay/rust-toolchain@v1
         with:
@@ -154,7 +154,7 @@ jobs:
   dartanalyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
 
       - run: make flutter
@@ -164,7 +164,7 @@ jobs:
   dartfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
 
       - run: make flutter
@@ -180,7 +180,7 @@ jobs:
         chart: ["medea-demo"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: azure/setup-helm@v4
 
       - run: make helm.lint chart=${{ matrix.chart }}
@@ -188,7 +188,7 @@ jobs:
   rustfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: nightly
@@ -253,7 +253,7 @@ jobs:
                || !startsWith(github.ref, 'refs/tags/medea-')
              }}" >> $GITHUB_OUTPUT
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: ${{ steps.skip.outputs.no == 'true' }}
       - uses: dtolnay/rust-toolchain@v1
         with:
@@ -307,7 +307,7 @@ jobs:
         browser: ["chrome", "firefox"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -388,7 +388,7 @@ jobs:
           tool-cache: false
         if: ${{ matrix.platform == 'android' }}
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -523,7 +523,7 @@ jobs:
               || (matrix.platform == 'windows'               && 'windows-latest')
               ||                                                'macos-latest' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -642,7 +642,7 @@ jobs:
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -683,7 +683,7 @@ jobs:
     runs-on: ubuntu-latest
     container: debian:bookworm  # pin `glibc` to 2.36 for better compatibility
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install linux dependencies
         run: |
           apt update
@@ -728,7 +728,7 @@ jobs:
                             && github.ref == 'refs/heads/master') }}"
              >> $GITHUB_OUTPUT
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: ${{ steps.skip.outputs.no == 'true' }}
       - uses: docker/setup-buildx-action@v3
         if: ${{ steps.skip.outputs.no == 'true' }}
@@ -752,7 +752,7 @@ jobs:
   rustdoc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -818,7 +818,7 @@ jobs:
       - test-flutter
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -866,7 +866,7 @@ jobs:
       - test-flutter
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 2 # for PRs only
 
@@ -1010,7 +1010,7 @@ jobs:
                        && steps.skip-image.outputs.no == 'true' }}"
              >> $GITHUB_OUTPUT
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: ${{ steps.skip.outputs.no == 'true' }}
 
       - uses: actions/download-artifact@v6
@@ -1125,7 +1125,7 @@ jobs:
         chart: ["medea-demo"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: trilom/file-changes-action@v1.2.4
         id: changed
       - id: chart
@@ -1154,7 +1154,7 @@ jobs:
     needs: ["cargo-publish"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Parse release version
         id: package
@@ -1196,7 +1196,7 @@ jobs:
       - test-flutter
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Parse pubspec version
         id: pubspec
