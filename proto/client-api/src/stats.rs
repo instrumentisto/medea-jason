@@ -267,7 +267,7 @@ pub struct RtcRtpStreamStats {
     /// related [MediaStreamTrack][0].
     ///
     /// [0]: https://w3.org/TR/mediacapture-streams/#dom-mediastreamtrack
-    pub kind: String, // TODO: add enum?
+    pub kind: String,
 
     /// It is a unique identifier that is associated to the object that was
     /// inspected to produce the [`RtcTransportStats`] associated with this
@@ -2340,7 +2340,7 @@ pub struct RtcOutboundRtpStreamVideo {
     /// [`KnownRtcQualityLimitationReason::None`] gives the total time
     /// that the stream has been limited.
     pub quality_limitation_durations:
-        BTreeMap<RtcQualityLimitationReason, Double>,
+        Option<BTreeMap<RtcQualityLimitationReason, Double>>,
 
     /// The number of times that the resolution has changed because
     /// we are quality limited (`quality_limitation_reason` has a value
