@@ -6,25 +6,19 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import '../../../frb_generated.dart';
+import '../../shared.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `from`
 
 /// Reason of why a [`Room`] is closed.
 class RoomCloseReason {
   /// [`Room`]'s close reason.
-  final String reason;
+  final RoomCloseKind reason;
 
   /// Indicator whether the [`Room`] was closed by server.
   final bool isClosedByServer;
 
-  /// Indicator whether the [`Room`] close reason is considered as an error.
-  final bool isErr;
-
-  const RoomCloseReason({
-    required this.reason,
-    required this.isClosedByServer,
-    required this.isErr,
-  });
+  const RoomCloseReason({required this.reason, required this.isClosedByServer});
 
   /// Constructs a [`ForeignClass`] from the given raw pointer via
   /// [`Box::from_raw()`].
@@ -36,8 +30,7 @@ class RoomCloseReason {
       .crateApiDartApiRoomCloseReasonRoomCloseReasonFromPtr(ptr: ptr);
 
   @override
-  int get hashCode =>
-      reason.hashCode ^ isClosedByServer.hashCode ^ isErr.hashCode;
+  int get hashCode => reason.hashCode ^ isClosedByServer.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -45,6 +38,5 @@ class RoomCloseReason {
       other is RoomCloseReason &&
           runtimeType == other.runtimeType &&
           reason == other.reason &&
-          isClosedByServer == other.isClosedByServer &&
-          isErr == other.isErr;
+          isClosedByServer == other.isClosedByServer;
 }

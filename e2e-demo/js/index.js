@@ -1032,9 +1032,8 @@ window.onload = async function() {
 
       alert(
         `Call was ended.
-        Reason: ${on_closed.reason()};
-        Is closed by server: ${on_closed.is_closed_by_server()};
-        Is error: ${on_closed.is_err()}.`
+        Reason: ${rust.RoomCloseKind[on_closed.reason()]};
+        Is closed by server: ${on_closed.is_closed_by_server()};`
       );
     });
 

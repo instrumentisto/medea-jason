@@ -1302,7 +1302,7 @@ mod on_close_callback {
                                   return closed.reason(); \
                                 }")]
     extern "C" {
-        fn get_reason(closed: &JsValue) -> String;
+        fn get_reason(closed: &JsValue) -> api::RoomCloseKind;
     }
     #[wasm_bindgen(inline_js = "export function get_is_closed_by_server(\
                                   reason\
@@ -1311,12 +1311,6 @@ mod on_close_callback {
                                 }")]
     extern "C" {
         fn get_is_closed_by_server(reason: &JsValue) -> bool;
-    }
-    #[wasm_bindgen(inline_js = "export function get_is_err(reason) { \
-                                  return reason.is_err(); \
-                                }")]
-    extern "C" {
-        fn get_is_err(reason: &JsValue) -> bool;
     }
 
     /// Tests that JS side [`RoomHandle::on_close`] works.
@@ -1334,9 +1328,8 @@ mod on_close_callback {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         let (cb, test_result) = js_callback!(|closed: JsValue| {
-            cb_assert_eq!(get_reason(&closed), "Finished");
+            cb_assert_eq!(get_reason(&closed), api::RoomCloseKind::Finished);
             cb_assert_eq!(get_is_closed_by_server(&closed), true);
-            cb_assert_eq!(get_is_err(&closed), false);
         });
         room_handle.on_close(cb.into()).unwrap();
 
@@ -1362,8 +1355,10 @@ mod on_close_callback {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         let (cb, test_result) = js_callback!(|closed: JsValue| {
-            cb_assert_eq!(get_reason(&closed), "RoomUnexpectedlyDropped");
-            cb_assert_eq!(get_is_err(&closed), true);
+            cb_assert_eq!(
+                get_reason(&closed),
+                api::RoomCloseKind::InternalClientError
+            );
             cb_assert_eq!(get_is_closed_by_server(&closed), false);
         });
         room_handle.on_close(cb.into()).unwrap();
@@ -1387,15 +1382,13 @@ mod on_close_callback {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         let (cb, test_result) = js_callback!(|closed: JsValue| {
-            cb_assert_eq!(get_reason(&closed), "RoomUnexpectedlyDropped");
-            cb_assert_eq!(get_is_err(&closed), false);
+            cb_assert_eq!(get_reason(&closed), api::RoomCloseKind::Finished);
             cb_assert_eq!(get_is_closed_by_server(&closed), false);
         });
         room_handle.on_close(cb.into()).unwrap();
 
         room.close(CloseReason::ByClient {
-            reason: ClientDisconnect::RoomUnexpectedlyDropped,
-            is_err: false,
+            reason: ClientDisconnect::RoomClosed,
         });
         wait_and_check_test_result(test_result, || {}).await;
     }
@@ -1473,7 +1466,6 @@ mod rpc_close_reason_on_room_drop {
         let (room, test_rx) = get_client().await;
         room.close(CloseReason::ByClient {
             reason: ClientDisconnect::RoomClosed,
-            is_err: false,
         });
 
         let close_reason = test_rx.await.unwrap();

@@ -7,6 +7,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import '../../../frb_generated.dart';
 import '../../../media/track.dart';
+import '../../shared.dart';
 import '../api.dart';
 import 'member_connection_state.dart';
 

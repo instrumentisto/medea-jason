@@ -3,12 +3,12 @@ Feature: Room closing
   Scenario: `Room.on_close()` fires when `Jason.close_room()` is invoked
     Given room with joined member Alice
     When Alice's room closed by client
-    Then Alice's `on_close` room's callback fires with `RoomClosed` reason
+    Then Alice's `on_close` room's callback fires with `Finished` reason
 
   Scenario: `Room.on_close()` fires when `Jason.dispose()` is invoked
     Given room with joined member Alice
     When Alice disposes Jason object
-    Then Alice's `on_close` room's callback fires with `RoomClosed` reason
+    Then Alice's `on_close` room's callback fires with `Finished` reason
 
   Scenario: `Room.on_close()` fires when member is removed by Control API
     Given room with joined member Alice

@@ -150,9 +150,6 @@ pub enum CloseReason {
     ByClient {
         /// Reason of closing.
         reason: ClientDisconnect,
-
-        /// Is closing considered as error.
-        is_err: bool,
     },
 }
 

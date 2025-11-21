@@ -25,12 +25,12 @@ $MemberConnectionStateCopyWith<MemberConnectionState> get copyWith => _$MemberCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MemberConnectionState&&(identical(other.field0, field0) || other.field0 == field0));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MemberConnectionState&&const DeepCollectionEquality().equals(other.field0, field0));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,field0);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(field0));
 
 @override
 String toString() {
@@ -62,9 +62,9 @@ class _$MemberConnectionStateCopyWithImpl<$Res>
 
 /// Create a copy of MemberConnectionState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? field0 = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? field0 = freezed,}) {
   return _then(_self.copyWith(
-field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+field0: freezed == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
 as PeerConnectionState,
   ));
 }
@@ -215,12 +215,12 @@ $MemberConnectionState_P2PCopyWith<MemberConnectionState_P2P> get copyWith => _$
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MemberConnectionState_P2P&&(identical(other.field0, field0) || other.field0 == field0));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MemberConnectionState_P2P&&const DeepCollectionEquality().equals(other.field0, field0));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,field0);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(field0));
 
 @override
 String toString() {
@@ -252,9 +252,9 @@ class _$MemberConnectionState_P2PCopyWithImpl<$Res>
 
 /// Create a copy of MemberConnectionState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? field0 = freezed,}) {
   return _then(MemberConnectionState_P2P(
-null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+freezed == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
 as PeerConnectionState,
   ));
 }
