@@ -7,6 +7,33 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import 'frb_generated.dart';
 
+/// Audio device kind.
+enum AudioDeviceKind {
+  /// Built-in earpiece speaker.
+  earSpeaker,
+
+  /// Built-in loudspeaker.
+  speakerphone,
+
+  /// Wired headphones without microphone.
+  wiredHeadphones,
+
+  /// Wired headset with a microphone.
+  wiredHeadset,
+
+  /// USB headphones without microphone.
+  usbHeadphones,
+
+  /// USB headset with a microphone.
+  usbHeadset,
+
+  /// Bluetooth headphones profile (A2DP/BLE speaker).
+  bluetoothHeadphones,
+
+  /// Bluetooth headset profile suitable for calls (SCO/BLE headset).
+  bluetoothHeadset,
+}
+
 /// [MediaDeviceInfo.kind][1] representation.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-kind

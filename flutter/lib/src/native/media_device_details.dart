@@ -25,6 +25,12 @@ class NativeMediaDeviceDetails implements MediaDeviceDetails {
   }
 
   @override
+  AudioDeviceKind? audioDeviceKind() {
+    final idx = _info.audioDeviceKind;
+    return idx == null ? null : AudioDeviceKind.values[idx.toInt()];
+  }
+
+  @override
   String? groupId() {
     return _info.groupId;
   }

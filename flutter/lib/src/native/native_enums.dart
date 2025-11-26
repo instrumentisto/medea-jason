@@ -8,3 +8,5 @@ export '../native/ffi/frb/media/constraints.dart'
 
 export 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart'
     show MediaStreamTrackState;
+export 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart'
+    show AudioDeviceKind;

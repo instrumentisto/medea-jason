@@ -89,3 +89,50 @@ pub enum MediaDeviceKind {
     /// Audio output device (for example, a pair of headphones).
     AudioOutput = 2,
 }
+
+/// Audio device kind.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[repr(u8)]
+pub enum AudioDeviceKind {
+    /// Built-in earpiece speaker.
+    EarSpeaker = 0,
+
+    /// Built-in loudspeaker.
+    Speakerphone = 1,
+
+    /// Wired headphones without microphone.
+    WiredHeadphones = 2,
+
+    /// Wired headset with a microphone.
+    WiredHeadset = 3,
+
+    /// USB headphones without microphone.
+    UsbHeadphones = 4,
+
+    /// USB headset with a microphone.
+    UsbHeadset = 5,
+
+    /// Bluetooth headphones profile (A2DP/BLE speaker).
+    BluetoothHeadphones = 6,
+
+    /// Bluetooth headset profile suitable for calls (SCO/BLE headset).
+    BluetoothHeadset = 7,
+}
+
+impl TryFrom<i64> for AudioDeviceKind {
+    type Error = ();
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        Ok(match value {
+            0 => Self::EarSpeaker,
+            1 => Self::Speakerphone,
+            2 => Self::WiredHeadphones,
+            3 => Self::WiredHeadset,
+            4 => Self::UsbHeadphones,
+            5 => Self::UsbHeadset,
+            6 => Self::BluetoothHeadphones,
+            7 => Self::BluetoothHeadset,
+            _ => return Err(()),
+        })
+    }
+}

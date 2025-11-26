@@ -83,6 +83,7 @@ impl MediaManagerHandle {
                         kind: v.kind(),
                         device_id: v.device_id(),
                         label: v.label(),
+                        audio_device_kind: v.audio_device_kind(),
                         group_id: v.group_id(),
                         is_failed: v.is_failed(),
                     })

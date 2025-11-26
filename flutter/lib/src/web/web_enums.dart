@@ -32,6 +32,33 @@ enum MediaDeviceKind {
   audioOutput,
 }
 
+/// Audio device kind.
+enum AudioDeviceKind {
+  /// Built-in earpiece speaker.
+  earSpeaker,
+
+  /// Built-in loudspeaker.
+  speakerphone,
+
+  /// Wired headphones without microphone.
+  wiredHeadphones,
+
+  /// Wired headset with a microphone.
+  wiredHeadset,
+
+  /// USB headphones without microphone.
+  usbHeadphones,
+
+  /// USB headset with a microphone.
+  usbHeadset,
+
+  /// Bluetooth headphones profile (A2DP/BLE speaker).
+  bluetoothHeadphones,
+
+  /// Bluetooth headset profile suitable for calls (SCO/BLE headset).
+  bluetoothHeadset,
+}
+
 /// Media exchange direction of a [`Track`].
 enum MediaDirection {
   /// [`Track`] is enabled on both receiver and sender sides.

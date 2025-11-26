@@ -234,6 +234,9 @@ class ApiMediaDeviceDetails {
   /// [`ApiMediaDeviceDetails`] (for example, "External USB Webcam").
   final String label;
 
+  /// Audio device kind index, if applicable.
+  final AudioDeviceKind? audioDeviceKind;
+
   /// Group identifier of the device represented by this
   /// [`ApiMediaDeviceDetails`].
   ///
@@ -252,6 +255,7 @@ class ApiMediaDeviceDetails {
     required this.kind,
     required this.deviceId,
     required this.label,
+    this.audioDeviceKind,
     this.groupId,
     required this.isFailed,
   });
@@ -261,6 +265,7 @@ class ApiMediaDeviceDetails {
       kind.hashCode ^
       deviceId.hashCode ^
       label.hashCode ^
+      audioDeviceKind.hashCode ^
       groupId.hashCode ^
       isFailed.hashCode;
 
@@ -272,6 +277,7 @@ class ApiMediaDeviceDetails {
           kind == other.kind &&
           deviceId == other.deviceId &&
           label == other.label &&
+          audioDeviceKind == other.audioDeviceKind &&
           groupId == other.groupId &&
           isFailed == other.isFailed;
 }

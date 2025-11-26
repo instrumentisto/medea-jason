@@ -5,7 +5,7 @@
 use medea_macro::dart_bridge;
 
 use crate::{
-    media::MediaDeviceKind,
+    media::{AudioDeviceKind, MediaDeviceKind},
     platform::dart::utils::{
         NonNullDartValueArgExt as _, dart_string_into_rust, handle::DartHandle,
     },
@@ -43,6 +43,10 @@ mod media_device_info {
         /// Indicates whether the last attempt to use the provided device
         /// failed.
         pub fn is_failed(info: Dart_Handle) -> Result<bool, Error>;
+
+        /// Returns an audio device kind index of the provided device if
+        /// present.
+        pub fn audio_device_kind(info: Dart_Handle) -> Result<i64, Error>;
     }
 }
 
@@ -105,6 +109,15 @@ impl MediaDeviceInfo {
     #[must_use]
     pub fn is_failed(&self) -> bool {
         unsafe { media_device_info::is_failed(self.handle.get()) }.unwrap()
+    }
+
+    /// Returns audio device kind if applicable.
+    #[must_use]
+    pub fn audio_device_kind(&self) -> Option<AudioDeviceKind> {
+        let v =
+            unsafe { media_device_info::audio_device_kind(self.handle.get()) }
+                .unwrap();
+        AudioDeviceKind::try_from(v).ok()
     }
 }
 

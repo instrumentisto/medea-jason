@@ -57,7 +57,7 @@ use crate::{
         new_frb_handler,
     },
     media::{
-        self, MediaDeviceKind, NoiseSuppressionLevel,
+        self, AudioDeviceKind, MediaDeviceKind, NoiseSuppressionLevel,
         constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
     },
     platform::{self},
@@ -122,6 +122,9 @@ pub struct ApiMediaDeviceDetails {
     /// Label describing the device represented by this
     /// [`ApiMediaDeviceDetails`] (for example, "External USB Webcam").
     pub label: String,
+
+    /// Audio device kind index, if applicable.
+    pub audio_device_kind: Option<AudioDeviceKind>,
 
     /// Group identifier of the device represented by this
     /// [`ApiMediaDeviceDetails`].
