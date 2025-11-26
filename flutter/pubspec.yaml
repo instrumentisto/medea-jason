@@ -4,8 +4,8 @@ version: 0.12.0-dev
 homepage: https://github.com/instrumentisto/medea-jason/blob/master/flutter
 
 environment:
-  flutter: ">=3.35.0"
-  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.38.0"
+  sdk: ">=3.10.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -16,7 +16,7 @@ dependencies:
   http: ">=0.13.6 <2.0.0"
   js_interop_utils: ^1.0.7
   json_annotation: ^4.9.0
-  medea_flutter_webrtc: 0.16.0-dev+rev.a25566d37859b892c9acca82fcb1e92e328cd563
+  medea_flutter_webrtc: 0.16.0-dev+rev.730ba5fff73959a253534f7b2a647092509df575
   plugin_platform_interface: ^2.0.2
   retry: ^3.1.2
   tuple: ^2.0.2

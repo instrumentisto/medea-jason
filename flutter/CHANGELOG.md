@@ -12,8 +12,8 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Bumped up minimum supported [Flutter] version to 3.35. ([#231])
-- Bumped up minimum supported [Dart] version to 3.9. ([#231])
+- Bumped up minimum supported [Flutter] version to 3.38. ([#231], TODO)
+- Bumped up minimum supported [Dart] version to 3.10. ([#231], TODO)
 - Bumped up minimum supported iOS deployment target to 15. ([#236])
 - Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.deviceAudio()`. ([#225], [#224])
 - Made `RoomHandle`'s `muteAudio()`, `unmuteAudio()`, `disableAudio()`, `enableAudio()`, `disableRemoteAudio()`, `enableRemoteAudio()` to accept optional `MediaSourceKind`. ([#225], [#224])
