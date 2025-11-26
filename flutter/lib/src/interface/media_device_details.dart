@@ -1,7 +1,7 @@
 import '/src/util/rust_handles_storage.dart';
 import 'enums.dart' show MediaDeviceKind, AudioDeviceKind;
 
-export 'enums.dart' show MediaDeviceKind;
+export 'enums.dart' show MediaDeviceKind, AudioDeviceKind;
 
 /// [`MediaDeviceInfo`][1] interface.
 ///
