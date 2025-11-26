@@ -833,10 +833,10 @@ pub struct RtcOutboundRtpStreamStats {
     /// This does not include the size of transport layer headers such as IP or
     /// UDP.
     ///
-    /// [`RtcSentRtpStreamStats::header_bytes_sent`] +
-    /// [`RtcSentRtpStreamStats::bytes_sent`] equals the number of bytes sent as
-    /// payload over the transport.
+    /// [`header_bytes_sent`] + [`RtcSentRtpStreamStats::bytes_sent`] equals the
+    /// number of bytes sent as payload over the transport.
     ///
+    /// [`header_bytes_sent`]: RtcOutboundRtpStreamStats::header_bytes_sent
     /// [RTP]: https://webrtcglossary.com/rtp
     /// [SSRC]: https://w3.org/TR/webrtc-stats#dfn-ssrc
     pub header_bytes_sent: Option<u64>,
@@ -886,11 +886,12 @@ pub struct RtcOutboundRtpStreamStats {
     /// retransmissions, SHOULD closely correlate to the target.
     ///
     /// See also the [`RtcSentRtpStreamStats::bytes_sent`] and the
-    /// [`RtcSentRtpStreamStats::retransmitted_bytes_sent`].
+    /// [`retransmitted_bytes_sent`][1].
     ///
     /// This is defined in the same way as the ["TIAS" bitrate RFC3890][0].
     ///
     /// [0]: https://rfc-editor.org/rfc/rfc3890#section-6.2
+    /// [1]: RtcOutboundRtpStreamStats::retransmitted_bytes_sent
     pub target_bitrate: Option<Double>,
 
     /// Total number of seconds that packets have spent buffered locally before
@@ -901,6 +902,7 @@ pub struct RtcOutboundRtpStreamStats {
     /// measurement is added to [`total_packet_send_delay`][1] when
     /// [`RtcSentRtpStreamStats::packets_sent`] is incremented.
     ///
+    /// [RTP]: https://webrtcglossary.com/rtp
     /// [1]: RtcOutboundRtpStreamStats::total_packet_send_delay
     pub total_packet_send_delay: Option<Double>,
 
@@ -1108,7 +1110,7 @@ pub struct RtcRemoteOutboundRtpStreamStats {
     /// [1]: https://www.rfc-editor.org/rfc/rfc3611#section-4.5
     /// [2]: RtcRemoteOutboundRtpStreamStats::round_trip_time
     /// [3]: RtcRemoteOutboundRtpStreamStats::total_round_trip_time
-    /// [5]: RtcRemoteOutboundRtpStreamStats::round_trip_time_measurements
+    /// [4]: RtcRemoteOutboundRtpStreamStats::round_trip_time_measurements
     pub total_round_trip_time: Option<Double>,
 
     /// Total number of [RTCP Sender Report] (SR) blocks received for this
