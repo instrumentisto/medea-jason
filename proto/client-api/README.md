@@ -18,7 +18,6 @@ Medea Client API protocol
 
 - `client` (default): Enables `Deserialize` implementation for `Event`s, and `Serialize` implementation for `Command`s.
 - `server`: Enables `Deserialize` implementation for `Command`s, and `Serialize` implementation for `Event`s.
-- `extended-stats`: Enables unused RTC Stats DTOs.
 
 
 
