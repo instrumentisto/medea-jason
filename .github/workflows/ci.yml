@@ -464,6 +464,7 @@ jobs:
           api-level: ${{ steps.api-version.outputs.target }}
           arch: x86_64
           profile: pixel_2
+          target: google_apis
           script: make test.e2e.native sfu=no up=yes debug=no dockerized=yes
                        medea-tag=${{ env.MEDEA_TAG }}
                        control-tag=build-${{ github.run_number }}
@@ -489,6 +490,7 @@ jobs:
           api-level: ${{ steps.api-version.outputs.target }}
           arch: x86_64
           profile: pixel_2
+          target: google_apis
           script: make test.e2e.native sfu=yes up=yes debug=no dockerized=yes
                        medea-tag=${{ env.MEDEA_TAG }}
                        control-tag=build-${{ github.run_number }}
@@ -590,6 +592,7 @@ jobs:
           api-level: ${{ steps.api-version.outputs.min }}
           arch: x86_64
           profile: pixel_2
+          target: google_apis
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
       - name: Test on target Android API version
@@ -598,6 +601,7 @@ jobs:
           api-level: ${{ steps.api-version.outputs.target }}
           arch: x86_64
           profile: pixel_2
+          target: google_apis
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
