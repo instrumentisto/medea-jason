@@ -14,9 +14,10 @@ use medea_client_api_proto::{
     MediaDirection, MediaSourceKind, MediaType, MemberId, NegotiationRole,
     PeerId, Track, TrackId, TrackPatchEvent, VideoSettings,
     stats::{
-        HighResTimeStamp, KnownIceCandidatePairState, NonExhaustive,
-        RtcInboundRtpStreamMediaType, RtcOutboundRtpStreamMediaType, RtcStat,
-        RtcStatsType, StatId, TrackStats, TrackStatsKind,
+        Double, HighResTimeStamp, InboundRtpMediaType,
+        KnownRtcStatsIceCandidatePairState, NonExhaustive,
+        OutboundRtpMediaType, RtcPeerConnectionStats, RtcStat, RtcStatsType,
+        StatId,
     },
 };
 use medea_jason::{
@@ -858,11 +859,11 @@ async fn get_traffic_stats() {
             for stat in stats.0 {
                 match stat.stats {
                     RtcStatsType::OutboundRtp(outbound) => {
-                        match outbound.media_type {
-                            RtcOutboundRtpStreamMediaType::Audio { .. } => {
+                        match outbound.media_specific {
+                            OutboundRtpMediaType::Audio { .. } => {
                                 first_peer_has_audio_outbound_stat = true
                             }
-                            RtcOutboundRtpStreamMediaType::Video { .. } => {
+                            OutboundRtpMediaType::Video { .. } => {
                                 first_peer_has_video_outbound = true
                             }
                         }
@@ -875,7 +876,7 @@ async fn get_traffic_stats() {
                     }
                     RtcStatsType::CandidatePair(candidate_pair) => {
                         if let NonExhaustive::Known(
-                            KnownIceCandidatePairState::Succeeded,
+                            KnownRtcStatsIceCandidatePairState::Succeeded,
                         ) = candidate_pair.state
                         {
                             firs_peer_has_succeeded_pairs = true;
@@ -911,11 +912,11 @@ async fn get_traffic_stats() {
         for stat in stats.0 {
             match stat.stats {
                 RtcStatsType::InboundRtp(inbound) => {
-                    match inbound.media_specific_stats {
-                        RtcInboundRtpStreamMediaType::Audio { .. } => {
+                    match inbound.media_specific {
+                        InboundRtpMediaType::Audio { .. } => {
                             second_peer_has_audio_inbound_stats = true
                         }
-                        RtcInboundRtpStreamMediaType::Video { .. } => {
+                        InboundRtpMediaType::Video { .. } => {
                             second_peer_has_video_inbound_stats = true
                         }
                     }
@@ -925,7 +926,7 @@ async fn get_traffic_stats() {
                 ),
                 RtcStatsType::CandidatePair(candidate_pair) => {
                     if let NonExhaustive::Known(
-                        KnownIceCandidatePairState::Succeeded,
+                        KnownRtcStatsIceCandidatePairState::Succeeded,
                     ) = candidate_pair.state
                     {
                         second_peer_has_succeeded_pairs = true;
@@ -983,13 +984,12 @@ mod peer_stats_caching {
         let stat = RtcStat {
             id: StatId("2ef2e34c".to_string()),
             timestamp: HighResTimeStamp(1584373509700.0),
-            stats: RtcStatsType::Track(Box::new(TrackStats {
-                track_identifier: "0d4f8e05-51d8-4f9b-90b2-453401fc8041"
-                    .to_string(),
-                kind: Some(TrackStatsKind::Audio),
-                remote_source: None,
-                ended: Some(false),
-            })),
+            stats: RtcStatsType::PeerConnection(Box::new(
+                RtcPeerConnectionStats {
+                    data_channels_opened: Some(55),
+                    data_channels_closed: None,
+                },
+            )),
         };
         peer.send_peer_stats(RtcStats(vec![stat.clone()]));
 
@@ -1041,13 +1041,12 @@ mod peer_stats_caching {
         let mut stat = RtcStat {
             id: StatId("2ef2e34c".to_string()),
             timestamp: HighResTimeStamp(1584373509700.0),
-            stats: RtcStatsType::Track(Box::new(TrackStats {
-                track_identifier: "0d4f8e05-51d8-4f9b-90b2-453401fc8041"
-                    .to_string(),
-                kind: Some(TrackStatsKind::Audio),
-                remote_source: None,
-                ended: Some(false),
-            })),
+            stats: RtcStatsType::PeerConnection(Box::new(
+                RtcPeerConnectionStats {
+                    data_channels_opened: Some(55),
+                    data_channels_closed: None,
+                },
+            )),
         };
         peer.send_peer_stats(RtcStats(vec![stat.clone()]));
 
@@ -1098,17 +1097,23 @@ mod peer_stats_caching {
             Rc::new(peer_state),
         );
 
-        let mut track_stat = Box::new(TrackStats {
-            track_identifier: "0d4f8e05-51d8-4f9b-90b2-453401fc8041"
-                .to_string(),
-            kind: Some(TrackStatsKind::Audio),
-            remote_source: None,
-            ended: Some(false),
-        });
+        let mut src_stat =
+            Box::new(medea_client_api_proto::stats::RtcMediaSourceStats {
+                track_identifier: Some(
+                    "0d4f8e05-51d8-4f9b-90b2-453401fc8041".to_string(),
+                ),
+                kind: medea_client_api_proto::stats::MediaSourceKind::Audio {
+                    audio_level: None,
+                    total_audio_energy: None,
+                    total_samples_duration: Some(Double(1.0)),
+                    echo_return_loss: None,
+                    echo_return_loss_enhancement: None,
+                },
+            });
         let mut stat = RtcStat {
             id: StatId("2ef2e34c".to_string()),
             timestamp: HighResTimeStamp(1584373509700.0),
-            stats: RtcStatsType::Track(track_stat.clone()),
+            stats: RtcStatsType::MediaSource(src_stat.clone()),
         };
         peer.send_peer_stats(RtcStats(vec![stat.clone()]));
 
@@ -1124,8 +1129,14 @@ mod peer_stats_caching {
         let first_rtc_stats = peer_events_stream.next().await.unwrap();
         assert_eq!(first_rtc_stats.0[0], stat);
 
-        track_stat.ended = Some(true);
-        stat.stats = RtcStatsType::Track(track_stat);
+        if let medea_client_api_proto::stats::MediaSourceKind::Audio {
+            total_samples_duration,
+            ..
+        } = &mut src_stat.kind
+        {
+            *total_samples_duration = Some(Double(2.0));
+        }
+        stat.stats = RtcStatsType::MediaSource(src_stat);
         peer.send_peer_stats(RtcStats(vec![stat.clone()]));
         let first_rtc_stats = peer_events_stream.next().await.unwrap();
         assert_eq!(first_rtc_stats.0[0], stat);
