@@ -742,6 +742,9 @@ pub enum Event {
         /// Indicator whether the created RTCPeerConnection should be forced to
         /// use relay [`IceServer`]s only.
         force_relay: bool,
+
+        /// Interval of [`PeerConnection`]'s stats scraping.
+        stats_scrape_interval_ms: u32,
     },
 
     /// Media Server notifies Web Client about necessity to apply the specified

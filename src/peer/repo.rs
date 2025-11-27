@@ -155,21 +155,46 @@ impl Repository {
     fn spawn_peers_stats_scrape_task(
         peers: Rc<RefCell<HashMap<PeerId, peer::Component>>>,
     ) -> TaskHandle {
-        let (fut, abort) = future::abortable(async move {
-            loop {
-                platform::delay_for(Duration::from_secs(1)).await;
+        static LOOP_TICK: Duration = Duration::from_millis(250);
 
-                let peers = peers
-                    .borrow()
-                    .values()
-                    .map(component::Component::obj)
-                    .collect::<Vec<_>>();
-                drop(
-                    future::join_all(
-                        peers.iter().map(|p| p.scrape_and_send_peer_stats()),
-                    )
-                    .await,
-                );
+        let (fut, abort) = future::abortable(async move {
+            let mut peers_next_scrape: HashMap<PeerId, Duration> =
+                HashMap::new();
+
+            loop {
+                platform::delay_for(LOOP_TICK).await;
+
+                let mut scrape_futures = Vec::new();
+                {
+                    let peers = peers.borrow();
+
+                    peers_next_scrape.retain(|id, _| peers.contains_key(id));
+
+                    for (id, peer_component) in peers.iter() {
+                        let interval =
+                            peer_component.state().stats_scrape_interval();
+
+                        let remaining = peers_next_scrape
+                            .entry(*id)
+                            .or_insert(Duration::ZERO);
+
+                        if *remaining == Duration::ZERO {
+                            let peer = peer_component.obj();
+                            scrape_futures.push(async move {
+                                peer.scrape_and_send_peer_stats().await;
+                            });
+                            *remaining = interval;
+                        }
+
+                        *remaining = remaining.saturating_sub(tick);
+                    }
+                }
+
+                if !scrape_futures.is_empty() {
+                    platform::spawn(async move {
+                        drop(future::join_all(scrape_futures).await);
+                    });
+                }
             }
         });
 
