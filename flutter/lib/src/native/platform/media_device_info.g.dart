@@ -9,33 +9,33 @@ typedef _ErrorSetterFnDart = void Function(Object);
 
 Pointer<Utf8> Function(Object)? _deviceId;
 int Function(Object)? _kind;
+int Function(Object)? _audioDeviceKind;
 Pointer<Utf8> Function(Object)? _label;
 Pointer Function(Object)? _groupId;
 bool Function(Object)? _isFailed;
-int Function(Object)? _audioDeviceKind;
 
 _ErrorSetterFnDart? _media_device_info__device_id__set_error;
 _ErrorSetterFnDart? _media_device_info__kind__set_error;
+_ErrorSetterFnDart? _media_device_info__audio_device_kind__set_error;
 _ErrorSetterFnDart? _media_device_info__label__set_error;
 _ErrorSetterFnDart? _media_device_info__group_id__set_error;
 _ErrorSetterFnDart? _media_device_info__is_failed__set_error;
-_ErrorSetterFnDart? _media_device_info__audio_device_kind__set_error;
 
 void registerFunction(
   DynamicLibrary dl, {
   required Pointer<Utf8> Function(Object) deviceId,
   required int Function(Object) kind,
+  required int Function(Object) audioDeviceKind,
   required Pointer<Utf8> Function(Object) label,
   required Pointer Function(Object) groupId,
   required bool Function(Object) isFailed,
-  required int Function(Object) audioDeviceKind,
 }) {
   _deviceId = deviceId;
   _kind = kind;
+  _audioDeviceKind = audioDeviceKind;
   _label = label;
   _groupId = groupId;
   _isFailed = isFailed;
-  _audioDeviceKind = audioDeviceKind;
 
   _media_device_info__device_id__set_error = dl
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
@@ -44,6 +44,10 @@ void registerFunction(
   _media_device_info__kind__set_error = dl
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
         'media_device_info__kind__set_error',
+      );
+  _media_device_info__audio_device_kind__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_device_info__audio_device_kind__set_error',
       );
   _media_device_info__label__set_error = dl
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
@@ -57,23 +61,19 @@ void registerFunction(
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
         'media_device_info__is_failed__set_error',
       );
-  _media_device_info__audio_device_kind__set_error = dl
-      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
-        'media_device_info__audio_device_kind__set_error',
-      );
 
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> deviceId_native =
       Pointer.fromFunction(_deviceIdProxy);
   Pointer<NativeFunction<Int64 Function(Handle)>> kind_native =
       Pointer.fromFunction(_kindProxy, 0);
+  Pointer<NativeFunction<Int64 Function(Handle)>> audioDeviceKind_native =
+      Pointer.fromFunction(_audioDeviceKindProxy, 0);
   Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> label_native =
       Pointer.fromFunction(_labelProxy);
   Pointer<NativeFunction<Pointer Function(Handle)>> groupId_native =
       Pointer.fromFunction(_groupIdProxy);
   Pointer<NativeFunction<Bool Function(Handle)>> isFailed_native =
       Pointer.fromFunction(_isFailedProxy, false);
-  Pointer<NativeFunction<Int64 Function(Handle)>> audioDeviceKind_native =
-      Pointer.fromFunction(_audioDeviceKindProxy, -1);
 
   dl.lookupFunction<
     Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
@@ -81,10 +81,10 @@ void registerFunction(
   >('register_media_device_info')(
     deviceId_native,
     kind_native,
+    audioDeviceKind_native,
     label_native,
     groupId_native,
     isFailed_native,
-    audioDeviceKind_native,
   );
 }
 
@@ -102,6 +102,15 @@ int _kindProxy(Object arg0) {
     return _kind!(arg0);
   } catch (e) {
     _media_device_info__kind__set_error!(e);
+    return 0;
+  }
+}
+
+int _audioDeviceKindProxy(Object arg0) {
+  try {
+    return _audioDeviceKind!(arg0);
+  } catch (e) {
+    _media_device_info__audio_device_kind__set_error!(e);
     return 0;
   }
 }
@@ -130,14 +139,5 @@ bool _isFailedProxy(Object arg0) {
   } catch (e) {
     _media_device_info__is_failed__set_error!(e);
     return false;
-  }
-}
-
-int _audioDeviceKindProxy(Object arg0) {
-  try {
-    return _audioDeviceKind!(arg0);
-  } catch (e) {
-    _media_device_info__audio_device_kind__set_error!(e);
-    return -1;
   }
 }
