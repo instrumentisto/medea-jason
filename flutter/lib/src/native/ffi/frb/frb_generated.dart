@@ -3714,14 +3714,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ApiMediaDeviceDetails dco_decode_api_media_device_details(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return ApiMediaDeviceDetails(
       kind: dco_decode_media_device_kind(arr[0]),
       deviceId: dco_decode_String(arr[1]),
       label: dco_decode_String(arr[2]),
-      groupId: dco_decode_opt_String(arr[3]),
-      isFailed: dco_decode_bool(arr[4]),
+      audioDeviceKind: dco_decode_opt_box_autoadd_audio_device_kind(arr[3]),
+      groupId: dco_decode_opt_String(arr[4]),
+      isFailed: dco_decode_bool(arr[5]),
     );
   }
 
@@ -3757,6 +3758,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             arr[3],
           ),
     );
+  }
+
+  @protected
+  AudioDeviceKind dco_decode_audio_device_kind(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return AudioDeviceKind.values[raw as int];
   }
 
   @protected
@@ -3807,6 +3814,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_api_media_stream_settings(raw);
+  }
+
+  @protected
+  AudioDeviceKind dco_decode_box_autoadd_audio_device_kind(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_audio_device_kind(raw);
   }
 
   @protected
@@ -4042,6 +4055,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return raw == null
         ? null
         : dco_decode_box_autoadd_api_display_video_track_constraints(raw);
+  }
+
+  @protected
+  AudioDeviceKind? dco_decode_opt_box_autoadd_audio_device_kind(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_audio_device_kind(raw);
   }
 
   @protected
@@ -4508,12 +4527,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_kind = sse_decode_media_device_kind(deserializer);
     var var_deviceId = sse_decode_String(deserializer);
     var var_label = sse_decode_String(deserializer);
+    var var_audioDeviceKind = sse_decode_opt_box_autoadd_audio_device_kind(
+      deserializer,
+    );
     var var_groupId = sse_decode_opt_String(deserializer);
     var var_isFailed = sse_decode_bool(deserializer);
     return ApiMediaDeviceDetails(
       kind: var_kind,
       deviceId: var_deviceId,
       label: var_label,
+      audioDeviceKind: var_audioDeviceKind,
       groupId: var_groupId,
       isFailed: var_isFailed,
     );
@@ -4556,6 +4579,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       deviceVideo: var_deviceVideo,
       displayVideo: var_displayVideo,
     );
+  }
+
+  @protected
+  AudioDeviceKind sse_decode_audio_device_kind(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return AudioDeviceKind.values[inner];
   }
 
   @protected
@@ -4614,6 +4644,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_api_media_stream_settings(deserializer));
+  }
+
+  @protected
+  AudioDeviceKind sse_decode_box_autoadd_audio_device_kind(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_audio_device_kind(deserializer));
   }
 
   @protected
@@ -4921,6 +4959,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       return (sse_decode_box_autoadd_api_display_video_track_constraints(
         deserializer,
       ));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  AudioDeviceKind? sse_decode_opt_box_autoadd_audio_device_kind(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_audio_device_kind(deserializer));
     } else {
       return null;
     }
@@ -5441,6 +5492,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_media_device_kind(self.kind, serializer);
     sse_encode_String(self.deviceId, serializer);
     sse_encode_String(self.label, serializer);
+    sse_encode_opt_box_autoadd_audio_device_kind(
+      self.audioDeviceKind,
+      serializer,
+    );
     sse_encode_opt_String(self.groupId, serializer);
     sse_encode_bool(self.isFailed, serializer);
   }
@@ -5477,6 +5532,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       self.displayVideo,
       serializer,
     );
+  }
+
+  @protected
+  void sse_encode_audio_device_kind(
+    AudioDeviceKind self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -5537,6 +5601,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_api_media_stream_settings(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_audio_device_kind(
+    AudioDeviceKind self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_audio_device_kind(self, serializer);
   }
 
   @protected
@@ -5842,6 +5915,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         self,
         serializer,
       );
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_audio_device_kind(
+    AudioDeviceKind? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_audio_device_kind(self, serializer);
     }
   }
 

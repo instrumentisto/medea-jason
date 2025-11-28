@@ -2227,12 +2227,15 @@ impl SseDecode for crate::api::dart::api::ApiMediaDeviceDetails {
             <crate::media::MediaDeviceKind>::sse_decode(deserializer);
         let mut var_deviceId = <String>::sse_decode(deserializer);
         let mut var_label = <String>::sse_decode(deserializer);
+        let mut var_audioDeviceKind =
+            <Option<crate::media::AudioDeviceKind>>::sse_decode(deserializer);
         let mut var_groupId = <Option<String>>::sse_decode(deserializer);
         let mut var_isFailed = <bool>::sse_decode(deserializer);
         return crate::api::dart::api::ApiMediaDeviceDetails {
             kind: var_kind,
             device_id: var_deviceId,
             label: var_label,
+            audio_device_kind: var_audioDeviceKind,
             group_id: var_groupId,
             is_failed: var_isFailed,
         };
@@ -2275,6 +2278,26 @@ impl SseDecode for crate::api::dart::api::ApiMediaStreamSettings {
             display_audio: var_displayAudio,
             device_video: var_deviceVideo,
             display_video: var_displayVideo,
+        };
+    }
+}
+
+impl SseDecode for crate::media::AudioDeviceKind {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::media::AudioDeviceKind::EarSpeaker,
+            1 => crate::media::AudioDeviceKind::Speakerphone,
+            2 => crate::media::AudioDeviceKind::WiredHeadphones,
+            3 => crate::media::AudioDeviceKind::WiredHeadset,
+            4 => crate::media::AudioDeviceKind::UsbHeadphones,
+            5 => crate::media::AudioDeviceKind::UsbHeadset,
+            6 => crate::media::AudioDeviceKind::BluetoothHeadphones,
+            7 => crate::media::AudioDeviceKind::BluetoothHeadset,
+            _ => unreachable!("Invalid variant for AudioDeviceKind: {}", inner),
         };
     }
 }
@@ -2648,6 +2671,21 @@ impl SseDecode
     ) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(<crate::api::dart::api::ApiDisplayVideoTrackConstraints>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::media::AudioDeviceKind> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::media::AudioDeviceKind>::sse_decode(
+                deserializer,
+            ));
         } else {
             return None;
         }
@@ -3260,6 +3298,7 @@ impl flutter_rust_bridge::IntoDart
             self.kind.into_into_dart().into_dart(),
             self.device_id.into_into_dart().into_dart(),
             self.label.into_into_dart().into_dart(),
+            self.audio_device_kind.into_into_dart().into_dart(),
             self.group_id.into_into_dart().into_dart(),
             self.is_failed.into_into_dart().into_dart(),
         ]
@@ -3328,6 +3367,33 @@ impl
     > for crate::api::dart::api::ApiMediaStreamSettings
 {
     fn into_into_dart(self) -> crate::api::dart::api::ApiMediaStreamSettings {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::media::AudioDeviceKind {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::EarSpeaker => 0.into_dart(),
+            Self::Speakerphone => 1.into_dart(),
+            Self::WiredHeadphones => 2.into_dart(),
+            Self::WiredHeadset => 3.into_dart(),
+            Self::UsbHeadphones => 4.into_dart(),
+            Self::UsbHeadset => 5.into_dart(),
+            Self::BluetoothHeadphones => 6.into_dart(),
+            Self::BluetoothHeadset => 7.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::media::AudioDeviceKind
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::media::AudioDeviceKind>
+    for crate::media::AudioDeviceKind
+{
+    fn into_into_dart(self) -> crate::media::AudioDeviceKind {
         self
     }
 }
@@ -4037,6 +4103,10 @@ impl SseEncode for crate::api::dart::api::ApiMediaDeviceDetails {
         <crate::media::MediaDeviceKind>::sse_encode(self.kind, serializer);
         <String>::sse_encode(self.device_id, serializer);
         <String>::sse_encode(self.label, serializer);
+        <Option<crate::media::AudioDeviceKind>>::sse_encode(
+            self.audio_device_kind,
+            serializer,
+        );
         <Option<String>>::sse_encode(self.group_id, serializer);
         <bool>::sse_encode(self.is_failed, serializer);
     }
@@ -4063,6 +4133,31 @@ impl SseEncode for crate::api::dart::api::ApiMediaStreamSettings {
         <Option<crate::api::dart::api::ApiDisplayAudioTrackConstraints>>::sse_encode(self.display_audio, serializer);
         <Option<crate::api::dart::api::ApiDeviceVideoTrackConstraints>>::sse_encode(self.device_video, serializer);
         <Option<crate::api::dart::api::ApiDisplayVideoTrackConstraints>>::sse_encode(self.display_video, serializer);
+    }
+}
+
+impl SseEncode for crate::media::AudioDeviceKind {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(
+            match self {
+                crate::media::AudioDeviceKind::EarSpeaker => 0,
+                crate::media::AudioDeviceKind::Speakerphone => 1,
+                crate::media::AudioDeviceKind::WiredHeadphones => 2,
+                crate::media::AudioDeviceKind::WiredHeadset => 3,
+                crate::media::AudioDeviceKind::UsbHeadphones => 4,
+                crate::media::AudioDeviceKind::UsbHeadset => 5,
+                crate::media::AudioDeviceKind::BluetoothHeadphones => 6,
+                crate::media::AudioDeviceKind::BluetoothHeadset => 7,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -4444,6 +4539,19 @@ impl SseEncode
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::api::dart::api::ApiDisplayVideoTrackConstraints>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::media::AudioDeviceKind> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::media::AudioDeviceKind>::sse_encode(value, serializer);
         }
     }
 }

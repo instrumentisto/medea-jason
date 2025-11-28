@@ -57,10 +57,10 @@ use crate::{
         new_frb_handler,
     },
     media::{
-        self, MediaDeviceKind, NoiseSuppressionLevel,
+        self, AudioDeviceKind, MediaDeviceKind, NoiseSuppressionLevel,
         constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
     },
-    platform::{self},
+    platform,
     utils::str_eq,
 };
 
@@ -110,20 +110,23 @@ pub trait ForeignClass: Sized {
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
 #[derive(Debug)]
 pub struct ApiMediaDeviceDetails {
-    /// [`MediaDeviceKind`] of this [`ApiMediaDeviceDetails`].
+    /// [`MediaDeviceKind`] of these [`ApiMediaDeviceDetails`].
     ///
     /// [`MediaDeviceKind`]: MediaDeviceKind
     pub kind: MediaDeviceKind,
 
-    /// Unique identifier of the device represented by this
+    /// Unique identifier of the device represented by these
     /// [`ApiMediaDeviceDetails`].
     pub device_id: String,
 
-    /// Label describing the device represented by this
+    /// Label describing the device represented by these
     /// [`ApiMediaDeviceDetails`] (for example, "External USB Webcam").
     pub label: String,
 
-    /// Group identifier of the device represented by this
+    /// [`AudioDeviceKind`] of these [`ApiMediaDeviceDetails`].
+    pub audio_device_kind: Option<AudioDeviceKind>,
+
+    /// Group identifier of the device represented by these
     /// [`ApiMediaDeviceDetails`].
     ///
     /// Two devices have the same group identifier if they belong to the same
@@ -138,6 +141,19 @@ pub struct ApiMediaDeviceDetails {
     pub is_failed: bool,
 }
 
+impl From<platform::MediaDeviceInfo> for ApiMediaDeviceDetails {
+    fn from(v: platform::MediaDeviceInfo) -> Self {
+        Self {
+            kind: v.kind(),
+            device_id: v.device_id(),
+            label: v.label(),
+            audio_device_kind: v.audio_device_kind(),
+            group_id: v.group_id(),
+            is_failed: v.is_failed(),
+        }
+    }
+}
+
 /// Representation of a display source.
 #[derive(Debug)]
 pub struct ApiMediaDisplayDetails {
@@ -147,6 +163,12 @@ pub struct ApiMediaDisplayDetails {
 
     /// Title describing the represented display.
     pub title: Option<String>,
+}
+
+impl From<platform::MediaDisplayInfo> for ApiMediaDisplayDetails {
+    fn from(v: platform::MediaDisplayInfo) -> Self {
+        Self { device_id: v.device_id(), title: v.title() }
+    }
 }
 
 /// Constraints applicable to audio tracks, sourced from a system audio

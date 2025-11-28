@@ -28,6 +28,12 @@ class WebMediaDeviceDetails implements MediaDeviceDetails {
     return fallibleFunction(() => obj.group_id());
   }
 
+  @override
+  AudioDeviceKind? audioDeviceKind() {
+    // No way to implement on web.
+    return null;
+  }
+
   @moveSemantics
   @override
   void free() {
