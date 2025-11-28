@@ -90,7 +90,7 @@ pub enum MediaDeviceKind {
     AudioOutput = 2,
 }
 
-/// Audio device kind.
+/// Possible kinds of audio devices.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(u8)]
 pub enum AudioDeviceKind {

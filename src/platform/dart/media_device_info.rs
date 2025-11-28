@@ -28,8 +28,8 @@ mod media_device_info {
         /// Returns a kind of the provided device.
         pub fn kind(info: Dart_Handle) -> Result<i64, Error>;
 
-        /// Returns an audio device kind index of the provided device if
-        /// present and `-1` otherwise.
+        /// Returns an audio device kind index of the provided device, if
+        /// present, or `-1` otherwise.
         pub fn audio_device_kind(info: Dart_Handle) -> Result<i64, Error>;
 
         /// Returns a label describing the provided device (for example,
@@ -111,7 +111,8 @@ impl MediaDeviceInfo {
         unsafe { media_device_info::is_failed(self.handle.get()) }.unwrap()
     }
 
-    /// Returns audio device kind if applicable.
+    /// Returns an [`AudioDeviceKind`] of this [`MediaDeviceInfo`], if
+    /// applicable.
     #[must_use]
     pub fn audio_device_kind(&self) -> Option<AudioDeviceKind> {
         let v =

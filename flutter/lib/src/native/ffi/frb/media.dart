@@ -7,7 +7,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import 'frb_generated.dart';
 
-/// Audio device kind.
+/// Possible kinds of audio devices.
 enum AudioDeviceKind {
   /// Built-in earpiece speaker.
   earSpeaker,

@@ -221,25 +221,23 @@ class ApiDisplayVideoTrackConstraints {
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
 class ApiMediaDeviceDetails {
-  /// [`MediaDeviceKind`] of this [`ApiMediaDeviceDetails`].
+  /// [`MediaDeviceKind`] of these [`ApiMediaDeviceDetails`].
   ///
   /// [`MediaDeviceKind`]: MediaDeviceKind
   final MediaDeviceKind kind;
 
-  /// Unique identifier of the device represented by this
+  /// Unique identifier of the device represented by these
   /// [`ApiMediaDeviceDetails`].
   final String deviceId;
 
-  /// Label describing the device represented by this
+  /// Label describing the device represented by these
   /// [`ApiMediaDeviceDetails`] (for example, "External USB Webcam").
   final String label;
 
-  /// [`AudioDeviceKind`] of this [`ApiMediaDeviceDetails`].
-  ///
-  /// [`AudioDeviceKind`]: AudioDeviceKind
+  /// [`AudioDeviceKind`] of these [`ApiMediaDeviceDetails`].
   final AudioDeviceKind? audioDeviceKind;
 
-  /// Group identifier of the device represented by this
+  /// Group identifier of the device represented by these
   /// [`ApiMediaDeviceDetails`].
   ///
   /// Two devices have the same group identifier if they belong to the same

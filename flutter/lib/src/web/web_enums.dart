@@ -32,7 +32,7 @@ enum MediaDeviceKind {
   audioOutput,
 }
 
-/// Audio device kind.
+/// Possible kinds of audio devices.
 enum AudioDeviceKind {
   /// Built-in earpiece speaker.
   earSpeaker,

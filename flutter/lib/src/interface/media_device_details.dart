@@ -21,9 +21,9 @@ abstract class MediaDeviceDetails implements SyncPlatformHandle {
   /// [1]: https://w3.org/TR/mediacapture-streams#device-info
   MediaDeviceKind kind();
 
-  /// Returns audio device kind if applicable.
+  /// Returns an [AudioDeviceKind] of these [MediaDeviceDetails], if applicable.
   ///
-  /// Only implemented on mobile platform at the moment.
+  /// Only implemented on mobile platforms at the moment.
   AudioDeviceKind? audioDeviceKind();
 
   /// Returns a group identifier of the represented device.

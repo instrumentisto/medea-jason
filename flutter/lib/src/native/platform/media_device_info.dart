@@ -56,7 +56,8 @@ int _kind(Object deviceInfo) {
   }
 }
 
-/// Returns [MediaDeviceInfo.audioDeviceKind] index or -1 if none.
+/// Returns a [MediaDeviceInfo.audioDeviceKind] index, if applicable, or `-1`
+/// otherwise.
 int _audioDeviceKind(Object deviceInfo) {
   deviceInfo as webrtc.MediaDeviceInfo;
   final kind = deviceInfo.audioDeviceKind;

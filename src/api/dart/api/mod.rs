@@ -110,25 +110,23 @@ pub trait ForeignClass: Sized {
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
 #[derive(Debug)]
 pub struct ApiMediaDeviceDetails {
-    /// [`MediaDeviceKind`] of this [`ApiMediaDeviceDetails`].
+    /// [`MediaDeviceKind`] of these [`ApiMediaDeviceDetails`].
     ///
     /// [`MediaDeviceKind`]: MediaDeviceKind
     pub kind: MediaDeviceKind,
 
-    /// Unique identifier of the device represented by this
+    /// Unique identifier of the device represented by these
     /// [`ApiMediaDeviceDetails`].
     pub device_id: String,
 
-    /// Label describing the device represented by this
+    /// Label describing the device represented by these
     /// [`ApiMediaDeviceDetails`] (for example, "External USB Webcam").
     pub label: String,
 
-    /// [`AudioDeviceKind`] of this [`ApiMediaDeviceDetails`].
-    ///
-    /// [`AudioDeviceKind`]: AudioDeviceKind
+    /// [`AudioDeviceKind`] of these [`ApiMediaDeviceDetails`].
     pub audio_device_kind: Option<AudioDeviceKind>,
 
-    /// Group identifier of the device represented by this
+    /// Group identifier of the device represented by these
     /// [`ApiMediaDeviceDetails`].
     ///
     /// Two devices have the same group identifier if they belong to the same
