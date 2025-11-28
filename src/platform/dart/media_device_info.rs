@@ -28,6 +28,10 @@ mod media_device_info {
         /// Returns a kind of the provided device.
         pub fn kind(info: Dart_Handle) -> Result<i64, Error>;
 
+        /// Returns an audio device kind index of the provided device if
+        /// present and `-1` otherwise.
+        pub fn audio_device_kind(info: Dart_Handle) -> Result<i64, Error>;
+
         /// Returns a label describing the provided device (for example,
         /// "External USB Webcam").
         ///
@@ -43,10 +47,6 @@ mod media_device_info {
         /// Indicates whether the last attempt to use the provided device
         /// failed.
         pub fn is_failed(info: Dart_Handle) -> Result<bool, Error>;
-
-        /// Returns an audio device kind index of the provided device if
-        /// present.
-        pub fn audio_device_kind(info: Dart_Handle) -> Result<i64, Error>;
     }
 }
 

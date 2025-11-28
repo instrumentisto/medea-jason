@@ -60,7 +60,7 @@ use crate::{
         self, AudioDeviceKind, MediaDeviceKind, NoiseSuppressionLevel,
         constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
     },
-    platform::{self},
+    platform,
     utils::str_eq,
 };
 
@@ -123,7 +123,9 @@ pub struct ApiMediaDeviceDetails {
     /// [`ApiMediaDeviceDetails`] (for example, "External USB Webcam").
     pub label: String,
 
-    /// Audio device kind index, if applicable.
+    /// [`AudioDeviceKind`] of this [`ApiMediaDeviceDetails`].
+    ///
+    /// [`AudioDeviceKind`]: AudioDeviceKind
     pub audio_device_kind: Option<AudioDeviceKind>,
 
     /// Group identifier of the device represented by this
@@ -141,6 +143,19 @@ pub struct ApiMediaDeviceDetails {
     pub is_failed: bool,
 }
 
+impl From<platform::MediaDeviceInfo> for ApiMediaDeviceDetails {
+    fn from(v: platform::MediaDeviceInfo) -> Self {
+        Self {
+            kind: v.kind(),
+            device_id: v.device_id(),
+            label: v.label(),
+            audio_device_kind: v.audio_device_kind(),
+            group_id: v.group_id(),
+            is_failed: v.is_failed(),
+        }
+    }
+}
+
 /// Representation of a display source.
 #[derive(Debug)]
 pub struct ApiMediaDisplayDetails {
@@ -150,6 +165,12 @@ pub struct ApiMediaDisplayDetails {
 
     /// Title describing the represented display.
     pub title: Option<String>,
+}
+
+impl From<platform::MediaDisplayInfo> for ApiMediaDisplayDetails {
+    fn from(v: platform::MediaDisplayInfo) -> Self {
+        Self { device_id: v.device_id(), title: v.title() }
+    }
 }
 
 /// Constraints applicable to audio tracks, sourced from a system audio
