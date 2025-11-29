@@ -230,6 +230,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ApiMediaStreamSettings dco_decode_api_media_stream_settings(dynamic raw);
 
   @protected
+  AudioDeviceKind dco_decode_audio_device_kind(dynamic raw);
+
+  @protected
   bool dco_decode_bool(dynamic raw);
 
   @protected
@@ -257,6 +260,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ApiMediaStreamSettings dco_decode_box_autoadd_api_media_stream_settings(
     dynamic raw,
   );
+
+  @protected
+  AudioDeviceKind dco_decode_box_autoadd_audio_device_kind(dynamic raw);
 
   @protected
   ConstrainBoolean dco_decode_box_autoadd_constrain_boolean(dynamic raw);
@@ -361,6 +367,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   ApiDisplayVideoTrackConstraints?
   dco_decode_opt_box_autoadd_api_display_video_track_constraints(dynamic raw);
+
+  @protected
+  AudioDeviceKind? dco_decode_opt_box_autoadd_audio_device_kind(dynamic raw);
 
   @protected
   ConstrainBoolean? dco_decode_opt_box_autoadd_constrain_boolean(dynamic raw);
@@ -579,6 +588,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  AudioDeviceKind sse_decode_audio_device_kind(SseDeserializer deserializer);
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
@@ -612,6 +624,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ApiMediaStreamSettings sse_decode_box_autoadd_api_media_stream_settings(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  AudioDeviceKind sse_decode_box_autoadd_audio_device_kind(
     SseDeserializer deserializer,
   );
 
@@ -734,6 +751,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   ApiDisplayVideoTrackConstraints?
   sse_decode_opt_box_autoadd_api_display_video_track_constraints(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  AudioDeviceKind? sse_decode_opt_box_autoadd_audio_device_kind(
     SseDeserializer deserializer,
   );
 
@@ -993,6 +1015,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_audio_device_kind(
+    AudioDeviceKind self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
@@ -1028,6 +1056,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_api_media_stream_settings(
     ApiMediaStreamSettings self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_audio_device_kind(
+    AudioDeviceKind self,
     SseSerializer serializer,
   );
 
@@ -1176,6 +1210,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_api_display_video_track_constraints(
     ApiDisplayVideoTrackConstraints? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_audio_device_kind(
+    AudioDeviceKind? self,
     SseSerializer serializer,
   );
 

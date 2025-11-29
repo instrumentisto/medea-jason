@@ -15,6 +15,7 @@ void registerFunctions(DynamicLibrary dl) {
     groupId: _groupId,
     kind: _kind,
     isFailed: _isFailed,
+    audioDeviceKind: _audioDeviceKind,
   );
 }
 
@@ -53,4 +54,12 @@ int _kind(Object deviceInfo) {
     case webrtc.MediaDeviceKind.audiooutput:
       return 2;
   }
+}
+
+/// Returns a [MediaDeviceInfo.audioDeviceKind] index, if applicable, or `-1`
+/// otherwise.
+int _audioDeviceKind(Object deviceInfo) {
+  deviceInfo as webrtc.MediaDeviceInfo;
+  final kind = deviceInfo.audioDeviceKind;
+  return kind == null ? -1 : kind.index;
 }

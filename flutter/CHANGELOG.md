@@ -12,9 +12,9 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Bumped up minimum supported [Flutter] version to 3.35. ([#231])
-- Bumped up minimum supported [Dart] version to 3.9. ([#231])
-- Bumped up minimum supported iOS deployment target to 15. ([#236])
+- Bumped up minimum supported [Flutter] version to 3.38. ([#231], [#247])
+- Bumped up minimum supported [Dart] version to 3.10. ([#231], [#247])
+- Bumped up minimum supported [iOS] deployment target to 15. ([#236])
 - Renamed `AudioTrackConstraints` to `DeviceAudioTrackConstraints` and `MediaStreamSettings.audio()` to `MediaStreamSettings.deviceAudio()`. ([#225], [#224])
 - Made `RoomHandle`'s `muteAudio()`, `unmuteAudio()`, `disableAudio()`, `enableAudio()`, `disableRemoteAudio()`, `enableRemoteAudio()` to accept optional `MediaSourceKind`. ([#225], [#224])
 - Dropped support for `i686-linux-android` target. ([#243])
@@ -28,6 +28,7 @@ All user visible changes to this project will be documented in this file. This p
 - `DisplayAudioTrackConstraints` and `MediaStreamSettings.displayAudio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
 - `Jason.networkChanged()` for instant reconnection of all signalling and ICE transports. ([#236])
 - `RoomCloseKind` enumeration to reflect why `Room` was closed. ([#244])
+- `AudioDeviceKind` enumeration and `MediaDeviceDetails.audioDeviceKind()` to reflect the nature of an audio recording/playout devices on [iOS] and [Android]. ([#248])
 
 ### Fixed
 
@@ -51,6 +52,8 @@ All user visible changes to this project will be documented in this file. This p
 [#242]: https://github.com/instrumentisto/medea-jason/pull/242
 [#243]: https://github.com/instrumentisto/medea-jason/pull/243
 [#244]: https://github.com/instrumentisto/medea-jason/pull/244
+[#247]: https://github.com/instrumentisto/medea-jason/pull/247
+[#248]: https://github.com/instrumentisto/medea-jason/pull/248
 
 
 
@@ -323,8 +326,10 @@ See also [`medea-jason` crate 0.5.0 changes](https://github.com/instrumentisto/m
 [`freezed_annotation`]: https://pub.dev/packages/freezed_annotation
 [`medea_flutter_webrtc`]: https://pub.dev/packages/medea_flutter_webrtc
 [`medea-jason`]: https://docs.rs/medea-jason
+[Android]: https://www.android.com
 [Dart]: https://dart.dev
 [Flutter]: https://flutter.dev
+[iOS]: https://www.apple.com/ios
 [macOS]: https://www.apple.com/macos
 [Semantic Versioning 2.0.0]: https://semver.org
 [SFU]: https://webrtcglossary.com/sfu

@@ -1,7 +1,7 @@
 import '/src/util/rust_handles_storage.dart';
-import 'enums.dart' show MediaDeviceKind;
+import 'enums.dart' show MediaDeviceKind, AudioDeviceKind;
 
-export 'enums.dart' show MediaDeviceKind;
+export 'enums.dart' show MediaDeviceKind, AudioDeviceKind;
 
 /// [`MediaDeviceInfo`][1] interface.
 ///
@@ -18,10 +18,13 @@ abstract class MediaDeviceDetails implements SyncPlatformHandle {
 
   /// Returns kind of the represented device.
   ///
-  /// This representation of a [`MediaDeviceInfo`][1] is ONLY for input devices.
-  ///
   /// [1]: https://w3.org/TR/mediacapture-streams#device-info
   MediaDeviceKind kind();
+
+  /// Returns an [AudioDeviceKind] of these [MediaDeviceDetails], if applicable.
+  ///
+  /// Only implemented on mobile platforms at the moment.
+  AudioDeviceKind? audioDeviceKind();
 
   /// Returns a group identifier of the represented device.
   ///

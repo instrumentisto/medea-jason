@@ -5,7 +5,7 @@
 use medea_macro::dart_bridge;
 
 use crate::{
-    media::MediaDeviceKind,
+    media::{AudioDeviceKind, MediaDeviceKind},
     platform::dart::utils::{
         NonNullDartValueArgExt as _, dart_string_into_rust, handle::DartHandle,
     },
@@ -27,6 +27,10 @@ mod media_device_info {
 
         /// Returns a kind of the provided device.
         pub fn kind(info: Dart_Handle) -> Result<i64, Error>;
+
+        /// Returns an audio device kind index of the provided device, if
+        /// present, or `-1` otherwise.
+        pub fn audio_device_kind(info: Dart_Handle) -> Result<i64, Error>;
 
         /// Returns a label describing the provided device (for example,
         /// "External USB Webcam").
@@ -105,6 +109,16 @@ impl MediaDeviceInfo {
     #[must_use]
     pub fn is_failed(&self) -> bool {
         unsafe { media_device_info::is_failed(self.handle.get()) }.unwrap()
+    }
+
+    /// Returns an [`AudioDeviceKind`] of this [`MediaDeviceInfo`], if
+    /// applicable.
+    #[must_use]
+    pub fn audio_device_kind(&self) -> Option<AudioDeviceKind> {
+        let v =
+            unsafe { media_device_info::audio_device_kind(self.handle.get()) }
+                .unwrap();
+        AudioDeviceKind::try_from(v).ok()
     }
 }
 

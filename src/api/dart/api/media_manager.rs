@@ -79,13 +79,7 @@ impl MediaManagerHandle {
                     .enumerate_devices()
                     .await?
                     .into_iter()
-                    .map(|v| ApiMediaDeviceDetails {
-                        kind: v.kind(),
-                        device_id: v.device_id(),
-                        label: v.label(),
-                        group_id: v.group_id(),
-                        is_failed: v.is_failed(),
-                    })
+                    .map(ApiMediaDeviceDetails::from)
                     .collect(),
             )
         }
@@ -108,10 +102,7 @@ impl MediaManagerHandle {
                     .enumerate_displays()
                     .await?
                     .into_iter()
-                    .map(|v| ApiMediaDisplayDetails {
-                        device_id: v.device_id(),
-                        title: v.title(),
-                    })
+                    .map(ApiMediaDisplayDetails::from)
                     .collect(),
             )
         }

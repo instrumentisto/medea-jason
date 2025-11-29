@@ -8,15 +8,18 @@ plugins {
 android {
     namespace = "com.instrumentisto.medea_jason_example"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    // TODO: Using default version provided by Flutter produces a warning.
+    //       Just ignore it and wait for a fix:
+    //       https://github.com/flutter/flutter/issues/139427
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     defaultConfig {
