@@ -1,6 +1,11 @@
 //! Component responsible for the [`peer::Component`] creating and removing.
 
-use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Duration};
+use std::{
+    cell::RefCell,
+    collections::{HashMap, hash_map::Entry},
+    rc::Rc,
+    time::{Duration, Instant},
+};
 
 use futures::{channel::mpsc, future};
 use medea_client_api_proto::{self as proto, PeerId};
@@ -155,44 +160,47 @@ impl Repository {
     fn spawn_peers_stats_scrape_task(
         peers: Rc<RefCell<HashMap<PeerId, peer::Component>>>,
     ) -> TaskHandle {
-        static LOOP_TICK: Duration = Duration::from_millis(250);
+        static LOOP_TICK: Duration = Duration::from_millis(500);
 
         let (fut, abort) = future::abortable(async move {
-            let mut peers_next_scrape: HashMap<PeerId, Duration> =
+            let mut peers_last_scrape: HashMap<PeerId, Instant> =
                 HashMap::new();
 
             loop {
                 platform::delay_for(LOOP_TICK).await;
 
-                let mut scrape_futures = Vec::new();
-                {
-                    let peers = peers.borrow();
+                let mut tasks = Vec::new();
+                let peers = peers.borrow();
 
-                    peers_next_scrape.retain(|id, _| peers.contains_key(id));
+                peers_last_scrape.retain(|id, _| peers.contains_key(id));
 
-                    for (id, peer_component) in peers.iter() {
-                        let interval =
-                            peer_component.state().stats_scrape_interval();
+                #[expect(
+                    clippy::iter_over_hash_type,
+                    reason = "order doesn't matter"
+                )]
+                for (id, peer_component) in peers.iter() {
+                    let interval =
+                        peer_component.state().stats_scrape_interval();
 
-                        let remaining = peers_next_scrape
-                            .entry(*id)
-                            .or_insert(Duration::ZERO);
+                    let last_scrape = peers_last_scrape.entry(*id);
 
-                        if *remaining == Duration::ZERO {
-                            let peer = peer_component.obj();
-                            scrape_futures.push(async move {
-                                peer.scrape_and_send_peer_stats().await;
-                            });
-                            *remaining = interval;
-                        }
+                    let should_scrape = match &last_scrape {
+                        Entry::Occupied(o) => o.get().elapsed() >= interval,
+                        Entry::Vacant(_) => true,
+                    };
 
-                        *remaining = remaining.saturating_sub(tick);
+                    if should_scrape {
+                        let peer = peer_component.obj();
+                        tasks.push(async move {
+                            peer.scrape_and_send_peer_stats().await;
+                        });
+                        last_scrape.insert_entry(Instant::now());
                     }
                 }
 
-                if !scrape_futures.is_empty() {
-                    platform::spawn(async move {
-                        drop(future::join_all(scrape_futures).await);
+                if !tasks.is_empty() {
+                    platform::spawn(async {
+                        drop(future::join_all(tasks).await);
                     });
                 }
             }

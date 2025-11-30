@@ -191,7 +191,8 @@ impl Item {
         let vis = self.orig_enum.vis.clone();
         quote! {
             #[automatically_derived]
-            #[allow(clippy::needless_arbitrary_self_type)]
+            #[allow(clippy::needless_arbitrary_self_type,
+                clippy::too_many_arguments)]
             #[doc = #trait_doc]
             #maybe_async_trait_macro
             #vis trait #handler_trait_ident {
