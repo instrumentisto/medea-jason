@@ -1,11 +1,6 @@
 //! Component responsible for the [`peer::Component`] creating and removing.
 
-use std::{
-    cell::RefCell,
-    collections::{HashMap, hash_map::Entry},
-    rc::Rc,
-    time::{Duration, Instant},
-};
+use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Duration};
 
 use futures::{channel::mpsc, future};
 use medea_client_api_proto::{self as proto, PeerId};
@@ -160,42 +155,42 @@ impl Repository {
     fn spawn_peers_stats_scrape_task(
         peers: Rc<RefCell<HashMap<PeerId, peer::Component>>>,
     ) -> TaskHandle {
-        static LOOP_TICK: Duration = Duration::from_millis(500);
+        // Inner stats send loop interval.
+        static LOOP_STEP: Duration = Duration::from_millis(500);
 
         let (fut, abort) = future::abortable(async move {
-            let mut peers_last_scrape: HashMap<PeerId, Instant> =
+            // TODO: Add platform::Instant abstraction.
+            // std Instant/SystemTime isn't available on wasm32-unknown-unknown,
+            // so this loop will drift over time. However, high precision
+            // isn't really important in this context.
+            let mut peers_next_scrape: HashMap<PeerId, Duration> =
                 HashMap::new();
 
             loop {
-                platform::delay_for(LOOP_TICK).await;
+                platform::delay_for(LOOP_STEP).await;
 
                 let mut tasks = Vec::new();
                 let peers = peers.borrow();
 
-                peers_last_scrape.retain(|id, _| peers.contains_key(id));
-
-                #[expect(
-                    clippy::iter_over_hash_type,
-                    reason = "order doesn't matter"
-                )]
+                #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
                 for (id, peer_component) in peers.iter() {
-                    let interval =
-                        peer_component.state().stats_scrape_interval();
+                    let remaining =
+                        peers_next_scrape.entry(*id).or_insert(Duration::ZERO);
 
-                    let last_scrape = peers_last_scrape.entry(*id);
-
-                    let should_scrape = match &last_scrape {
-                        Entry::Occupied(o) => o.get().elapsed() >= interval,
-                        Entry::Vacant(_) => true,
-                    };
-
-                    if should_scrape {
+                    if *remaining == Duration::ZERO {
                         let peer = peer_component.obj();
                         tasks.push(async move {
                             peer.scrape_and_send_peer_stats().await;
                         });
-                        last_scrape.insert_entry(Instant::now());
+                        *remaining =
+                            peer_component.state().stats_scrape_interval();
                     }
+
+                    *remaining = remaining.saturating_sub(LOOP_STEP);
+                }
+
+                if peers_next_scrape.len() != peers.len() {
+                    peers_next_scrape.retain(|id, _| peers.contains_key(id));
                 }
 
                 if !tasks.is_empty() {
