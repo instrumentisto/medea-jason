@@ -156,7 +156,7 @@ impl Repository {
         peers: Rc<RefCell<HashMap<PeerId, peer::Component>>>,
     ) -> TaskHandle {
         // Inner stats send loop interval.
-        static LOOP_STEP: Duration = Duration::from_millis(500);
+        static LOOP_STEP: Duration = Duration::from_millis(333);
 
         let (fut, abort) = future::abortable(async move {
             // TODO: Add platform::Instant abstraction.
