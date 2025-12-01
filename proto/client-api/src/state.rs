@@ -1,10 +1,7 @@
 //! State of the Media Server which will be used for Client and Server
 //! synchronization.
 
-use std::{
-    collections::{HashMap, HashSet},
-    time::Duration,
-};
+use std::collections::{HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 
@@ -61,8 +58,10 @@ pub struct Peer {
     /// All [`IceCandidate`]s of this [`Peer`].
     pub ice_candidates: HashSet<IceCandidate>,
 
-    /// Interval of RTCPeerConnection's stats scraping.
-    pub stats_scrape_interval: Duration,
+    /// Interval of [RTCPeerConnection][0]'s stats scraping.
+    ///
+    /// [0]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    pub stats_scrape_interval_ms: u32,
 }
 
 /// State of `MediaTrack`s with a `Send` direction.

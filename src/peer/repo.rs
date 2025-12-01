@@ -185,8 +185,12 @@ impl Repository {
                         tasks.push(async move {
                             peer.scrape_and_send_peer_stats().await;
                         });
-                        *remaining =
-                            peer_component.state().stats_scrape_interval();
+                        *remaining = Duration::from_millis(
+                            peer_component
+                                .state()
+                                .stats_scrape_interval_ms()
+                                .into(),
+                        );
                     }
 
                     *remaining = remaining.saturating_sub(LOOP_STEP);

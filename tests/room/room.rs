@@ -3115,7 +3115,7 @@ mod state_synchronization {
                 remote_sdp: None,
                 ice_candidates: HashSet::new(),
                 connection_mode: ConnectionMode::Mesh,
-                stats_scrape_interval: Duration::from_secs(1),
+                stats_scrape_interval_ms: 1000,
             },
         );
         event_tx

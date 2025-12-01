@@ -5,7 +5,7 @@ mod local_sdp;
 mod tracks_repository;
 mod watchers;
 
-use std::{cell::Cell, collections::HashSet, rc::Rc, time::Duration};
+use std::{cell::Cell, collections::HashSet, rc::Rc};
 
 use futures::{StreamExt as _, TryFutureExt as _, future::LocalBoxFuture};
 pub use local_sdp::DESCRIPTION_APPROVE_TIMEOUT;
@@ -155,7 +155,7 @@ pub struct State {
     sync_phase: ObservableCell<SyncPhase>,
 
     /// Interval of [`PeerConnection`]'s stats scraping.
-    stats_scrape_interval: Duration,
+    stats_scrape_interval_ms: u32,
 }
 
 impl State {
@@ -167,7 +167,7 @@ impl State {
         force_relay: bool,
         negotiation_role: Option<NegotiationRole>,
         connection_mode: ConnectionMode,
-        stats_scrape_interval: Duration,
+        stats_scrape_interval_ms: u32,
     ) -> Self {
         Self {
             id,
@@ -186,7 +186,7 @@ impl State {
             maybe_update_local_stream: ObservableCell::new(false),
             maybe_update_connections: ObservableCell::new(None),
             sync_phase: ObservableCell::new(SyncPhase::Synced),
-            stats_scrape_interval,
+            stats_scrape_interval_ms,
         }
     }
 
@@ -204,8 +204,8 @@ impl State {
 
     /// Returns stats scraping interval of this [`State`].
     #[must_use]
-    pub const fn stats_scrape_interval(&self) -> Duration {
-        self.stats_scrape_interval
+    pub const fn stats_scrape_interval_ms(&self) -> u32 {
+        self.stats_scrape_interval_ms
     }
 
     /// Returns all [`IceServer`]s of this [`State`].
@@ -492,7 +492,7 @@ impl AsProtoState for State {
             local_sdp: self.local_sdp.current(),
             remote_sdp: self.remote_sdp.get(),
             restart_ice: self.restart_ice.get(),
-            stats_scrape_interval: self.stats_scrape_interval,
+            stats_scrape_interval_ms: self.stats_scrape_interval_ms,
         }
     }
 }
@@ -510,7 +510,7 @@ impl SynchronizableState for State {
             input.force_relay,
             input.negotiation_role,
             input.connection_mode,
-            input.stats_scrape_interval,
+            input.stats_scrape_interval_ms,
         );
 
         #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]

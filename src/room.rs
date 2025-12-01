@@ -4,7 +4,6 @@ use std::{
     cell::RefCell,
     collections::{HashMap, HashSet},
     rc::{Rc, Weak},
-    time::Duration,
 };
 
 use async_recursion::async_recursion;
@@ -1568,7 +1567,7 @@ impl EventHandler for InnerRoom {
             force_relay,
             Some(negotiation_role),
             connection_mode,
-            Duration::from_millis(stats_scrape_interval_ms.into()),
+            stats_scrape_interval_ms,
         );
         for track in &tracks {
             peer_state.insert_track(track, self.send_constraints.clone());
