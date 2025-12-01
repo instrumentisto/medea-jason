@@ -61,7 +61,7 @@ pub struct Peer {
     /// All [`IceCandidate`]s of this [`Peer`].
     pub ice_candidates: HashSet<IceCandidate>,
 
-    /// Interval of [`PeerConnection`]'s stats scraping.
+    /// Interval of RTCPeerConnection's stats scraping.
     pub stats_scrape_interval: Duration,
 }
 

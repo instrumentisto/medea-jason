@@ -172,7 +172,10 @@ impl Repository {
                 let mut tasks = Vec::new();
                 let peers = peers.borrow();
 
-                #[expect(clippy::iter_over_hash_type, reason = "order doesn't matter")]
+                #[expect(
+                    clippy::iter_over_hash_type,
+                    reason = "order doesn't matter"
+                )]
                 for (id, peer_component) in peers.iter() {
                     let remaining =
                         peers_next_scrape.entry(*id).or_insert(Duration::ZERO);
