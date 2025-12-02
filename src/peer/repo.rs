@@ -155,21 +155,56 @@ impl Repository {
     fn spawn_peers_stats_scrape_task(
         peers: Rc<RefCell<HashMap<PeerId, peer::Component>>>,
     ) -> TaskHandle {
-        let (fut, abort) = future::abortable(async move {
-            loop {
-                platform::delay_for(Duration::from_secs(1)).await;
+        // Inner stats send loop interval.
+        static LOOP_STEP: Duration = Duration::from_millis(333);
 
-                let peers = peers
-                    .borrow()
-                    .values()
-                    .map(component::Component::obj)
-                    .collect::<Vec<_>>();
-                drop(
-                    future::join_all(
-                        peers.iter().map(|p| p.scrape_and_send_peer_stats()),
-                    )
-                    .await,
-                );
+        let (fut, abort) = future::abortable(async move {
+            // TODO: Add `platform::Instant` abstraction.
+            // `Instant`/`SystemTime` from `std` are not available on
+            // `wasm32-unknown-unknown` target, so this loop will drift over
+            // time. However, high precision isn't really important here.
+            let mut peers_next_scrape: HashMap<PeerId, Duration> =
+                HashMap::new();
+
+            loop {
+                platform::delay_for(LOOP_STEP).await;
+
+                let mut tasks = Vec::new();
+                let peers = peers.borrow();
+
+                #[expect( // order doesn't matter here
+                    clippy::iter_over_hash_type,
+                    reason = "order doesn't matter here"
+                )]
+                for (id, peer_component) in peers.iter() {
+                    let remaining =
+                        peers_next_scrape.entry(*id).or_insert(Duration::ZERO);
+
+                    if *remaining == Duration::ZERO {
+                        let peer = peer_component.obj();
+                        tasks.push(async move {
+                            peer.scrape_and_send_peer_stats().await;
+                        });
+                        *remaining = Duration::from_millis(
+                            peer_component
+                                .state()
+                                .stats_scrape_interval_ms()
+                                .into(),
+                        );
+                    }
+
+                    *remaining = remaining.saturating_sub(LOOP_STEP);
+                }
+
+                if peers_next_scrape.len() != peers.len() {
+                    peers_next_scrape.retain(|id, _| peers.contains_key(id));
+                }
+
+                if !tasks.is_empty() {
+                    platform::spawn(async {
+                        drop(future::join_all(tasks).await);
+                    });
+                }
             }
         });
 

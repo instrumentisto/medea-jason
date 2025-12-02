@@ -14,11 +14,13 @@ All user visible changes to this project will be documented in this file. This p
 - Added `is_reconnect` field to `Event::RoomJoined`. ([#242])
 - Reworked RTC stats to align with [Identifiers for WebRTC's Statistics API][webrtc-stats] specification. ([#245])
 - Removed `extended-stats` Cargo feature. ([#245])
+- Added `stats_scrape_interval_ms` field to `Event::PeerCreated` and `state::Peer`. ([#249])
 
 [#224]: https://github.com/instrumentisto/medea-jason/issues/224
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
 [#242]: https://github.com/instrumentisto/medea-jason/pull/242
 [#245]: https://github.com/instrumentisto/medea-jason/pull/245
+[#249]: https://github.com/instrumentisto/medea-jason/pull/249
 
 
 

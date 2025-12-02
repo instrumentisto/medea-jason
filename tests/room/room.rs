@@ -127,6 +127,7 @@ async fn get_test_room_and_exist_peer(
             ice_servers: Vec::new(),
             force_relay: false,
             connection_mode: ConnectionMode::Mesh,
+            stats_scrape_interval_ms: 1000,
         })
         .unwrap();
 
@@ -181,6 +182,7 @@ async fn error_get_local_stream_on_new_peer() {
             ice_servers: Vec::new(),
             force_relay: false,
             connection_mode: ConnectionMode::Mesh,
+            stats_scrape_interval_ms: 1000,
         })
         .unwrap();
 
@@ -272,6 +274,7 @@ mod connection_mode {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
     }
@@ -298,6 +301,7 @@ mod connection_mode {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Sfu,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
     }
@@ -368,6 +372,7 @@ mod disable_recv_tracks {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
 
@@ -446,6 +451,7 @@ mod init_track_states {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
 
@@ -507,6 +513,7 @@ mod init_track_states {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
 
@@ -566,6 +573,7 @@ mod receivers_patch_send_tracks {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
         delay_for(200).await;
@@ -1071,6 +1079,7 @@ mod disable_send_tracks {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
 
@@ -1154,6 +1163,7 @@ mod disable_send_tracks {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
 
@@ -1234,6 +1244,7 @@ mod disable_send_tracks {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
 
@@ -1563,6 +1574,7 @@ mod patches_generation {
                     ice_servers: Vec::new(),
                     force_relay: false,
                     connection_mode: ConnectionMode::Mesh,
+                    stats_scrape_interval_ms: 1000,
                 })
                 .unwrap();
 
@@ -2418,6 +2430,7 @@ async fn send_enabling_holds_local_tracks() {
             ice_servers: Vec::new(),
             force_relay: false,
             connection_mode: ConnectionMode::Mesh,
+            stats_scrape_interval_ms: 1000,
         })
         .unwrap();
     // wait until Event::PeerCreated is handled
@@ -2491,6 +2504,7 @@ mod set_local_media_settings {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
 
@@ -2523,6 +2537,7 @@ mod set_local_media_settings {
                             ice_servers: Vec::new(),
                             force_relay: false,
                             connection_mode: ConnectionMode::Mesh,
+                            stats_scrape_interval_ms: 1000,
                         })
                         .unwrap();
                 }
@@ -2658,6 +2673,7 @@ mod set_local_media_settings {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
 
@@ -2811,6 +2827,7 @@ mod set_local_media_settings {
                 ice_servers: Vec::new(),
                 force_relay: false,
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             })
             .unwrap();
         delay_for(10).await;
@@ -3098,6 +3115,7 @@ mod state_synchronization {
                 remote_sdp: None,
                 ice_candidates: HashSet::new(),
                 connection_mode: ConnectionMode::Mesh,
+                stats_scrape_interval_ms: 1000,
             },
         );
         event_tx
@@ -3151,6 +3169,7 @@ mod state_synchronization {
                     ice_servers: Vec::new(),
                     force_relay: false,
                     connection_mode: ConnectionMode::Mesh,
+                    stats_scrape_interval_ms: 1000,
                 })
                 .unwrap();
 
@@ -3275,6 +3294,7 @@ async fn intentions_are_sent_on_reconnect() {
             ice_servers: Vec::new(),
             force_relay: false,
             connection_mode: ConnectionMode::Mesh,
+            stats_scrape_interval_ms: 1000,
         })
         .unwrap();
     while let Some(cmd) = commands_rx.next().await {
@@ -3389,6 +3409,7 @@ async fn sender_answerer() {
             ice_servers: Vec::new(),
             force_relay: false,
             connection_mode: ConnectionMode::Mesh,
+            stats_scrape_interval_ms: 1000,
         })
         .unwrap();
 

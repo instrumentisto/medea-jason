@@ -83,6 +83,7 @@ async fn jason_network_changed() {
                                 ice_servers: Vec::new(),
                                 force_relay: false,
                                 connection_mode: ConnectionMode::Sfu,
+                                stats_scrape_interval_ms: 1000,
                             },
                         },
                     ])

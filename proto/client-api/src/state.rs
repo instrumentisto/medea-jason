@@ -57,6 +57,11 @@ pub struct Peer {
 
     /// All [`IceCandidate`]s of this [`Peer`].
     pub ice_candidates: HashSet<IceCandidate>,
+
+    /// Interval (in milliseconds) of [RTCPeerConnection][0]'s stats scraping.
+    ///
+    /// [0]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
+    pub stats_scrape_interval_ms: u32,
 }
 
 /// State of `MediaTrack`s with a `Send` direction.
