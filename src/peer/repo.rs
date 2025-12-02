@@ -159,10 +159,10 @@ impl Repository {
         static LOOP_STEP: Duration = Duration::from_millis(333);
 
         let (fut, abort) = future::abortable(async move {
-            // TODO: Add platform::Instant abstraction.
-            // std Instant/SystemTime isn't available on wasm32-unknown-unknown,
-            // so this loop will drift over time. However, high precision
-            // isn't really important in this context.
+            // TODO: Add `platform::Instant` abstraction.
+            // `Instant`/`SystemTime` from `std` are not available on
+            // `wasm32-unknown-unknown` target, so this loop will drift over
+            // time. However, high precision isn't really important here.
             let mut peers_next_scrape: HashMap<PeerId, Duration> =
                 HashMap::new();
 
@@ -172,9 +172,9 @@ impl Repository {
                 let mut tasks = Vec::new();
                 let peers = peers.borrow();
 
-                #[expect(
+                #[expect( // order doesn't matter here
                     clippy::iter_over_hash_type,
-                    reason = "order doesn't matter"
+                    reason = "order doesn't matter here"
                 )]
                 for (id, peer_component) in peers.iter() {
                     let remaining =

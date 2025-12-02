@@ -26,7 +26,7 @@ All user visible changes to this project will be documented in this file. This p
 - `ConnectionHandle.get_state()` and `ConnectionHandle.on_state_change()` for tracking connection with remote member in P2P mode. ([#229])
 - `Jason.network_changed()` for instant reconnection of all signalling and ICE transports. ([#236])
 - `RoomCloseKind` enumeration to reflect why `Room` was closed. ([#244])
-- RTC stats scrape interval configuration via `Event::PeerCreated`. ([#249])
+- RTC stats scraping interval configuration via `Event::PeerCreated`. ([#249])
 
 ### Fixed
 

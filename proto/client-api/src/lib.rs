@@ -717,14 +717,14 @@ pub enum Event {
         close_reason: CloseReason,
     },
 
-    /// Media Server notifies Web Client about necessity of
+    /// Media Server notifies Web Client about necessity of an
     /// [RTCPeerConnection][0] creation.
     ///
-    /// [0]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [0]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     PeerCreated {
-        /// ID of the `Peer` to create [RTCPeerConnection][0] for.
+        /// ID of the `Peer` to create an [RTCPeerConnection][0] for.
         ///
-        /// [0]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+        /// [0]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
         peer_id: PeerId,
 
         /// [`NegotiationRole`] of the `Peer`.
@@ -737,32 +737,33 @@ pub enum Event {
         /// [SFU]: https://webrtcglossary.com/sfu
         connection_mode: ConnectionMode,
 
-        /// [`Track`]s to create [RTCPeerConnection][0] with.
+        /// [`Track`]s to create an [RTCPeerConnection][0] with.
         ///
-        /// [0]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+        /// [0]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
         tracks: Vec<Track>,
 
-        /// [`IceServer`]s to create [RTCPeerConnection][0] with.
+        /// [`IceServer`]s to create an [RTCPeerConnection][0] with.
         ///
-        /// [0]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+        /// [0]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
         ice_servers: Vec<IceServer>,
 
         /// Indicator whether the created [RTCPeerConnection][0] should be
         /// forced to use relay [`IceServer`]s only.
         ///
-        /// [0]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+        /// [0]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
         force_relay: bool,
 
-        /// Interval of [RTCPeerConnection][0] stats scraping.
+        /// Interval (in milliseconds) of [RTCPeerConnection][0]'s stats
+        /// scraping.
         ///
-        /// [0]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+        /// [0]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
         stats_scrape_interval_ms: u32,
     },
 
     /// Media Server notifies Web Client about necessity to apply the specified
     /// SDP Answer to Web Client's [RTCPeerConnection][0].
     ///
-    /// [0]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [0]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     SdpAnswerMade {
         /// ID of the `Peer` to apply SDP Answer to.
         peer_id: PeerId,
@@ -790,10 +791,10 @@ pub enum Event {
         candidate: IceCandidate,
     },
 
-    /// Media Server notifies Web Client about necessity of
+    /// Media Server notifies Web Client about necessity of the
     /// [RTCPeerConnection][0] close.
     ///
-    /// [0]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [0]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     PeersRemoved {
         /// IDs of `Peer`s to be removed.
         peer_ids: Vec<PeerId>,

@@ -154,7 +154,7 @@ pub struct State {
     /// [`SyncPhase`] of this [`Component`].
     sync_phase: ObservableCell<SyncPhase>,
 
-    /// Interval of [`PeerConnection`]'s stats scraping.
+    /// Interval (in milliseconds) of [`PeerConnection`]'s stats scraping.
     stats_scrape_interval_ms: u32,
 }
 
@@ -202,7 +202,7 @@ impl State {
         self.id
     }
 
-    /// Returns stats scraping interval of this [`State`].
+    /// Returns the stats scraping interval of this [`State`] in milliseconds.
     #[must_use]
     pub const fn stats_scrape_interval_ms(&self) -> u32 {
         self.stats_scrape_interval_ms
