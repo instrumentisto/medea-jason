@@ -177,6 +177,12 @@ impl Repository {
                     reason = "order doesn't matter here"
                 )]
                 for (id, peer_component) in peers.iter() {
+                    let Some(interval) =
+                        peer_component.state().stats_scrape_interval_ms()
+                    else {
+                        continue;
+                    };
+
                     let remaining =
                         peers_next_scrape.entry(*id).or_insert(Duration::ZERO);
 
@@ -185,12 +191,9 @@ impl Repository {
                         tasks.push(async move {
                             peer.scrape_and_send_peer_stats().await;
                         });
-                        *remaining = Duration::from_millis(
-                            peer_component
-                                .state()
-                                .stats_scrape_interval_ms()
-                                .into(),
-                        );
+
+                        *remaining =
+                            Duration::from_millis(interval.get().into());
                     }
 
                     *remaining = remaining.saturating_sub(LOOP_STEP);

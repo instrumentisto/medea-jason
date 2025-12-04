@@ -754,7 +754,7 @@ pub enum Event {
         force_relay: bool,
 
         /// Interval (in milliseconds) of [RTCPeerConnection][0]'s stats
-        /// scraping.
+        /// scraping. `0` disables stats scrape.
         ///
         /// [0]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
         stats_scrape_interval_ms: u32,

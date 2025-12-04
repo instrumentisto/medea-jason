@@ -5,7 +5,7 @@ mod local_sdp;
 mod tracks_repository;
 mod watchers;
 
-use std::{cell::Cell, collections::HashSet, rc::Rc};
+use std::{cell::Cell, collections::HashSet, num::NonZeroU32, rc::Rc};
 
 use futures::{StreamExt as _, TryFutureExt as _, future::LocalBoxFuture};
 pub use local_sdp::DESCRIPTION_APPROVE_TIMEOUT;
@@ -204,8 +204,8 @@ impl State {
 
     /// Returns the stats scraping interval of this [`State`] in milliseconds.
     #[must_use]
-    pub const fn stats_scrape_interval_ms(&self) -> u32 {
-        self.stats_scrape_interval_ms
+    pub const fn stats_scrape_interval_ms(&self) -> Option<NonZeroU32> {
+        NonZeroU32::new(self.stats_scrape_interval_ms)
     }
 
     /// Returns all [`IceServer`]s of this [`State`].
