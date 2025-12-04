@@ -192,8 +192,7 @@ impl Repository {
                             peer.scrape_and_send_peer_stats().await;
                         });
 
-                        *remaining =
-                            Duration::from_millis(interval.get().into());
+                        *remaining = interval;
                     }
 
                     *remaining = remaining.saturating_sub(LOOP_STEP);
