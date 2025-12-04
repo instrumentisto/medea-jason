@@ -178,7 +178,7 @@ impl Repository {
                 )]
                 for (id, peer_component) in peers.iter() {
                     let Some(interval) =
-                        peer_component.state().stats_scrape_interval_ms()
+                        peer_component.state().stats_scrape_interval()
                     else {
                         continue;
                     };

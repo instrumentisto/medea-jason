@@ -5,7 +5,12 @@ mod local_sdp;
 mod tracks_repository;
 mod watchers;
 
-use std::{cell::Cell, collections::HashSet, num::NonZeroU32, rc::Rc};
+use std::{
+    cell::Cell,
+    collections::HashSet,
+    num::{NonZero, NonZeroU32},
+    rc::Rc,
+};
 
 use futures::{StreamExt as _, TryFutureExt as _, future::LocalBoxFuture};
 pub use local_sdp::DESCRIPTION_APPROVE_TIMEOUT;
@@ -154,8 +159,10 @@ pub struct State {
     /// [`SyncPhase`] of this [`Component`].
     sync_phase: ObservableCell<SyncPhase>,
 
-    /// Interval (in milliseconds) of [`PeerConnection`]'s stats scraping.
-    stats_scrape_interval_ms: u32,
+    /// Interval of [`PeerConnection`]'s stats scraping.
+    ///
+    /// [`None`] if stats scrape is disabled.
+    stats_scrape_interval: Option<NonZeroU32>,
 }
 
 impl State {
@@ -186,7 +193,7 @@ impl State {
             maybe_update_local_stream: ObservableCell::new(false),
             maybe_update_connections: ObservableCell::new(None),
             sync_phase: ObservableCell::new(SyncPhase::Synced),
-            stats_scrape_interval_ms,
+            stats_scrape_interval: NonZero::new(stats_scrape_interval_ms),
         }
     }
 
@@ -202,10 +209,11 @@ impl State {
         self.id
     }
 
-    /// Returns the stats scraping interval of this [`State`] in milliseconds.
+    /// Returns the stats scraping interval of this [`State`] or [`None`] if
+    /// stats scrape is disabled.
     #[must_use]
-    pub const fn stats_scrape_interval_ms(&self) -> Option<NonZeroU32> {
-        NonZeroU32::new(self.stats_scrape_interval_ms)
+    pub const fn stats_scrape_interval(&self) -> Option<NonZeroU32> {
+        self.stats_scrape_interval
     }
 
     /// Returns all [`IceServer`]s of this [`State`].
@@ -492,7 +500,9 @@ impl AsProtoState for State {
             local_sdp: self.local_sdp.current(),
             remote_sdp: self.remote_sdp.get(),
             restart_ice: self.restart_ice.get(),
-            stats_scrape_interval_ms: self.stats_scrape_interval_ms,
+            stats_scrape_interval_ms: self
+                .stats_scrape_interval
+                .map_or(0, NonZeroU32::get),
         }
     }
 }
