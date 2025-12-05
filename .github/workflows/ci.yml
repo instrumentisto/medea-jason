@@ -591,7 +591,6 @@ jobs:
         with:
           api-level: ${{ steps.api-version.outputs.min }}
           arch: x86_64
-          profile: pixel_2
           target: google_apis
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
@@ -600,7 +599,6 @@ jobs:
         with:
           api-level: ${{ steps.api-version.outputs.target }}
           arch: x86_64
-          profile: pixel_2
           target: google_apis
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
