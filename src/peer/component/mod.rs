@@ -5,7 +5,9 @@ mod local_sdp;
 mod tracks_repository;
 mod watchers;
 
-use std::{cell::Cell, collections::HashSet, rc::Rc};
+use std::{
+    cell::Cell, collections::HashSet, num::NonZeroU32, rc::Rc, time::Duration,
+};
 
 use futures::{StreamExt as _, TryFutureExt as _, future::LocalBoxFuture};
 pub use local_sdp::DESCRIPTION_APPROVE_TIMEOUT;
@@ -155,7 +157,9 @@ pub struct State {
     sync_phase: ObservableCell<SyncPhase>,
 
     /// Interval (in milliseconds) of [`PeerConnection`]'s stats scraping.
-    stats_scrape_interval_ms: u32,
+    ///
+    /// [`None`] if stats scraping is disabled.
+    stats_scrape_interval_ms: Option<NonZeroU32>,
 }
 
 impl State {
@@ -186,7 +190,7 @@ impl State {
             maybe_update_local_stream: ObservableCell::new(false),
             maybe_update_connections: ObservableCell::new(None),
             sync_phase: ObservableCell::new(SyncPhase::Synced),
-            stats_scrape_interval_ms,
+            stats_scrape_interval_ms: NonZeroU32::new(stats_scrape_interval_ms),
         }
     }
 
@@ -202,10 +206,13 @@ impl State {
         self.id
     }
 
-    /// Returns the stats scraping interval of this [`State`] in milliseconds.
+    /// Returns the stats scraping interval of this [`State`].
+    ///
+    /// [`None`] if stats scraping is disabled.
     #[must_use]
-    pub const fn stats_scrape_interval_ms(&self) -> u32 {
+    pub fn stats_scrape_interval(&self) -> Option<Duration> {
         self.stats_scrape_interval_ms
+            .map(|v| Duration::from_millis(v.get().into()))
     }
 
     /// Returns all [`IceServer`]s of this [`State`].
@@ -492,7 +499,9 @@ impl AsProtoState for State {
             local_sdp: self.local_sdp.current(),
             remote_sdp: self.remote_sdp.get(),
             restart_ice: self.restart_ice.get(),
-            stats_scrape_interval_ms: self.stats_scrape_interval_ms,
+            stats_scrape_interval_ms: self
+                .stats_scrape_interval_ms
+                .map_or(0, NonZeroU32::get),
         }
     }
 }

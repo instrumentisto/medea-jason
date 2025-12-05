@@ -1816,26 +1816,30 @@ impl PeerEventHandler for InnerRoom {
         peer_id: PeerId,
         peer_connection_state: PeerConnectionState,
     ) -> Self::Output {
+        let Some(peer_state) = self.peers.state().get(peer_id) else {
+            return Ok(());
+        };
+
         self.rpc.send_command(Command::AddPeerConnectionMetrics {
             peer_id,
             metrics: PeerMetrics::PeerConnectionState(peer_connection_state),
         });
 
-        if peer_connection_state == PeerConnectionState::Connected {
+        if peer_state.stats_scrape_interval().is_some()
+            && peer_connection_state == PeerConnectionState::Connected
+        {
             if let Some(peer) = self.peers.get(peer_id) {
                 peer.scrape_and_send_peer_stats().await;
             }
         }
 
-        if let Some(peer_state) = self.peers.state().get(peer_id) {
-            peer_state
-                .get_tracks()
-                .into_iter()
-                .flat_map(|track_id| self.connections.iter_by_track(&track_id))
-                .for_each(|conn| {
-                    conn.update_peer_state(peer_connection_state);
-                });
-        }
+        peer_state
+            .get_tracks()
+            .into_iter()
+            .flat_map(|track_id| self.connections.iter_by_track(&track_id))
+            .for_each(|conn| {
+                conn.update_peer_state(peer_connection_state);
+            });
 
         Ok(())
     }
