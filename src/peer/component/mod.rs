@@ -158,7 +158,7 @@ pub struct State {
 
     /// Interval (in milliseconds) of [`PeerConnection`]'s stats scraping.
     ///
-    /// [`None`] if stats scrape is disabled.
+    /// [`None`] if stats scraping is disabled.
     stats_scrape_interval_ms: Option<NonZeroU32>,
 }
 
@@ -206,8 +206,9 @@ impl State {
         self.id
     }
 
-    /// Returns the stats scraping interval of this [`State`] or [`None`] if
-    /// stats scrape is disabled.
+    /// Returns the stats scraping interval of this [`State`].
+    ///
+    /// [`None`] if stats scraping is disabled.
     #[must_use]
     pub fn stats_scrape_interval(&self) -> Option<Duration> {
         self.stats_scrape_interval_ms
