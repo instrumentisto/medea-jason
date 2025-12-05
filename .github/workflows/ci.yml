@@ -589,16 +589,18 @@ jobs:
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ steps.api-version.outputs.min }}
+          api-level: 27
           arch: x86_64
+          profile: pixel_2
           target: google_apis
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ steps.api-version.outputs.target }}
+          api-level: 27
           arch: x86_64
+          profile: pixel_2
           target: google_apis
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
