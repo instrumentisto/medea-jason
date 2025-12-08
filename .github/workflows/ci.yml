@@ -575,7 +575,7 @@ jobs:
       - name: Install Flutter Android dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ibx11-xcb1
+          sudo apt-get install -y libx11-xcb1
         if: ${{ matrix.platform == 'android' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
