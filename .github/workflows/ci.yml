@@ -380,7 +380,6 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
         if: ${{ matrix.platform == 'android' }}
-
       - name: Free disk space for Android
         uses: jlumbroso/free-disk-space@v1.3.1
         with:
@@ -388,11 +387,6 @@ jobs:
           swap-storage: false
           tool-cache: false
         if: ${{ matrix.platform == 'android' }}
-
-      - name: Install linux dependencies
-        run: |
-          apt update
-          apt install -y libx11-xcb1
 
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@v1
@@ -568,14 +562,21 @@ jobs:
       - uses: subosito/flutter-action@v2
       - run: flutter config --enable-linux-desktop
         if: ${{ matrix.platform == 'linux' }}
+
       - name: Install Flutter Linux dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
                        cmake \
                        libgtk-3-dev liblzma-dev libpulse-dev \
-                       ninja-build pkg-config xvfb
+                       ninja-build pkg-config xvfb libx11-xcb1
         if: ${{ matrix.platform == 'linux' }}
+
+      - name: Install Flutter Android dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ibx11-xcb1
+        if: ${{ matrix.platform == 'android' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     args="--features mockable"
@@ -592,6 +593,15 @@ jobs:
           >> $GITHUB_OUTPUT
         if: ${{ matrix.platform == 'android' }}
 
+      - name: Test on min Android API version
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.min }}
+          arch: x86_64
+          profile: pixel_2
+          target: google_apis
+          script: make test.flutter
+        if: ${{ matrix.platform == 'android' }}
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -688,7 +698,7 @@ jobs:
       - name: Install linux dependencies
         run: |
           apt update
-          apt install -y clang curl make xz-utils libx11-xcb1
+          apt install -y clang curl make xz-utils
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
