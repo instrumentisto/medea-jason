@@ -6,7 +6,6 @@ import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
 import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'peer_connection.g.dart' as bridge;
-import 'rtc_stats.dart';
 
 /// Registers [PeerConnection] related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
@@ -114,7 +113,7 @@ Future<String> Function() _getStats(Object conn) {
   conn as PeerConnection;
   return () async {
     var stats = await conn.getStats();
-    var statsToEncode = stats.map((stat) => stat.toMap()).toList();
+    var statsToEncode = stats.map((stat) => stat.toJson()).toList();
     return jsonEncode(statsToEncode);
   };
 }

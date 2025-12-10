@@ -40,7 +40,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`medea_flutter_webrtc`] to 0.16.0 version. ([#231])
+    - [`medea_flutter_webrtc`] to 0.16.0 version. ([#231], [#252])
 
 [#224]: https://github.com/instrumentisto/medea-jason/issues/224
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
@@ -54,6 +54,7 @@ All user visible changes to this project will be documented in this file. This p
 [#244]: https://github.com/instrumentisto/medea-jason/pull/244
 [#247]: https://github.com/instrumentisto/medea-jason/pull/247
 [#248]: https://github.com/instrumentisto/medea-jason/pull/248
+[#252]: https://github.com/instrumentisto/medea-jason/pull/252
 
 
 
