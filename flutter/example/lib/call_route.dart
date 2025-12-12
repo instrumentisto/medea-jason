@@ -60,6 +60,12 @@ class ConnectWidgets {
 
     return res;
   }
+
+  Future<void> dispose() async {
+    for (var r in videoTracks.values) {
+      await r.videoRenderer.dispose();
+    }
+  }
 }
 
 class _CallState extends State<CallRoute> {
@@ -439,6 +445,14 @@ class _CallState extends State<CallRoute> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    for (var c in _widgets.values) {
+      c.dispose();
+    }
+    super.dispose();
   }
 }
 
