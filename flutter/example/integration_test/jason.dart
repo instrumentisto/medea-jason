@@ -9,7 +9,6 @@ import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'package:medea_jason/src/native/media_device_details.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
-import 'package:medea_jason/src/native/platform/rtc_stats.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import 'package:device_info_plus/device_info_plus.dart';
 
@@ -290,10 +289,10 @@ void main() {
     var receiverStats = await pc2.getStats();
 
     var senderStatsJson = jsonEncode(
-      senderStats.map((stat) => stat.toMap()).toList(),
+      senderStats.map((stat) => stat.toJson()).toList(),
     );
     var receiverStatsJson = jsonEncode(
-      receiverStats.map((stat) => stat.toMap()).toList(),
+      receiverStats.map((stat) => stat.toJson()).toList(),
     );
 
     var senderStatsString = ForeignValue.fromString(senderStatsJson);
