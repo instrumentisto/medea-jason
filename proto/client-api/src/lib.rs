@@ -122,6 +122,7 @@
     clippy::use_self,
     clippy::useless_let_if_seq,
     clippy::verbose_file_reads,
+    clippy::volatile_composites,
     clippy::while_float,
     clippy::wildcard_enum_match_arm,
     ambiguous_negative_literals,
@@ -1113,7 +1114,7 @@ pub struct IceServer {
 #[cfg_attr(feature = "client", derive(Deserialize))]
 #[cfg_attr(feature = "server", derive(Serialize))]
 #[derive(Clone, Debug, Eq, PartialEq)]
-// TODO: Use different struct without mids in PeerUpdated event.
+// TODO: Use different struct without `mids` in `PeerUpdated` event.
 pub enum Direction {
     /// Outgoing direction.
     Send {

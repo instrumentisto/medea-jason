@@ -1006,9 +1006,7 @@ impl PeerConnection {
 }
 
 #[cfg(feature = "mockable")]
-// TODO: Try remove on next Rust version upgrade.
-#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
-#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
+#[expect(clippy::multiple_inherent_impl, reason = "feature gated")]
 impl PeerConnection {
     /// Returns [`RtcStats`] of this [`PeerConnection`].
     ///

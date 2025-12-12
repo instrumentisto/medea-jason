@@ -329,9 +329,7 @@ impl Receiver {
 }
 
 #[cfg(feature = "mockable")]
-// TODO: Try remove on next Rust version upgrade.
-#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
-#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
+#[expect(clippy::multiple_inherent_impl, reason = "feature gated")]
 impl Receiver {
     /// Returns the current `enabled_general` status of this [`Receiver`].
     #[must_use]

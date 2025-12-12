@@ -35,7 +35,7 @@ pub struct Statement {
     ///
     /// Result returned from this [`Statement`] will be provided to the
     /// [`Statement::and_then`].
-    and_then: Option<Box<Statement>>,
+    and_then: Option<Box<Self>>,
 }
 
 impl Statement {

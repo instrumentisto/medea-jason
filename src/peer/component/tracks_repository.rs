@@ -226,9 +226,7 @@ impl<S> TracksRepository<S> {
 }
 
 #[cfg(feature = "mockable")]
-// TODO: Try remove on next Rust version upgrade.
-#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
-#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
+#[expect(clippy::multiple_inherent_impl, reason = "feature gated")]
 impl TracksRepository<sender::State> {
     /// Sets [`SyncState`] of all [`sender::State`]s to the
     /// [`SyncState::Synced`].

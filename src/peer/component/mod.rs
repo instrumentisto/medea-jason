@@ -602,9 +602,7 @@ impl Updatable for State {
 }
 
 #[cfg(feature = "mockable")]
-// TODO: Try remove on next Rust version upgrade.
-#[expect(clippy::allow_attributes, reason = "`#[expect]` is not considered")]
-#[allow(clippy::multiple_inherent_impl, reason = "feature gated")]
+#[expect(clippy::multiple_inherent_impl, reason = "feature gated")]
 impl State {
     /// Waits for a [`State::remote_sdp`] change to be applied.
     pub async fn when_remote_sdp_processed(&self) {
