@@ -130,7 +130,12 @@ fn spawn_idle_watchdog_task(this: Rc<RefCell<Inner>>) -> TaskHandle {
             this.borrow().send_pong(last_ping_num + 1);
 
             let idle_timeout = this.borrow().idle_timeout;
-            platform::delay_for(idle_timeout.0 - wait_for_ping.0).await;
+            #[expect(clippy::expect_used, reason = "not happens")]
+            let delay = idle_timeout
+                .0
+                .checked_sub(wait_for_ping.0)
+                .expect("`wait_for_ping` > `idle_timeout`");
+            platform::delay_for(delay).await;
             this.borrow_mut()
                 .on_idle_subs
                 .retain(|sub| sub.unbounded_send(()).is_ok());
