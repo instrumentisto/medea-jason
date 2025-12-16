@@ -146,7 +146,7 @@ async fn then_remote_media_track(
     let member = world.get_member(&id).expect("000");
     let partner_connection =
         timeout(Duration::from_secs(10), member.connections().wait_for_connection(partner_id)).await.expect("111").expect("111111");
-    let tracks_with_partner = timeout(Duration::from_secs(10), partner_connection.tracks_store()).await.expect("222").await.expect("222222");
+    let tracks_with_partner = timeout(Duration::from_secs(10), partner_connection.tracks_store()).await.expect("222").expect("222222");
 
     sleep(Duration::from_millis(500)).await;
     let (media_kind, source_kind) = parse_media_kinds(&kind).expect("333");
