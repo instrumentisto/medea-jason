@@ -100,6 +100,7 @@ wasm-logger = "0.2"
         "RtcBundlePolicy",
         "RtcConfiguration",
         "RtcIceCandidate", "RtcIceCandidateInit",
+        "RtcIceGatheringState",
         "RtcIceConnectionState",
         "RtcIceServer",
         "RtcIceTransportPolicy",

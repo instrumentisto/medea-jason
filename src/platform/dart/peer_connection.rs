@@ -23,15 +23,15 @@ use super::{
 use crate::{
     media::MediaKind,
     platform::{
-        IceCandidate, IceCandidateError, RtcPeerConnectionError, RtcStats,
-        RtcStatsError, SdpType,
+        IceCandidate, IceCandidateError, IceGatheringState,
+        RtcPeerConnectionError, RtcStats, RtcStatsError, SdpType,
         dart::{
             ice_server::RtcIceServers,
             transceiver::Transceiver,
             utils::{
                 callback::Callback, dart_future::FutureFromDart,
                 handle::DartHandle, ice_connection_from_int,
-                peer_connection_state_from_int,
+                ice_gathering_state_from_int, peer_connection_state_from_int,
             },
         },
     },
@@ -56,6 +56,14 @@ mod peer_connection {
         ///
         /// [1]: https://w3.org/TR/webrtc#event-connectionstatechange
         pub fn on_connection_state_change(
+            peer: Dart_Handle,
+            cb: Dart_Handle,
+        ) -> Result<(), Error>;
+
+        /// Sets handler for a [`icegatheringstatechange`][1] event.
+        ///
+        /// [1]: https://w3.org/TR/webrtc/#event-icegatheringstatechange
+        pub fn on_ice_gathering_state_change(
             peer: Dart_Handle,
             cb: Dart_Handle,
         ) -> Result<(), Error>;
@@ -354,6 +362,32 @@ impl RtcPeerConnection {
                     self.handle.get(),
                     Callback::from_fn_mut(move |v| {
                         h(peer_connection_state_from_int(v));
+                    })
+                    .into_dart(),
+                )
+            }
+            .unwrap();
+        }
+    }
+
+    /// Sets handler for a [`icegatheringstatechange`][1] event.
+    ///
+    /// # Panics
+    ///
+    /// If binding to the [`icegatheringstatechange`][1] event fails. Not
+    /// supposed to ever happen.
+    ///
+    /// [1]: https://w3.org/TR/webrtc/#event-icegatheringstatechange
+    pub fn on_ice_gathering_state_change<F>(&self, handler: Option<F>)
+    where
+        F: 'static + FnMut(IceGatheringState),
+    {
+        if let Some(mut h) = handler {
+            unsafe {
+                peer_connection::on_ice_gathering_state_change(
+                    self.handle.get(),
+                    Callback::from_fn_mut(move |v| {
+                        h(ice_gathering_state_from_int(v));
                     })
                     .into_dart(),
                 )

@@ -20,6 +20,7 @@ pub use self::string::{
 };
 #[doc(inline)]
 pub use self::{completer::Completer, function::Function};
+use crate::platform::IceGatheringState;
 
 /// Extension for the [`ptr::NonNull`] for unboxing it to the underlying value.
 pub trait NonNullDartValueArgExt<T> {
@@ -63,6 +64,17 @@ pub fn peer_connection_state_from_int(i: i32) -> PeerConnectionState {
         3 => PeerConnectionState::Disconnected,
         4 => PeerConnectionState::Failed,
         5 => PeerConnectionState::Closed,
+        _ => unreachable!(),
+    }
+}
+
+/// Returns [`IceGatheringState`] based on the provided enum index.
+#[must_use]
+pub fn ice_gathering_state_from_int(i: i32) -> IceGatheringState {
+    match i {
+        0 => IceGatheringState::New,
+        1 => IceGatheringState::Gathering,
+        2 => IceGatheringState::Complete,
         _ => unreachable!(),
     }
 }

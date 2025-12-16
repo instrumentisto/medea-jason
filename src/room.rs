@@ -1809,6 +1809,33 @@ impl PeerEventHandler for InnerRoom {
         Ok(())
     }
 
+    /// Handles [`PeerEvent::IceGatheringStateChanged`].
+    ///
+    /// Passes current [`PeerConnectionState`] if
+    /// [`platform::IceGatheringState::Complete`].
+    async fn on_ice_gathering_state_changed(
+        &self,
+        peer_id: PeerId,
+        ice_gathering_state: platform::IceGatheringState,
+    ) -> Self::Output {
+        let Some(peer) = self.peers.get(peer_id) else { return Ok(()) };
+
+        // Handles a special case when ICE restart hasn't changed
+        // IceConnectionState or PeerConnectionState so this explicitly
+        // emits current PeerConnectionState when ICE gathering is completed
+        if matches!(ice_gathering_state, platform::IceGatheringState::Complete)
+        {
+            return self
+                .on_peer_connection_state_changed(
+                    peer_id,
+                    peer.connection_state(),
+                )
+                .await;
+        }
+
+        Ok(())
+    }
+
     /// Handles [`PeerEvent::PeerConnectionStateChanged`] event and sends new
     /// state to the RPC server.
     async fn on_peer_connection_state_changed(

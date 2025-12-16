@@ -24,6 +24,7 @@ void registerFunctions(DynamicLibrary dl) {
     onIceCandidate: _onIceCandidate,
     onIceCandidateError: _onIceCandidateError,
     onIceConnectionStateChange: _onIceConnectionStateChange,
+    onIceGatheringStateChange: _onIceGatheringStateChange,
     newPeer: _newPeer,
     addTransceiver: _addTransceiver,
     createOffer: _createOffer,
@@ -94,6 +95,16 @@ void _onIceConnectionStateChange(Object conn, Object f) {
   conn as PeerConnection;
   f as Function;
   conn.onIceConnectionStateChange((e) {
+    f(e.index);
+  });
+}
+
+/// Sets the provided [f] to the [PeerConnection.onIceGatheringStateChange]
+/// callback.
+void _onIceGatheringStateChange(Object conn, Object f) {
+  conn as PeerConnection;
+  f as Function;
+  conn.onIceGatheringStateChange((e) {
     f(e.index);
   });
 }

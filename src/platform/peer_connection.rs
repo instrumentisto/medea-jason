@@ -25,6 +25,31 @@ pub enum SdpType {
     Answer(String),
 }
 
+/// Representation of [RTCIceGatheringState][1] enum.
+///
+/// [1]: https://w3.org/TR/webrtc/#rtcicegatheringstate-enum
+#[derive(Clone, Copy, Debug, Display, PartialEq, Eq)]
+pub enum IceGatheringState {
+    /// Any of the [RTCIceTransport][0]s are in the [`IceGatheringState::New`]
+    /// gathering state and none of the transports are in the
+    /// [`IceGatheringState::Gathering`] state, or there are no transports.
+    ///
+    /// [0]: https://w3.org/TR/webrtc/#dom-rtcicetransport
+    New,
+
+    /// Any of the [RTCIceTransport][0]s are in the
+    /// [`IceGatheringState::Gathering`] state.
+    ///
+    /// [0]: https://w3.org/TR/webrtc/#dom-rtcicetransport
+    Gathering,
+
+    /// At least one [RTCIceTransport][0] exists, and all [RTCIceTransport][0]s
+    /// are in the [`IceGatheringState::Complete`].
+    ///
+    /// [0]: https://w3.org/TR/webrtc/#dom-rtcicetransport
+    Complete,
+}
+
 /// [RTCIceCandidate][1] representation.
 ///
 /// [1]: https://w3.org/TR/webrtc#rtcicecandidate-interface
