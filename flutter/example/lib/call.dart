@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
@@ -90,6 +91,13 @@ class Call {
     bool fakeMedia,
     bool isSFUMode,
   ) async {
+    await webrtc.setupForegroundService(
+      webrtc.ForegroundServiceConfig(
+        notificationTitle: 'medea-jason',
+        notificationText: 'Ongoing call',
+      ),
+    );
+
     if (fakeMedia) {
       await webrtc.initFfiBridge();
       await webrtc.enableFakeMedia();
@@ -111,10 +119,10 @@ class Call {
 
       if (publishAudio) {
         audioDeviceId = devices
-            .firstWhere(
+            .firstWhereOrNull(
               (element) => element.kind() == MediaDeviceKind.audioInput,
             )
-            .deviceId();
+            ?.deviceId();
         constraints.deviceAudio(DeviceAudioTrackConstraints());
       }
 

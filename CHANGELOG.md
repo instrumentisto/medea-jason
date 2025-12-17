@@ -24,7 +24,7 @@ All user visible changes to this project will be documented in this file. This p
 
 - `DisplayAudioTrackConstraints` and `MediaStreamSettings.display_audio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
 - `ConnectionHandle.get_state()` and `ConnectionHandle.on_state_change()` for tracking connection with remote member in P2P mode. ([#229])
-- `Jason.network_changed()` for instant reconnection of all signalling and ICE transports. ([#236], [#252])
+- `Jason.network_changed()` for instant reconnection of all signalling and ICE transports. ([#236], [#255])
 - `RoomCloseKind` enumeration to reflect why `Room` was closed. ([#244])
 - RTC stats scraping interval configuration via `Event::PeerCreated`. ([#249], [#250])
 
@@ -49,7 +49,7 @@ All user visible changes to this project will be documented in this file. This p
 [#244]: https://github.com/instrumentisto/medea-jason/pull/244
 [#249]: https://github.com/instrumentisto/medea-jason/pull/249
 [#250]: https://github.com/instrumentisto/medea-jason/pull/250
-[#252]: https://github.com/instrumentisto/medea-jason/pull/252
+[#255]: https://github.com/instrumentisto/medea-jason/pull/255
 [095368cb]: https://github.com/instrumentisto/medea-jason/commit/095368cb2e5dd6faca44882955b7cab6b19d8ad2
 [`cargo-ndk` 4.0 version]: https://github.com/bbqsrc/cargo-ndk/blob/v4.0.0/CHANGELOG.md#v400---2025-07-30
 

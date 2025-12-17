@@ -19,12 +19,13 @@ dependencies:
   medea_jason:
     path: ../
 
+  collection: ^1.19.1
   cupertino_icons: ^1.0.2
   device_info_plus: ^11.4.0
   faker_dart: ^0.2.2
   freezed_annotation: ^3.1.0
   http: ">=0.13.6 <2.0.0"
-  medea_flutter_webrtc: 0.16.0-dev+rev.730ba5fff73959a253534f7b2a647092509df575
+  medea_flutter_webrtc: 0.16.0-dev+rev.dbeb882f303db1e9c3b219eb8cde5fab95b6fe6e
   retry: ^3.1.2
 
 dev_dependencies:

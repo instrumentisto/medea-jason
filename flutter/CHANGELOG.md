@@ -26,7 +26,7 @@ All user visible changes to this project will be documented in this file. This p
 
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
 - `DisplayAudioTrackConstraints` and `MediaStreamSettings.displayAudio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
-- `Jason.networkChanged()` for instant reconnection of all signalling and ICE transports. ([#236], [#252])
+- `Jason.networkChanged()` for instant reconnection of all signalling and ICE transports. ([#236], [#255])
 - `RoomCloseKind` enumeration to reflect why `Room` was closed. ([#244])
 - `AudioDeviceKind` enumeration and `MediaDeviceDetails.audioDeviceKind()` to reflect the nature of an audio recording/playout devices on [iOS] and [Android]. ([#248])
 
@@ -40,7 +40,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`medea_flutter_webrtc`] to 0.16.0 version. ([#231])
+    - [`medea_flutter_webrtc`] to 0.16.0 version. ([#231], [#252])
 
 [#224]: https://github.com/instrumentisto/medea-jason/issues/224
 [#225]: https://github.com/instrumentisto/medea-jason/pull/225
@@ -55,6 +55,7 @@ All user visible changes to this project will be documented in this file. This p
 [#247]: https://github.com/instrumentisto/medea-jason/pull/247
 [#248]: https://github.com/instrumentisto/medea-jason/pull/248
 [#252]: https://github.com/instrumentisto/medea-jason/pull/252
+[#255]: https://github.com/instrumentisto/medea-jason/pull/255
 
 
 
