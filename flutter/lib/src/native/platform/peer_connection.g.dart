@@ -9,6 +9,7 @@ typedef _ErrorSetterFnDart = void Function(Object);
 
 int Function(Object)? _iceConnectionState;
 void Function(Object, Object)? _onConnectionStateChange;
+void Function(Object, Object)? _onIceGatheringStateChange;
 int Function(Object)? _connectionState;
 void Function(Object)? _restartIce;
 Object Function(Object)? _rollback;
@@ -29,6 +30,7 @@ void Function(Object)? _close;
 
 _ErrorSetterFnDart? _peer_connection__ice_connection_state__set_error;
 _ErrorSetterFnDart? _peer_connection__on_connection_state_change__set_error;
+_ErrorSetterFnDart? _peer_connection__on_ice_gathering_state_change__set_error;
 _ErrorSetterFnDart? _peer_connection__connection_state__set_error;
 _ErrorSetterFnDart? _peer_connection__restart_ice__set_error;
 _ErrorSetterFnDart? _peer_connection__rollback__set_error;
@@ -51,6 +53,7 @@ void registerFunction(
   DynamicLibrary dl, {
   required int Function(Object) iceConnectionState,
   required void Function(Object, Object) onConnectionStateChange,
+  required void Function(Object, Object) onIceGatheringStateChange,
   required int Function(Object) connectionState,
   required void Function(Object) restartIce,
   required Object Function(Object) rollback,
@@ -73,6 +76,7 @@ void registerFunction(
 }) {
   _iceConnectionState = iceConnectionState;
   _onConnectionStateChange = onConnectionStateChange;
+  _onIceGatheringStateChange = onIceGatheringStateChange;
   _connectionState = connectionState;
   _restartIce = restartIce;
   _rollback = rollback;
@@ -98,6 +102,10 @@ void registerFunction(
   _peer_connection__on_connection_state_change__set_error = dl
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
         'peer_connection__on_connection_state_change__set_error',
+      );
+  _peer_connection__on_ice_gathering_state_change__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'peer_connection__on_ice_gathering_state_change__set_error',
       );
   _peer_connection__connection_state__set_error = dl
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
@@ -174,6 +182,10 @@ void registerFunction(
   onConnectionStateChange_native = Pointer.fromFunction(
     _onConnectionStateChangeProxy,
   );
+  Pointer<NativeFunction<Void Function(Handle, Handle)>>
+  onIceGatheringStateChange_native = Pointer.fromFunction(
+    _onIceGatheringStateChangeProxy,
+  );
   Pointer<NativeFunction<Int32 Function(Handle)>> connectionState_native =
       Pointer.fromFunction(_connectionStateProxy, 0);
   Pointer<NativeFunction<Void Function(Handle)>> restartIce_native =
@@ -234,8 +246,10 @@ void registerFunction(
       Pointer,
       Pointer,
       Pointer,
+      Pointer,
     ),
     void Function(
+      Pointer,
       Pointer,
       Pointer,
       Pointer,
@@ -259,6 +273,7 @@ void registerFunction(
   >('register_peer_connection')(
     iceConnectionState_native,
     onConnectionStateChange_native,
+    onIceGatheringStateChange_native,
     connectionState_native,
     restartIce_native,
     rollback_native,
@@ -293,6 +308,15 @@ void _onConnectionStateChangeProxy(Object arg0, Object arg1) {
     return _onConnectionStateChange!(arg0, arg1);
   } catch (e) {
     _peer_connection__on_connection_state_change__set_error!(e);
+    return;
+  }
+}
+
+void _onIceGatheringStateChangeProxy(Object arg0, Object arg1) {
+  try {
+    return _onIceGatheringStateChange!(arg0, arg1);
+  } catch (e) {
+    _peer_connection__on_ice_gathering_state_change__set_error!(e);
     return;
   }
 }

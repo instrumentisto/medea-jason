@@ -217,7 +217,7 @@ pub enum PeerEvent {
 
     /// [`platform::RtcPeerConnection`]'s [connection][1] state changed.
     ///
-    /// [1]: https://w3.org/TR/webrtc#dfn-ice-connection-state
+    /// [1]: https://w3.org/TR/webrtc#dom-peerconnection-connection-state
     PeerConnectionStateChanged {
         /// ID of the [`PeerConnection`] that sends
         /// [`connectionstatechange`][1] event.
@@ -227,6 +227,21 @@ pub enum PeerEvent {
 
         /// New [`PeerConnectionState`].
         peer_connection_state: PeerConnectionState,
+    },
+
+    /// [`platform::RtcPeerConnection`]'s [iceGatheringState][1] property has
+    /// changed.
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-peerconnection-ice-gathering-state
+    IceGatheringStateChanged {
+        /// ID of the [`PeerConnection`] that sends
+        /// [`icegatheringstatechange`][1] event.
+        ///
+        /// [1]: https://w3.org/TR/webrtc#event-icegatheringstatechange
+        peer_id: Id,
+
+        /// New [`platform::IceGatheringState`].
+        ice_gathering_state: platform::IceGatheringState,
     },
 
     /// [`platform::RtcPeerConnection`]'s [`platform::RtcStats`] update.
@@ -479,6 +494,22 @@ impl PeerConnection {
                 }
             }));
         }
+
+        {
+            let id = self.id;
+            let weak_sender = Rc::downgrade(&self.peer_events_sender);
+            self.peer.on_ice_gathering_state_change(Some(
+                move |ice_gathering_state_change| {
+                    if let Some(sender) = weak_sender.upgrade() {
+                        Self::on_ice_gathering_state_change(
+                            id,
+                            &sender,
+                            ice_gathering_state_change,
+                        );
+                    }
+                },
+            ));
+        }
     }
 
     /// Handles [`TrackEvent`]s emitted from a [`Sender`] or a [`Receiver`].
@@ -664,6 +695,20 @@ impl PeerConnection {
         drop(sender.unbounded_send(PeerEvent::PeerConnectionStateChanged {
             peer_id,
             peer_connection_state,
+        }));
+    }
+
+    /// Handles `icegatheringstatechange` event from the underlying peer
+    /// emitting [`PeerEvent::IceGatheringStateChanged`] event into this peer's
+    /// `peer_events_sender`.
+    fn on_ice_gathering_state_change(
+        peer_id: Id,
+        sender: &mpsc::UnboundedSender<PeerEvent>,
+        ice_gathering_state: platform::IceGatheringState,
+    ) {
+        drop(sender.unbounded_send(PeerEvent::IceGatheringStateChanged {
+            peer_id,
+            ice_gathering_state,
         }));
     }
 
@@ -1002,6 +1047,11 @@ impl PeerConnection {
     /// provided [`TrackId`] from this [`PeerConnection`].
     pub fn remove_track(&self, track_id: TrackId) {
         self.media_connections.remove_track(track_id);
+    }
+
+    /// Returns the [`PeerConnectionState`] of this [`PeerConnection`].
+    pub fn connection_state(&self) -> PeerConnectionState {
+        self.peer.connection_state()
     }
 }
 
