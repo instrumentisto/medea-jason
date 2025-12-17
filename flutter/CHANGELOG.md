@@ -26,7 +26,7 @@ All user visible changes to this project will be documented in this file. This p
 
 - `ConnectionHandle.getState()` and `ConnectionHandle.onStateChange()` for tracking connection with remote member in P2P mode. ([#229])
 - `DisplayAudioTrackConstraints` and `MediaStreamSettings.displayAudio()` to capture system audio (only works in Chrome and Windows desktop). ([#225], [#224])
-- `Jason.networkChanged()` for instant reconnection of all signalling and ICE transports. ([#236])
+- `Jason.networkChanged()` for instant reconnection of all signalling and ICE transports. ([#236], [#252])
 - `RoomCloseKind` enumeration to reflect why `Room` was closed. ([#244])
 - `AudioDeviceKind` enumeration and `MediaDeviceDetails.audioDeviceKind()` to reflect the nature of an audio recording/playout devices on [iOS] and [Android]. ([#248])
 

@@ -16,19 +16,21 @@ use tracerr::Traced;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
-    RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
-    RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceErrorEvent,
-    RtcPeerConnectionIceEvent, RtcPeerConnectionState, RtcRtpTransceiver,
-    RtcSdpType, RtcSessionDescription, RtcSessionDescriptionInit,
-    RtcStatsReport, RtcTrackEvent,
+    RtcIceConnectionState, RtcIceGatheringState, RtcIceTransportPolicy,
+    RtcOfferOptions, RtcPeerConnection as SysRtcPeerConnection,
+    RtcPeerConnectionIceErrorEvent, RtcPeerConnectionIceEvent,
+    RtcPeerConnectionState, RtcRtpTransceiver, RtcSdpType,
+    RtcSessionDescription, RtcSessionDescriptionInit, RtcStatsReport,
+    RtcTrackEvent,
 };
 
 use super::ice_server::RtcIceServers;
 use crate::{
     media::MediaKind,
     platform::{
-        self, IceCandidate, IceCandidateError, MediaStreamTrack,
-        RtcPeerConnectionError, RtcStats, SdpType, Transceiver,
+        self, IceCandidate, IceCandidateError, IceGatheringState,
+        MediaStreamTrack, RtcPeerConnectionError, RtcStats, SdpType,
+        Transceiver,
         wasm::{transceiver::TransceiverInit, utils::EventListener},
     },
 };
@@ -89,16 +91,26 @@ pub struct RtcPeerConnection {
 
     /// [`connectionstatechange`][2] callback of [RTCPeerConnection][1],
     /// fires whenever the aggregate state of the connection changes.
+    ///
     /// The aggregate state is a combination of the states of all individual
     /// network transports being used by the connection.
-    ///
-    /// Implemented in Chrome and Safari.
-    /// Tracking issue for Firefox:
-    /// <https://bugzilla.mozilla.org/show_bug.cgi?id=1265827>
     ///
     /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     /// [2]: https://w3.org/TR/webrtc#event-connectionstatechange
     on_connection_state_changed:
+        RefCell<Option<EventListener<SysRtcPeerConnection, Event>>>,
+
+    /// [`icegatheringstatechange`][1] callback of [RTCPeerConnection][1],
+    /// fires when the state of the [ICE] candidate gathering process changes.
+    ///
+    /// This signifies that the value of the connection's [iceGatheringState][3]
+    /// property has changed.
+    ///
+    /// [ICE]: https://webrtcglossary.com/ice
+    /// [1]: https://w3.org/TR/webrtc#event-icegatheringstatechange
+    /// [2]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
+    /// [3]: https://w3.org/TR/webrtc#dom-peerconnection-ice-gathering-state
+    on_ice_gathering_state_changed:
         RefCell<Option<EventListener<SysRtcPeerConnection, Event>>>,
 
     /// [`ontrack`][2] callback of [RTCPeerConnection][1] to handle
@@ -148,6 +160,7 @@ impl RtcPeerConnection {
             on_ice_candidate: RefCell::new(None),
             on_ice_candidate_error: RefCell::new(None),
             on_ice_connection_state_changed: RefCell::new(None),
+            on_ice_gathering_state_changed: RefCell::new(None),
             on_connection_state_changed: RefCell::new(None),
             on_track: RefCell::new(None),
         })
@@ -196,8 +209,8 @@ impl RtcPeerConnection {
             None => on_track.take(),
             Some(mut f) => {
                 on_track.replace(
-                    // Unwrapping is OK here, because this function shouldn't
-                    // error ever.
+                    // PANIC: Unwrapping is OK here, because this function
+                    //        shouldn't error ever.
                     EventListener::new_mut(
                         Rc::clone(&self.peer),
                         "track",
@@ -236,8 +249,8 @@ impl RtcPeerConnection {
             None => on_ice_candidate_error.take(),
             Some(mut f) => {
                 on_ice_candidate_error.replace(
-                    // Unwrapping is OK here, because this function shouldn't
-                    // error ever.
+                    // PANIC: Unwrapping is OK here, because this function
+                    //        shouldn't error ever.
                     EventListener::new_mut(
                         Rc::clone(&self.peer),
                         "icecandidateerror",
@@ -277,14 +290,14 @@ impl RtcPeerConnection {
             None => on_ice_candidate.take(),
             Some(mut f) => {
                 on_ice_candidate.replace(
-                    // Unwrapping is OK here, because this function shouldn't
-                    // error ever.
+                    // PANIC: Unwrapping is OK here, because this function
+                    //        shouldn't error ever.
                     EventListener::new_mut(
                         Rc::clone(&self.peer),
                         "icecandidate",
                         move |msg: RtcPeerConnectionIceEvent| {
-                            // None candidate means that all ICE transports have
-                            // finished gathering candidates.
+                            // `None` candidate means that all ICE transports
+                            // have finished gathering candidates.
                             // Doesn't need to be delivered onward to the remote
                             // peer.
                             if let Some(c) = msg.candidate() {
@@ -302,13 +315,13 @@ impl RtcPeerConnection {
         });
     }
 
-    /// Returns [`RtcIceConnectionState`] of this [`RtcPeerConnection`].
+    /// Returns the [`IceConnectionState`] of this [`RtcPeerConnection`].
     #[must_use]
     pub fn ice_connection_state(&self) -> IceConnectionState {
         parse_ice_connection_state(self.peer.ice_connection_state())
     }
 
-    /// Returns [`PeerConnectionState`] of this [`RtcPeerConnection`].
+    /// Returns the [`PeerConnectionState`] of this [`RtcPeerConnection`].
     #[must_use]
     pub fn connection_state(&self) -> PeerConnectionState {
         parse_peer_connection_state(self.peer.connection_state())
@@ -333,8 +346,8 @@ impl RtcPeerConnection {
             Some(mut f) => {
                 let peer = Rc::clone(&self.peer);
                 on_ice_connection_state_changed.replace(
-                    // Unwrapping is OK here, because this function shouldn't
-                    // error ever.
+                    // PANIC: Unwrapping is OK here, because this function
+                    //        shouldn't error ever.
                     EventListener::new_mut(
                         Rc::clone(&self.peer),
                         "iceconnectionstatechange",
@@ -369,8 +382,8 @@ impl RtcPeerConnection {
             Some(mut f) => {
                 let peer = Rc::clone(&self.peer);
                 on_connection_state_changed.replace(
-                    // Unwrapping is OK here, because this function shouldn't
-                    // error ever.
+                    // PANIC: Unwrapping is OK here, because this function
+                    //        shouldn't error ever.
                     EventListener::new_mut(
                         Rc::clone(&self.peer),
                         "connectionstatechange",
@@ -389,6 +402,44 @@ impl RtcPeerConnection {
             }
         });
     }
+
+    /// Sets handler for an [`icegatheringstatechange`][1] event.
+    ///
+    /// # Panics
+    ///
+    /// If binding to the [`icegatheringstatechange`][1] event fails. Not
+    /// supposed to ever happen.
+    ///
+    /// [1]: https://w3.org/TR/webrtc/#event-icegatheringstatechange
+    pub fn on_ice_gathering_state_change<F>(&self, f: Option<F>)
+    where
+        F: 'static + FnMut(IceGatheringState),
+    {
+        let mut on_ice_gathering_state_changed =
+            self.on_ice_gathering_state_changed.borrow_mut();
+        drop(match f {
+            None => on_ice_gathering_state_changed.take(),
+            Some(mut f) => {
+                let peer = Rc::clone(&self.peer);
+                on_ice_gathering_state_changed.replace(
+                    // PANIC: Unwrapping is OK here, because this function
+                    //        shouldn't error ever.
+                    EventListener::new_mut(
+                        Rc::clone(&self.peer),
+                        "icegatheringstatechange",
+                        move |_| {
+                            f(parse_ice_gathering_state(
+                                peer.as_ref().ice_gathering_state(),
+                            ));
+                        },
+                    )
+                    .unwrap(),
+                )
+            }
+        });
+    }
+
+    //
 
     /// Adds remote [RTCPeerConnection][1]'s [ICE candidate][2] to this
     /// [`RtcPeerConnection`].
@@ -656,6 +707,7 @@ impl Drop for RtcPeerConnection {
         drop(self.on_ice_candidate.borrow_mut().take());
         drop(self.on_ice_candidate_error.borrow_mut().take());
         drop(self.on_ice_connection_state_changed.borrow_mut().take());
+        drop(self.on_ice_gathering_state_changed.borrow_mut().take());
         drop(self.on_connection_state_changed.borrow_mut().take());
         self.peer.close();
     }
@@ -676,12 +728,13 @@ fn parse_peer_connection_state(
         S::Failed => PeerConnectionState::Failed,
         S::Closed => PeerConnectionState::Closed,
         _ => {
-            unreachable!("unknown `RtcPeerConnectionState::{state:?}`");
+            unreachable!("unknown `RtcPeerConnectionState`: `{state:?}`");
         }
     }
 }
 
-/// Parses a [`IceConnectionState`] out of the given [`RtcIceConnectionState`].
+/// Parses an [`IceConnectionState`] out of the provided
+/// [`RtcIceConnectionState`].
 fn parse_ice_connection_state(
     state: RtcIceConnectionState,
 ) -> IceConnectionState {
@@ -696,7 +749,22 @@ fn parse_ice_connection_state(
         S::Disconnected => IceConnectionState::Disconnected,
         S::Closed => IceConnectionState::Closed,
         _ => {
-            unreachable!("unknown `IceConnectionState::{state:?}`");
+            unreachable!("unknown `RtcIceConnectionState`: `{state:?}`");
+        }
+    }
+}
+
+/// Parses an [`IceGatheringState`] out of the provided
+/// [`RtcIceGatheringState`].
+fn parse_ice_gathering_state(state: RtcIceGatheringState) -> IceGatheringState {
+    use RtcIceGatheringState as S;
+
+    match state {
+        S::New => IceGatheringState::New,
+        S::Gathering => IceGatheringState::Gathering,
+        S::Complete => IceGatheringState::Complete,
+        _ => {
+            unreachable!("unknown `RtcIceGatheringState`: `{state:?}`");
         }
     }
 }

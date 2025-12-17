@@ -24,7 +24,8 @@ pub use self::{
     callback::Callback,
     codec_capability::get_capabilities,
     peer_connection::{
-        IceCandidate, IceCandidateError, RtcPeerConnectionError, SdpType,
+        IceCandidate, IceCandidateError, IceGatheringState,
+        RtcPeerConnectionError, SdpType,
     },
     rtc_stats::RtcStatsError,
     send_encoding_parameters::SendEncodingParameters,
