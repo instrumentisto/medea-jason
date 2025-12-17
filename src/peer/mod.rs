@@ -232,7 +232,7 @@ pub enum PeerEvent {
     /// [`platform::RtcPeerConnection`]'s [iceGatheringState][1] property has
     /// changed.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-peerconnection-ice-gathering-state
+    /// [1]: https://w3.org/TR/webrtc#dom-peerconnection-ice-gathering-state
     IceGatheringStateChanged {
         /// ID of the [`PeerConnection`] that sends
         /// [`icegatheringstatechange`][1] event.
@@ -1049,7 +1049,7 @@ impl PeerConnection {
         self.media_connections.remove_track(track_id);
     }
 
-    /// Returns [`PeerConnectionState`] of this [`PeerConnection`].
+    /// Returns the [`PeerConnectionState`] of this [`PeerConnection`].
     pub fn connection_state(&self) -> PeerConnectionState {
         self.peer.connection_state()
     }

@@ -60,9 +60,10 @@ mod peer_connection {
             cb: Dart_Handle,
         ) -> Result<(), Error>;
 
-        /// Sets handler for a [`icegatheringstatechange`][1] event.
+        /// Sets the provided callback to an [`icegatheringstatechange`][1]
+        /// event of the provided [`PeerConnection`].
         ///
-        /// [1]: https://w3.org/TR/webrtc/#event-icegatheringstatechange
+        /// [1]: https://w3.org/TR/webrtc#event-icegatheringstatechange
         pub fn on_ice_gathering_state_change(
             peer: Dart_Handle,
             cb: Dart_Handle,
@@ -370,14 +371,9 @@ impl RtcPeerConnection {
         }
     }
 
-    /// Sets handler for a [`icegatheringstatechange`][1] event.
+    /// Sets `handler` for an [`icegatheringstatechange`][1] event.
     ///
-    /// # Panics
-    ///
-    /// If binding to the [`icegatheringstatechange`][1] event fails. Not
-    /// supposed to ever happen.
-    ///
-    /// [1]: https://w3.org/TR/webrtc/#event-icegatheringstatechange
+    /// [1]: https://w3.org/TR/webrtc#event-icegatheringstatechange
     pub fn on_ice_gathering_state_change<F>(&self, handler: Option<F>)
     where
         F: 'static + FnMut(IceGatheringState),

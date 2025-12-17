@@ -39,7 +39,7 @@ impl<T> NonNullDartValueArgExt<T> for ptr::NonNull<T> {
     }
 }
 
-/// Returns [`IceConnectionState`] based on the provided enum index.
+/// Returns an [`IceConnectionState`] based on the provided enum index.
 #[must_use]
 pub fn ice_connection_from_int(i: i32) -> IceConnectionState {
     match i {
@@ -54,7 +54,7 @@ pub fn ice_connection_from_int(i: i32) -> IceConnectionState {
     }
 }
 
-/// Returns [`PeerConnectionState`] based on the provided enum index.
+/// Returns a [`PeerConnectionState`] based on the provided enum index.
 #[must_use]
 pub fn peer_connection_state_from_int(i: i32) -> PeerConnectionState {
     match i {
@@ -68,7 +68,7 @@ pub fn peer_connection_state_from_int(i: i32) -> PeerConnectionState {
     }
 }
 
-/// Returns [`IceGatheringState`] based on the provided enum index.
+/// Returns an [`IceGatheringState`] based on the provided enum index.
 #[must_use]
 pub fn ice_gathering_state_from_int(i: i32) -> IceGatheringState {
     match i {
