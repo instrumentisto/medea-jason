@@ -197,7 +197,7 @@ impl Transceiver {
             // uniformity.
             let active = new_track.is_some();
             let params = self.get_send_parameters().await;
-            for encoding in params.encodings().iter() {
+            for encoding in &params.encodings().iter() {
                 encoding.set_active(active);
             }
             self.set_send_parameters(params).await?;
