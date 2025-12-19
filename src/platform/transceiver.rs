@@ -59,7 +59,7 @@ impl Transceiver {
         &self,
         updated_encodings: &[proto::EncodingParameters],
     ) -> Result<(), UpdateSendEncodingError> {
-        let params = self.get_send_parameters().await;
+        let params = self.get_send_parameters().await?;
         let current_encodings = params.encodings();
 
         if updated_encodings.len() != current_encodings.len() {

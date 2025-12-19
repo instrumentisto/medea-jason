@@ -189,14 +189,14 @@ impl Transceiver {
             //
             // Ideally this should be fixed in medea-flutter-webrtc with a
             // custom AudioDeviceModule. But since we are not expecting to have
-            // multiple local audio tracks (thus have to wire specific track to
-            // specific transceiver) on mobile platforms, and the only issue
-            // is that a single audio track is being sent multiple times, this
-            // seems to be too much effort. Moreover, the only reason why we
-            // have two audio transceivers on mobile platforms is code
+            // multiple local audio tracks (thus do not need to wire specific
+            // track to specific transceiver) on mobile platforms, and the only
+            // issue is that a single audio track is being sent multiple times,
+            // this seems to be too much effort. Moreover, the only reason why
+            // we have two audio transceivers on mobile platforms is code
             // uniformity.
             let active = new_track.is_some();
-            let params = self.get_send_parameters().await;
+            let params = self.get_send_parameters().await?;
             for encoding in params.encodings() {
                 encoding.set_active(active);
             }
@@ -243,14 +243,22 @@ impl Transceiver {
 
     /// Returns [`SendParameters`] of the underlying [RTCRtpSender].
     ///
+    /// # Errors
+    ///
+    /// With [`platform::Error`] on unexpected platform errors from
+    /// [getParameters()][1] call.
+    ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-    pub async fn get_send_parameters(&self) -> SendParameters {
+    /// [1]: https://www.w3.org/TR/webrtc/#dom-rtcrtpsender-getparameters
+    pub async fn get_send_parameters(
+        &self,
+    ) -> Result<SendParameters, platform::Error> {
         let fut =
             unsafe { transceiver::get_send_parameters(self.0.get()) }.unwrap();
         let params: DartHandle =
-            unsafe { FutureFromDart::execute(fut) }.await.unwrap();
+            unsafe { FutureFromDart::execute(fut) }.await?;
 
-        SendParameters::from(params)
+        Ok(SendParameters::from(params))
     }
 
     /// Sets [`SendParameters`] into the underlying [RTCRtpSender].

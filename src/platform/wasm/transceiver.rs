@@ -139,10 +139,18 @@ impl Transceiver {
 
     /// Returns [`SendParameters`] of the underlying [RTCRtpSender].
     ///
+    /// # Errors
+    ///
+    /// With [`platform::Error`] on unexpected platform errors from
+    /// [getParameters()][1] call.
+    ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    /// [1]: https://www.w3.org/TR/webrtc/#dom-rtcrtpsender-getparameters
     #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
-    pub async fn get_send_parameters(&self) -> SendParameters {
-        SendParameters::from(self.0.sender().get_parameters())
+    pub async fn get_send_parameters(
+        &self,
+    ) -> Result<SendParameters, platform::Error> {
+        Ok(SendParameters::from(self.0.sender().get_parameters()))
     }
 
     /// Sets [`SendParameters`] into the underlying [RTCRtpSender].
