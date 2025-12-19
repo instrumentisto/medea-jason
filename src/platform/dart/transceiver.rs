@@ -175,26 +175,26 @@ impl Transceiver {
     ) -> Result<(), platform::Error> {
         #[cfg(any(target_os = "ios", target_os = "android"))]
         {
-            // TODO: Fix in libwebrtc / medea-flutter-webrtc once it would
+            // TODO: Fix in `libwebrtc-bin`/`medea-flutter-webrtc` once it would
             //       make more sense.
-            // Workaround for the problem that libwebrtc's voice engine’s
-            // AudioSendStream is fed by the global AudioState whenever a
-            // send stream is started, even if no AudioSource/track is wired.
+            // Workaround for the problem that `libwebrtc`'s voice engine’s
+            // `AudioSendStream` is fed by the global `AudioState` whenever a
+            // send stream is started, even if no `AudioSource`/track is wired.
             //
-            // So what happens is that once local audio track is created and
-            // there are active audio sendonly/sendercv transceivers with ssrc
-            // then this audio track will be sent from all these transceivers.
-            // Event without wiring track to transceivers with replaceTrack
-            // (setTrack).
+            // So, what happens is that once local audio track is created and
+            // there are active audio `sendonly`/`sendercv` transceivers with
+            // `ssrc` then this audio track will be sent from all these
+            // transceivers. Event without wiring track to transceivers with
+            // `replaceTrack` (or `setTrack`).
             //
-            // Ideally this should be fixed in medea-flutter-webrtc with a
-            // custom AudioDeviceModule. But since we are not expecting to have
-            // multiple local audio tracks (thus do not need to wire specific
-            // track to specific transceiver) on mobile platforms, and the only
-            // issue is that a single audio track is being sent multiple times,
-            // this seems to be too much effort. Moreover, the only reason why
-            // we have two audio transceivers on mobile platforms is code
-            // uniformity.
+            // Ideally, this should be fixed in `medea-flutter-webrtc` with a
+            // custom `AudioDeviceModule`. But since we are not expecting to
+            // have multiple local audio tracks (thus do not need to wire
+            // specific track to specific transceiver) on mobile platforms, and
+            // the only issue is that a single audio track is being sent
+            // multiple times, this seems to be too much effort. Moreover, the
+            // only reason why we have two audio transceivers on mobile
+            // platforms is code uniformity.
             let active = new_track.is_some();
             let params = self.get_send_parameters().await?;
             for encoding in params.encodings() {
@@ -245,11 +245,11 @@ impl Transceiver {
     ///
     /// # Errors
     ///
-    /// With [`platform::Error`] on unexpected platform errors from
+    /// With a [`platform::Error`] on unexpected platform errors from
     /// [getParameters()][1] call.
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-    /// [1]: https://www.w3.org/TR/webrtc/#dom-rtcrtpsender-getparameters
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-getparameters
     pub async fn get_send_parameters(
         &self,
     ) -> Result<SendParameters, platform::Error> {

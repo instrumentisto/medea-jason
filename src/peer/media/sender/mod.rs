@@ -329,7 +329,7 @@ impl Sender {
     /// On unexpected platform error from [getParameters()][1] call.
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-    /// [1]: https://www.w3.org/TR/webrtc/#dom-rtcrtpsender-getparameters
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-getparameters
     #[expect(clippy::unwrap_used, reason = "only used in tests")]
     pub async fn get_send_encodings(
         &self,

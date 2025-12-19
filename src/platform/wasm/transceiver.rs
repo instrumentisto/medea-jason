@@ -141,11 +141,11 @@ impl Transceiver {
     ///
     /// # Errors
     ///
-    /// With [`platform::Error`] on unexpected platform errors from
+    /// With a [`platform::Error`] on unexpected platform errors from
     /// [getParameters()][1] call.
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-    /// [1]: https://www.w3.org/TR/webrtc/#dom-rtcrtpsender-getparameters
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-getparameters
     #[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
     pub async fn get_send_parameters(
         &self,
