@@ -330,8 +330,6 @@ impl Sender {
     ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
     /// [1]: https://www.w3.org/TR/webrtc/#dom-rtcrtpsender-getparameters
-    ///
-    /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
     #[expect(clippy::unwrap_used, reason = "only used in tests")]
     pub async fn get_send_encodings(
         &self,
