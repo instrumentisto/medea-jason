@@ -324,11 +324,17 @@ impl Sender {
 
     /// Returns [`Parameters`] of the underlying [RTCRtpSender].
     ///
+    /// # Panics
+    ///
+    /// On unexpected platform error from [getParameters()][1] call.
+    ///
     /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-getparameters
+    #[expect(clippy::unwrap_used, reason = "only used in tests")]
     pub async fn get_send_encodings(
         &self,
     ) -> Box<[platform::SendEncodingParameters]> {
-        self.transceiver.get_send_parameters().await.encodings()
+        self.transceiver.get_send_parameters().await.unwrap().encodings()
     }
 }
 
