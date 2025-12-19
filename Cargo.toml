@@ -1,6 +1,6 @@
 [package]
 name = "medea-jason"
-version = "0.12.0-dev"
+version = "0.12.0"
 edition = "2024"
 rust-version = "1.86"
 description = "Client library for Medea media server."
@@ -48,8 +48,8 @@ derive_more = { version = "2.0", features = ["as_ref", "debug", "deref", "displa
 flutter_rust_bridge = { version = "=2.11.1", features = ["anyhow", "dart-opaque", "rust-async"], default-features = false }
 futures = "0.3"
 log = "0.4"
-medea-client-api-proto = { version = "0.10.0-dev", path = "proto/client-api" }
-medea-macro = { path = "crates/medea-macro" }
+medea-client-api-proto = { version = "0.10.0", path = "proto/client-api" }
+medea-macro = { version = "0.3", path = "crates/medea-macro" }
 medea-reactive = { version = "0.1", path = "crates/medea-reactive" }
 mockall = { version = "0.14", optional = true }
 sealed = "0.6"
@@ -121,9 +121,6 @@ wasm-logger = "0.2"
         "RtcTrackEvent",
         "WebSocket", "Window",
     ]
-
-[build-dependencies]
-cc = "1.1"
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 instant = { version = "0.1", features = ["wasm-bindgen"] }
