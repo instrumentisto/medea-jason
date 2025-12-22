@@ -20,8 +20,8 @@ All user visible changes to this project will be documented in this file. This p
     - [`prost`] to 0.14 version. ([095368cb])
     - [`tonic`] to 0.14 version. ([095368cb])
 
-[095368cb]: https://github.com/instrumentisto/medea-jason/commit/095368cb2e5dd6faca44882955b7cab6b19d8ad2
 [#257]: https://github.com/instrumentisto/medea-jason/pull/257
+[095368cb]: https://github.com/instrumentisto/medea-jason/commit/095368cb2e5dd6faca44882955b7cab6b19d8ad2
 
 
 
