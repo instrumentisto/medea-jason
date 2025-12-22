@@ -6,7 +6,13 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.17.0] · 2025-12-22
+[0.17.0]: https://github.com/instrumentisto/medea-jason/tree/medea-control-api-proto-0.17.0/proto/control-api
+
+### BC Breaks
+
+- Dependencies:
+    - Upgraded [`medea-client-api-proto`] to 0.10.0 version. ([todo])
 
 ### Upgraded
 
