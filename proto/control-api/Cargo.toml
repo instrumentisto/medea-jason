@@ -1,6 +1,6 @@
 [package]
 name = "medea-control-api-proto"
-version = "0.16.0"
+version = "0.17.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Control API protocol implementation for Medea media server."
@@ -28,7 +28,7 @@ async-trait = "0.1.34"
 derive_more = { version = "2.0", features = ["as_ref", "display", "error", "from", "from_str", "into"] }
 futures = { version = "0.3.21", optional = true }
 humantime-serde = { version = "1.1", optional = true }
-medea-client-api-proto = { version = "0.10.0-dev", path = "../client-api", optional = true }
+medea-client-api-proto = { version = "0.10", path = "../client-api", optional = true }
 prost = { version = "0.14", optional = true }
 prost-types = { version = "0.14", optional = true }
 rand = "0.9"
