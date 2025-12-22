@@ -12,15 +12,16 @@ All user visible changes to this project will be documented in this file. This p
 ### BC Breaks
 
 - Dependencies:
-    - Upgraded [`medea-client-api-proto`] to 0.10.0 version. ([todo])
+    - Upgraded [`medea-client-api-proto`] to 0.10.0 version. ([#257])
 
 ### Upgraded
 
 - Dependencies:
-    - [`prost`] to 0.14 version. ([todo])
-    - [`tonic`] to 0.14 version. ([todo])
+    - [`prost`] to 0.14 version. ([095368cb])
+    - [`tonic`] to 0.14 version. ([095368cb])
 
-[todo]: https://github.com/instrumentisto/medea-jason/commit/todo
+[095368cb]: https://github.com/instrumentisto/medea-jason/commit/095368cb2e5dd6faca44882955b7cab6b19d8ad2
+[#257]: https://github.com/instrumentisto/medea-jason/pull/257
 
 
 
