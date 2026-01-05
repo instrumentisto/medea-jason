@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "medea_jason_example" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "medea_jason_example" "\0"
-            VALUE "LegalCopyright", "Copyright © 2022-2025 com.instrumentisto. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright © 2022-2026 com.instrumentisto. All rights reserved." "\0"
             VALUE "OriginalFilename", "medea_jason_example.exe" "\0"
             VALUE "ProductName", "medea_jason_example" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
