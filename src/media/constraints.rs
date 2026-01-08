@@ -1392,7 +1392,6 @@ impl DeviceAudioTrackConstraints {
         if !self.required && another.required {
             self.required = another.required;
         }
-
         if self.auto_gain_control.is_none()
             && another.auto_gain_control.is_some()
         {

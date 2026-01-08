@@ -6,6 +6,19 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.12.0...master)
+
+### Changed
+
+- Disable audio processing in captured system audio on web (already disabled on desktops). ([#259])
+
+[#259]: https://github.com/instrumentisto/medea-jason/pull/259
+
+
+
+
 ## [0.12.0] · 2025-12-19
 [0.12.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.12.0/flutter
 

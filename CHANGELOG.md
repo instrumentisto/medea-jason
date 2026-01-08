@@ -12,7 +12,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Changed
 
-- Disable audio processing in captured system audio on web. ([#259])
+- Disable audio processing in captured system audio on web (already disabled on desktops). ([#259])
 
 [#259]: https://github.com/instrumentisto/medea-jason/pull/259
 
