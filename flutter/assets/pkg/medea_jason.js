@@ -4131,7 +4131,7 @@ async function __wbg_init(module_or_path) {
     }
 
     if (typeof module_or_path === 'undefined') {
-        module_or_path = new URL('medea_jason_bg.wasm?97e85df26ee41e9a7ae396f9f678a277bee4a36d2f759a963618b96feb36fb2d', import.meta.url);
+        module_or_path = new URL('medea_jason_bg.wasm?7779b292ab3665cfd17e8fe6259af63f399f981f3abdeee2993b47d4d85d5ee7', import.meta.url);
     }
     const imports = __wbg_get_imports();
 

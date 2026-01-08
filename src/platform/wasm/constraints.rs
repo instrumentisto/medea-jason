@@ -217,7 +217,7 @@ impl From<DisplayAudioTrackConstraints> for MediaTrackConstraints {
         drop(Reflect::set_with_receiver(
             &this,
             &"restrictOwnAudio".into(),
-            &ConstrainBooleanParameters::from(ConstrainBoolean::Ideal(false))
+            &ConstrainBooleanParameters::from(ConstrainBoolean::Ideal(true))
                 .into(),
             &this,
         ));
