@@ -77,7 +77,7 @@ Future<void> Function() _replaceSendTrack(Object transceiver, Object track) {
 /// Drops the [RtpTransceiver.sender] of the provided [RtpTransceiver].
 Future Function() _dropSender(Object transceiver) {
   transceiver as RtpTransceiver;
-  if (transceiver.sender.track == null) {
+  if (transceiver.sender.track != null) {
     return () => transceiver.sender.replaceTrack(null);
   } else {
     return () => Future.value();

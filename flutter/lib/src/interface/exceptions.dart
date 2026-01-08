@@ -103,7 +103,7 @@ abstract class InternalException implements Exception {
   /// Returns error message describing the problem.
   String message();
 
-  /// Returns error that caused this [RpcClientException].
+  /// Returns error that caused this [InternalException].
   dynamic cause();
 
   /// Returns stacktrace of this [InternalException].

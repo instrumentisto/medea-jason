@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  MEDEA_TAG: prep-0-12
+  MEDEA_TAG: edge
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 

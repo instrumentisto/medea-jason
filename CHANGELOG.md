@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.12.0...master)
+
+### Fixed
+
+- `InternalException` providing incorrect error message in some cases. ([#258])
+- Disabling audio/video not working in rare cases. ([#258])
+
+[#258]: https://github.com/instrumentisto/medea-jason/pull/258
+
+
+
+
 ## [0.12.0] · 2025-12-19
 [0.12.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.12.0
 
