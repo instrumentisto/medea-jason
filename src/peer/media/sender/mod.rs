@@ -41,12 +41,12 @@ pub enum CreateError {
     TransceiverNotFound(String),
 }
 
-/// Error occuring in [`RTCRtpSender.replaceTrack()`][1] method.
+/// Error occurring in [`RTCRtpSender.replaceTrack()`][1] method.
 ///
 /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-replacetrack
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = platform::Error)]
-#[display("`MediaManagerHandle` is in detached state")]
+#[display("`RTCRtpSender.replaceTrack()` failed")]
 pub struct InsertTrackError(platform::Error);
 
 /// Representation of a [`local::Track`] that is being sent to some remote peer.
