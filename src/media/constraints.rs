@@ -1392,6 +1392,30 @@ impl DeviceAudioTrackConstraints {
         if !self.required && another.required {
             self.required = another.required;
         }
+        if self.auto_gain_control.is_none()
+            && another.auto_gain_control.is_some()
+        {
+            self.auto_gain_control = another.auto_gain_control;
+        }
+        if self.noise_suppression.is_none()
+            && another.noise_suppression.is_some()
+        {
+            self.noise_suppression = another.noise_suppression;
+        }
+        if self.noise_suppression_level.is_none()
+            && another.noise_suppression_level.is_some()
+        {
+            self.noise_suppression_level = another.noise_suppression_level;
+        }
+        if self.echo_cancellation.is_none()
+            && another.echo_cancellation.is_some()
+        {
+            self.echo_cancellation = another.echo_cancellation;
+        }
+        if self.high_pass_filter.is_none() && another.high_pass_filter.is_some()
+        {
+            self.high_pass_filter = another.high_pass_filter;
+        }
     }
 
     /// Returns an importance of these [`DeviceAudioTrackConstraints`].

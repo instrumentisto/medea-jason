@@ -150,12 +150,18 @@ let disableDisplayVideoRecv = document.getElementById('control__disable_display_
 let disableCameraDisplayVideoRecv = document.getElementById('control__disable_camera_video_recv');
 let muteAudioSend = document.getElementById('control__mute_audio_send');
 let muteVideoSend = document.getElementById('control__mute_video_send');
+let muteSystemAudioSend = document.getElementById('control__mute_system_audio_send');
+let muteDeviceAudioSend = document.getElementById('control__mute_device_audio_send');
+let muteSystemVideoSend = document.getElementById('control__mute_system_video_send');
+let muteDeviceVideoSend = document.getElementById('control__mute_device_video_send');
 let closeApp = document.getElementById('control__close_app');
 let audioSelect = document.getElementById('connect__select-device_audio');
 let videoSelect = document.getElementById('connect__select-device_video');
 let screenshareSwitchEl = document.getElementById('connection-settings__screenshare');
 let screenshareAudioSwitchEl = document.getElementById('connection-settings__screenshare-audio');
-let disableAudioGainControlSwitchEl = document.getElementById('connection-settings__audio_gain_control');
+let agcSwitchEl = document.getElementById('connection-settings__agc');
+let aecSwitchEl = document.getElementById('connection-settings__aec');
+let nsSwitchEl = document.getElementById('connection-settings__ns');
 let localVideo = document.getElementById('local-video');
 
 function getMemberId() {
@@ -650,6 +656,10 @@ window.onload = async function() {
   let isCameraVideoRecvEnabled = true;
   let isAudioMuted = false;
   let isVideoMuted = false;
+  let isSystemAudioMuted = false;
+  let isDeviceAudioMuted = false;
+  let isSystemVideoMuted = false;
+  let isDeviceVideoMuted = false;
   let room = await newRoom();
 
   async function initLocalStream() {
@@ -682,7 +692,7 @@ window.onload = async function() {
       return constraints;
   }
 
-  async function fillMediaDevicesInputs(audio_select, video_select, current_stream) {
+  async function fillMediaDevicesInputs(audio_select, video_select) {
     let currentAudio = 'disable';
     let currentVideo = 'disable';
     for (const track of localTracks) {
@@ -732,7 +742,9 @@ window.onload = async function() {
       if (audioSource) {
         audio.device_id(audioSource.value);
       }
-      audio.exact_auto_gain_control(!disableAudioGainControlSwitchEl.checked);
+      audio.exact_auto_gain_control(agcSwitchEl.checked);
+      audio.exact_echo_cancellation(aecSwitchEl.checked);
+      audio.exact_noise_suppression(nsSwitchEl.checked);
       constraints.device_audio(audio);
     }
 
@@ -772,7 +784,7 @@ window.onload = async function() {
 
     try {
       const constraints = await initLocalStream();
-      await fillMediaDevicesInputs(audioSelect, videoSelect, null);
+      await fillMediaDevicesInputs(audioSelect, videoSelect);
       await room.set_local_media_settings(constraints, false, false);
     } catch (e) {
       console.error('Init local video failed: ' + e);
@@ -1043,28 +1055,31 @@ window.onload = async function() {
   try {
     let audioSwitch = async () => {
       try {
-            let constraints = await build_constraints(audioSelect, videoSelect);
-            for (const track of localTracks) {
-              if (track.ptr > 0) {
-                track.free();
-              }
-            }
-            if (!isAudioSendEnabled) {
-              constraints = await initLocalStream();
-            }
-            await room.set_local_media_settings(constraints, true, true);
-          } catch (e) {
-            console.error('Changing audio source failed: ' + e);
+        let constraints = await build_constraints(audioSelect, videoSelect);
+        for (const track of window.localTracks) {
+          if (track.__wbg_ptr > 0 && track.kind() === rust.MediaKind.Audio) {
+            track.free();
           }
+        }
+
+        if (!isAudioSendEnabled) {
+          constraints = await initLocalStream();
+        }
+        await room.set_local_media_settings(constraints, true, true);
+      } catch (e) {
+        console.error('Changing audio source failed: ' + e);
+      }
     };
     audioSelect.addEventListener('change', audioSwitch);
-    disableAudioGainControlSwitchEl.addEventListener('change', audioSwitch);
+    if (agcSwitchEl) agcSwitchEl.addEventListener('change', audioSwitch);
+    if (aecSwitchEl) aecSwitchEl.addEventListener('change', audioSwitch);
+    if (nsSwitchEl) nsSwitchEl.addEventListener('change', audioSwitch);
 
     let videoSwitch = async () => {
       try {
         let constraints = await build_constraints(audioSelect, videoSelect);
         for (const track of localTracks) {
-          if (track.ptr > 0) {
+          if (track.__wbg_ptr > 0 && track.kind() === rust.MediaKind.Video) {
             track.free();
           }
         }
@@ -1105,10 +1120,8 @@ window.onload = async function() {
         if (isAudioSendEnabled) {
           await room.disable_audio();
           for (const track of localTracks) {
-            if (track.ptr > 0) {
-              if (track.kind() === rust.MediaKind.Audio && track.ptr > 0) {
-                track.free();
-              }
+            if (track.__wbg_ptr > 0 && track.kind() === rust.MediaKind.Audio) {
+              track.free();
             }
           }
           isAudioSendEnabled = false;
@@ -1130,10 +1143,8 @@ window.onload = async function() {
         if (isVideoSendEnabled) {
           await room.disable_video();
           for (const track of localTracks) {
-            if (track.ptr > 0) {
-              if (track.kind() === rust.MediaKind.Video && track.ptr > 0) {
-                track.free();
-              }
+            if (track.__wbg_ptr > 0 && track.kind() === rust.MediaKind.Video) {
+              track.free();
             }
           }
           isVideoSendEnabled = false;
@@ -1175,6 +1186,66 @@ window.onload = async function() {
           await room.mute_video();
           isVideoMuted = true;
           muteVideoSend.textContent = 'Unmute video send';
+        }
+      } catch (e) {
+        console.error(e.trace());
+      }
+    });
+    muteSystemAudioSend.addEventListener('click', async () => {
+      try {
+        if (isSystemAudioMuted) {
+          await room.unmute_audio(rust.MediaSourceKind.Display);
+          isSystemAudioMuted = false;
+          muteSystemAudioSend.textContent = 'Mute system audio send';
+        } else {
+          await room.mute_audio(rust.MediaSourceKind.Display);
+          isSystemAudioMuted = true;
+          muteSystemAudioSend.textContent = 'Unmute system audio send';
+        }
+      } catch (e) {
+        console.error(e.trace());
+      }
+    });
+    muteDeviceAudioSend.addEventListener('click', async () => {
+      try {
+        if (isDeviceAudioMuted) {
+          await room.unmute_audio(rust.MediaSourceKind.Device);
+          isDeviceAudioMuted = false;
+          muteDeviceAudioSend.textContent = 'Mute device audio send';
+        } else {
+          await room.mute_audio(rust.MediaSourceKind.Device);
+          isDeviceAudioMuted = true;
+          muteDeviceAudioSend.textContent = 'Unmute device audio send';
+        }
+      } catch (e) {
+        console.error(e.trace());
+      }
+    });
+    muteSystemVideoSend.addEventListener('click', async () => {
+      try {
+        if (isSystemVideoMuted) {
+          await room.unmute_video(rust.MediaSourceKind.Display);
+          isSystemVideoMuted = false;
+          muteSystemVideoSend.textContent = 'Mute system video send';
+        } else {
+          await room.mute_video(rust.MediaSourceKind.Display);
+          isSystemVideoMuted = true;
+          muteSystemVideoSend.textContent = 'Unmute system video send';
+        }
+      } catch (e) {
+        console.error(e.trace());
+      }
+    });
+    muteDeviceVideoSend.addEventListener('click', async () => {
+      try {
+        if (isDeviceVideoMuted) {
+          await room.unmute_video(rust.MediaSourceKind.Device);
+          isDeviceVideoMuted = false;
+          muteDeviceVideoSend.textContent = 'Mute device video send';
+        } else {
+          await room.mute_video(rust.MediaSourceKind.Device);
+          isDeviceVideoMuted = true;
+          muteDeviceVideoSend.textContent = 'Unmute device video send';
         }
       } catch (e) {
         console.error(e.trace());

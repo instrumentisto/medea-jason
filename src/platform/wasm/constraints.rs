@@ -1,6 +1,7 @@
 //! Media tracks and streams constraints functionality.
 
 use derive_more::with_trait::{AsRef, Into};
+use js_sys::Reflect;
 use web_sys::{
     ConstrainBooleanParameters, ConstrainDomStringParameters,
     ConstrainDoubleRange, MediaTrackConstraints,
@@ -195,6 +196,33 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
 
 impl From<DisplayAudioTrackConstraints> for MediaTrackConstraints {
     fn from(_: DisplayAudioTrackConstraints) -> Self {
-        Self::new()
+        let this = Self::new();
+
+        // TODO: Consider allowing to toggle audio processing settings.
+        //       That would require `medea-flutter-webrtc` changes.
+        // Disable audio processing for system audio on web, this aligns with
+        // the current desktop implementation in `medea-flutter-webrtc` which
+        // has no APM for system audio at all.
+        this.set_auto_gain_control(&ConstrainBooleanParameters::from(
+            ConstrainBoolean::Ideal(false),
+        ));
+        this.set_echo_cancellation(&ConstrainBooleanParameters::from(
+            ConstrainBoolean::Ideal(false),
+        ));
+        this.set_noise_suppression(&ConstrainBooleanParameters::from(
+            ConstrainBoolean::Ideal(false),
+        ));
+
+        // TODO: Not implemented in `web_sys`, so have to use `Reflect`.
+        // Excludes the current tab audio. Supported on Chrome 141+.
+        drop(Reflect::set_with_receiver(
+            &this,
+            &"restrictOwnAudio".into(),
+            &ConstrainBooleanParameters::from(ConstrainBoolean::Ideal(true))
+                .into(),
+            &this,
+        ));
+
+        this
     }
 }
