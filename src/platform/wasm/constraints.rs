@@ -1,6 +1,7 @@
 //! Media tracks and streams constraints functionality.
 
 use derive_more::with_trait::{AsRef, Into};
+use js_sys::Reflect;
 use web_sys::{
     ConstrainBooleanParameters, ConstrainDomStringParameters,
     ConstrainDoubleRange, MediaTrackConstraints,
@@ -210,6 +211,15 @@ impl From<DisplayAudioTrackConstraints> for MediaTrackConstraints {
         ));
         this.set_noise_suppression(&ConstrainBooleanParameters::from(
             ConstrainBoolean::Ideal(false),
+        ));
+
+        // TODO: Not implemented in `web_sys` so have to use reflect.
+        drop(Reflect::set_with_receiver(
+            &this,
+            &"restrictOwnAudio".into(),
+            &ConstrainBooleanParameters::from(ConstrainBoolean::Ideal(false))
+                .into(),
+            &this,
         ));
 
         this

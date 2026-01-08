@@ -3805,6 +3805,10 @@ function __wbg_get_imports() {
         const ret = arg0.setTimeout(arg1, arg2);
         return ret;
     }, arguments) };
+    imports.wbg.__wbg_set_4308bc4cf8a29876 = function() { return handleError(function (arg0, arg1, arg2, arg3) {
+        const ret = Reflect.set(arg0, arg1, arg2, arg3);
+        return ret;
+    }, arguments) };
     imports.wbg.__wbg_set_active_8e1f0e253038c475 = function(arg0, arg1) {
         arg0.active = arg1 !== 0;
     };
@@ -4127,7 +4131,7 @@ async function __wbg_init(module_or_path) {
     }
 
     if (typeof module_or_path === 'undefined') {
-        module_or_path = new URL('medea_jason_bg.wasm?73c102bfd2ca765821811e9971c3837c9a7a9ce66fa863f9b5dce25e3240ad24', import.meta.url);
+        module_or_path = new URL('medea_jason_bg.wasm?97e85df26ee41e9a7ae396f9f678a277bee4a36d2f759a963618b96feb36fb2d', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
