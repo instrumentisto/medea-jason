@@ -199,10 +199,10 @@ impl From<DisplayAudioTrackConstraints> for MediaTrackConstraints {
         let this = Self::new();
 
         // TODO: Consider allowing to toggle audio processing settings.
-        //       That would require medea-flutter-webrtc changes.
-        // Disable audio processing for system audio on web, this aligns
-        // with current desktop implementation in medea-flutter-webrtc
-        // which has no APM for system audio at all.
+        //       That would require `medea-flutter-webrtc` changes.
+        // Disable audio processing for system audio on web, this aligns with
+        // the current desktop implementation in `medea-flutter-webrtc` which
+        // has no APM for system audio at all.
         this.set_auto_gain_control(&ConstrainBooleanParameters::from(
             ConstrainBoolean::Ideal(false),
         ));
@@ -213,8 +213,8 @@ impl From<DisplayAudioTrackConstraints> for MediaTrackConstraints {
             ConstrainBoolean::Ideal(false),
         ));
 
-        // TODO: Not implemented in `web_sys` so have to use reflect.
-        // Excludes current tab audio. Supported on Chrome 141+.
+        // TODO: Not implemented in `web_sys`, so have to use `Reflect`.
+        // Excludes the current tab audio. Supported on Chrome 141+.
         drop(Reflect::set_with_receiver(
             &this,
             &"restrictOwnAudio".into(),

@@ -10,11 +10,14 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.12.0...master)
 
+### Changed
+
+- Disabled audio processing in captured system audio on web (already disabled on desktops). ([#259])
+
 ### Fixed
 
 - `InternalException` providing incorrect error message in some cases. ([#258])
 - Disabling audio/video not working in rare cases. ([#258])
-- Disable audio processing in captured system audio on web (already disabled on desktops). ([#259])
 
 [#258]: https://github.com/instrumentisto/medea-jason/pull/258
 [#259]: https://github.com/instrumentisto/medea-jason/pull/259
