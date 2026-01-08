@@ -13,7 +13,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Fixed
 
 - `InternalException` providing incorrect error message in some cases. ([#258])
-- Disabling audio/video send might not work in rare cases. ([#258])
+- Disabling audio/video not working in rare cases. ([#258])
 
 [#258]: https://github.com/instrumentisto/medea-jason/pull/258
 
