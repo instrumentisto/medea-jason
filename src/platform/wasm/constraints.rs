@@ -195,6 +195,23 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
 
 impl From<DisplayAudioTrackConstraints> for MediaTrackConstraints {
     fn from(_: DisplayAudioTrackConstraints) -> Self {
-        Self::new()
+        let this = Self::new();
+
+        // TODO: Consider allowing to toggle audio processing settings,
+        //       but that would require medea-flutter-webrtc changes.
+        // Disable audio processing for system audio on web, this aligns
+        // with current desktop implementation in medea-flutter-webrtc
+        // which has no APM for system audio at all.
+        this.set_auto_gain_control(&ConstrainBooleanParameters::from(
+            ConstrainBoolean::Ideal(false),
+        ));
+        this.set_echo_cancellation(&ConstrainBooleanParameters::from(
+            ConstrainBoolean::Ideal(false),
+        ));
+        this.set_noise_suppression(&ConstrainBooleanParameters::from(
+            ConstrainBoolean::Ideal(false),
+        ));
+
+        this
     }
 }

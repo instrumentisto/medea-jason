@@ -235,6 +235,12 @@
       <button id="control__mute_video_send" class="btn btn-secondary">Mute video send</button>
       <button id="control__network_changed" class="btn btn-warning">Network changed</button>
     </div>
+    <div class="mb-3">
+      <button id="control__mute_system_audio_send" class="btn btn-secondary">Mute system audio send</button>
+      <button id="control__mute_device_audio_send" class="btn btn-secondary">Mute device audio send</button>
+      <button id="control__mute_system_video_send" class="btn btn-secondary">Mute system video send</button>
+      <button id="control__mute_device_video_send" class="btn btn-secondary">Mute device video send</button>
+    </div>
     <button type="button"
             class="btn btn-secondary"
             data-toggle="modal"
@@ -769,14 +775,52 @@
           <label for="connect__select-device_audio">Audio</label>
           <select id="connect__select-device_audio" class="custom-select">
           </select>
-          <div class="custom-control custom-switch" style="margin-top: 10px">
+          <div class="d-flex flex-row" style="gap: 10px; margin-top: 10px">
+            <div class="custom-control custom-switch">
+              <input type="checkbox"
+                     id="connection-settings__agc"
+                     class="custom-control-input"
+                     autocomplete="off"
+                     checked>
+              <label for="connection-settings__agc"
+                     class="custom-control-label">
+                AGC
+              </label>
+            </div>
+
+            <div class="custom-control custom-switch">
+              <input type="checkbox"
+                     id="connection-settings__aec"
+                     class="custom-control-input"
+                     autocomplete="off"
+                     checked>
+              <label for="connection-settings__aec"
+                     class="custom-control-label">
+                AEC
+              </label>
+            </div>
+
+            <div class="custom-control custom-switch">
+              <input type="checkbox"
+                     id="connection-settings__ns"
+                     class="custom-control-input"
+                     autocomplete="off"
+                     checked>
+              <label for="connection-settings__ns"
+                     class="custom-control-label">
+                NS
+              </label>
+            </div>
+          </div>
+          <!-- Backward compat: keep old ID referenced by some setups (unused by current JS after this change). -->
+          <div class="custom-control custom-switch d-none" style="margin-top: 10px">
             <input type="checkbox"
                    id="connection-settings__audio_gain_control"
                    class="custom-control-input"
                    autocomplete="off">
             <label for="connection-settings__audio_gain_control"
                    class="custom-control-label">
-              Disable audio gain control
+              AGC
             </label>
           </div><br>
 
