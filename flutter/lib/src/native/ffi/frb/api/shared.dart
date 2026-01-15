@@ -7,6 +7,23 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import '../frb_generated.dart';
 
+/// Global log level for [`medea-jason`] and all its subsystems.
+///
+/// [`medea-jason`]: https://github.com/instrumentisto/medea-jason
+enum LogLevel {
+  /// Print `error`-level logs only.
+  error,
+
+  /// Print `warn` and `error` logs.
+  warn,
+
+  /// Print `info`, `warn` and `error` logs.
+  info,
+
+  /// Print all available logs.
+  debug,
+}
+
 /// Possible connection states of a [`PeerConnection`].
 enum PeerConnectionState {
   /// At least one of the connection's [ICE] transports are in the

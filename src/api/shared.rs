@@ -145,3 +145,33 @@ impl From<proto::PeerConnectionState> for PeerConnectionState {
         }
     }
 }
+
+/// Global log level for [`medea-jason`] and all its subsystems.
+///
+/// [`medea-jason`]: https://github.com/instrumentisto/medea-jason
+#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum LogLevel {
+    /// Print `error`-level logs only.
+    Error,
+
+    /// Print `warn` and `error` logs.
+    Warn,
+
+    /// Print `info`, `warn` and `error` logs.
+    Info,
+
+    /// Print all available logs.
+    Debug,
+}
+
+impl From<LogLevel> for log::LevelFilter {
+    fn from(value: LogLevel) -> Self {
+        match value {
+            LogLevel::Error => Self::Error,
+            LogLevel::Warn => Self::Warn,
+            LogLevel::Info => Self::Info,
+            LogLevel::Debug => Self::Debug,
+        }
+    }
+}

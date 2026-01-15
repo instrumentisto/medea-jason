@@ -17,7 +17,9 @@ pub mod room_close_reason;
 pub mod room_handle;
 
 use derive_more::with_trait::Display;
+use js_sys::Promise;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::future_to_promise;
 
 pub use self::{
     connection_handle::ConnectionHandle,
@@ -39,7 +41,17 @@ pub use self::{
     room_close_reason::RoomCloseReason,
     room_handle::RoomHandle,
 };
-use crate::media;
+use crate::{api, media, platform};
+
+/// Sets the global maximum log level.
+#[wasm_bindgen]
+pub fn set_log_level(level: api::LogLevel) -> Promise {
+    future_to_promise(async move {
+        platform::set_log_level(level).await;
+
+        Ok(JsValue::UNDEFINED)
+    })
+}
 
 /// [MediaStreamTrack.kind][1] representation.
 ///

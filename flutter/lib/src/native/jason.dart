@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
+import '../interface/enums.dart' as base;
 import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
@@ -44,6 +45,11 @@ void Function(String)? _onPanicCallback;
 /// NOT be used.
 void onPanic(void Function(String)? cb) {
   _onPanicCallback = cb;
+}
+
+/// Sets the global maximum log level.
+Future<void> setLogLevel(base.LogLevel level) async {
+  await (frb.setLogLevel(level: level) as Future);
 }
 
 ExternalLibrary _dlLoad() {

@@ -49,7 +49,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -320558178;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -91957164;
 
 // Section: executor
 
@@ -1802,6 +1802,19 @@ fn wire__crate__api__dart__api__set_dart_opaque_message_port_impl(
                      let output_ok = Result::<_,()>::Ok({ crate::api::dart::api::set_dart_opaque_message_port(api_dart_handler_port); })?;   Ok(output_ok)
                 })()) })
 }
+fn wire__crate__api__dart__api__set_log_level_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "set_log_level", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_level = <crate::api::shared::LogLevel>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                     let output_ok = Result::<_,()>::Ok(crate::api::dart::api::set_log_level(api_level))?;   Ok(output_ok)
+                })()) })
+}
 fn wire__crate__api__dart__api__local_media_track__vec_local_tracks_from_raw_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2486,6 +2499,22 @@ impl SseDecode for Vec<u8> {
     }
 }
 
+impl SseDecode for crate::api::shared::LogLevel {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::shared::LogLevel::Error,
+            1 => crate::api::shared::LogLevel::Warn,
+            2 => crate::api::shared::LogLevel::Info,
+            3 => crate::api::shared::LogLevel::Debug,
+            _ => unreachable!("Invalid variant for LogLevel: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for crate::media::MediaDeviceKind {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(
@@ -2980,9 +3009,10 @@ fn pde_ffi_dispatcher_sync_impl(
 81 => wire__crate__api__dart__api__on_panic_impl(ptr, rust_vec_len, data_len),
 82 => wire__crate__api__dart__api__room_close_reason__room_close_reason_from_ptr_impl(ptr, rust_vec_len, data_len),
 83 => wire__crate__api__dart__api__set_dart_opaque_message_port_impl(ptr, rust_vec_len, data_len),
-84 => wire__crate__api__dart__api__local_media_track__vec_local_tracks_from_raw_impl(ptr, rust_vec_len, data_len),
-85 => wire__crate__api__dart__api__vec_media_device_details_from_raw_impl(ptr, rust_vec_len, data_len),
-86 => wire__crate__api__dart__api__vec_media_display_details_from_raw_impl(ptr, rust_vec_len, data_len),
+84 => wire__crate__api__dart__api__set_log_level_impl(ptr, rust_vec_len, data_len),
+85 => wire__crate__api__dart__api__local_media_track__vec_local_tracks_from_raw_impl(ptr, rust_vec_len, data_len),
+86 => wire__crate__api__dart__api__vec_media_device_details_from_raw_impl(ptr, rust_vec_len, data_len),
+87 => wire__crate__api__dart__api__vec_media_display_details_from_raw_impl(ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -3481,6 +3511,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::media::constraints::FacingMode>
     for crate::media::constraints::FacingMode
 {
     fn into_into_dart(self) -> crate::media::constraints::FacingMode {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::shared::LogLevel {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Error => 0.into_dart(),
+            Self::Warn => 1.into_dart(),
+            Self::Info => 2.into_dart(),
+            Self::Debug => 3.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::shared::LogLevel
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::shared::LogLevel>
+    for crate::api::shared::LogLevel
+{
+    fn into_into_dart(self) -> crate::api::shared::LogLevel {
         self
     }
 }
@@ -4334,6 +4387,27 @@ impl SseEncode for Vec<u8> {
         for item in self {
             <u8>::sse_encode(item, serializer);
         }
+    }
+}
+
+impl SseEncode for crate::api::shared::LogLevel {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::shared::LogLevel::Error => 0,
+                crate::api::shared::LogLevel::Warn => 1,
+                crate::api::shared::LogLevel::Info => 2,
+                crate::api::shared::LogLevel::Debug => 3,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 

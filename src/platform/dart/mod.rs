@@ -16,6 +16,7 @@ pub mod error;
 pub mod executor;
 pub mod ice_candidate;
 pub mod ice_server;
+pub mod logging;
 pub mod media_device_info;
 pub mod media_devices;
 pub mod media_display_info;
@@ -28,9 +29,10 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::{cell::RefCell, mem::ManuallyDrop, panic};
+use std::{cell::RefCell, mem::ManuallyDrop, panic, sync::Once};
 
 use libc::c_void;
+use log::LevelFilter;
 
 pub use self::{
     codec_capability::CodecCapability,
@@ -47,7 +49,7 @@ pub use self::{
     transport::WebSocketRpcTransport,
     utils::{Function, completer::delay_for},
 };
-use crate::platform::utils::dart_api;
+use crate::platform::{self, utils::dart_api};
 
 /// Function to initialize `dart_api_dl` functions.
 ///
@@ -90,13 +92,20 @@ pub fn set_panic_callback(cb: Function<String>) {
     }
 }
 
-#[cfg(target_os = "android")]
-/// Initializes [`android_logger`] as the default application logger with filter
-/// level set to [`log::LevelFilter::Debug`].
+/// Initializes global logger.
 pub fn init_logger() {
+    static INITIALIZED: Once = Once::new();
+    INITIALIZED.call_once(|| {
+        init_logger_inner(LevelFilter::max());
+        log::set_max_level(platform::DEFAULT_LOG_LEVEL);
+    });
+}
+
+#[cfg(target_os = "android")]
+/// Initializes [`android_logger`] as the default application logger.
+fn init_logger_inner(level: LevelFilter) {
     android_logger::init_once(
-        android_logger::Config::default()
-            .with_max_level(log::LevelFilter::Debug),
+        android_logger::Config::default().with_max_level(level),
     );
 }
 
@@ -106,19 +115,21 @@ pub fn init_logger() {
     target_os = "macos",
     target_os = "windows"
 ))]
-/// Initializes [`simple_logger`] as the default application logger with filter
-/// level set to [`log::LevelFilter::Debug`].
-pub fn init_logger() {
-    use std::cell::LazyCell;
+/// Initializes [`simple_logger`] as the default application logger.
+fn init_logger_inner(level: LevelFilter) {
+    _ = simple_logger::SimpleLogger::new().with_level(level).init();
+}
 
-    thread_local! {
-        /// [`LazyCell`] ensuring that a [`simple_logger`] is initialized only
-        /// once.
-        static INITIALIZED: LazyCell<()> = LazyCell::new(|| {
-            _ = simple_logger::SimpleLogger::new()
-                .with_level(log::LevelFilter::Debug)
-                .init();
-        });
-    }
-    INITIALIZED.with(|i| **i);
+/// Sets the global maximum log level for both `medea-jason` and
+/// [`medea-flutter-webrtc`][0] (including bundled [`libwebrtc`][1]).
+///
+/// [0]: https://github.com/instrumentisto/medea-flutter-webrtc
+/// [1]: https://webrtc.googlesource.com/src/
+pub async fn set_log_level<T>(level: T)
+where
+    T: Into<LevelFilter>,
+{
+    let level: LevelFilter = level.into();
+    log::set_max_level(level);
+    logging::set_log_level(level).await;
 }
