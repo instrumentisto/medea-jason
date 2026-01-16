@@ -53,5 +53,5 @@ pub async fn set_log_level(level: log::LevelFilter) {
     unsafe { FutureFromDart::execute::<()>(fut) }
         .await
         .map_err(tracerr::wrap!())
-        .unwrap()
+        .unwrap();
 }
