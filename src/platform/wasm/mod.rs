@@ -15,7 +15,7 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::time::Duration;
+use std::{sync::Once, time::Duration};
 
 use js_sys::Promise;
 use wasm_bindgen_futures::JsFuture;
@@ -34,6 +34,7 @@ pub use self::{
     transport::WebSocketRpcTransport,
     utils::Function,
 };
+use crate::platform;
 
 /// Unimplemented on WASM targets.
 pub type MediaDisplayInfo = ();
@@ -61,7 +62,20 @@ pub use console_error_panic_hook::set_once as set_panic_hook;
 ///
 /// [`wasm_logger`]: https://docs.rs/wasm-logger
 pub fn init_logger() {
-    wasm_logger::init(wasm_logger::Config::default());
+    static INITIALIZED: Once = Once::new();
+    INITIALIZED.call_once(|| {
+        wasm_logger::init(wasm_logger::Config::new(log::Level::max()));
+        log::set_max_level(platform::DEFAULT_LOG_LEVEL);
+    });
+}
+
+/// Sets the global maximum log level.
+#[expect(clippy::unused_async, reason = "`cfg` code uniformity")]
+pub async fn set_log_level<T>(level: T)
+where
+    T: Into<log::LevelFilter>,
+{
+    log::set_max_level(level.into());
 }
 
 /// Runs a Rust [`Future`] on the current thread.

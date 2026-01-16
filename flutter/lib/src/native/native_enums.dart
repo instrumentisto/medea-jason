@@ -1,6 +1,6 @@
 export '../native/ffi/frb/media/track/remote.dart' show MediaDirection;
 export '../native/ffi/frb/api/shared.dart'
-    show PeerConnectionState, RoomCloseKind;
+    show PeerConnectionState, RoomCloseKind, LogLevel;
 export '../native/ffi/frb/media/track.dart' show MediaSourceKind;
 export '../native/ffi/frb/media.dart'
     show MediaKind, MediaDeviceKind, AudioDeviceKind;

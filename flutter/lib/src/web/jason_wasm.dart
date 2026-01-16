@@ -39,6 +39,17 @@ extension type RpcClientExceptionKind._(JSObject _) implements JSObject {
 }
 
 @JS()
+extension type LogLevel._(JSObject _) implements JSObject {
+  external static num get Error;
+  external static num get Warn;
+  external static num get Info;
+  external static num get Debug;
+}
+
+@JS()
+external JSPromise<JSAny?> set_log_level(num level);
+
+@JS()
 extension type MemberConnectionState._(JSObject _) implements JSObject {
   external void free();
   external num kind();

@@ -34,6 +34,9 @@ pub use self::{
 };
 use crate::utils::Caused;
 
+/// Default Rust-side logging level used right after logger initialization.
+pub const DEFAULT_LOG_LEVEL: log::LevelFilter = log::LevelFilter::Warn;
+
 /// [`Error`] appeared on [getUserMedia()][1] request, differentiated by its
 /// cause.
 ///

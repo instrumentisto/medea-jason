@@ -52,15 +52,15 @@ pub use self::{
 };
 use crate::{
     api::{
-        DART_HANDLER_PORT, FrbHandler,
+        DART_HANDLER_PORT, FrbHandler, LogLevel,
         api::api_bridge_generated::FLUTTER_RUST_BRIDGE_CODEGEN_VERSION,
-        new_frb_handler,
+        dart::Error as DartError, new_frb_handler,
     },
     media::{
         self, AudioDeviceKind, MediaDeviceKind, NoiseSuppressionLevel,
         constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
     },
-    platform,
+    platform::{self, utils::dart_future::IntoDartFuture as _},
     utils::str_eq,
 };
 
@@ -468,4 +468,16 @@ pub fn on_panic(cb: DartOpaque) {
 #[must_use]
 pub fn set_dart_opaque_message_port(dart_handler_port: i64) {
     DART_HANDLER_PORT.set(Some(dart_handler_port));
+}
+
+/// Sets the global maximum [`LogLevel`].
+#[frb(sync)]
+#[must_use]
+pub fn set_log_level(level: LogLevel) -> DartOpaque {
+    async move {
+        platform::set_log_level(level).await;
+        Ok::<_, DartError>(())
+    }
+    .into_dart_future()
+    .into_dart_opaque()
 }

@@ -196,3 +196,18 @@ enum RoomCloseKind {
   /// server.
   evicted,
 }
+
+/// Global log level for the whole library and all its subsystems.
+enum LogLevel {
+  /// Print `error`-level logs only.
+  error,
+
+  /// Print `warn` and `error` logs.
+  warn,
+
+  /// Print `info`, `warn` and `error` logs.
+  info,
+
+  /// Print all available logs.
+  debug,
+}

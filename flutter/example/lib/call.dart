@@ -77,6 +77,7 @@ class Call {
     self._jason = await Jason.init();
     self._mediaManager = self._jason.mediaManager();
     self._room = self._jason.initRoom();
+    await setLogLevel(LogLevel.debug);
 
     return self;
   }

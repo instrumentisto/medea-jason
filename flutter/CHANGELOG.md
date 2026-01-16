@@ -10,12 +10,17 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.12.0...master)
 
+### Added
+
+- `LogLevel` enum and `Logger.setLogLevel(LogLevel)` function to configure global library logging level. ([#260])
+
 ### Fixed
 
 - `InternalException` providing incorrect error message in some cases. ([#258])
 - Disabling audio/video not working in rare cases. ([#258])
 
 [#258]: https://github.com/instrumentisto/medea-jason/pull/258
+[#260]: https://github.com/instrumentisto/medea-jason/pull/260
 
 
 

@@ -1,5 +1,5 @@
 export 'src/interface/connection_handle.dart';
-export 'src/interface/enums.dart' show PeerConnectionState;
+export 'src/interface/enums.dart' show PeerConnectionState, LogLevel;
 export 'src/interface/member_connection_state.dart'
     show MemberConnectionState, MemberConnectionStateP2P;
 export 'src/interface/exceptions.dart';
@@ -7,6 +7,7 @@ export 'src/interface/media_device_details.dart';
 export 'src/interface/media_manager.dart';
 export 'src/interface/media_track.dart';
 export 'src/interface/media_display_details.dart';
+export 'src/interface/logging.dart';
 export 'src/interface/reconnect_handle.dart';
 export 'src/interface/room_close_reason.dart';
 export 'src/interface/room_handle.dart';

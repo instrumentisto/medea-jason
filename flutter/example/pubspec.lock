@@ -45,10 +45,10 @@ packages:
     dependency: transitive
     description:
       name: build
-      sha256: c1668065e9ba04752570ad7e038288559d1e2ca5c6d0131c0f5f55e39e777413
+      sha256: "275bf6bb2a00a9852c28d4e0b410da1d833a734d57d39d44f94bfc895a484ec3"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.3"
+    version: "4.0.4"
   build_cli_annotations:
     dependency: transitive
     description:
@@ -165,10 +165,10 @@ packages:
     dependency: transitive
     description:
       name: ffi
-      sha256: "289279317b4b16eb2bb7e271abccd4bf84ec9bdcbe999e278a94b804f5630418"
+      sha256: d07d37192dbf97461359c1518788f203b0c9102cfd2c35a716b823741219542c
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.5"
   file:
     dependency: transitive
     description:
@@ -300,10 +300,10 @@ packages:
     dependency: "direct dev"
     description:
       name: json_serializable
-      sha256: "6b253f7851cf1626a05c8b49c792e04a14897349798c03798137f2b5f7e0b5b1"
+      sha256: "5b89c1e32ae3840bb20a1b3434e3a590173ad3cb605896fb0f60487ce2f8104e"
       url: "https://pub.dev"
     source: hosted
-    version: "6.11.3"
+    version: "6.11.4"
   leak_tracker:
     dependency: transitive
     description:
@@ -364,10 +364,10 @@ packages:
     dependency: "direct main"
     description:
       name: medea_flutter_webrtc
-      sha256: "330ee76b457b85307a5e99ae63439a30e7b224418afe9abfa17099601a96863e"
+      sha256: "31463d1a794d329806087671ac35470e6bec74d32488cf078ec0ef259730bdd5"
       url: "https://pub.dev"
     source: hosted
-    version: "0.16.1"
+    version: "0.16.2-dev+rev.df8b32749e6c8ea858ef1752970d86107bb39e02"
   medea_jason:
     dependency: "direct main"
     description:
@@ -456,18 +456,18 @@ packages:
     dependency: transitive
     description:
       name: source_gen
-      sha256: "07b277b67e0096c45196cbddddf2d8c6ffc49342e88bf31d460ce04605ddac75"
+      sha256: "585bc140f20da42c584ece2df28f4d9ef2566955332b626f655957b3a8c8ad54"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.1"
+    version: "4.1.2"
   source_helper:
     dependency: transitive
     description:
       name: source_helper
-      sha256: e82b1996c63da42aa3e6a34cc1ec17427728a1baf72ed017717a5669a7123f0d
+      sha256: "4a85e90b50694e652075cbe4575665539d253e6ec10e46e76b45368ab5e3caae"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.9"
+    version: "1.3.10"
   source_span:
     dependency: transitive
     description:
@@ -568,10 +568,10 @@ packages:
     dependency: transitive
     description:
       name: watcher
-      sha256: f52385d4f73589977c80797e60fe51014f7f2b957b5e9a62c3f6ada439889249
+      sha256: "1398c9f081a753f9226febe8900fce8f7d0a67163334e1c94a2438339d79d635"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.2.1"
   web:
     dependency: transitive
     description:

@@ -1,5 +1,6 @@
 import 'dart:js_interop';
 
+import '../interface/enums.dart' as base;
 import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
@@ -8,6 +9,11 @@ import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 import 'media_manager.dart';
 import 'room_handle.dart';
+
+/// Sets the global maximum [base.LogLevel].
+Future<void> setLogLevel(base.LogLevel level) async {
+  await fallibleFuture(wasm.set_log_level(level.index).toDart);
+}
 
 class Jason extends base.Jason {
   final wasm.Jason obj = wasm.Jason();

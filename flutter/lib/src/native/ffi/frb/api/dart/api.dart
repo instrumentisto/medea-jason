@@ -9,6 +9,7 @@ import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 import '../../frb_generated.dart';
 import '../../media.dart';
 import '../../media/constraints.dart';
+import '../shared.dart';
 
 part 'api.freezed.dart';
 
@@ -44,6 +45,10 @@ void setDartOpaqueMessagePort({required PlatformInt64 dartHandlerPort}) =>
     RustLib.instance.api.crateApiDartApiSetDartOpaqueMessagePort(
       dartHandlerPort: dartHandlerPort,
     );
+
+/// Sets the global maximum [`LogLevel`].
+Object setLogLevel({required LogLevel level}) =>
+    RustLib.instance.api.crateApiDartApiSetLogLevel(level: level);
 
 abstract class ForeignClass {}
 
