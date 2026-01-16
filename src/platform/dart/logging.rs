@@ -33,12 +33,10 @@ enum WebRtcLogLevel {
 impl From<log::LevelFilter> for WebRtcLogLevel {
     fn from(value: log::LevelFilter) -> Self {
         match value {
-            log::LevelFilter::Off => Self::Error,
-            log::LevelFilter::Error => Self::Error,
+            log::LevelFilter::Off | log::LevelFilter::Error => Self::Error,
             log::LevelFilter::Warn => Self::Warning,
             log::LevelFilter::Info => Self::Info,
-            log::LevelFilter::Debug => Self::Verbose,
-            log::LevelFilter::Trace => Self::Verbose,
+            log::LevelFilter::Debug | log::LevelFilter::Trace => Self::Verbose,
         }
     }
 }

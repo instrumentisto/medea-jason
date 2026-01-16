@@ -1,5 +1,5 @@
 export 'src/interface/connection_handle.dart';
-export 'src/interface/enums.dart' show PeerConnectionState;
+export 'src/interface/enums.dart' show PeerConnectionState, LogLevel;
 export 'src/interface/member_connection_state.dart'
     show MemberConnectionState, MemberConnectionStateP2P;
 export 'src/interface/exceptions.dart';
