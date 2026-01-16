@@ -7,13 +7,13 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 typedef _ErrorSetterFnC = Void Function(Handle);
 typedef _ErrorSetterFnDart = void Function(Object);
 
-void Function(int)? _setWebrtcLogLevel;
+Object Function(int)? _setWebrtcLogLevel;
 
 _ErrorSetterFnDart? _logging__set_webrtc_log_level__set_error;
 
 void registerFunction(
   DynamicLibrary dl, {
-  required void Function(int) setWebrtcLogLevel,
+  required Object Function(int) setWebrtcLogLevel,
 }) {
   _setWebrtcLogLevel = setWebrtcLogLevel;
 
@@ -22,7 +22,7 @@ void registerFunction(
         'logging__set_webrtc_log_level__set_error',
       );
 
-  Pointer<NativeFunction<Void Function(Int64)>> setWebrtcLogLevel_native =
+  Pointer<NativeFunction<Handle Function(Int64)>> setWebrtcLogLevel_native =
       Pointer.fromFunction(_setWebrtcLogLevelProxy);
 
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
@@ -30,11 +30,11 @@ void registerFunction(
   )(setWebrtcLogLevel_native);
 }
 
-void _setWebrtcLogLevelProxy(int arg0) {
+Object _setWebrtcLogLevelProxy(int arg0) {
   try {
     return _setWebrtcLogLevel!(arg0);
   } catch (e) {
     _logging__set_webrtc_log_level__set_error!(e);
-    return;
+    return 0;
   }
 }

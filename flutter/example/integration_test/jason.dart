@@ -31,6 +31,7 @@ void main() {
         await Future.delayed(Duration(seconds: 5));
       }
     }
+    await setLogLevel(LogLevel.info);
   });
 
   testWidgets('MediaManager', (WidgetTester tester) async {
