@@ -43,7 +43,9 @@ pub use self::{
 };
 use crate::{api, media, platform};
 
-/// Sets the global maximum log level.
+/// Sets the global maximum [`LogLevel`].
+///
+/// [`LogLevel`]: api::LogLevel
 #[wasm_bindgen]
 pub fn set_log_level(level: api::LogLevel) -> Promise {
     future_to_promise(async move {

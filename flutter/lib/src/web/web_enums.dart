@@ -197,9 +197,7 @@ enum RoomCloseKind {
   evicted,
 }
 
-/// Global log level for [`medea-jason`] and all its subsystems.
-///
-/// [`medea-jason`]: https://github.com/instrumentisto/medea-jason
+/// Global log level for the whole library and all its subsystems.
 enum LogLevel {
   /// Print `error`-level logs only.
   error,

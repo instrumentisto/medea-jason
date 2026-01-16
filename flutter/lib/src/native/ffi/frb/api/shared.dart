@@ -7,9 +7,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import '../frb_generated.dart';
 
-/// Global log level for [`medea-jason`] and all its subsystems.
-///
-/// [`medea-jason`]: https://github.com/instrumentisto/medea-jason
+/// Global log level for the library and all its subsystems.
 enum LogLevel {
   /// Print `error`-level logs only.
   error,

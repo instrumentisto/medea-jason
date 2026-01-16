@@ -10,7 +10,7 @@ import 'jason_wasm.dart' as wasm;
 import 'media_manager.dart';
 import 'room_handle.dart';
 
-/// Sets the global maximum log level.
+/// Sets the global maximum [base.LogLevel].
 Future<void> setLogLevel(base.LogLevel level) async {
   await fallibleFuture(wasm.set_log_level(level.index).toDart);
 }

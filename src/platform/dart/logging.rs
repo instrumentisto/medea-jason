@@ -24,9 +24,16 @@ mod logging {
 ///
 /// [0]: https://github.com/instrumentisto/medea-flutter-webrtc
 enum WebRtcLogLevel {
+    /// Print all available logs.
     Verbose,
+
+    /// Print common logs.
     Info,
+
+    /// Print only warning and error logs.
     Warning,
+
+    /// Print only error logs.
     Error,
 }
 

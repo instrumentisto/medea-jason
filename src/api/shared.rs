@@ -146,9 +146,7 @@ impl From<proto::PeerConnectionState> for PeerConnectionState {
     }
 }
 
-/// Global log level for [`medea-jason`] and all its subsystems.
-///
-/// [`medea-jason`]: https://github.com/instrumentisto/medea-jason
+/// Global log level for the library and all its subsystems.
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum LogLevel {

@@ -12,7 +12,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- `LogLevel` enum and `set_log_level(LogLevel)` global function to configure logging level in `medea_jason`. ([#260])
+- `LogLevel` enum and `set_log_level(LogLevel)` global function to configure global library logging level. ([#260])
 
 ### Changed
 

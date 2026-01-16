@@ -47,7 +47,7 @@ void onPanic(void Function(String)? cb) {
   _onPanicCallback = cb;
 }
 
-/// Sets the global maximum log level.
+/// Sets the global maximum [base.LogLevel].
 Future<void> setLogLevel(base.LogLevel level) async {
   await (frb.setLogLevel(level: level) as Future);
 }

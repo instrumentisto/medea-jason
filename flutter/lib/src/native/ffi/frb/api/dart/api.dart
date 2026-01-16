@@ -46,7 +46,7 @@ void setDartOpaqueMessagePort({required PlatformInt64 dartHandlerPort}) =>
       dartHandlerPort: dartHandlerPort,
     );
 
-/// Sets the global maximum log level.
+/// Sets the global maximum [`LogLevel`].
 Object setLogLevel({required LogLevel level}) =>
     RustLib.instance.api.crateApiDartApiSetLogLevel(level: level);
 

@@ -470,7 +470,7 @@ pub fn set_dart_opaque_message_port(dart_handler_port: i64) {
     DART_HANDLER_PORT.set(Some(dart_handler_port));
 }
 
-/// Sets the global maximum log level.
+/// Sets the global maximum [`LogLevel`].
 #[frb(sync)]
 #[must_use]
 pub fn set_log_level(level: LogLevel) -> DartOpaque {

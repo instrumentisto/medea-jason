@@ -92,7 +92,7 @@ pub fn set_panic_callback(cb: Function<String>) {
     }
 }
 
-/// Initializes global logger.
+/// Initializes the global logger.
 pub fn init_logger() {
     static INITIALIZED: Once = Once::new();
     INITIALIZED.call_once(|| {
@@ -115,12 +115,12 @@ fn init_logger_inner(level: LevelFilter) {
     target_os = "macos",
     target_os = "windows"
 ))]
-/// Initializes [`simple_logger`] as the default application logger.
+/// Initializes a [`simple_logger`] as the default application logger.
 fn init_logger_inner(level: LevelFilter) {
     _ = simple_logger::SimpleLogger::new().with_level(level).init();
 }
 
-/// Sets the global maximum log level for both `medea-jason` and
+/// Sets the global maximum log level for the whole library and the
 /// [`medea-flutter-webrtc`][0] (including bundled [`libwebrtc`][1]).
 ///
 /// [0]: https://github.com/instrumentisto/medea-flutter-webrtc
