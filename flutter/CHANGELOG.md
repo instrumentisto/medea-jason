@@ -6,9 +6,15 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.13.0] · 2026-01-19
+[0.13.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0/flutter
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.12.0...master)
+See also [`medea-jason` crate 0.13.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.13.0/CHANGELOG.md).
+
+### Upgraded
+
+- Dependencies:
+    - [`medea_flutter_webrtc`] to 0.17.0 version. ([#261])
 
 ### Added
 
@@ -21,6 +27,8 @@ All user visible changes to this project will be documented in this file. This p
 
 [#258]: https://github.com/instrumentisto/medea-jason/pull/258
 [#260]: https://github.com/instrumentisto/medea-jason/pull/260
+[#260]: https://github.com/instrumentisto/medea-jason/pull/260
+[#261]: https://github.com/instrumentisto/medea-jason/pull/261
 
 
 
