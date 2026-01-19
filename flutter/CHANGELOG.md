@@ -7,14 +7,9 @@ All user visible changes to this project will be documented in this file. This p
 
 
 ## [0.13.0] · 2026-01-19
-[0.13.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.11.0/flutter
+[0.13.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.13.0/flutter
 
 See also [`medea-jason` crate 0.13.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.13.0/CHANGELOG.md).
-
-### Upgraded
-
-- Dependencies:
-    - [`medea_flutter_webrtc`] to 0.17.0 version. ([#261])
 
 ### Added
 
@@ -25,8 +20,12 @@ See also [`medea-jason` crate 0.13.0 changes](https://github.com/instrumentisto/
 - `InternalException` providing incorrect error message in some cases. ([#258])
 - Disabling audio/video not working in rare cases. ([#258])
 
+### Upgraded
+
+- Dependencies:
+    - [`medea_flutter_webrtc`] to 0.17.0 version. ([#261])
+
 [#258]: https://github.com/instrumentisto/medea-jason/pull/258
-[#260]: https://github.com/instrumentisto/medea-jason/pull/260
 [#260]: https://github.com/instrumentisto/medea-jason/pull/260
 [#261]: https://github.com/instrumentisto/medea-jason/pull/261
 
