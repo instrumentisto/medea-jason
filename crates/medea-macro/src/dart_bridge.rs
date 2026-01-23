@@ -313,7 +313,7 @@ impl<'a> IdentGenerator<'a> {
 
     /// Returns a [`syn::Ident`] for the [`FnExpander`]'s storage.
     ///
-    /// Generates something like `PEER_CONNECTION__CREATE_OFFER__FUNCTION`
+    /// Generates something like `PEER_CONNECTION__CREATE_OFFER__FUNCTION`.
     fn fn_storage(&self) -> syn::Ident {
         format_ident!(
             "{}__{}__FUNCTION",
@@ -324,7 +324,7 @@ impl<'a> IdentGenerator<'a> {
 
     /// Returns a [`syn::Ident`] for the [`FnExpander`]'s error slot name.
     ///
-    /// Generates something like `PEER_CONNECTION__CREATE_OFFER__ERROR`
+    /// Generates something like `PEER_CONNECTION__CREATE_OFFER__ERROR`.
     fn error_slot_name(&self) -> syn::Ident {
         format_ident!(
             "{}__{}__ERROR",

@@ -60,7 +60,7 @@ pub struct Spec {
     pub video_settings: VideoSettings,
 }
 
-/// ID of a [`WebRtcPublish`] media [`Element`]
+/// ID of a [`WebRtcPublish`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
 #[derive(

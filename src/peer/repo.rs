@@ -84,7 +84,7 @@ pub struct Repository {
     /// [`MediaManager`] for injecting into new created [`PeerConnection`]s.
     media_manager: Rc<MediaManager>,
 
-    /// Peer id to [`PeerConnection`],
+    /// [`PeerId`] to [`PeerConnection`] mapping.
     peers: Rc<RefCell<HashMap<PeerId, peer::Component>>>,
 
     /// [`TaskHandle`] for a task which will call

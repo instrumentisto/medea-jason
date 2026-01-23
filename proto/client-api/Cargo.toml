@@ -30,5 +30,5 @@ medea-macro = { version = "0.3", path = "../../crates/medea-macro" }
 rand = "0.9"
 secrecy = { version = "0.10", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
-serde_with = "3.0"
+serde_with = { version = "3.16", features = ["macros"], default-features = false }
 subtle = "2.6"

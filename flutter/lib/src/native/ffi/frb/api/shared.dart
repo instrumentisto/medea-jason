@@ -82,7 +82,7 @@ enum PeerConnectionState {
 
 /// The reason of why a `Room` was closed.
 ///
-/// Provided in a [`RoomCloseReason`]
+/// Provided in a [`RoomCloseReason`].
 enum RoomCloseKind {
   /// Unexpected client error.
   internalClientError,
