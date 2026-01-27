@@ -248,7 +248,7 @@ mod media_stream_track {
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
 #[derive(Clone, Debug)]
 pub struct MediaStreamTrack {
-    /// Pointer on the [MediaStreamTrack][0]
+    /// Pointer on the [MediaStreamTrack][0].
     ///
     /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     inner: DartHandle,

@@ -150,7 +150,7 @@ pub struct Sid {
 }
 
 impl Sid {
-    /// Renders the [URI] string of this [`Sid`]
+    /// Renders the [URI] string of this [`Sid`].
     ///
     /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
     // TODO: Return `SecretString` once `secrecy` crate allows to unwrap it:

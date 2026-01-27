@@ -90,7 +90,7 @@ impl MediaDeviceInfo {
     }
 
     /// Returns a group identifier of the device represented by this
-    /// [`MediaDeviceInfo`]
+    /// [`MediaDeviceInfo`].
     ///
     /// Two devices have the same group identifier if they belong to the same
     /// physical device. For example, the audio input and output devices

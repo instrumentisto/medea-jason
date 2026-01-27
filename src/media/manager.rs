@@ -181,7 +181,7 @@ pub struct MediaManager(Rc<InnerMediaManager>);
 /// Actual data of [`MediaManager`].
 #[derive(Debug, Default)]
 struct InnerMediaManager {
-    /// Obtained tracks storage
+    /// Obtained tracks storage.
     tracks: RefCell<HashMap<String, Weak<local::Track>>>,
 
     /// Media devices platform controller.

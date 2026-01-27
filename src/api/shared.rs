@@ -12,7 +12,7 @@ use crate::{api::RoomCloseReason, peer::PeerConnection};
 
 /// The reason of why a `Room` was closed.
 ///
-/// Provided in a [`RoomCloseReason`]
+/// Provided in a [`RoomCloseReason`].
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum RoomCloseKind {

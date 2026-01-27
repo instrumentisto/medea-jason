@@ -121,7 +121,7 @@ pub async fn run(opts: &Cli, callback_server: Addr<GrpcCallbackServer>) {
 /// Generates `request` macro which will generate [`actix_web`] request handler
 /// which will call some function with `Path` extracted from `Request`.
 ///
-/// `$call_fn` - function which will be called on request;
+/// `$call_fn` - function which will be called on request.
 ///
 /// `$resp` - type of response on this request.
 macro_rules! gen_request_macro {
@@ -129,7 +129,7 @@ macro_rules! gen_request_macro {
         /// Generates handler with provided name and `Path` which will be
         /// passed to `$call_fn` function.
         ///
-        /// `$name` - name of generated function;
+        /// `$name` - name of generated function.
         ///
         /// `$uri_tuple` - type of path which will be provided by [`actix_web`].
         macro_rules! request {

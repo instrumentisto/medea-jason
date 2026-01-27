@@ -54,7 +54,7 @@ static ALLOCATOR: talc::TalckWasm = unsafe { talc::TalckWasm::new_global() };
 /// we will get better error messages if our code ever panics.
 ///
 /// For more details see:
-/// <https://github.com/rustwasm/console_error_panic_hook#readme>
+/// <https://github.com/rustwasm/console_error_panic_hook#readme>.
 #[cfg(feature = "console_error_panic_hook")]
 pub use console_error_panic_hook::set_once as set_panic_hook;
 
