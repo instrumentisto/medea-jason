@@ -173,9 +173,9 @@ impl LocalMediaTrackImpl {
         self.0.on_ended(callback);
     }
 
-    /// Returns a [`MediaStreamTrackState::Live`] if
-    /// this [`LocalMediaTrackImpl`] is active, or
-    /// a [`MediaStreamTrackState::Ended`] if it has ended.
+    /// Returns a [`MediaStreamTrackState::Live`] if this
+    /// [`LocalMediaTrackImpl`] is active, or a
+    /// [`MediaStreamTrackState::Ended`] if it has ended.
     pub async fn state(&self) -> MediaStreamTrackState {
         self.0.state().await
     }

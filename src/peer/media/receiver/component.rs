@@ -341,7 +341,7 @@ impl Component {
                 fut.await;
             }
         }
-        receiver.maybe_notify_track().await;
+        receiver.maybe_notify_track();
     }
 
     /// Watcher for [`media_exchange_state::Stable`] media exchange state

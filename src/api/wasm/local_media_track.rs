@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
 
 use crate::{
-    api::{self, MediaKind, MediaSourceKind},
+    api::{self, MediaKind, MediaSourceKind, MediaStreamTrackState},
     media::track::local,
 };
 
@@ -39,17 +39,13 @@ impl LocalMediaTrack {
         self.0.kind().into()
     }
 
-    /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
-    /// audio track, or a [`MediaKind::Video`] if it represents a video track.
-    // TODO: Try remove on next Rust upgrade.
-    #[expect(clippy::allow_attributes, reason = "`#[expect]` doesn't work")]
-    // TODO: Needs refactoring.
-    #[allow(clippy::as_conversions, reason = "needs refactoring")]
+    /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`]
+    /// is active, or a [`MediaStreamTrackState::Ended`] if it has ended.
     pub fn state(&self) -> Promise {
         let this = self.0.clone();
-        future_to_promise(
-            async move { Ok(JsValue::from(this.state().await as u8)) },
-        )
+        future_to_promise(async move {
+            Ok(JsValue::from(MediaStreamTrackState::from(this.state().await)))
+        })
     }
 
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is
