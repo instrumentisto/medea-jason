@@ -6,6 +6,17 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### Fixed
+
+- `ConnectionHandle.on_remote_track_added()` not being called if media receive is disabled locally. ([#262])
+
+[#262]: https://github.com/instrumentisto/medea-jason/pull/262
+
+
+
+
 ## [0.13.0] · 2026-01-19
 [0.13.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.13.0/flutter
 

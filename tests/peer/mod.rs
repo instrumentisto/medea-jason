@@ -1416,18 +1416,20 @@ async fn new_remote_track() {
         let audio_rx_enabled = bit_at(i, 2);
         let video_rx_enabled = bit_at(i, 3);
 
+        // Track is fired if it's enabled on the `tx` side and `rx` side has no
+        // effect.
         assert_eq!(
             helper(
                 audio_tx_enabled,
                 video_tx_enabled,
                 audio_rx_enabled,
-                video_rx_enabled
+                video_rx_enabled,
             )
             .await
             .unwrap(),
             FinalTrack {
-                has_audio: audio_tx_enabled && audio_rx_enabled,
-                has_video: video_tx_enabled && video_rx_enabled,
+                has_audio: audio_tx_enabled,
+                has_video: video_tx_enabled,
             },
             "{audio_tx_enabled} {video_tx_enabled} \
              {audio_rx_enabled} {video_rx_enabled}",

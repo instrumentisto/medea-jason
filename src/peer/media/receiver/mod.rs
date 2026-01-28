@@ -268,7 +268,7 @@ impl Receiver {
             .await;
         }
 
-        self.maybe_notify_track().await;
+        self.maybe_notify_track();
     }
 
     /// Updates [`MediaDirection`] of this [`Receiver`].
@@ -305,14 +305,7 @@ impl Receiver {
 
     /// Emits [`PeerEvent::NewRemoteTrack`] if [`Receiver`] is receiving media
     /// and has not notified yet.
-    async fn maybe_notify_track(&self) {
-        if self.is_track_notified.get() {
-            return;
-        }
-        if !self.is_receiving().await {
-            return;
-        }
-        // Re-check since state might have changed during `.await`.
+    fn maybe_notify_track(&self) {
         if self.is_track_notified.get() {
             return;
         }

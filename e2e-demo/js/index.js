@@ -865,6 +865,13 @@ window.onload = async function() {
       });
 
       connection.on_remote_track_added((track) => {
+      console.log(
+        `Remote track (${rust.MediaKind[track.kind()]} ` +
+        `${rust.MediaSourceKind[track.media_source_kind()]}) ` +
+        `from ${remoteMemberId} added with direction ` +
+        `${rust.MediaDirection[track.media_direction()]}`
+      );
+
         let playElement = undefined;
 
         if (track.kind() === rust.MediaKind.Video) {
@@ -956,7 +963,12 @@ window.onload = async function() {
         }
 
         track.on_media_direction_changed(async (direction) => {
-          console.log('New TransceiverDirection: ' + direction);
+          console.log(
+            `Remote track (${rust.MediaKind[track.kind()]} ` +
+            `${rust.MediaSourceKind[track.media_source_kind()]}) ` +
+            `from ${remoteMemberId} direction changed to ` +
+            `${rust.MediaDirection[direction]}`
+          );
 
           const isVideo = track.kind() === rust.MediaKind.Video;
 

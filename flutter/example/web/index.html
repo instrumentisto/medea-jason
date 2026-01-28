@@ -33,30 +33,32 @@
   <link rel="manifest" href="manifest.json">
   <script type="module">
     import init, {
-      Jason,
-      MediaStreamSettings,
       DeviceAudioTrackConstraints,
-      DisplayAudioTrackConstraints,
       DeviceVideoTrackConstraints,
+      DisplayAudioTrackConstraints,
       DisplayVideoTrackConstraints,
-      LogLevel,
       FacingMode,
+      Jason,
+      LogLevel,
+      MediaDirection,
       MediaKind,
-      MediaSourceKind
+      MediaSourceKind,
+      MediaStreamSettings,
     } from '/assets/packages/medea_jason/assets/pkg/medea_jason.js';
 
     (async () => {
       await init();
-      window.Jason = Jason;
-      window.MediaStreamSettings = MediaStreamSettings;
       window.DeviceAudioTrackConstraints = DeviceAudioTrackConstraints;
-      window.DisplayAudioTrackConstraints = DisplayAudioTrackConstraints;
       window.DeviceVideoTrackConstraints = DeviceVideoTrackConstraints;
+      window.DisplayAudioTrackConstraints = DisplayAudioTrackConstraints;
       window.DisplayVideoTrackConstraints = DisplayVideoTrackConstraints;
-      window.LogLevel = LogLevel;
       window.FacingMode = FacingMode;
+      window.Jason = Jason;
+      window.LogLevel = LogLevel;
+      window.MediaDirection = MediaDirection;
       window.MediaKind = MediaKind;
       window.MediaSourceKind = MediaSourceKind;
+      window.MediaStreamSettings = MediaStreamSettings;
     })();
   </script>
 </head>
