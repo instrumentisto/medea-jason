@@ -12,7 +12,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Fixed
 
-- `ConnectionHandle.onRemoteTrackAdded()` not called if media receive is disabled locally. ([#262])
+- `ConnectionHandle.on_remote_rrack_added()` not being called if media receive is disabled locally. ([#262])
 
 [#262]: https://github.com/instrumentisto/medea-jason/pull/262
 

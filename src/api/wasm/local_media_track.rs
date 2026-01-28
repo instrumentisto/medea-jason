@@ -39,8 +39,8 @@ impl LocalMediaTrack {
         self.0.kind().into()
     }
 
-    /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`]
-    /// is active, or a [`MediaStreamTrackState::Ended`] if it has ended.
+    /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is
+    /// active, or a [`MediaStreamTrackState::Ended`] if it has ended.
     pub fn state(&self) -> Promise {
         let this = self.0.clone();
         future_to_promise(async move {

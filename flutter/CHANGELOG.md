@@ -8,11 +8,9 @@ All user visible changes to this project will be documented in this file. This p
 
 ## master
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.13.0...master)
-
 ### Fixed
 
-- `ConnectionHandle.on_remote_track_added()` not called if media receive is disabled locally. ([#262])
+- `ConnectionHandle.on_remote_track_added()` not being called if media receive is disabled locally. ([#262])
 
 [#262]: https://github.com/instrumentisto/medea-jason/pull/262
 

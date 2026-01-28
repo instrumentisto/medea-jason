@@ -965,9 +965,9 @@ window.onload = async function() {
         track.on_media_direction_changed(async (direction) => {
           console.log(
             `Remote track (${rust.MediaKind[track.kind()]} ` +
-              `${rust.MediaSourceKind[track.media_source_kind()]}) ` +
-              `from ${remoteMemberId} direction changed to ` +
-              `${rust.MediaDirection[direction]}`
+            `${rust.MediaSourceKind[track.media_source_kind()]}) ` +
+            `from ${remoteMemberId} direction changed to ` +
+            `${rust.MediaDirection[direction]}`
           );
 
           const isVideo = track.kind() === rust.MediaKind.Video;
