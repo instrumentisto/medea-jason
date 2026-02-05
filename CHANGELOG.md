@@ -6,9 +6,10 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.13.1] · 2026-02-06
+[0.13.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.13.1
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.13.0...master)
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.13.0...medea-jason-0.13.1)
 
 ### Fixed
 

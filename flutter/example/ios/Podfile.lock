@@ -8,7 +8,7 @@ PODS:
   - medea_flutter_webrtc (0.17.1):
     - Flutter
     - instrumentisto-libwebrtc-bin (= 144.0.7559.59)
-  - medea_jason (0.13.0):
+  - medea_jason (0.13.1):
     - Flutter
 
 DEPENDENCIES:
