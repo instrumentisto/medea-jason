@@ -15,7 +15,7 @@ See also [`medea_jason` pub package 0.13.1 changes](https://github.com/instrumen
 
 ### Fixed
 
-- `ConnectionHandle.on_remote_rrack_added()` not being called if media receive is disabled locally. ([#262])
+- `ConnectionHandle.on_remote_track_added()` not being called if media receive is disabled locally. ([#262])
 
 [#262]: https://github.com/instrumentisto/medea-jason/pull/262
 

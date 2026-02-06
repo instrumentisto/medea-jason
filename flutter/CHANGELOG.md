@@ -13,7 +13,7 @@ See also [`medea-jason` crate 0.13.1 changes](https://github.com/instrumentisto/
 
 ### Fixed
 
-- `ConnectionHandle.on_remote_track_added()` not being called if media receive is disabled locally. ([#262])
+- `ConnectionHandle.onRemoteTrackAdded()` not being called if media receive is disabled locally. ([#262])
 
 [#262]: https://github.com/instrumentisto/medea-jason/pull/262
 
