@@ -11,7 +11,7 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.13.0...medea-jason-0.13.1)
 
-See also [`medea_jason` pub package 0.13.1 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.13.0/flutter/CHANGELOG.md).
+See also [`medea_jason` pub package 0.13.1 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.13.1/flutter/CHANGELOG.md).
 
 ### Fixed
 
