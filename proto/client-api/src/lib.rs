@@ -157,7 +157,7 @@ use std::{
 
 use derive_more::with_trait::{Constructor, Display, From, Into};
 use medea_macro::dispatchable;
-use rand::{Rng as _, distr::Alphanumeric};
+use rand::{RngExt as _, distr::Alphanumeric};
 use secrecy::{ExposeSecret as _, SecretString};
 use serde::{Deserialize, Serialize, Serializer};
 

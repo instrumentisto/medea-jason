@@ -274,7 +274,7 @@ impl Credentials {
     /// Generates new random [`Credentials::Plain`].
     #[must_use]
     pub fn random() -> Self {
-        use rand::{Rng as _, distr::Alphanumeric};
+        use rand::{RngExt as _, distr::Alphanumeric};
 
         Self::Plain(
             rand::rng()
