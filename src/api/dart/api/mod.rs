@@ -137,6 +137,16 @@ pub struct ApiMediaDeviceDetails {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
     pub group_id: Option<String>,
 
+    /// Native sample rate in Hz.
+    ///
+    /// For audio devices only. [`None`] for video or if unavailable.
+    pub sample_rate: Option<u32>,
+
+    /// Number of channels.
+    ///
+    /// For audio devices only. [`None`] for video or if unavailable.
+    pub num_channels: Option<u16>,
+
     /// Indicator whether the last attempt to use the provided device failed.
     pub is_failed: bool,
 }
@@ -149,6 +159,8 @@ impl From<platform::MediaDeviceInfo> for ApiMediaDeviceDetails {
             label: v.label(),
             audio_device_kind: v.audio_device_kind(),
             group_id: v.group_id(),
+            sample_rate: v.sample_rate(),
+            num_channels: v.num_channels(),
             is_failed: v.is_failed(),
         }
     }

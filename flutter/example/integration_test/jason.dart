@@ -16,8 +16,13 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
+    // TODO: Add explicit FFI layer initialization.
+    // Call Jason.init() to bootstrap FFI.
+    var jason = await Jason.init();
+    jason.free();
+    await setLogLevel(LogLevel.info);
+
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      await webrtc.initFfiBridge();
       await webrtc.enableFakeMedia();
     }
     if (Platform.isAndroid) {
@@ -31,7 +36,6 @@ void main() {
         await Future.delayed(Duration(seconds: 5));
       }
     }
-    await setLogLevel(LogLevel.info);
   });
 
   testWidgets('MediaManager', (WidgetTester tester) async {

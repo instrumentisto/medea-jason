@@ -2243,6 +2243,8 @@ impl SseDecode for crate::api::dart::api::ApiMediaDeviceDetails {
         let mut var_audioDeviceKind =
             <Option<crate::media::AudioDeviceKind>>::sse_decode(deserializer);
         let mut var_groupId = <Option<String>>::sse_decode(deserializer);
+        let mut var_sampleRate = <Option<u32>>::sse_decode(deserializer);
+        let mut var_numChannels = <Option<u16>>::sse_decode(deserializer);
         let mut var_isFailed = <bool>::sse_decode(deserializer);
         return crate::api::dart::api::ApiMediaDeviceDetails {
             kind: var_kind,
@@ -2250,6 +2252,8 @@ impl SseDecode for crate::api::dart::api::ApiMediaDeviceDetails {
             label: var_label,
             audio_device_kind: var_audioDeviceKind,
             group_id: var_groupId,
+            sample_rate: var_sampleRate,
+            num_channels: var_numChannels,
             is_failed: var_isFailed,
         };
     }
@@ -2804,6 +2808,19 @@ impl SseDecode for Option<crate::media::constraints::NoiseSuppressionLevel> {
     }
 }
 
+impl SseDecode for Option<u16> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<u16>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<u32> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(
@@ -2868,6 +2885,15 @@ impl SseDecode for crate::api::dart::api::room_close_reason::RoomCloseReason {
             reason: var_reason,
             is_closed_by_server: var_isClosedByServer,
         };
+    }
+}
+
+impl SseDecode for u16 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(
+        deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer,
+    ) -> Self {
+        deserializer.cursor.read_u16::<NativeEndian>().unwrap()
     }
 }
 
@@ -3330,6 +3356,8 @@ impl flutter_rust_bridge::IntoDart
             self.label.into_into_dart().into_dart(),
             self.audio_device_kind.into_into_dart().into_dart(),
             self.group_id.into_into_dart().into_dart(),
+            self.sample_rate.into_into_dart().into_dart(),
+            self.num_channels.into_into_dart().into_dart(),
             self.is_failed.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -4161,6 +4189,8 @@ impl SseEncode for crate::api::dart::api::ApiMediaDeviceDetails {
             serializer,
         );
         <Option<String>>::sse_encode(self.group_id, serializer);
+        <Option<u32>>::sse_encode(self.sample_rate, serializer);
+        <Option<u16>>::sse_encode(self.num_channels, serializer);
         <bool>::sse_encode(self.is_failed, serializer);
     }
 }
@@ -4707,6 +4737,19 @@ impl SseEncode for Option<crate::media::constraints::NoiseSuppressionLevel> {
     }
 }
 
+impl SseEncode for Option<u16> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <u16>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<u32> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(
@@ -4777,6 +4820,16 @@ impl SseEncode for crate::api::dart::api::room_close_reason::RoomCloseReason {
             serializer,
         );
         <bool>::sse_encode(self.is_closed_by_server, serializer);
+    }
+}
+
+impl SseEncode for u16 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+        serializer.cursor.write_u16::<NativeEndian>(self).unwrap();
     }
 }
 

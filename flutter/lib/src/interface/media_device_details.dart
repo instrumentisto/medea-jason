@@ -36,6 +36,16 @@ abstract class MediaDeviceDetails implements SyncPlatformHandle {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
   String? groupId();
 
+  /// Audio device sample rate in Hz.
+  ///
+  /// For audio devices only. `null` for video or if unavailable.
+  int? sampleRate();
+
+  /// Audio device number of channels.
+  ///
+  /// For audio devices only. `null` for video or if unavailable.
+  int? numChannels();
+
   /// Indicates whether the last attempt to use this device failed.
   bool isFailed();
 }
