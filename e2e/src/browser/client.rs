@@ -88,8 +88,8 @@ impl WebDriverClient {
         let (tx, rx) = mpsc::channel();
         let client = Arc::clone(&self.inner);
         drop(tokio::spawn(async move {
-            let inner = client.lock().await;
-            inner.0.clone().close().await.unwrap();
+            let client = client.lock().await.0.clone();
+            client.close().await.unwrap();
             tx.send(()).unwrap();
         }));
         task::block_in_place(move || {
@@ -106,8 +106,7 @@ impl WebDriverClient {
         let (tx, rx) = mpsc::channel();
         let client = Arc::clone(&self.inner);
         drop(tokio::spawn(async move {
-            let client = client.lock().await;
-            client.close_window(window).await;
+            client.lock().await.close_window(window).await;
             tx.send(()).unwrap();
         }));
         task::block_in_place(move || {

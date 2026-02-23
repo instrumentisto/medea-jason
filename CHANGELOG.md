@@ -6,6 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### Added
+
+- `MediaDeviceDetails.sampleRate()`, `MediaDeviceDetails.numChannels()` function (only accessible via Dart API). ([#264])
+
+### Fixed
+
+- `MediaDeviceDetails.groupId()` not working on Windows platform (only accessible via Dart API). ([#264])
+
+[#264]: https://github.com/instrumentisto/medea-jason/pull/264
+
+
+
+
 ## [0.13.1] · 2026-02-06
 [0.13.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.13.1
 

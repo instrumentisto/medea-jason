@@ -10,11 +10,13 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- `MediaDeviceDetails.sampleRate()`, `MediaDeviceDetails.numChannels()` function (only works on Windows right now).
+- `MediaDeviceDetails.sampleRate()`, `MediaDeviceDetails.numChannels()` function (only works on Windows right now). ([#264])
 
 ### Fixed
 
-- `MediaDeviceDetails.groupId()` not working on Windows platform.
+- `MediaDeviceDetails.groupId()` not working on Windows platform. ([#264])
+
+[#264]: https://github.com/instrumentisto/medea-jason/pull/264
 
 
 
