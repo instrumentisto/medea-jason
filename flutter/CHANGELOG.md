@@ -10,7 +10,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- `MediaDeviceDetails.sampleRate()`, `MediaDeviceDetails.numChannels()` function (only works on Windows right now). ([#264])
+- `MediaDeviceDetails.sampleRate()` and `MediaDeviceDetails.numChannels()` methods (only works on Windows right now). ([#264])
 
 ### Fixed
 
