@@ -12,6 +12,8 @@ int Function(Object)? _kind;
 int Function(Object)? _audioDeviceKind;
 Pointer<Utf8> Function(Object)? _label;
 Pointer Function(Object)? _groupId;
+int Function(Object)? _sampleRate;
+int Function(Object)? _numChannels;
 bool Function(Object)? _isFailed;
 
 _ErrorSetterFnDart? _media_device_info__device_id__set_error;
@@ -19,6 +21,8 @@ _ErrorSetterFnDart? _media_device_info__kind__set_error;
 _ErrorSetterFnDart? _media_device_info__audio_device_kind__set_error;
 _ErrorSetterFnDart? _media_device_info__label__set_error;
 _ErrorSetterFnDart? _media_device_info__group_id__set_error;
+_ErrorSetterFnDart? _media_device_info__sample_rate__set_error;
+_ErrorSetterFnDart? _media_device_info__num_channels__set_error;
 _ErrorSetterFnDart? _media_device_info__is_failed__set_error;
 
 void registerFunction(
@@ -28,6 +32,8 @@ void registerFunction(
   required int Function(Object) audioDeviceKind,
   required Pointer<Utf8> Function(Object) label,
   required Pointer Function(Object) groupId,
+  required int Function(Object) sampleRate,
+  required int Function(Object) numChannels,
   required bool Function(Object) isFailed,
 }) {
   _deviceId = deviceId;
@@ -35,6 +41,8 @@ void registerFunction(
   _audioDeviceKind = audioDeviceKind;
   _label = label;
   _groupId = groupId;
+  _sampleRate = sampleRate;
+  _numChannels = numChannels;
   _isFailed = isFailed;
 
   _media_device_info__device_id__set_error = dl
@@ -57,6 +65,14 @@ void registerFunction(
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
         'media_device_info__group_id__set_error',
       );
+  _media_device_info__sample_rate__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_device_info__sample_rate__set_error',
+      );
+  _media_device_info__num_channels__set_error = dl
+      .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
+        'media_device_info__num_channels__set_error',
+      );
   _media_device_info__is_failed__set_error = dl
       .lookupFunction<_ErrorSetterFnC, _ErrorSetterFnDart>(
         'media_device_info__is_failed__set_error',
@@ -72,18 +88,42 @@ void registerFunction(
       Pointer.fromFunction(_labelProxy);
   Pointer<NativeFunction<Pointer Function(Handle)>> groupId_native =
       Pointer.fromFunction(_groupIdProxy);
+  Pointer<NativeFunction<Int64 Function(Handle)>> sampleRate_native =
+      Pointer.fromFunction(_sampleRateProxy, 0);
+  Pointer<NativeFunction<Int64 Function(Handle)>> numChannels_native =
+      Pointer.fromFunction(_numChannelsProxy, 0);
   Pointer<NativeFunction<Bool Function(Handle)>> isFailed_native =
       Pointer.fromFunction(_isFailedProxy, false);
 
   dl.lookupFunction<
-    Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
-    void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer)
+    Void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    ),
+    void Function(
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+      Pointer,
+    )
   >('register_media_device_info')(
     deviceId_native,
     kind_native,
     audioDeviceKind_native,
     label_native,
     groupId_native,
+    sampleRate_native,
+    numChannels_native,
     isFailed_native,
   );
 }
@@ -130,6 +170,24 @@ Pointer _groupIdProxy(Object arg0) {
   } catch (e) {
     _media_device_info__group_id__set_error!(e);
     return Pointer.fromAddress(0);
+  }
+}
+
+int _sampleRateProxy(Object arg0) {
+  try {
+    return _sampleRate!(arg0);
+  } catch (e) {
+    _media_device_info__sample_rate__set_error!(e);
+    return 0;
+  }
+}
+
+int _numChannelsProxy(Object arg0) {
+  try {
+    return _numChannels!(arg0);
+  } catch (e) {
+    _media_device_info__num_channels__set_error!(e);
+    return 0;
   }
 }
 

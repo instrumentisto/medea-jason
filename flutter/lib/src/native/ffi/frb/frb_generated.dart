@@ -3739,15 +3739,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ApiMediaDeviceDetails dco_decode_api_media_device_details(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return ApiMediaDeviceDetails(
       kind: dco_decode_media_device_kind(arr[0]),
       deviceId: dco_decode_String(arr[1]),
       label: dco_decode_String(arr[2]),
       audioDeviceKind: dco_decode_opt_box_autoadd_audio_device_kind(arr[3]),
       groupId: dco_decode_opt_String(arr[4]),
-      isFailed: dco_decode_bool(arr[5]),
+      sampleRate: dco_decode_opt_box_autoadd_u_32(arr[5]),
+      numChannels: dco_decode_opt_box_autoadd_u_16(arr[6]),
+      isFailed: dco_decode_bool(arr[7]),
     );
   }
 
@@ -3879,6 +3881,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_noise_suppression_level(raw);
+  }
+
+  @protected
+  int dco_decode_box_autoadd_u_16(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
   }
 
   @protected
@@ -4133,6 +4141,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int? dco_decode_opt_box_autoadd_u_16(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_u_16(raw);
+  }
+
+  @protected
   int? dco_decode_opt_box_autoadd_u_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_u_32(raw);
@@ -4160,6 +4174,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       reason: dco_decode_room_close_kind(arr[0]),
       isClosedByServer: dco_decode_bool(arr[1]),
     );
+  }
+
+  @protected
+  int dco_decode_u_16(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
   }
 
   @protected
@@ -4562,6 +4582,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       deserializer,
     );
     var var_groupId = sse_decode_opt_String(deserializer);
+    var var_sampleRate = sse_decode_opt_box_autoadd_u_32(deserializer);
+    var var_numChannels = sse_decode_opt_box_autoadd_u_16(deserializer);
     var var_isFailed = sse_decode_bool(deserializer);
     return ApiMediaDeviceDetails(
       kind: var_kind,
@@ -4569,6 +4591,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       label: var_label,
       audioDeviceKind: var_audioDeviceKind,
       groupId: var_groupId,
+      sampleRate: var_sampleRate,
+      numChannels: var_numChannels,
       isFailed: var_isFailed,
     );
   }
@@ -4723,6 +4747,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_noise_suppression_level(deserializer));
+  }
+
+  @protected
+  int sse_decode_box_autoadd_u_16(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_u_16(deserializer));
   }
 
   @protected
@@ -5081,6 +5111,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int? sse_decode_opt_box_autoadd_u_16(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_u_16(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -5116,6 +5157,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       reason: var_reason,
       isClosedByServer: var_isClosedByServer,
     );
+  }
+
+  @protected
+  int sse_decode_u_16(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint16();
   }
 
   @protected
@@ -5535,6 +5582,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       serializer,
     );
     sse_encode_opt_String(self.groupId, serializer);
+    sse_encode_opt_box_autoadd_u_32(self.sampleRate, serializer);
+    sse_encode_opt_box_autoadd_u_16(self.numChannels, serializer);
     sse_encode_bool(self.isFailed, serializer);
   }
 
@@ -5693,6 +5742,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_noise_suppression_level(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_u_16(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_16(self, serializer);
   }
 
   @protected
@@ -6041,6 +6096,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_u_16(int? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_u_16(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -6076,6 +6141,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_room_close_kind(self.reason, serializer);
     sse_encode_bool(self.isClosedByServer, serializer);
+  }
+
+  @protected
+  void sse_encode_u_16(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint16(self);
   }
 
   @protected

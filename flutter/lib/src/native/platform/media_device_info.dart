@@ -16,6 +16,8 @@ void registerFunctions(DynamicLibrary dl) {
     kind: _kind,
     isFailed: _isFailed,
     audioDeviceKind: _audioDeviceKind,
+    sampleRate: _sampleRate,
+    numChannels: _numChannels,
   );
 }
 
@@ -34,7 +36,27 @@ Pointer<Utf8> _label(Object deviceInfo) {
 /// Returns [MediaDeviceInfo.groupId] value.
 Pointer _groupId(Object deviceInfo) {
   deviceInfo as webrtc.MediaDeviceInfo;
-  return ForeignValue.none().intoRustOwned();
+  if (deviceInfo.containerId != null) {
+    return ForeignValue.fromString(deviceInfo.containerId!).intoRustOwned();
+  } else {
+    return ForeignValue.none().intoRustOwned();
+  }
+}
+
+/// Returns native sample rate in `Hz`.
+///
+/// For audio only; -1 for video or if is unavailable.
+int _sampleRate(Object deviceInfo) {
+  deviceInfo as webrtc.MediaDeviceInfo;
+  return deviceInfo.sampleRate == null ? -1 : deviceInfo.sampleRate!;
+}
+
+/// Returns number of channels.
+///
+/// For audio only; -1 for video or if is unavailable.
+int _numChannels(Object deviceInfo) {
+  deviceInfo as webrtc.MediaDeviceInfo;
+  return deviceInfo.numChannels == null ? -1 : deviceInfo.numChannels!;
 }
 
 /// Indicates whether the last attempt to use the provided device failed.

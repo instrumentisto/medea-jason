@@ -44,6 +44,12 @@ mod media_device_info {
             info: Dart_Handle,
         ) -> Result<ptr::NonNull<DartValueArg<Option<String>>>, Error>;
 
+        /// Returns native sample rate in `Hz` for the provided device.
+        pub fn sample_rate(info: Dart_Handle) -> Result<i64, Error>;
+
+        /// Returns number of channels for the provided device.
+        pub fn num_channels(info: Dart_Handle) -> Result<i64, Error>;
+
         /// Indicates whether the last attempt to use the provided device
         /// failed.
         pub fn is_failed(info: Dart_Handle) -> Result<bool, Error>;
@@ -103,6 +109,30 @@ impl MediaDeviceInfo {
         let group_id =
             unsafe { media_device_info::group_id(self.handle.get()) }.unwrap();
         Option::try_from(unsafe { group_id.unbox() }).unwrap()
+    }
+
+    /// Native sample rate in Hz.
+    ///
+    /// For audio devices only. [`None`] for video or if unavailable.
+    #[must_use]
+    pub fn sample_rate(&self) -> Option<u32> {
+        let sample_rate =
+            unsafe { media_device_info::sample_rate(self.handle.get()) }
+                .unwrap();
+
+        if sample_rate > 0 { u32::try_from(sample_rate).ok() } else { None }
+    }
+
+    /// Number of channels.
+    ///
+    /// For audio devices only. [`None`] for video or if unavailable.
+    #[must_use]
+    pub fn num_channels(&self) -> Option<u16> {
+        let channels =
+            unsafe { media_device_info::num_channels(self.handle.get()) }
+                .unwrap();
+
+        if channels > 0 { u16::try_from(channels).ok() } else { None }
     }
 
     /// Indicates whether the last attempt to use this device failed.

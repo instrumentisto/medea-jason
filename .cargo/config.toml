@@ -5,6 +5,5 @@ CARGO_WORKSPACE_DIR = { value = "", relative = true }
 [target.wasm32-unknown-unknown]
 runner = "wasm-bindgen-test-runner"
 rustflags = [
-    "--cfg", "getrandom_backend=\"wasm_js\"",
     "--cfg=web_sys_unstable_apis",
 ]

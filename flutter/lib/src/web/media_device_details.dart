@@ -34,6 +34,18 @@ class WebMediaDeviceDetails implements MediaDeviceDetails {
     return null;
   }
 
+  @override
+  int? sampleRate() {
+    // Not implemented on web.
+    return null;
+  }
+
+  @override
+  int? numChannels() {
+    // Not implemented on web.
+    return null;
+  }
+
   @moveSemantics
   @override
   void free() {

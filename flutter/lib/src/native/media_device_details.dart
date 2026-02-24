@@ -35,6 +35,16 @@ class NativeMediaDeviceDetails implements MediaDeviceDetails {
   }
 
   @override
+  int? sampleRate() {
+    return _info.sampleRate;
+  }
+
+  @override
+  int? numChannels() {
+    return _info.numChannels;
+  }
+
+  @override
   bool isFailed() {
     return _info.isFailed;
   }

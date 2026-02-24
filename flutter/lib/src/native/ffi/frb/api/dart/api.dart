@@ -253,6 +253,16 @@ class ApiMediaDeviceDetails {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
   final String? groupId;
 
+  /// Native sample rate in `Hz`.
+  ///
+  /// For audio devices only. [`None`] for video or if is unavailable.
+  final int? sampleRate;
+
+  /// Number of channels.
+  ///
+  /// For audio devices only. [`None`] for video or if is unavailable.
+  final int? numChannels;
+
   /// Indicator whether the last attempt to use the provided device failed.
   final bool isFailed;
 
@@ -262,6 +272,8 @@ class ApiMediaDeviceDetails {
     required this.label,
     this.audioDeviceKind,
     this.groupId,
+    this.sampleRate,
+    this.numChannels,
     required this.isFailed,
   });
 
@@ -272,6 +284,8 @@ class ApiMediaDeviceDetails {
       label.hashCode ^
       audioDeviceKind.hashCode ^
       groupId.hashCode ^
+      sampleRate.hashCode ^
+      numChannels.hashCode ^
       isFailed.hashCode;
 
   @override
@@ -284,6 +298,8 @@ class ApiMediaDeviceDetails {
           label == other.label &&
           audioDeviceKind == other.audioDeviceKind &&
           groupId == other.groupId &&
+          sampleRate == other.sampleRate &&
+          numChannels == other.numChannels &&
           isFailed == other.isFailed;
 }
 
