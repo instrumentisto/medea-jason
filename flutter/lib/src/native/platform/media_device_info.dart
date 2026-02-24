@@ -43,14 +43,17 @@ Pointer _groupId(Object deviceInfo) {
   }
 }
 
-/// Returns native sample rate in Hz. For audio only; -1 for video or if
-/// unavailable.
+/// Returns native sample rate in `Hz`.
+///
+/// For audio only; -1 for video or if is unavailable.
 int _sampleRate(Object deviceInfo) {
   deviceInfo as webrtc.MediaDeviceInfo;
   return deviceInfo.sampleRate == null ? -1 : deviceInfo.sampleRate!;
 }
 
-/// Returns number of channels. For audio only; -1 for video or if unavailable.
+/// Returns number of channels.
+///
+/// For audio only; -1 for video or if is unavailable.
 int _numChannels(Object deviceInfo) {
   deviceInfo as webrtc.MediaDeviceInfo;
   return deviceInfo.numChannels == null ? -1 : deviceInfo.numChannels!;

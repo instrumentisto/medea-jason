@@ -137,14 +137,14 @@ pub struct ApiMediaDeviceDetails {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
     pub group_id: Option<String>,
 
-    /// Native sample rate in Hz.
+    /// Native sample rate in `Hz`.
     ///
-    /// For audio devices only. [`None`] for video or if unavailable.
+    /// For audio devices only. [`None`] for video or if is unavailable.
     pub sample_rate: Option<u32>,
 
     /// Number of channels.
     ///
-    /// For audio devices only. [`None`] for video or if unavailable.
+    /// For audio devices only. [`None`] for video or if is unavailable.
     pub num_channels: Option<u16>,
 
     /// Indicator whether the last attempt to use the provided device failed.

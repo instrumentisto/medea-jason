@@ -17,7 +17,7 @@ void main() {
 
   setUpAll(() async {
     // TODO: Add explicit FFI layer initialization.
-    // Call Jason.init() to bootstrap FFI.
+    // Call `Jason.init()` to bootstrap FFI.
     var jason = await Jason.init();
     jason.free();
     await setLogLevel(LogLevel.info);

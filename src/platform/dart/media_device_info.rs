@@ -44,7 +44,7 @@ mod media_device_info {
             info: Dart_Handle,
         ) -> Result<ptr::NonNull<DartValueArg<Option<String>>>, Error>;
 
-        /// Returns native sample rate in Hz for the provided device.
+        /// Returns native sample rate in `Hz` for the provided device.
         pub fn sample_rate(info: Dart_Handle) -> Result<i64, Error>;
 
         /// Returns number of channels for the provided device.

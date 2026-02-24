@@ -253,14 +253,14 @@ class ApiMediaDeviceDetails {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
   final String? groupId;
 
-  /// Native sample rate in Hz.
+  /// Native sample rate in `Hz`.
   ///
-  /// For audio devices only. [`None`] for video or if unavailable.
+  /// For audio devices only. [`None`] for video or if is unavailable.
   final int? sampleRate;
 
   /// Number of channels.
   ///
-  /// For audio devices only. [`None`] for video or if unavailable.
+  /// For audio devices only. [`None`] for video or if is unavailable.
   final int? numChannels;
 
   /// Indicator whether the last attempt to use the provided device failed.
