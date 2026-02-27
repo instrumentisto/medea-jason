@@ -678,7 +678,7 @@ jobs:
       - run: make flutter.web.assets
         if: ${{ matrix.platform == 'web' }}
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: build-jason-${{ matrix.platform }}
           path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
@@ -706,7 +706,7 @@ jobs:
       - run: make cargo.build.jason platform=linux
                                     dockerized=no debug=no
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: build-jason-linux
           path: ./flutter/linux/lib/
@@ -750,7 +750,7 @@ jobs:
                   image=${{ matrix.image }} tags=build-${{ github.run_number }}
         if: ${{ steps.skip.outputs.no == 'true'
              && steps.export.outputs.yes == 'true' }}
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: docker-${{ matrix.image }}-${{ github.run_number }}
           path: .cache/image.tar
