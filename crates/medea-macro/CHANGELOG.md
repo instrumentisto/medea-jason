@@ -8,12 +8,13 @@ All user visible changes to this project will be documented in this file. This p
 
 ## master
 
-### Changed
+### Fixed
 
 - `#[dart_bridge]` macro:
-    - Fix segfault on Flutter hot restart. ([#267])
+    - Segfault on [Flutter] hot restart. ([#267])
 
 [#267]: https://github.com/instrumentisto/medea-jason/pull/267
+
 
 
 
@@ -148,4 +149,5 @@ All user visible changes to this project will be documented in this file. This p
 
 [`async-trait`]: https://docs.rs/async-trait
 [`syn`]: https://docs.rs/syn
+[Flutter]: https://flutter.dev
 [Semantic Versioning 2.0.0]: https://semver.org

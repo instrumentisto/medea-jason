@@ -18,7 +18,9 @@ Future<void> setLogLevel(base.LogLevel level) async {
 class Jason extends base.Jason {
   final wasm.Jason obj = wasm.Jason();
 
-  /// Initializes the plugin's FFI layer. No-op for Web.
+  /// Initializes the plugin's FFI layer.
+  ///
+  /// No-op for Web.
   static Future<void> ensureInitialized() async {}
 
   /// Creates a new instance of [Jason].

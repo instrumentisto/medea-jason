@@ -54,7 +54,7 @@ Future<void> setLogLevel(base.LogLevel level) async {
   await (frb.setLogLevel(level: level) as Future);
 }
 
-/// Throws [StateError] if [RustLib] is not initialized.
+/// Throws [StateError] if the [RustLib] is not initialized.
 void _throwIfUninit() {
   if (!RustLib.instance.initialized) {
     throw StateError('Jason.ensureInitialized() must be called first.');

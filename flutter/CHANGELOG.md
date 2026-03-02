@@ -10,7 +10,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- `Jason.init()` split in two separate methods ([#267]):
+- `Jason.init()` decoupled into two separate methods: ([#267])
     - `Jason.ensureInitialized()` - async idempotent FFI layer initialization.
     - `Jason.create()` - sync static constructor.
 
@@ -20,7 +20,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Fixed
 
-- Segfault on Flutter hot restart. ([#267])
+- Segfault on [Flutter] hot restart. ([#267])
 - `MediaDeviceDetails.groupId()` not working on Windows platform. ([#264])
 
 [#264]: https://github.com/instrumentisto/medea-jason/pull/264
