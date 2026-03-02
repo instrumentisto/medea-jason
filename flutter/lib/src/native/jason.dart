@@ -32,7 +32,7 @@ final DynamicLibrary dl = el.ffiDynamicLibrary;
 
 /// [Executor] that drives Rust futures.
 ///
-/// Instantiated in the [_dl_load()] function, and must not be touched ever
+/// Instantiated in the [_dlLoad()] function, and must not be touched ever
 /// after that.
 late Executor executor;
 
@@ -49,7 +49,16 @@ void onPanic(void Function(String)? cb) {
 
 /// Sets the global maximum [base.LogLevel].
 Future<void> setLogLevel(base.LogLevel level) async {
+  _throwIfUninit();
+
   await (frb.setLogLevel(level: level) as Future);
+}
+
+/// Throws [StateError] if the [RustLib] is not initialized.
+void _throwIfUninit() {
+  if (!RustLib.instance.initialized) {
+    throw StateError('Jason.ensureInitialized() must be called first.');
+  }
 }
 
 ExternalLibrary _dlLoad() {
@@ -107,11 +116,12 @@ class Jason implements base.Jason {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   late util.RustOpaque<frb.Jason> opaque;
 
-  /// Creates a new instance of [Jason].
-  static Future<Jason> init() async {
-    // Init `medea_flutter_webrtc`.
-    await initFfiBridge();
+  /// Initializes the plugin's FFI layer.
+  ///
+  /// Must be called before anything else.
+  static Future<void> ensureInitialized() async {
     if (!RustLib.instance.initialized) {
+      await initFfiBridge();
       await RustLib.init(externalLibrary: el);
 
       var port =
@@ -129,6 +139,11 @@ class Jason implements base.Jason {
       );
       frb.setDartOpaqueMessagePort(dartHandlerPort: port);
     }
+  }
+
+  /// Creates a new instance of [Jason].
+  static Jason create() {
+    _throwIfUninit();
 
     var jason = Jason._();
 

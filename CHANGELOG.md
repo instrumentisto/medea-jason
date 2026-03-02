@@ -14,9 +14,11 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Fixed
 
+- Segfault on [Flutter] hot restart. ([#267])
 - `MediaDeviceDetails.groupId()` not working on Windows platform (only accessible via Dart API). ([#264])
 
 [#264]: https://github.com/instrumentisto/medea-jason/pull/264
+[#267]: https://github.com/instrumentisto/medea-jason/pull/267
 
 
 
