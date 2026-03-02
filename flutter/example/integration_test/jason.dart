@@ -16,10 +16,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
-    // TODO: Add explicit FFI layer initialization.
-    // Call `Jason.init()` to bootstrap FFI.
-    var jason = await Jason.init();
-    jason.free();
+    await Jason.ensureInitialized();
     await setLogLevel(LogLevel.info);
 
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
@@ -39,7 +36,7 @@ void main() {
   });
 
   testWidgets('MediaManager', (WidgetTester tester) async {
-    var jason = await Jason.init();
+    var jason = Jason.create();
     var mediaManager = jason.mediaManager();
 
     var devices = await mediaManager.enumerateDevices();
@@ -118,7 +115,7 @@ void main() {
   });
 
   testWidgets('RoomHandle', (WidgetTester tester) async {
-    var jason = await Jason.init();
+    var jason = Jason.create();
     var room = jason.initRoom();
     room.onFailedLocalMedia((_) {});
     room.onConnectionLoss((_) {});
@@ -365,7 +362,7 @@ void main() {
     final firePanic = dl.lookupFunction<Void Function(), void Function()>(
       'fire_panic',
     );
-    final jason = await Jason.init();
+    final jason = Jason.create();
     var completer = Completer();
     onPanic((msg) => completer.complete(msg));
     try {
@@ -382,7 +379,7 @@ void main() {
   testWidgets('Enumerate displays', (WidgetTester widgetTester) async {
     var shouldWork = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
 
-    var jason = await Jason.init();
+    var jason = Jason.create();
     var media = jason.mediaManager();
 
     if (!shouldWork) {
@@ -402,7 +399,7 @@ void main() {
       return;
     }
 
-    var jason = await Jason.init();
+    var jason = Jason.create();
     var mediaManager = jason.mediaManager();
 
     {
@@ -516,7 +513,7 @@ void main() {
   });
 
   testWidgets('AudioProcessing in runtime', (WidgetTester tester) async {
-    var jason = await Jason.init();
+    var jason = Jason.create();
     var mediaManager = jason.mediaManager();
 
     if (Platform.isAndroid || Platform.isIOS) {
@@ -588,7 +585,7 @@ void main() {
       return;
     }
 
-    var jason = await Jason.init();
+    var jason = Jason.create();
     var mediaManager = jason.mediaManager();
 
     // Configure settings with both display video and audio

@@ -6,6 +6,18 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### Fixed
+
+- `#[dart_bridge]` macro:
+    - Segfault on [Flutter] hot restart. ([#267])
+
+[#267]: https://github.com/instrumentisto/medea-jason/pull/267
+
+
+
+
 ## [0.3.3] · 2025-12-19
 [0.3.3]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.3.3/crates/medea-macro
 
@@ -137,4 +149,5 @@ All user visible changes to this project will be documented in this file. This p
 
 [`async-trait`]: https://docs.rs/async-trait
 [`syn`]: https://docs.rs/syn
+[Flutter]: https://flutter.dev
 [Semantic Versioning 2.0.0]: https://semver.org

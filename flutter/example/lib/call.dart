@@ -74,7 +74,8 @@ class Call {
   static Future<Call> create() async {
     var self = Call._create();
 
-    self._jason = await Jason.init();
+    await Jason.ensureInitialized();
+    self._jason = Jason.create();
     self._mediaManager = self._jason.mediaManager();
     self._room = self._jason.initRoom();
     await setLogLevel(LogLevel.debug);
