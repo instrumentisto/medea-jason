@@ -6,7 +6,10 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.14.0] · 2026-03-05
+[0.14.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.13.1/flutter
+
+See also [`medea-jason` crate 0.14.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.14.0/CHANGELOG.md).
 
 ### BC Breaks
 
