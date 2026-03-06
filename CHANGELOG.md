@@ -6,7 +6,12 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.14.0] · 2026-03-06
+[0.14.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.14.0
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.13.1...medea-jason-0.14.0)
+
+See also [`medea_jason` pub package 0.14.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.14.0/flutter/CHANGELOG.md).
 
 ### Added
 
@@ -19,10 +24,11 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Changed
 
-- Bumped up [MSRV] to 1.94. ([todo])
+- Bumped up [MSRV] to 1.94. ([8bbca777])
 
 [#264]: https://github.com/instrumentisto/medea-jason/pull/264
 [#267]: https://github.com/instrumentisto/medea-jason/pull/267
+[8bbca777]: https://github.com/instrumentisto/medea-jason/commit/8bbca777582cbea8c1169489a376965b2f7346cf
 
 
 

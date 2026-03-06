@@ -6,7 +6,8 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.3.4] · 2026-03-06
+[0.3.4]: https://github.com/instrumentisto/medea-jason/tree/medea-macro-0.3.4/crates/medea-macro
 
 ### Fixed
 
