@@ -218,6 +218,7 @@ where
 }
 
 #[cfg(feature = "mockable")]
+#[expect(clippy::multiple_inherent_impl, reason = "feature gated")]
 impl<S> TracksRepository<S> {
     /// Waits until all the track inserts will be processed.
     pub fn when_insert_processed(&self) -> medea_reactive::Processed<'static> {

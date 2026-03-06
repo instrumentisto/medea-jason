@@ -22,6 +22,10 @@ See also [`medea_jason` pub package 0.14.0 changes](https://github.com/instrumen
 - Segfault on [Flutter] hot restart. ([#267])
 - `MediaDeviceDetails.groupId()` not working on Windows platform (only accessible via Dart API). ([#264])
 
+### Changed
+
+- Bumped up [MSRV] to 1.94. ([todo])
+
 [#264]: https://github.com/instrumentisto/medea-jason/pull/264
 [#267]: https://github.com/instrumentisto/medea-jason/pull/267
 
