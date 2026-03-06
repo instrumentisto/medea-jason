@@ -151,11 +151,11 @@ impl ControlClient {
 
         let response = self.get_client().create(tonic::Request::new(req)).await;
 
-        if response.is_ok() {
-            if let Some(subs) = self.subscribers.lock().unwrap().get(&room_id) {
-                for sub in subs {
-                    sub.do_send(notification.clone());
-                }
+        if response.is_ok()
+            && let Some(subs) = self.subscribers.lock().unwrap().get(&room_id)
+        {
+            for sub in subs {
+                sub.do_send(notification.clone());
             }
         }
 
@@ -214,14 +214,13 @@ impl ControlClient {
         let req = id_request(vec![fid.clone().into()]);
         let response = self.get_client().delete(tonic::Request::new(req)).await;
 
-        if response.is_ok() {
-            if let Some(subs) =
+        if response.is_ok()
+            && let Some(subs) =
                 self.subscribers.lock().unwrap().get(fid.room_id())
-            {
-                let notification = Notification::deleted(&fid);
-                for sub in subs {
-                    sub.do_send(notification.clone());
-                }
+        {
+            let notification = Notification::deleted(&fid);
+            for sub in subs {
+                sub.do_send(notification.clone());
             }
         }
         response.map(tonic::Response::into_inner)

@@ -103,7 +103,6 @@ impl Receiver {
     ) -> Self {
         let caps = TrackConstraints::from(state.media_type().clone());
 
-        #[expect(clippy::if_then_some_else_none, reason = "more readable")]
         let transceiver = if state.mid().is_none() {
             // Try to find send transceiver that can be used as `sendrecv`.
             let sender = media_connections
