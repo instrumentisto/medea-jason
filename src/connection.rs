@@ -13,7 +13,7 @@ use futures::{
 };
 use medea_client_api_proto::{
     self as proto, ConnectionMode, ConnectionQualityScore, MemberId,
-    PeerConnectionState, TrackId,
+    PeerConnectionState, PeerId, TrackId,
 };
 use tracerr::Traced;
 
@@ -336,18 +336,12 @@ impl ClientConnectionQualityScore {
 }
 
 /// [`Connection`]'s state.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, From, PartialEq)]
 pub enum MemberConnectionState {
     /// State in [P2P mesh] mode.
     ///
     /// [P2P mesh]: https://webrtcglossary.com/mesh
     P2P(PeerConnectionState),
-}
-
-impl From<PeerConnectionState> for MemberConnectionState {
-    fn from(state: PeerConnectionState) -> Self {
-        Self::P2P(state)
-    }
 }
 
 /// Actual data of a connection with a specific remote `Member`.
@@ -365,8 +359,11 @@ struct InnerConnection {
     /// Current [`ClientConnectionQualityScore`] of this [`Connection`].
     client_quality_score: Cell<Option<ClientConnectionQualityScore>>,
 
-    /// Current [`MemberConnectionState`] of this [`Connection`].
-    state: Cell<Option<MemberConnectionState>>,
+    /// [`PeerConnectionState`] of each [`PeerConnection`] participating in
+    /// this [`Connection`], keyed by [`PeerId`].
+    ///
+    /// [`PeerConnection`]: crate::peer::PeerConnection
+    peer_states: RefCell<HashMap<PeerId, PeerConnectionState>>,
 
     /// Callback invoked when a [`remote::Track`] is received.
     on_remote_track_added: platform::Callback<api::RemoteMediaTrack>,
@@ -486,10 +483,23 @@ impl ConnectionHandleImpl {
         &self,
     ) -> Result<Option<MemberConnectionState>, Traced<HandleDetachedError>>
     {
-        self.0
-            .upgrade()
-            .ok_or_else(|| tracerr::new!(HandleDetachedError))
-            .map(|inner| inner.state.get())
+        // TODO: `MemberConnectionState::SFU` isn't yet implemented.
+        //       See instrumentisto/medea-jason#211 for the details:
+        //       https://github.com/instrumentisto/medea-jason/issues/211
+        self.0.upgrade().ok_or_else(|| tracerr::new!(HandleDetachedError)).map(
+            |inner| {
+                (inner.connection_mode == ConnectionMode::Mesh)
+                    .then(|| {
+                        inner
+                            .peer_states
+                            .borrow()
+                            .values()
+                            .next()
+                            .map(|&s| MemberConnectionState::P2P(s))
+                    })
+                    .flatten()
+            },
+        )
     }
 
     /// Sets callback, invoked when a new [`MemberConnectionState`] is set in
@@ -696,7 +706,7 @@ impl Connection {
             remote_id,
             quality_score: Cell::default(),
             client_quality_score: Cell::default(),
-            state: Cell::default(),
+            peer_states: RefCell::default(),
             on_quality_score_update: platform::Callback::default(),
             on_state_change: platform::Callback::default(),
             recv_constraints,
@@ -779,51 +789,48 @@ impl Connection {
     }
 
     /// Updates the [`PeerConnectionState`] of this [`Connection`].
-    pub fn update_peer_state(&self, state: PeerConnectionState) {
-        if self.0.connection_mode != ConnectionMode::Mesh {
-            // TODO: `MemberConnectionState::SFU` isn't yet implemented.
-            //       See instrumentisto/medea-jason#211 for the details:
-            //       https://github.com/instrumentisto/medea-jason/issues/211
-            return;
-        }
-
-        let state = state.into();
-
-        if self.0.state.replace(Some(state)) == Some(state) {
+    pub fn update_peer_state(
+        &self,
+        peer_id: PeerId,
+        state: PeerConnectionState,
+    ) {
+        let old = self.0.peer_states.borrow_mut().insert(peer_id, state);
+        if old == Some(state) {
             return;
         }
 
         self.refresh_client_conn_quality_score();
-
-        self.0
-            .on_state_change
-            .call1::<api::MemberConnectionState>(state.into());
+        if self.0.connection_mode == ConnectionMode::Mesh {
+            self.0.on_state_change.call1::<api::MemberConnectionState>(
+                MemberConnectionState::P2P(state).into(),
+            );
+        } else {
+            // TODO: `MemberConnectionState::SFU` isn't yet implemented.
+            //       See instrumentisto/medea-jason#211 for the details:
+            //       https://github.com/instrumentisto/medea-jason/issues/211
+        }
     }
 
     /// Refreshes the [`ClientConnectionQualityScore`] of this [`Connection`].
     fn refresh_client_conn_quality_score(&self) {
-        use MemberConnectionState as M;
         use PeerConnectionState as S;
 
-        match self.0.connection_mode {
-            // `on_quality_score_update()` isn't implemented for SFU mode.
-            // See instrumentisto/medea-jason#227 for the details:
-            // https://github.com/instrumentisto/medea-jason/issues/227
-            ConnectionMode::Sfu => return,
-            ConnectionMode::Mesh => (),
-        }
-
-        let state = self.0.state.get();
+        let peer_states = self.0.peer_states.borrow();
         let quality_score = self.0.quality_score.get();
-        let score = match (state, quality_score) {
-            (Some(M::P2P(S::Connected)), Some(quality_score)) => {
-                quality_score.into()
+        let score = if peer_states.is_empty() {
+            return;
+        } else if peer_states
+            .values()
+            .any(|s| matches!(s, S::Disconnected | S::Failed | S::Closed))
+        {
+            ClientConnectionQualityScore::Disconnected
+        } else if peer_states.values().all(|s| matches!(s, S::Connected)) {
+            match quality_score {
+                Some(qs) => qs.into(),
+                None => return,
             }
-            (Some(M::P2P(S::Disconnected | S::Failed | S::Closed)), _) => {
-                ClientConnectionQualityScore::Disconnected
-            }
-            (Some(M::P2P(S::Connecting | S::New)) | None, _)
-            | (Some(M::P2P(S::Connected)), None) => return,
+        } else {
+            return;
         };
 
         let is_score_changed =

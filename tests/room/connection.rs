@@ -15,12 +15,17 @@ fn get_test_connection() -> Connection {
 }
 
 #[wasm_bindgen_test]
-async fn initial_state_is_null() {
+async fn initial_state_is_new() {
     let connection = get_test_connection();
     let connection_handle =
         api::ConnectionHandle::from(connection.new_handle());
 
-    assert!(connection_handle.get_state().unwrap().is_none());
+    let state = connection_handle.get_state().unwrap().unwrap();
+    assert_eq!(state.kind(), api::MemberConnectionStateKind::P2P);
+    assert_eq!(
+        state.value(),
+        JsValue::from(api::PeerConnectionState::New as u8),
+    );
 }
 
 #[wasm_bindgen_test]
