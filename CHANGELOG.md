@@ -10,7 +10,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- Support `ConnectionHandle.onQualityScoreUpdate()` in [SFU] mode. ([#272])
+- Support `ConnectionHandle.on_quality_score_update()` in [SFU] mode. ([#272])
 
 [#272]: https://github.com/instrumentisto/medea-jason/pull/272
 

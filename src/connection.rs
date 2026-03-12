@@ -359,8 +359,8 @@ struct InnerConnection {
     /// Current [`ClientConnectionQualityScore`] of this [`Connection`].
     client_quality_score: Cell<Option<ClientConnectionQualityScore>>,
 
-    /// [`PeerConnectionState`] of each [`PeerConnection`] participating in
-    /// this [`Connection`], keyed by [`PeerId`].
+    /// [`PeerConnectionState`] of each [`PeerConnection`] participating in this
+    /// [`Connection`], keyed by a [`PeerId`].
     ///
     /// [`PeerConnection`]: crate::peer::PeerConnection
     peer_states: RefCell<HashMap<PeerId, PeerConnectionState>>,

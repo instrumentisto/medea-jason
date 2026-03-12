@@ -71,7 +71,7 @@ async fn sfu_quality_score_disconnected_when_any_peer_fails() {
     let conn = get_test_connection(ConnectionMode::Sfu);
     let handle = api::ConnectionHandle::from(conn.new_handle());
 
-    // Connect both peers first
+    // Connect both peers first.
     conn.update_peer_state(PeerId(0), PeerConnectionState::Connected);
     conn.update_peer_state(PeerId(1), PeerConnectionState::Connected);
 
