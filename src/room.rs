@@ -1866,7 +1866,7 @@ impl PeerEventHandler for InnerRoom {
             .into_iter()
             .flat_map(|track_id| self.connections.iter_by_track(&track_id))
             .for_each(|conn| {
-                conn.update_peer_state(peer_connection_state);
+                conn.update_peer_state(peer_id, peer_connection_state);
             });
 
         Ok(())

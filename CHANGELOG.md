@@ -6,6 +6,17 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## master
+
+### Added
+
+- Support `ConnectionHandle.on_quality_score_update()` in [SFU] mode. ([#272])
+
+[#272]: https://github.com/instrumentisto/medea-jason/pull/272
+
+
+
+
 ## [0.14.0] · 2026-03-06
 [0.14.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.14.0
 
