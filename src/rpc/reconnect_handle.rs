@@ -50,6 +50,7 @@ impl ReconnectHandleImpl {
         &self,
         delay_ms: u32,
     ) -> Result<(), Traced<ReconnectError>> {
+        log::error!("ReconnectHandleImpl::reconnect_with_delay");
         platform::delay_for(Duration::from_millis(u64::from(delay_ms))).await;
 
         let rpc = self
@@ -92,6 +93,8 @@ impl ReconnectHandleImpl {
         max_delay: u32,
         max_elapsed_time_ms: Option<u32>,
     ) -> Result<(), Traced<ReconnectError>> {
+        log::error!("ReconnectHandleImpl::reconnect_with_backoff");
+
         BackoffDelayer::new(
             Duration::from_millis(starting_delay_ms.into()),
             multiplier,
