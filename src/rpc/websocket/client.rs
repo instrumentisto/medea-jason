@@ -443,6 +443,7 @@ impl WebSocketRpcClient {
             let weak_this = Rc::downgrade(&self);
             platform::spawn(async move {
                 while let Some(state) = transport_state_changes.next().await {
+                    log::error!("transport_state_changed {state:?}");
                     if let Some(this) = weak_this.upgrade() {
                         if let platform::TransportState::Closed(msg) = state {
                             this.handle_close_message(msg);

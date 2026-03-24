@@ -176,6 +176,8 @@ impl RpcTransport for WebSocketRpcTransport {
                             .unwrap();
                     let reason = unsafe { dart_string_into_rust(reason) };
 
+                    log::error!("Dart RpcTransport on_close: {code}, {reason}");
+
                     socket_state.set(TransportState::Closed(CloseMsg::from((
                         code, reason,
                     ))));

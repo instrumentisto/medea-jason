@@ -359,7 +359,7 @@ impl WebSocketRpcSession {
                 ClientDisconnect::RpcClientUnexpectedlyDropped.into()
             });
             if let Some(this) = weak_this.upgrade() {
-                log::error!("SessionState::Finished spawn_close_watcher");
+                log::error!("SessionState::Finished spawn_close_watcher {reason:?}");
                 this.state.set(SessionState::Finished(reason));
             }
         });
