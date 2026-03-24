@@ -181,7 +181,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
 
       - run: make helm.lint chart=${{ matrix.chart }}
 
@@ -1144,7 +1144,7 @@ jobs:
                                    chart=${{ matrix.chart }})/Chart.yaml"
              >> $GITHUB_OUTPUT
 
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
         if: ${{ contains(steps.changed.outputs.files,
                          steps.chart.outputs.manifest) }}
 
