@@ -249,7 +249,10 @@ impl WebSocketRpcClient {
     /// [`WebSocketRpcClient::on_connection_loss`] subs about connection
     /// loss.
     fn handle_connection_loss(&self, close_msg: ConnectionLostReason) {
-        log::error!("handle_connection_loss for {} with {close_msg:?}", self.0.borrow().me);
+        log::error!(
+            "handle_connection_loss for {} with {close_msg:?}",
+            self.0.borrow().me
+        );
         self.0.borrow().state.set(ClientState::Closed(
             ClosedStateReason::ConnectionLost(close_msg),
         ));
@@ -265,7 +268,10 @@ impl WebSocketRpcClient {
     /// This function will be called on every WebSocket close (normal and
     /// abnormal) regardless of the [`CloseReason`].
     fn handle_close_message(&self, close_msg: CloseMsg) {
-        log::error!("handle_close_message for {} with {close_msg:?}", self.0.borrow().me);
+        log::error!(
+            "handle_close_message for {} with {close_msg:?}",
+            self.0.borrow().me
+        );
         drop(self.0.borrow_mut().heartbeat.take());
 
         match close_msg {

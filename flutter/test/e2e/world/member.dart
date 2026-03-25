@@ -764,9 +764,6 @@ class Member {
 
   /// Closes the [WebSocket] connection.
   Future<void> connectionLoss() async {
-    var ws = MockWebSocket.getSocket(id)!;
-    // Closest thing to simulating disconnect that we have. Remote receives an
-    // empty CloseFrame and local receives { code: 1005, reason: null }.
-    await (ws as StreamSink).close();
+    await MockWebSocket.close(id);
   }
 }
