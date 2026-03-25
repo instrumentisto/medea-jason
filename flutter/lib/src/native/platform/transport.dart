@@ -48,7 +48,7 @@ class CloseFrame {
   CloseFrame(this.code, this.reason);
 }
 
-/// [WebSocket] + its subscription + `onClose` callback stored by
+/// [WebSocket] + its subscription + `onClose` callback stored by a
 /// [MockWebSocket].
 typedef WsEntry = (WebSocket, StreamSubscription, void Function(CloseFrame));
 
@@ -98,7 +98,7 @@ class MockWebSocket {
     _allWebSocket.addAll({member: _lastWebSocket});
   }
 
-  /// Simulates connection loss of the [WebSocket] of the given [member].
+  /// Simulates connection loss of the [WebSocket] of the provided [member].
   static Future<void> connectionLoss(String member) async {
     var (ws, sub, onClose) = _allWebSocket[member]!;
 
