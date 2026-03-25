@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.14.1] · 2026-03-20
+## [0.14.1] · 2026-03-25
 [0.14.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.14.1/flutter
 
 See also [`medea-jason` crate 0.14.1 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.14.1/CHANGELOG.md).

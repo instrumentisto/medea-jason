@@ -359,10 +359,6 @@ impl WebSocketRpcSession {
                 ClientDisconnect::RpcClientUnexpectedlyDropped.into()
             });
             if let Some(this) = weak_this.upgrade() {
-                log::error!(
-                    "SessionState::Finished spawn_close_watcher {reason:?}, {:?}",
-                    this.state
-                );
                 this.state.set(SessionState::Finished(reason));
             }
         });
@@ -482,10 +478,6 @@ impl RpcSession for WebSocketRpcSession {
                 .leave_room(info.room_id.clone(), info.member_id.clone());
         }
 
-        log::error!(
-            "SessionState::Finished close_with_reason, {:?}",
-            self.state
-        );
         self.client.set_close_reason(close_reason);
         self.state.set(SessionState::Finished(close_reason.into()));
     }
@@ -605,10 +597,6 @@ impl RpcEventHandler for WebSocketRpcSession {
 
         match state {
             SessionState::Opened { .. } => {
-                log::error!(
-                    "SessionState::Finished on_left_room SessionState::Opened, {:?}",
-                    self.state
-                );
                 self.state.set(SessionState::Finished(close_reason));
             }
             SessionState::Authorizing(_) => {

@@ -48,15 +48,19 @@ class CloseFrame {
   CloseFrame(this.code, this.reason);
 }
 
+/// [WebSocket] + its subscription + `onClose` callback stored by
+/// [MockWebSocket].
+typedef WsEntry = (WebSocket, StreamSubscription, void Function(CloseFrame));
+
 /// Provider to mock a [WebSocket].
 ///
 /// [mockable] must be `true`.
 class MockWebSocket {
   /// Safe last created [WebSocket].
-  static late (WebSocket, StreamSubscription, void Function(CloseFrame)) _lastWebSocket;
+  static late WsEntry _lastWebSocket;
 
   /// Stored [WebSocket]s for outside access.
-  static final _allWebSocket = HashMap<String, (WebSocket, StreamSubscription, void Function(CloseFrame))>();
+  static final _allWebSocket = HashMap<String, WsEntry>();
 
   /// Connects to the provided [addr] and returns a [WebSocket] for it.
   ///
@@ -94,7 +98,8 @@ class MockWebSocket {
     _allWebSocket.addAll({member: _lastWebSocket});
   }
 
-  static Future<void> close(String member) async {
+  /// Simulates connection loss of the [WebSocket] of the given [member].
+  static Future<void> connectionLoss(String member) async {
     var (ws, sub, onClose) = _allWebSocket[member]!;
 
     sub.onDone(null);

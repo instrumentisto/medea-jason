@@ -469,7 +469,7 @@ jobs:
           script: make test.e2e.native sfu=no up=yes debug=no dockerized=yes
                        medea-tag=${{ env.MEDEA_TAG }}
                        control-tag=build-${{ github.run_number }}
-                       server=10.0.2.2 log=yes
+                       server=10.0.2.2
         if: ${{ matrix.platform == 'android' }}
       - name: P2P mesh
         run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
@@ -480,7 +480,7 @@ jobs:
                           ||     matrix.platform }}
                   up=yes debug=no dockerized=yes
                   medea-tag=${{ env.MEDEA_TAG }}
-                  control-tag=build-${{ github.run_number }} log=yes
+                  control-tag=build-${{ github.run_number }}
              ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
               ||                              '' }}
         if: ${{ matrix.platform != 'android' }}
@@ -495,7 +495,7 @@ jobs:
           script: make test.e2e.native sfu=yes up=yes debug=no dockerized=yes
                        medea-tag=${{ env.MEDEA_TAG }}
                        control-tag=build-${{ github.run_number }}
-                       server=10.0.2.2 log=yes
+                       server=10.0.2.2
         if: ${{ matrix.platform == 'android' }}
       - name: SFU
         run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
@@ -506,7 +506,7 @@ jobs:
                           ||     matrix.platform }}
                   up=yes debug=no dockerized=yes
                   medea-tag=${{ env.MEDEA_TAG }}
-                  control-tag=build-${{ github.run_number }} log=yes
+                  control-tag=build-${{ github.run_number }}
              ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
               ||                              '' }}
         if: ${{ matrix.platform != 'android' }}

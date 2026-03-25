@@ -881,11 +881,9 @@ impl Room {
                             }
                         }
                         RoomEvent::RpcClientLostConnection => {
-                            log::error!("RoomEvent::RpcClientLostConnection");
                             this_room.handle_rpc_connection_lost();
                         }
                         RoomEvent::RpcClientReconnected => {
-                            log::error!("RoomEvent::RpcClientLostConnection");
                             this_room.handle_rpc_connection_recovered();
                         }
                     }
@@ -1518,7 +1516,6 @@ impl InnerRoom {
     /// [`Room`].
     fn handle_rpc_connection_lost(&self) {
         self.peers.connection_lost();
-        log::error!("handle_rpc_connection_lost {:?}", self.close_reason);
         self.on_connection_loss
             .call1(ReconnectHandleImpl::new(Rc::downgrade(&self.rpc)));
     }
@@ -1944,7 +1941,6 @@ impl PeerEventHandler for InnerRoom {
 impl Drop for InnerRoom {
     /// Unsubscribes [`InnerRoom`] from all its subscriptions.
     fn drop(&mut self) {
-        log::error!("InnerRoom::drop {:?}", self.close_reason);
         if let CloseReason::ByClient { reason, .. } =
             *self.close_reason.borrow()
         {

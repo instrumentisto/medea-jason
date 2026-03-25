@@ -98,7 +98,6 @@ pub enum ClientState {
 /// Inner state of [`WebSocketRpcClient`].
 #[derive(Debug)]
 struct Inner {
-    me: String,
     /// Transport connection with remote media server.
     #[debug(skip)]
     sock: Option<Rc<dyn platform::RpcTransport>>,
@@ -146,7 +145,6 @@ impl Inner {
     /// Instantiates new [`Inner`] state of [`WebSocketRpcClient`].
     fn new(rpc_transport_factory: RpcTransportFactory) -> RefCell<Self> {
         RefCell::new(Self {
-            me: "???".to_string(),
             sock: None,
             on_close_subscribers: Vec::new(),
             subs: Vec::new(),
@@ -233,7 +231,6 @@ impl WebSocketRpcClient {
         credential: Credential,
         capabilities: Capabilities,
     ) {
-        self.0.borrow_mut().me = member_id.to_string();
         self.send_command(
             room_id,
             Command::JoinRoom { member_id, credential, capabilities },
@@ -249,10 +246,6 @@ impl WebSocketRpcClient {
     /// [`WebSocketRpcClient::on_connection_loss`] subs about connection
     /// loss.
     fn handle_connection_loss(&self, close_msg: ConnectionLostReason) {
-        log::error!(
-            "handle_connection_loss for {} with {close_msg:?}",
-            self.0.borrow().me
-        );
         self.0.borrow().state.set(ClientState::Closed(
             ClosedStateReason::ConnectionLost(close_msg),
         ));
@@ -268,10 +261,6 @@ impl WebSocketRpcClient {
     /// This function will be called on every WebSocket close (normal and
     /// abnormal) regardless of the [`CloseReason`].
     fn handle_close_message(&self, close_msg: CloseMsg) {
-        log::error!(
-            "handle_close_message for {} with {close_msg:?}",
-            self.0.borrow().me
-        );
         drop(self.0.borrow_mut().heartbeat.take());
 
         match close_msg {
@@ -454,8 +443,6 @@ impl WebSocketRpcClient {
             let weak_this = Rc::downgrade(&self);
             platform::spawn(async move {
                 while let Some(state) = transport_state_changes.next().await {
-                    log::error!("transport_state_changed {state:?}");
-                    // asasasasasd
                     if let Some(this) = weak_this.upgrade() {
                         if let platform::TransportState::Closed(msg) = state {
                             this.handle_close_message(msg);
