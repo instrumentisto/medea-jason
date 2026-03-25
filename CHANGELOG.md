@@ -6,7 +6,12 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## master
+## [0.14.1] · 2026-03-25
+[0.14.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.14.1
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.14.0...medea-jason-0.14.1)
+
+See also [`medea_jason` pub package 0.14.1 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.14.1/flutter/CHANGELOG.md).
 
 ### Added
 

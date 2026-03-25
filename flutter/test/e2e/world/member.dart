@@ -764,7 +764,6 @@ class Member {
 
   /// Closes the [WebSocket] connection.
   Future<void> connectionLoss() async {
-    var ws = MockWebSocket.getSocket(id)!;
-    await ws.close(9999);
+    await MockWebSocket.connectionLoss(id);
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:ffi';
 import 'dart:io';
@@ -47,15 +48,19 @@ class CloseFrame {
   CloseFrame(this.code, this.reason);
 }
 
+/// [WebSocket] + its subscription + `onClose` callback stored by a
+/// [MockWebSocket].
+typedef WsEntry = (WebSocket, StreamSubscription, void Function(CloseFrame));
+
 /// Provider to mock a [WebSocket].
 ///
 /// [mockable] must be `true`.
 class MockWebSocket {
   /// Safe last created [WebSocket].
-  static late WebSocket _lastWebSocket;
+  static late WsEntry _lastWebSocket;
 
   /// Stored [WebSocket]s for outside access.
-  static final _allWebSocket = HashMap<String, WebSocket>();
+  static final _allWebSocket = HashMap<String, WsEntry>();
 
   /// Connects to the provided [addr] and returns a [WebSocket] for it.
   ///
@@ -67,12 +72,11 @@ class MockWebSocket {
     Object onClose,
   ) {
     onMessage as Function;
-    onClose as Function;
+    onClose as void Function(CloseFrame);
+
     return () async {
       var ws = await WebSocket.connect(addr.nativeStringToDartString());
-      _lastWebSocket = ws;
-
-      ws.listen(
+      var sub = ws.listen(
         (msg) {
           if (msg is String) {
             onMessage(msg);
@@ -83,6 +87,8 @@ class MockWebSocket {
         },
         cancelOnError: true,
       );
+
+      _lastWebSocket = (ws, sub, onClose);
       return ws;
     };
   }
@@ -92,9 +98,16 @@ class MockWebSocket {
     _allWebSocket.addAll({member: _lastWebSocket});
   }
 
-  /// Returns the [WebSocket] of the provided [member].
-  static WebSocket? getSocket(String member) {
-    return _allWebSocket[member];
+  /// Simulates connection loss of the [WebSocket] of the provided [member].
+  static Future<void> connectionLoss(String member) async {
+    var (ws, sub, onClose) = _allWebSocket[member]!;
+
+    sub.onDone(null);
+    sub.onData(null);
+    sub.onError(null);
+    await sub.cancel();
+    onClose(CloseFrame(1005, null));
+    await ws.close(9999, null);
   }
 }
 
