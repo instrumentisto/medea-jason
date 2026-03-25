@@ -87,10 +87,7 @@ jobs:
       - run: make rustup.targets only=${{ matrix.platform }}
         if: ${{ matrix.platform != 'workspace' }}
 
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-ndk
-          use-tool-cache: true
+      - run: cargo install cargo-ndk
         if: ${{ matrix.platform == 'android' }}
 
       - run: make cargo.lint platform=${{ matrix.platform }}
@@ -121,15 +118,9 @@ jobs:
           components: rustfmt
       - run: make rustup.targets only=android
         if: ${{ matrix.crate == 'medea-jason' }}
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-ndk
-          use-tool-cache: true
+      - run: cargo install cargo-ndk
         if: ${{ matrix.crate == 'medea-jason' }}
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-expand
-          use-tool-cache: true
+      - run: cargo install cargo-expand
 
       - uses: subosito/flutter-action@v2
         if: ${{ matrix.crate == 'medea-jason' }}
@@ -276,11 +267,7 @@ jobs:
              >> $GITHUB_OUTPUT
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.crate == 'medea-jason' }}
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: wasm-bindgen-cli
-          version: ${{ steps.wasm-cli.outputs.version }}
-          use-tool-cache: true
+      - run: cargo install wasm-bindgen-cli@${{ steps.wasm-cli.outputs.version }}
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.crate == 'medea-jason' }}
 
@@ -317,10 +304,7 @@ jobs:
           version: ${{ env.PROTOC_VER }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: wasm-pack
-          use-tool-cache: true
+      - run: cargo install wasm-pack
 
       - name: Download `medea-control-api-mock` Docker image
         uses: actions/download-artifact@v8
@@ -554,10 +538,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
         if: ${{ matrix.platform == 'android' }}
 
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-ndk
-          use-tool-cache: true
+      - run: cargo install cargo-ndk
         if: ${{ matrix.platform == 'android' }}
       - name: Install Flutter Android dependencies
         run: |
@@ -659,10 +640,7 @@ jobs:
           toolchain: stable
       - run: make rustup.targets only=${{ matrix.platform }}
 
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-ndk
-          use-tool-cache: true
+      - run: cargo install cargo-ndk
         if: ${{ matrix.platform == 'android' }}
 
       - uses: jetli/wasm-pack-action@v0.4.0
