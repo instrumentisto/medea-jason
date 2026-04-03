@@ -40,7 +40,7 @@ SPEC CHECKSUMS:
   instrumentisto-libwebrtc-bin: 9bbfd92b764b0ab28476df2a32e98e9111bc66b6
   integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
   medea_flutter_webrtc: cfaf55c82217a0078c8c10b5f6896b48ef134bf9
-  medea_jason: 52df5ba260c91db46c04c3be720db5c6973e568f
+  medea_jason: 6b48063ae2b23e3064819ece8bec8ef07a4ac2dc
 
 PODFILE CHECKSUM: b6c1777b8742f73e5cdad8789e3d9f4d8eaca881
 
