@@ -2218,7 +2218,7 @@ dependencies = [
 
 [[package]]
 name = "medea-jason"
-version = "0.15.0"
+version = "0.14.2"
 dependencies = [
  "android_logger",
  "async-recursion",
