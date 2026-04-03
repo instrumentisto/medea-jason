@@ -18,6 +18,8 @@ pub mod utils;
 use std::{sync::Once, time::Duration};
 
 use js_sys::Promise;
+#[cfg(feature = "talc")]
+use talc::wasm;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::Window;
 
@@ -46,8 +48,7 @@ pub type MediaDisplayInfo = ();
 ///
 /// The runtime environment must be single-threaded WASM.
 #[global_allocator]
-// SAFETY: Runtime environment is assumed to be single-threaded WASM.
-static ALLOCATOR: talc::TalckWasm = unsafe { talc::TalckWasm::new_global() };
+static ALLOCATOR: wasm::WasmDynamicTalc = wasm::new_wasm_dynamic_allocator();
 
 /// When the `console_error_panic_hook` feature is enabled, we can call the
 /// `set_panic_hook` function at least once during initialization, and then

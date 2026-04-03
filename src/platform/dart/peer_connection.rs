@@ -324,7 +324,7 @@ impl RtcPeerConnection {
     #[must_use]
     pub fn connection_state(&self) -> PeerConnectionState {
         let conn_state =
-            unsafe { peer_connection::ice_connection_state(self.handle.get()) }
+            unsafe { peer_connection::connection_state(self.handle.get()) }
                 .unwrap();
         peer_connection_state_from_int(conn_state)
     }
