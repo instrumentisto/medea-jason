@@ -4,21 +4,22 @@
 //! [Flutter]: https://flutter.dev
 
 #[expect(
-    clippy::unwrap_used,
     clippy::absolute_paths,
     clippy::allow_attributes_without_reason,
     clippy::as_conversions,
     clippy::cast_lossless,
     clippy::cast_possible_truncation,
     clippy::cast_possible_wrap,
+    clippy::cast_sign_loss,
     clippy::missing_docs_in_private_items,
     clippy::redundant_else,
     clippy::significant_drop_tightening,
     clippy::undocumented_unsafe_blocks,
+    clippy::unreadable_literal,
     clippy::unused_trait_names,
+    clippy::unwrap_used,
     clippy::use_self,
     clippy::wildcard_imports,
-    clippy::unreadable_literal,
     unused_qualifications,
     unit_bindings,
     reason = "codegen"

@@ -6,6 +6,24 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.15.0] · 2026-04-03
+[0.15.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-[0.15.0/flutter
+
+See also [`medea-jason` crate 0.15.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.15.0/CHANGELOG.md).
+
+## BC Breaks
+
+- Upgraded [`flutter_rust_bridge`] crate to 2.12.0 version. ([#273])
+
+### Fixed
+
+- `ConnectionHandle.onQualityScoreUpdate()` stuck in `0` on native platforms in [SFU] mode. ([#273])
+
+[#273]: https://github.com/instrumentisto/medea-jason/pull/273
+
+
+
+
 ## [0.14.1] · 2026-03-25
 [0.14.1]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.14.1/flutter
 
