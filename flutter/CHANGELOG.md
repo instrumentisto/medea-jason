@@ -22,7 +22,7 @@ See also [`medea-jason` crate 0.14.2 changes](https://github.com/instrumentisto/
 ### Upgraded
 
 - Dependencies:
-  - [`medea_flutter_webrtc`] to 0.18.0 version. ([#275])
+  - [`medea_flutter_webrtc`] to 0.19.0 version. ([#275])
 
 [#275]: https://github.com/instrumentisto/medea-jason/pull/275
 
