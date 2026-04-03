@@ -15,14 +15,14 @@ See also [`medea_jason` pub package 0.14.2 changes](https://github.com/instrumen
 
 ### Fixed
 
-- `ConnectionHandle.on_quality_score_update()` stuck in `0` on native platforms in [SFU] mode. ([#273])
+- `ConnectionHandle.on_quality_score_update()` stuck in `0` on native platforms in [SFU] mode. ([#275])
 
 ### Upgraded
 
 - Dependencies:
-    - Upgraded [`flutter_rust_bridge`] crate to 2.12.0 version. ([#273])
+    - Upgraded [`flutter_rust_bridge`] crate to 2.12.0 version. ([#275])
 
-[#273]: https://github.com/instrumentisto/medea-jason/pull/273
+[#275]: https://github.com/instrumentisto/medea-jason/pull/275
 
 
 
