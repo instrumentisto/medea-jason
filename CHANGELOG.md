@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.14.2] · 2026-04-06
+## [0.14.2] · 2026-04-07
 [0.14.2]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.14.2
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.14.1...medea-jason-0.14.2)
@@ -20,7 +20,7 @@ See also [`medea_jason` pub package 0.14.2 changes](https://github.com/instrumen
 ### Upgraded
 
 - Dependencies:
-    - Upgraded [`flutter_rust_bridge`] crate to 2.12.0 version. ([#275])
+    - [`flutter_rust_bridge`] crate to 2.12.0 version. ([#275])
 
 [#275]: https://github.com/instrumentisto/medea-jason/pull/275
 
