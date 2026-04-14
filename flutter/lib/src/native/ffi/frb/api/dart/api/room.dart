@@ -134,6 +134,42 @@ abstract class RoomHandle implements RustOpaqueInterface {
   /// [`Connection`]: connection::Connection
   void onNewConnection({required Object cb});
 
+  /// Sets a callback to be invoked when this [`Room`]'s own connection
+  /// quality estimate changes (the member's path to the media server).
+  ///
+  /// If the value provided to the callback is positive then it is a
+  /// [ITU-T G.107] R-factor. Negative value means [ICE] connection
+  /// failure.
+  ///
+  /// This is only called in [SFU] mode and describes the quality of the
+  /// local peer connection(s) to the [SFU] server.
+  ///
+  /// # R-factor to user satisfaction
+  ///
+  /// While you can interpret R-factor however you want the recommended
+  /// values are defined in [ITU-T G.107] as follows:
+  ///
+  /// | R-factor |       User satisfaction       |
+  /// |----------|-------------------------------|
+  /// | >90      | Very satisfied                |
+  /// | 80-90    | Satisfied                     |
+  /// | 70-80    | Some users dissatisfied       |
+  /// | 60-70    | Many users dissatisfied       |
+  /// | 50-60    | Nearly all users dissatisfied |
+  /// | <50      | All users dissatisfied        |
+  ///
+  ///
+  /// # Errors
+  ///
+  /// If the [`core::RoomHandleImpl::on_quality_score_update()`] method
+  /// errors.
+  ///
+  /// [P2P mesh]: https://webrtcglossary.com/mesh
+  /// [SFU]: https://webrtcglossary.com/sfu
+  /// [ITU-T G.107]: https://itu.int/rec/T-REC-G.107
+  /// [ICE]: https://webrtcglossary.com/ice
+  void onQualityScoreUpdate({required Object cb});
+
   /// Updates this [`Room`]'s [`ApiMediaStreamSettings`].
   ///
   /// This affects all the [`PeerConnection`]s in this [`Room`]. If

@@ -6,8 +6,18 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.11.0] · 2026-04-??
+[0.11.0]: https://github.com/instrumentisto/medea-jason/tree/medea-client-api-proto-0.11.0/proto/client-api
+
+### BC Breaks
+
+- Changed `Event::ConnectionQualityUpdated` payload
+
+
+
+
 ## [0.10.0] · 2025-12-19
-[0.10.0]: https://github.com/instrumentisto/medea-jason/tree/medea-client-api-proto-0.9.0/proto/client-api
+[0.10.0]: https://github.com/instrumentisto/medea-jason/tree/medea-client-api-proto-0.10.0/proto/client-api
 
 ### BC Breaks
 

@@ -149,6 +149,11 @@ class NativeRoomHandle implements RoomHandle {
     );
   }
 
+  @override
+  void onQualityScoreUpdate(void Function(int) f) {
+    opaque.inner.onQualityScoreUpdate(f: f);
+  }
+
   @moveSemantics
   @override
   void free() {

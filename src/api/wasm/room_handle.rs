@@ -150,6 +150,24 @@ impl RoomHandle {
             .map_err(Into::into)
     }
 
+    /// Sets callback, invoked when a room-level connection quality score is
+    /// updated by a media server.
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// [`StateError`]: crate::api::err::StateError
+    pub fn on_quality_score_update(
+        &self,
+        cb: js_sys::Function,
+    ) -> Result<(), JsValue> {
+        self.0
+            .on_quality_score_update(cb.into())
+            .map_err(Error::from)
+            .map_err(Into::into)
+    }
+
     /// Updates this [`Room`]s [`MediaStreamSettings`]. This affects all
     /// [`PeerConnection`]s in this [`Room`]. If [`MediaStreamSettings`] is
     /// configured for some [`Room`], then this [`Room`] can only send media

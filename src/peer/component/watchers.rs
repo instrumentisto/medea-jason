@@ -159,14 +159,11 @@ impl Component {
         medea_reactive::when_all_processed(wait_futs).await;
 
         let ((track_id, new_sender), _guard) = val.into_parts();
-        let peer_state = peer.connection_state();
-        for conn in peer.connections.update_connections(
+        drop(peer.connections.update_connections(
             &track_id,
             new_sender.receivers().into_iter().collect(),
             state.connection_mode,
-        ) {
-            conn.update_peer_state(state.id(), peer_state);
-        }
+        ));
         let sender = sender::Sender::new(
             &new_sender,
             &peer.media_connections,
@@ -219,9 +216,7 @@ impl Component {
             Rc::new(receiver),
             Rc::clone(&rcvr_state),
         ));
-        let peer_state = peer.connection_state();
         for conn in conns {
-            conn.update_peer_state(state.id(), peer_state);
             conn.add_receiver(Rc::clone(&rcvr_state));
         }
     }
@@ -237,14 +232,11 @@ impl Component {
         state: &State,
         val: (TrackId, HashSet<MemberId>),
     ) {
-        let peer_state = peer.connection_state();
-        for conn in peer.connections.update_connections(
+        drop(peer.connections.update_connections(
             &val.0,
             val.1,
             state.connection_mode,
-        ) {
-            conn.update_peer_state(state.id(), peer_state);
-        }
+        ));
 
         state.maybe_update_connections.set(None);
     }

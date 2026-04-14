@@ -54,13 +54,40 @@ abstract class ConnectionHandle implements SyncPlatformHandle {
   /// [ConnectionHandle].
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f);
 
-  /// Sets callback, invoked when a connection quality score is updated by a
-  /// server.
+  /// Sets a callback to be invoked when the quality estimate for this
+  /// [`Connection`] changes.
+  ///
+  /// If the value provided to the callback is positive then it is a
+  /// [ITU-T G.107] R-factor. Negative value means [ICE] connection
+  /// failure.
+  ///
+  /// In [P2P mesh] mode the quality indication describes the single
+  /// connection between local peer and remote. In [SFU] mode it describes
+  /// the remote member connection to the [SFU] server.
+  ///
+  /// # R-factor to user satisfaction
+  ///
+  /// While you can interpret R-factor however you want the recommended
+  /// values are defined in [ITU-T G.107] as follows:
+  ///
+  /// | R-factor |       User satisfaction       |
+  /// |----------|-------------------------------|
+  /// | >90      | Very satisfied                |
+  /// | 80-90    | Satisfied                     |
+  /// | 70-80    | Some users dissatisfied       |
+  /// | 60-70    | Many users dissatisfied       |
+  /// | 50-60    | Nearly all users dissatisfied |
+  /// | <50      | All users dissatisfied        |
   ///
   /// Throws a [StateError] if the underlying object has been disposed, e.g.
   /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
+  ///
+  /// [P2P mesh]: https://webrtcglossary.com/mesh
+  /// [SFU]: https://webrtcglossary.com/sfu
+  /// [ITU-T G.107]: https://itu.int/rec/T-REC-G.107
+  /// [ICE]: https://webrtcglossary.com/ice
   void onQualityScoreUpdate(void Function(int) f);
 
   /// Enables inbound audio in this `Connection`.

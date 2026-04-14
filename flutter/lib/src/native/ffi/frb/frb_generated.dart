@@ -81,7 +81,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -91957164;
+  int get rustContentHash => -1118835089;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -428,6 +428,11 @@ abstract class RustLibApi extends BaseApi {
   });
 
   void crateApiDartApiRoomRoomHandleOnNewConnection({
+    required RoomHandle that,
+    required Object cb,
+  });
+
+  void crateApiDartApiRoomRoomHandleOnQualityScoreUpdate({
     required RoomHandle that,
     required Object cb,
   });
@@ -3033,6 +3038,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  void crateApiDartApiRoomRoomHandleOnQualityScoreUpdate({
+    required RoomHandle that,
+    required Object cb,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRoomHandle(
+            that,
+            serializer,
+          );
+          sse_encode_DartOpaque(cb, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 75)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_DartOpaque,
+        ),
+        constMeta: kCrateApiDartApiRoomRoomHandleOnQualityScoreUpdateConstMeta,
+        argValues: [that, cb],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiDartApiRoomRoomHandleOnQualityScoreUpdateConstMeta =>
+      const TaskConstMeta(
+        debugName: "RoomHandle_on_quality_score_update",
+        argNames: ["that", "cb"],
+      );
+
+  @override
   Object crateApiDartApiRoomRoomHandleSetLocalMediaSettings({
     required RoomHandle that,
     required ApiMediaStreamSettings settings,
@@ -3053,7 +3092,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_bool(stopFirst, serializer);
           sse_encode_bool(rollbackOnFail, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 75)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 76)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_DartOpaque,
@@ -3087,7 +3126,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 76)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 77)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_DartOpaque,
@@ -3120,7 +3159,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_opt_box_autoadd_media_source_kind(sourceKind, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 77)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 78)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_DartOpaque,
@@ -3150,7 +3189,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(message, serializer);
           sse_encode_String(stackTrace, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 79)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 80)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3179,7 +3218,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_CastedPrimitive_usize(ptr, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 80)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 81)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_member_connection_state,
@@ -3207,7 +3246,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_DartOpaque(cb, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 81)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 82)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3232,7 +3271,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_CastedPrimitive_usize(ptr, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 82)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 83)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_room_close_reason,
@@ -3262,7 +3301,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_i_64(dartHandlerPort, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 83)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 84)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3288,7 +3327,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_log_level(level, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 84)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 85)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_DartOpaque,
@@ -3313,7 +3352,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_CastedPrimitive_usize(ptr, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 85)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 86)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -3344,7 +3383,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_CastedPrimitive_usize(ptr, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 86)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 87)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_api_media_device_details,
@@ -3372,7 +3411,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_CastedPrimitive_usize(ptr, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 87)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 88)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_api_media_display_details,
@@ -6269,13 +6308,41 @@ class ConnectionHandleImpl extends RustOpaque implements ConnectionHandle {
   void onClose({required Object f}) => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleOnClose(that: this, f: f);
 
-  /// Sets a callback to be invoked once a quality score of the associated
-  /// [`Connection`] is updated by a media server.
+  /// Sets a callback to be invoked when the quality estimate for this
+  /// [`Connection`] changes.
+  ///
+  /// If the value provided to the callback is positive then it is a
+  /// [ITU-T G.107] R-factor. Negative value means [ICE] connection
+  /// failure.
+  ///
+  /// In [P2P mesh] mode the quality indication describes the single
+  /// connection between local peer and remote. In [SFU] mode it describes
+  /// the remote member connection to the [SFU] server.
+  ///
+  /// # R-factor to user satisfaction
+  ///
+  /// While you can interpret R-factor however you want the recommended
+  /// values are defined in [ITU-T G.107] as follows:
+  ///
+  /// | R-factor |       User satisfaction       |
+  /// |----------|-------------------------------|
+  /// | >90      | Very satisfied                |
+  /// | 80-90    | Satisfied                     |
+  /// | 70-80    | Some users dissatisfied       |
+  /// | 60-70    | Many users dissatisfied       |
+  /// | 50-60    | Nearly all users dissatisfied |
+  /// | <50      | All users dissatisfied        |
+  ///
   ///
   /// # Errors
   ///
   /// If the [`core::ConnectionHandleImpl::on_quality_score_update()`] method
   /// errors.
+  ///
+  /// [P2P mesh]: https://webrtcglossary.com/mesh
+  /// [SFU]: https://webrtcglossary.com/sfu
+  /// [ITU-T G.107]: https://itu.int/rec/T-REC-G.107
+  /// [ICE]: https://webrtcglossary.com/ice
   void onQualityScoreUpdate({required Object f}) => RustLib.instance.api
       .crateApiDartApiConnectionHandleConnectionHandleOnQualityScoreUpdate(
         that: this,
@@ -6968,6 +7035,43 @@ class RoomHandleImpl extends RustOpaque implements RoomHandle {
   /// [`Connection`]: connection::Connection
   void onNewConnection({required Object cb}) => RustLib.instance.api
       .crateApiDartApiRoomRoomHandleOnNewConnection(that: this, cb: cb);
+
+  /// Sets a callback to be invoked when this [`Room`]'s own connection
+  /// quality estimate changes (the member's path to the media server).
+  ///
+  /// If the value provided to the callback is positive then it is a
+  /// [ITU-T G.107] R-factor. Negative value means [ICE] connection
+  /// failure.
+  ///
+  /// This is only called in [SFU] mode and describes the quality of the
+  /// local peer connection(s) to the [SFU] server.
+  ///
+  /// # R-factor to user satisfaction
+  ///
+  /// While you can interpret R-factor however you want the recommended
+  /// values are defined in [ITU-T G.107] as follows:
+  ///
+  /// | R-factor |       User satisfaction       |
+  /// |----------|-------------------------------|
+  /// | >90      | Very satisfied                |
+  /// | 80-90    | Satisfied                     |
+  /// | 70-80    | Some users dissatisfied       |
+  /// | 60-70    | Many users dissatisfied       |
+  /// | 50-60    | Nearly all users dissatisfied |
+  /// | <50      | All users dissatisfied        |
+  ///
+  ///
+  /// # Errors
+  ///
+  /// If the [`core::RoomHandleImpl::on_quality_score_update()`] method
+  /// errors.
+  ///
+  /// [P2P mesh]: https://webrtcglossary.com/mesh
+  /// [SFU]: https://webrtcglossary.com/sfu
+  /// [ITU-T G.107]: https://itu.int/rec/T-REC-G.107
+  /// [ICE]: https://webrtcglossary.com/ice
+  void onQualityScoreUpdate({required Object cb}) => RustLib.instance.api
+      .crateApiDartApiRoomRoomHandleOnQualityScoreUpdate(that: this, cb: cb);
 
   /// Updates this [`Room`]'s [`ApiMediaStreamSettings`].
   ///

@@ -6,6 +6,25 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.15.0] · 2026-04-??
+[0.15.0]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.15.0
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.14.1...medea-jason-0.15.0)
+
+See also [`medea_jason` pub package 0.15.0 changes](https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.15.0/flutter/CHANGELOG.md).
+
+### BC Breaks
+
+- `ConnectionHandle.onQualityScoreUpdate()` callback now provide a raw [ITU-T G.107] R-factor or `-1` when disconnected.
+- `ConnectionHandle.onQualityScoreUpdate()` now does not account for local peer connections state in [SFU] mode.
+
+### Added
+
+- `RoomHandle.onQualityScoreUpdate()` callback for room-level connection quality updates.
+
+
+
+
 ## [0.14.2] · 2026-04-07
 [0.14.2]: https://github.com/instrumentisto/medea-jason/tree/medea-jason-0.14.2
 
@@ -714,6 +733,7 @@ See [`medea_jason` pub package 0.9.1 changes](https://github.com/instrumentisto/
 
 [Cargo features]: https://doc.rust-lang.org/cargo/reference/features.html
 [Flutter]: https://flutter.dev
+[ITU-T G.107]: https://itu.int/rec/T-REC-G.107
 [MSRV]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
 [SFU]: https://webrtcglossary.com/sfu
 [Semantic Versioning 2.0.0]: https://semver.org
