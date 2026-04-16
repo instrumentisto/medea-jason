@@ -823,10 +823,10 @@ pub enum Event {
     /// Media Server notifies about connection quality score update.
     ConnectionQualityUpdated {
         /// Partner [`MemberId`] of the `Peer`.
-        partner_member_id: MemberId,
+        kind: ConnectionQualityUpdateKind,
 
         /// Estimated connection quality.
-        quality_score: ConnectionQualityScore,
+        quality: ConnectionQualityScore,
     },
 
     /// Media Server synchronizes Web Client state and reports the proper one.
@@ -1415,15 +1415,24 @@ pub struct Codec {
 #[cfg_attr(feature = "server", derive(Serialize))]
 #[derive(Clone, Copy, Debug, Display, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum ConnectionQualityScore {
-    /// Nearly all users dissatisfied.
-    Poor = 1,
+    /// Connection is up with the given [ITU-T G.107] R-factor.
+    ///
+    /// [ITU-T G.107]: https://itu.int/rec/T-REC-G.107
+    Connected(u8),
 
-    /// Many users dissatisfied.
-    Low = 2,
+    /// Connection is lost or quality is unavailable.
+    Disconnected,
+}
 
-    /// Some users dissatisfied.
-    Medium = 3,
+/// Target of a connection quality update in
+/// [`Event::ConnectionQualityUpdated`].
+#[cfg_attr(feature = "client", derive(Deserialize))]
+#[cfg_attr(feature = "server", derive(Serialize))]
+#[derive(Clone, Debug, Display, Eq, Hash, PartialEq)]
+pub enum ConnectionQualityUpdateKind {
+    /// Quality update applies to this member's own connection.
+    This,
 
-    /// Satisfied.
-    High = 4,
+    /// Quality update applies to the connection with the given remote member.
+    Partner(MemberId),
 }

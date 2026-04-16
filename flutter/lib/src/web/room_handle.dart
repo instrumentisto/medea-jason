@@ -137,6 +137,11 @@ class WebRoomHandle implements RoomHandle {
     fallibleFunction(() => obj.on_failed_local_media(fn.toJS));
   }
 
+  @override
+  void onQualityScoreUpdate(void Function(int) f) {
+    fallibleFunction(() => obj.on_quality_score_update(f.toJS));
+  }
+
   @moveSemantics
   @override
   void free() {

@@ -268,6 +268,7 @@ extension type RoomHandle._(JSObject _) implements JSObject {
   external void on_local_track(JSFunction cb);
   external void on_failed_local_media(JSFunction cb);
   external void on_connection_loss(JSFunction cb);
+  external void on_quality_score_update(JSFunction cb);
   external JSPromise<JSAny?> join(String token);
   external JSPromise<JSAny?> set_local_media_settings(
     MediaStreamSettings settings,

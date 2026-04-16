@@ -13,7 +13,7 @@ use futures::{
 };
 use medea_client_api_proto::{
     self as proto, ConnectionMode, ConnectionQualityScore, MemberId,
-    PeerConnectionState, PeerId, TrackId,
+    PeerConnectionState, TrackId,
 };
 use tracerr::Traced;
 
@@ -312,29 +312,6 @@ pub struct HandleDetachedError;
 #[derive(Clone, Debug)]
 pub struct ConnectionHandleImpl(Weak<InnerConnection>);
 
-/// Estimated [`Connection`]'s quality on the client side only.
-#[derive(Clone, Copy, Debug, Display, Eq, From, Ord, PartialEq, PartialOrd)]
-pub enum ClientConnectionQualityScore {
-    /// [`Connection`] is lost.
-    Disconnected,
-
-    /// [`Connection`] is established and scored.
-    Connected(ConnectionQualityScore),
-}
-
-impl ClientConnectionQualityScore {
-    /// Converts this [`ClientConnectionQualityScore`] into a [`u8`] number.
-    #[must_use]
-    pub const fn into_u8(self) -> u8 {
-        match self {
-            Self::Disconnected => 0,
-            // TODO: Replace with derive?
-            #[expect(clippy::as_conversions, reason = "needs refactoring")]
-            Self::Connected(score) => score as u8,
-        }
-    }
-}
-
 /// [`Connection`]'s state.
 #[derive(Clone, Copy, Debug, Eq, From, PartialEq)]
 pub enum MemberConnectionState {
@@ -353,17 +330,11 @@ struct InnerConnection {
     /// Remote `Member` ID.
     remote_id: MemberId,
 
-    /// Current [`ConnectionQualityScore`] of this [`Connection`].
+    /// Last quality estimate received from a server, if any.
     quality_score: Cell<Option<ConnectionQualityScore>>,
 
-    /// Current [`ClientConnectionQualityScore`] of this [`Connection`].
-    client_quality_score: Cell<Option<ClientConnectionQualityScore>>,
-
-    /// [`PeerConnectionState`] of each [`PeerConnection`] participating in this
-    /// [`Connection`], keyed by a [`PeerId`].
-    ///
-    /// [`PeerConnection`]: crate::peer::PeerConnection
-    peer_states: RefCell<HashMap<PeerId, PeerConnectionState>>,
+    /// Current [`MemberConnectionState`] of this [`Connection`].
+    state: Cell<Option<MemberConnectionState>>,
 
     /// Callback invoked when a [`remote::Track`] is received.
     on_remote_track_added: platform::Callback<api::RemoteMediaTrack>,
@@ -374,8 +345,13 @@ struct InnerConnection {
     /// All [`receiver::State`]s related to this [`InnerConnection`].
     receivers: RefCell<Vec<Rc<receiver::State>>>,
 
-    /// Callback invoked when a [`ConnectionQualityScore`] is updated.
-    on_quality_score_update: platform::Callback<u8>,
+    /// Last value delivered to `on_quality_score_update` callback, if any.
+    on_quality_score_update_last_val: Cell<Option<ConnectionQualityScore>>,
+
+    /// Callback invoked when a connection quality estimate is updated.
+    ///
+    /// Invoked with the R-factor as [`i32`], or `-1` when disconnected.
+    on_quality_score_update: platform::Callback<i32>,
 
     /// Callback invoked whenever the [`MemberConnectionState`] is updated.
     on_state_change: platform::Callback<api::MemberConnectionState>,
@@ -486,20 +462,10 @@ impl ConnectionHandleImpl {
         // TODO: `MemberConnectionState::SFU` isn't yet implemented.
         //       See instrumentisto/medea-jason#211 for the details:
         //       https://github.com/instrumentisto/medea-jason/issues/211
-        self.0.upgrade().ok_or_else(|| tracerr::new!(HandleDetachedError)).map(
-            |inner| {
-                (inner.connection_mode == ConnectionMode::Mesh)
-                    .then(|| {
-                        inner
-                            .peer_states
-                            .borrow()
-                            .values()
-                            .next()
-                            .map(|&s| MemberConnectionState::P2P(s))
-                    })
-                    .flatten()
-            },
-        )
+        self.0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(HandleDetachedError))
+            .map(|inner| inner.state.get())
     }
 
     /// Sets callback, invoked when a new [`MemberConnectionState`] is set in
@@ -542,7 +508,7 @@ impl ConnectionHandleImpl {
     /// See [`HandleDetachedError`] for details.
     pub fn on_quality_score_update(
         &self,
-        f: platform::Function<u8>,
+        f: platform::Function<i32>,
     ) -> Result<(), Traced<HandleDetachedError>> {
         self.0
             .upgrade()
@@ -705,8 +671,8 @@ impl Connection {
             ],
             remote_id,
             quality_score: Cell::default(),
-            client_quality_score: Cell::default(),
-            peer_states: RefCell::default(),
+            state: Cell::default(),
+            on_quality_score_update_last_val: Cell::default(),
             on_quality_score_update: platform::Callback::default(),
             on_state_change: platform::Callback::default(),
             recv_constraints,
@@ -789,54 +755,76 @@ impl Connection {
     }
 
     /// Updates the [`PeerConnectionState`] of this [`Connection`].
-    pub fn update_peer_state(
-        &self,
-        peer_id: PeerId,
-        state: PeerConnectionState,
-    ) {
-        let old = self.0.peer_states.borrow_mut().insert(peer_id, state);
-        if old == Some(state) {
+    pub fn update_peer_state(&self, state: PeerConnectionState) {
+        if self.0.connection_mode != ConnectionMode::Mesh {
+            // TODO: `MemberConnectionState::SFU` isn't yet implemented.
+            //       See instrumentisto/medea-jason#211 for the details:
+            //       https://github.com/instrumentisto/medea-jason/issues/211
+            return;
+        }
+
+        let state = state.into();
+
+        if self.0.state.replace(Some(state)) == Some(state) {
             return;
         }
 
         self.refresh_client_conn_quality_score();
-        if self.0.connection_mode == ConnectionMode::Mesh {
-            self.0.on_state_change.call1::<api::MemberConnectionState>(
-                MemberConnectionState::P2P(state).into(),
-            );
-        } else {
-            // TODO: `MemberConnectionState::SFU` isn't yet implemented.
-            //       See instrumentisto/medea-jason#211 for the details:
-            //       https://github.com/instrumentisto/medea-jason/issues/211
-        }
+
+        self.0
+            .on_state_change
+            .call1::<api::MemberConnectionState>(state.into());
     }
 
     /// Refreshes the [`ClientConnectionQualityScore`] of this [`Connection`].
     fn refresh_client_conn_quality_score(&self) {
+        use MemberConnectionState as M;
         use PeerConnectionState as S;
 
-        let peer_states = self.0.peer_states.borrow();
         let quality_score = self.0.quality_score.get();
-        let score = if peer_states.is_empty() {
-            return;
-        } else if peer_states
-            .values()
-            .any(|s| matches!(s, S::Disconnected | S::Failed | S::Closed))
-        {
-            ClientConnectionQualityScore::Disconnected
-        } else if peer_states.values().all(|s| matches!(s, S::Connected)) {
-            match quality_score {
-                Some(qs) => qs.into(),
-                None => return,
+        let effective_quality = match self.0.connection_mode {
+            ConnectionMode::Sfu => quality_score,
+            ConnectionMode::Mesh => {
+                let state = self.0.state.get();
+                match (state, quality_score) {
+                    (Some(M::P2P(S::Connected)), Some(quality_score)) => {
+                        Some(quality_score)
+                    }
+                    (
+                        Some(M::P2P(S::Disconnected | S::Failed | S::Closed)),
+                        _,
+                    ) => {
+                        // Treat local peer disconnected same as
+                        // `ConnectionQualityScore::Disconnected`.
+                        Some(ConnectionQualityScore::Disconnected)
+                    }
+                    (Some(M::P2P(S::Connecting | S::New)) | None, _)
+                    | (Some(M::P2P(S::Connected)), None) => None,
+                }
             }
-        } else {
-            return;
         };
 
-        let is_score_changed =
-            self.0.client_quality_score.replace(Some(score)) != Some(score);
+        let Some(effective_quality) = effective_quality else {
+            return;
+        };
+        let is_score_changed = self
+            .0
+            .on_quality_score_update_last_val
+            .replace(Some(effective_quality))
+            != Some(effective_quality);
         if is_score_changed {
-            self.0.on_quality_score_update.call1(score.into_u8());
+            self.0
+                .on_quality_score_update
+                .call1(quality_to_int(effective_quality));
         }
+    }
+}
+
+/// Converts [`ConnectionQualityScore`].
+#[must_use]
+pub fn quality_to_int(score: ConnectionQualityScore) -> i32 {
+    match score {
+        ConnectionQualityScore::Connected(r) => i32::from(r),
+        ConnectionQualityScore::Disconnected => -1,
     }
 }

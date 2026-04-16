@@ -50,7 +50,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -91957164;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1118835089;
 
 // Section: executor
 
@@ -1666,6 +1666,29 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
  let output_ok = crate::api::dart::api::room::RoomHandle::on_new_connection(&*api_that_guard, api_cb)?;   Ok(output_ok)
                 })()) })
 }
+fn wire__crate__api__dart__api__room__RoomHandle_on_quality_score_update_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "RoomHandle_on_quality_score_update", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RoomHandle>>>::sse_decode(&mut deserializer);
+let api_cb = <flutter_rust_bridge::DartOpaque>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, flutter_rust_bridge::DartOpaque>((move || {
+                    let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = crate::api::dart::api::room::RoomHandle::on_quality_score_update(&*api_that_guard, api_cb)?;   Ok(output_ok)
+                })()) })
+}
 fn wire__crate__api__dart__api__room__RoomHandle_set_local_media_settings_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -3028,18 +3051,19 @@ fn pde_ffi_dispatcher_sync_impl(
 72 => wire__crate__api__dart__api__room__RoomHandle_on_failed_local_media_impl(ptr, rust_vec_len, data_len),
 73 => wire__crate__api__dart__api__room__RoomHandle_on_local_track_impl(ptr, rust_vec_len, data_len),
 74 => wire__crate__api__dart__api__room__RoomHandle_on_new_connection_impl(ptr, rust_vec_len, data_len),
-75 => wire__crate__api__dart__api__room__RoomHandle_set_local_media_settings_impl(ptr, rust_vec_len, data_len),
-76 => wire__crate__api__dart__api__room__RoomHandle_unmute_audio_impl(ptr, rust_vec_len, data_len),
-77 => wire__crate__api__dart__api__room__RoomHandle_unmute_video_impl(ptr, rust_vec_len, data_len),
-79 => wire__crate__api__dart__api__log_dart_exception_impl(ptr, rust_vec_len, data_len),
-80 => wire__crate__api__dart__api__member_connection_state__member_connection_state_from_ptr_impl(ptr, rust_vec_len, data_len),
-81 => wire__crate__api__dart__api__on_panic_impl(ptr, rust_vec_len, data_len),
-82 => wire__crate__api__dart__api__room_close_reason__room_close_reason_from_ptr_impl(ptr, rust_vec_len, data_len),
-83 => wire__crate__api__dart__api__set_dart_opaque_message_port_impl(ptr, rust_vec_len, data_len),
-84 => wire__crate__api__dart__api__set_log_level_impl(ptr, rust_vec_len, data_len),
-85 => wire__crate__api__dart__api__local_media_track__vec_local_tracks_from_raw_impl(ptr, rust_vec_len, data_len),
-86 => wire__crate__api__dart__api__vec_media_device_details_from_raw_impl(ptr, rust_vec_len, data_len),
-87 => wire__crate__api__dart__api__vec_media_display_details_from_raw_impl(ptr, rust_vec_len, data_len),
+75 => wire__crate__api__dart__api__room__RoomHandle_on_quality_score_update_impl(ptr, rust_vec_len, data_len),
+76 => wire__crate__api__dart__api__room__RoomHandle_set_local_media_settings_impl(ptr, rust_vec_len, data_len),
+77 => wire__crate__api__dart__api__room__RoomHandle_unmute_audio_impl(ptr, rust_vec_len, data_len),
+78 => wire__crate__api__dart__api__room__RoomHandle_unmute_video_impl(ptr, rust_vec_len, data_len),
+80 => wire__crate__api__dart__api__log_dart_exception_impl(ptr, rust_vec_len, data_len),
+81 => wire__crate__api__dart__api__member_connection_state__member_connection_state_from_ptr_impl(ptr, rust_vec_len, data_len),
+82 => wire__crate__api__dart__api__on_panic_impl(ptr, rust_vec_len, data_len),
+83 => wire__crate__api__dart__api__room_close_reason__room_close_reason_from_ptr_impl(ptr, rust_vec_len, data_len),
+84 => wire__crate__api__dart__api__set_dart_opaque_message_port_impl(ptr, rust_vec_len, data_len),
+85 => wire__crate__api__dart__api__set_log_level_impl(ptr, rust_vec_len, data_len),
+86 => wire__crate__api__dart__api__local_media_track__vec_local_tracks_from_raw_impl(ptr, rust_vec_len, data_len),
+87 => wire__crate__api__dart__api__vec_media_device_details_from_raw_impl(ptr, rust_vec_len, data_len),
+88 => wire__crate__api__dart__api__vec_media_display_details_from_raw_impl(ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }

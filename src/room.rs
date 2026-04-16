@@ -1,7 +1,7 @@
 //! Medea [`Room`].
 
 use std::{
-    cell::RefCell,
+    cell::{Cell, RefCell},
     collections::{HashMap, HashSet},
     rc::{Rc, Weak},
 };
@@ -14,17 +14,18 @@ use futures::{
     future::LocalBoxFuture,
 };
 use medea_client_api_proto::{
-    self as proto, Command, ConnectionQualityScore, Event as RpcEvent,
-    EventHandler, IceCandidate, IceConnectionState, IceServer, MemberId,
-    NegotiationRole, PeerConnectionError, PeerConnectionState, PeerId,
-    PeerMetrics, PeerUpdate, Track, TrackId,
+    self as proto, Command, ConnectionQualityScore,
+    ConnectionQualityUpdateKind, Event as RpcEvent, EventHandler, IceCandidate,
+    IceConnectionState, IceServer, MemberId, NegotiationRole,
+    PeerConnectionError, PeerConnectionState, PeerId, PeerMetrics, PeerUpdate,
+    Track, TrackId,
 };
 use proto::{ConnectionMode, IceCandidateError};
 use tracerr::Traced;
 
 use crate::{
     api,
-    connection::Connections,
+    connection::{Connections, quality_to_int},
     media::{
         InitLocalTracksError, LocalTracksConstraints, MediaKind, MediaManager,
         MediaSourceKind, MediaStreamSettings, RecvConstraints,
@@ -321,6 +322,20 @@ impl RoomHandleImpl {
         f: platform::Function<api::ReconnectHandle>,
     ) -> Result<(), Traced<HandleDetachedError>> {
         upgrade_inner!(self.0).map(|inner| inner.on_connection_loss.set_func(f))
+    }
+
+    /// Sets callback, invoked when a room-level connection quality score is
+    /// updated by a media server.
+    ///
+    /// # Errors
+    ///
+    /// See [`HandleDetachedError`] for details.
+    pub fn on_quality_score_update(
+        &self,
+        f: platform::Function<i32>,
+    ) -> Result<(), Traced<HandleDetachedError>> {
+        upgrade_inner!(self.0)
+            .map(|inner| inner.on_quality_score_update.set_func(f))
     }
 
     /// Updates this [`Room`]s [`MediaStreamSettings`]. This affects all
@@ -1001,6 +1016,24 @@ struct InnerRoom {
     /// Callback invoked when a [`RpcSession`] loses connection.
     on_connection_loss: platform::Callback<api::ReconnectHandle>,
 
+    /// Last server-published score for this member's own connection in an
+    /// [SFU] room.
+    ///
+    /// [SFU]: https://webrtcglossary.com/sfu
+    sfu_room_server_quality: Cell<Option<ConnectionQualityScore>>,
+
+    /// Last room-level quality score delivered to
+    /// [`on_quality_score_update`].
+    sfu_room_client_quality_score: Cell<Option<ConnectionQualityScore>>,
+
+    /// Callback invoked when a room-level connection quality score is updated
+    /// by a media server. Only called in [SFU] mode.
+    ///
+    /// Invoked with the R-factor as [`i32`], or `-1` when disconnected.
+    ///
+    /// [SFU]: https://webrtcglossary.com/sfu
+    on_quality_score_update: platform::Callback<i32>,
+
     /// Callback invoked when this [`Room`] is closed.
     on_close: Rc<platform::Callback<api::RoomCloseReason>>,
 
@@ -1138,6 +1171,9 @@ impl InnerRoom {
             recv_constraints,
             connections,
             on_connection_loss: platform::Callback::default(),
+            on_quality_score_update: platform::Callback::default(),
+            sfu_room_server_quality: Cell::default(),
+            sfu_room_client_quality_score: Cell::default(),
             on_failed_local_media: Rc::new(platform::Callback::default()),
             on_local_track: platform::Callback::default(),
             on_close: Rc::new(platform::Callback::default()),
@@ -1145,6 +1181,82 @@ impl InnerRoom {
                 reason: ClientDisconnect::RoomUnexpectedlyDropped,
             }),
         }
+    }
+
+    /// Returns whether this [`Room`] has at least one SFU-mode
+    /// [`PeerConnection`].
+    #[must_use]
+    fn is_sfu_topology_room(&self) -> bool {
+        self.peers
+            .state()
+            .all()
+            .iter()
+            .any(|s| s.connection_mode() == ConnectionMode::Sfu)
+    }
+
+    /// Emits room-level SFU quality callback if effective quality changed.
+    fn emit_sfu_room_quality_if_changed(
+        &self,
+        effective: ConnectionQualityScore,
+    ) {
+        let is_changed =
+            self.sfu_room_client_quality_score.replace(Some(effective))
+                != Some(effective);
+        if is_changed {
+            self.on_quality_score_update.call1(quality_to_int(effective));
+        }
+    }
+
+    /// Recomputes the room-level quality signal in an SFU topology from SFU
+    /// [`PeerConnection`] states and the last server score for
+    /// [`ConnectionQualityUpdateKind::This`].
+    fn refresh_sfu_room_quality_score(&self) {
+        use PeerConnectionState as Pcs;
+
+        if !self.is_sfu_topology_room() {
+            return;
+        }
+
+        let sfu_ids: Vec<PeerId> = self
+            .peers
+            .state()
+            .all()
+            .into_iter()
+            .filter(|s| s.connection_mode() == ConnectionMode::Sfu)
+            .map(|s| s.id())
+            .collect();
+
+        if sfu_ids.is_empty() {
+            return;
+        }
+
+        let sfu_states: Option<Vec<PeerConnectionState>> = sfu_ids
+            .iter()
+            .map(|id| self.peers.get(*id).map(|peer| peer.connection_state()))
+            .collect();
+        let Some(sfu_states) = sfu_states else {
+            return;
+        };
+
+        let any_bad = sfu_states.iter().any(|s| {
+            matches!(s, Pcs::Disconnected | Pcs::Failed | Pcs::Closed)
+        });
+
+        let all_connected =
+            sfu_states.iter().all(|s| matches!(s, Pcs::Connected));
+
+        let effective = if any_bad {
+            ConnectionQualityScore::Disconnected
+        } else if all_connected {
+            let Some(q) = self.sfu_room_server_quality.get() else {
+                return;
+            };
+            q
+        } else {
+            return;
+        };
+
+        self.emit_sfu_room_quality_if_changed(effective);
     }
 
     /// Toggles [`InnerRoom::recv_constraints`] or
@@ -1631,6 +1743,7 @@ impl EventHandler for InnerRoom {
         for id in peer_ids {
             self.peers.state().remove(id);
         }
+        self.refresh_sfu_room_quality_score();
         Ok(())
     }
 
@@ -1683,11 +1796,23 @@ impl EventHandler for InnerRoom {
     /// [1]: crate::connection::Connection::update_quality_score
     async fn on_connection_quality_updated(
         &self,
-        partner_member_id: MemberId,
-        quality_score: ConnectionQualityScore,
+        kind: ConnectionQualityUpdateKind,
+        quality: ConnectionQualityScore,
     ) -> Self::Output {
-        if let Some(conn) = self.connections.get(&partner_member_id) {
-            conn.update_quality_score(quality_score);
+        match kind {
+            ConnectionQualityUpdateKind::This => {
+                if self.is_sfu_topology_room() {
+                    self.sfu_room_server_quality.set(Some(quality));
+                    self.refresh_sfu_room_quality_score();
+                } else {
+                    // Room.on_quality_score_update is only called in SFU mode.
+                }
+            }
+            ConnectionQualityUpdateKind::Partner(partner_member_id) => {
+                if let Some(conn) = self.connections.get(&partner_member_id) {
+                    conn.update_quality_score(quality);
+                }
+            }
         }
         Ok(())
     }
@@ -1866,8 +1991,12 @@ impl PeerEventHandler for InnerRoom {
             .into_iter()
             .flat_map(|track_id| self.connections.iter_by_track(&track_id))
             .for_each(|conn| {
-                conn.update_peer_state(peer_id, peer_connection_state);
+                conn.update_peer_state(peer_connection_state);
             });
+
+        if peer_state.connection_mode() == ConnectionMode::Sfu {
+            self.refresh_sfu_room_quality_score();
+        }
 
         Ok(())
     }
